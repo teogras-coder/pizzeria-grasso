@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Lato:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+
+    --background: 30 30% 5%;
+    --foreground: 35 30% 90%;
+    --card: 30 25% 12%;
+    --card-foreground: 35 30% 90%;
+    --popover: 30 25% 10%;
+    --popover-foreground: 35 30% 90%;
+    --primary: 37 45% 58%;
+    --primary-foreground: 30 30% 5%;
+    --secondary: 25 50% 24%;
+    --secondary-foreground: 35 40% 88%;
+    --muted: 30 15% 18%;
+    --muted-foreground: 35 15% 55%;
+    --accent: 35 55% 78%;
+    --accent-foreground: 30 30% 8%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 20% 20%;
+    --input: 30 20% 20%;
+    --ring: 37 45% 58%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
+}
