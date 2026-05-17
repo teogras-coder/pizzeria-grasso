@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer({ cartCount }) {
@@ -16,7 +16,7 @@ export default function Footer({ cartCount }) {
         <span className="font-body text-[10px] text-muted-foreground">Manfredonia, Tel. 0884 660377</span>
       </div>
       
-      {/* PALLINO STATO + CARRELLO */}
+      {/* PALLINO STATO + ADMIN + CARRELLO */}
       <div className="flex items-center gap-2">
         {/* Pallino stato */}
         {isOpen ? (
@@ -30,6 +30,15 @@ export default function Footer({ cartCount }) {
             <span className="font-body text-[10px] text-destructive font-bold">Chiusi</span>
           </div>
         )}
+        
+        {/* LINK ADMIN - NUOVO! */}
+        <Link
+          to="/admin-pin"
+          className="bg-background/50 hover:bg-background border border-border rounded-full p-2 transition-colors"
+          title="Area Admin"
+        >
+          <Settings className="w-4 h-4 text-muted-foreground" />
+        </Link>
         
         <Link
           to="/carrello"
