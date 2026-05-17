@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSettings } from '@/lib/apiClient';
 import { Lock, ArrowLeft } from 'lucide-react';
+
+const ADMIN_PIN = '1980'; // PIN fisso per ora
 
 export default function AdminPin() {
   const [pin, setPin] = useState('');
@@ -10,10 +11,7 @@ export default function AdminPin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const settings = getSettings();
-    const correctPin = settings.pin || '1980';
-
-    if (pin === correctPin) {
+    if (pin === ADMIN_PIN) {
       localStorage.setItem('admin_auth', 'true');
       navigate('/admin');
     } else {
