@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Store, Clock } from 'lucide-react';
+import { Store, Clock, Lock } from 'lucide-react';
+import PinSettings from './PinSettings';
 
 export default function SettingsPanel() {
   const [isOpen, setIsOpen] = useState(() => {
@@ -20,6 +21,7 @@ export default function SettingsPanel() {
         Impostazioni
       </h2>
 
+      {/* CARD TOGGLE APERTO/CHIUSO */}
       <div className="bg-card rounded-xl border border-border p-4">
         <div className="flex items-center gap-2 mb-3">
           <Clock className="w-5 h-5 text-primary" />
@@ -49,6 +51,9 @@ export default function SettingsPanel() {
             : 'I clienti vedranno un avviso di chiusura.'}
         </p>
       </div>
+
+      {/* CARD CAMBIA PIN */}
+      <PinSettings />
     </div>
   );
 }
