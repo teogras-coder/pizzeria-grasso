@@ -4,6 +4,7 @@ import OrderCard from '@/components/admin/OrderCard';
 import MenuManager from '@/components/admin/MenuManager';
 import SettingsPanel from '@/components/admin/SettingsPanel';
 import CouponManager from '@/components/admin/CouponManager';
+import CategoryManager from '@/components/admin/CategoryManager';
 import { getOrders } from '@/lib/apiClient';
 
 export default function Admin() {
@@ -49,6 +50,7 @@ export default function Admin() {
         )}
         {activeTab === 'menu' && <MenuManager />}
         {activeTab === 'coupon' && <CouponManager />}
+        {activeTab === 'categorie' && <CategoryManager />}
         {activeTab === 'impostazioni' && <SettingsPanel />}
       </div>
     </div>
