@@ -29,23 +29,23 @@ export default function Home() {
     <div className="min-h-screen bg-background pb-24">
       <Header />
       
-      {/* SCRITTA SENZA CASELLA - più in alto */}
+      {/* SCRITTA PIÙ IN SU */}
       {!isOpen && (
-        <div className="mx-4 mt-4 text-center">
+        <div className="mx-4 mt-6 mb-2 text-center">
           <p className="text-destructive font-body text-sm font-bold">
             🔴 Siamo chiusi
           </p>
         </div>
       )}
       {isOpen && (
-        <div className="mx-4 mt-4 text-center">
+        <div className="mx-4 mt-6 mb-2 text-center">
           <p className="text-green-400 font-body text-sm font-bold">
             🟢 Siamo aperti
           </p>
         </div>
       )}
 
-      <div className="px-4 space-y-3 -mt-4 relative z-10">
+      <div className="px-4 space-y-3 relative z-10">
         {categories.map((cat) => <CategoryCard key={cat.title} {...cat} />)}
       </div>
       <div className="px-4 mt-4 space-y-2">
