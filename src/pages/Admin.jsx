@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import OrderCard from '@/components/admin/OrderCard';
 import MenuManager from '@/components/admin/MenuManager';
+import SettingsPanel from '@/components/admin/SettingsPanel';
 import { getOrders } from '@/lib/apiClient';
 
 export default function Admin() {
@@ -46,6 +47,7 @@ export default function Admin() {
           </div>
         )}
         {activeTab === 'menu' && <MenuManager />}
+        {activeTab === 'impostazioni' && <SettingsPanel />}
       </div>
     </div>
   );
