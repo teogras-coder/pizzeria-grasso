@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// Funzioni coupon inline (senza import esterno per test)
 const getCoupons = () => {
   const raw = localStorage.getItem('pizzeria_coupons');
   return raw ? JSON.parse(raw) : [];
@@ -16,7 +15,6 @@ const createCoupon = (data) => {
     isActive: true,
   };
   localStorage.setItem('pizzeria_coupons', JSON.stringify([...coupons, newCoupon]));
-  return newCoupon;
 };
 
 const updateCoupon = (id, data) => {
