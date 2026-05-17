@@ -18,18 +18,32 @@ export default function Header() {
 
   return (
     <div className="relative">
+      {/* IMMAGINE PRINCIPALE */}
       <img 
         src={mainImage} 
         alt="Antica Pizzeria Grasso"
-        className="w-full h-48 object-cover"
+        className="w-full h-40 object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-      <div className="absolute bottom-4 left-4 right-4">
-        <h1 className="font-heading text-2xl font-bold text-primary-foreground drop-shadow-lg">
-          Antica Pizzeria Grasso
-        </h1>
-        <p className="font-body text-sm text-primary-foreground/80 drop-shadow">
-          Manfredonia (FG) - Via Antiche Mura Otto
+      
+      {/* SFUMATURA SCURA PER LEGGERE IL TESTO */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      
+      {/* LOGO E TESTO IN ALTO A SINISTRA */}
+      <div className="absolute top-4 left-4">
+        <div className="bg-primary/90 backdrop-blur-sm rounded-lg px-3 py-2">
+          <h1 className="font-heading text-lg font-bold text-primary-foreground">
+            🍕 Antica Pizzeria Grasso
+          </h1>
+        </div>
+      </div>
+      
+      {/* INDIRIZZO IN BASSO */}
+      <div className="absolute bottom-3 left-4 right-4">
+        <p className="font-body text-xs text-white/90 drop-shadow">
+          📍 Via Antiche Mura Otto, 71043 Manfredonia (FG)
+        </p>
+        <p className="font-body text-xs text-white/70 drop-shadow">
+          📞 0884 660377
         </p>
       </div>
     </div>
