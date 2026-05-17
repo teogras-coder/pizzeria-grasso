@@ -29,18 +29,18 @@ export default function Home() {
     <div className="min-h-screen bg-background pb-24">
       <Header />
       
-      {/* BANNER APERTO/CHIUSO */}
+      {/* BANNER COMPATTO - solo scritta */}
       {!isOpen && (
-        <div className="mx-4 mt-2 bg-destructive/20 border border-destructive/40 rounded-lg p-3 text-center">
-          <p className="text-destructive font-body text-sm font-bold">
-            🔴 Al momento siamo chiusi. Gli ordini verranno elaborati all'apertura.
+        <div className="mx-4 mt-1 bg-destructive/15 border border-destructive/30 rounded-md py-1.5 px-2 text-center">
+          <p className="text-destructive font-body text-xs font-bold">
+            🔴 Siamo chiusi
           </p>
         </div>
       )}
       {isOpen && (
-        <div className="mx-4 mt-2 bg-green-900/30 border border-green-600/40 rounded-lg p-3 text-center">
-          <p className="text-green-400 font-body text-sm font-bold">
-            🟢 Siamo aperti! Ordina ora.
+        <div className="mx-4 mt-1 bg-green-900/20 border border-green-600/30 rounded-md py-1.5 px-2 text-center">
+          <p className="text-green-400 font-body text-xs font-bold">
+            🟢 Siamo aperti
           </p>
         </div>
       )}
