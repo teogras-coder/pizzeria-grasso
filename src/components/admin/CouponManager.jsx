@@ -176,4 +176,23 @@ export default function CouponManager() {
                 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => toggle
+                    onClick={() => toggleActive(coupon.id, coupon.isActive)}
+                    className="text-xs px-2 py-1 rounded-md bg-background/50 hover:bg-background"
+                  >
+                    {coupon.isActive ? 'Disattiva' : 'Attiva'}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(coupon.id)}
+                    className="text-xs px-2 py-1 rounded-md bg-destructive/20 text-destructive hover:bg-destructive/30"
+                  >
+                    Elimina
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
