@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowLeft } from 'lucide-react';
 
-const ADMIN_PIN = '1980'; // PIN fisso per ora
-
 export default function AdminPin() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+
+  // Legge il PIN salvato, se non c'è usa '1980' di default
+  const ADMIN_PIN = localStorage.getItem('admin_pin') || '1980';
 
   const handleSubmit = (e) => {
     e.preventDefault();
