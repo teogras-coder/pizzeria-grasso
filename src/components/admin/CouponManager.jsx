@@ -76,6 +76,13 @@ export default function CouponManager() {
     }
   };
 
+  // Funzione sicura per formattare il valore
+  const formatValue = (val, type) => {
+    if (val === undefined || val === null || isNaN(val)) return '0';
+    if (type === 'percent') return `${val}%`;
+    return `€${parseFloat(val).toFixed(2)}`;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -162,30 +169,11 @@ export default function CouponManager() {
                   </div>
                   <p className="text-xs text-muted-foreground font-body">
                     {coupon.description || 'Nessuna descrizione'} • 
-                    {coupon.discountType === 'percent' ? ` ${coupon.value}%` : ` €${coupon.value.toFixed(2)}`} • 
-                    Usato {coupon.usedCount}x{coupon.maxUses ? ` / ${coupon.maxUses}` : ''}
+                    {formatValue(coupon.value, coupon.discountType)} • 
+                    Usato {coupon.usedCount || 0}x{coupon.maxUses ? ` / ${coupon.maxUses}` : ''}
                   </p>
                 </div>
                 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => toggleActive(coupon.id, coupon.isActive)}
-                    className="text-xs px-2 py-1 rounded-md bg-background/50 hover:bg-background"
-                  >
-                    {coupon.isActive ? 'Disattiva' : 'Attiva'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(coupon.id)}
-                    className="text-xs px-2 py-1 rounded-md bg-destructive/20 text-destructive hover:bg-destructive/30"
-                  >
-                    Elimina
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
+                    onClick={() => toggle
