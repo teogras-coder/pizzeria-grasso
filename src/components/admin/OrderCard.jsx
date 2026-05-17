@@ -1,7 +1,7 @@
 import React from 'react';
 import { updateOrder } from '@/lib/apiClient';
 import { format } from 'date-fns';
-import { Phone, MapPin, Clock, User } from 'lucide-react';
+import { Phone, MapPin, Clock, User, Hash } from 'lucide-react';
 
 const statusColors = {
   nuovo: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -28,20 +28,31 @@ export default function OrderCard({ order, onUpdate }) {
   return (
     <div className="bg-card/80 rounded-xl border border-primary/15 p-4 space-y-3">
       <div className="flex justify-between items-start">
-        <div>
+        <div className="w-full">
+          {/* NUMERO ORDINE + DATA/ORA */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Hash className="w-4 h-4 text-primary" />
+              <span className="font-heading text-lg font-bold text-primary">
+                Ordine #{order.orderNumber || '---'}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="w-3 h-3" />
+              <span>{order.orderTime || (order.created_date ? format(new Date(order.created_date), 'dd/MM/yyyy HH:mm') : '')}</span>
+            </div>
+          </div>
+          
           <div className="flex items-center gap-2 mb-1">
             <User className="w-3 h-3 text-primary" />
             <span className="font-heading text-sm font-bold text-accent">{order.customer_name}</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock className="w-3 h-3" />
-            <span>{order.created_date ? format(new Date(order.created_date), 'dd/MM HH:mm') : ''}</span>
           </div>
         </div>
         <span className={`px-2 py-1 rounded-full text-xs font-body border ${statusColors[order.status]}`}>
           {statusLabels[order.status]}
         </span>
       </div>
+      
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <Phone className="w-3 h-3" /> {order.customer_phone}
@@ -52,6 +63,7 @@ export default function OrderCard({ order, onUpdate }) {
           </span>
         )}
       </div>
+      
       <div className="bg-background/50 rounded-lg p-2 space-y-1">
         {order.items?.map((item, idx) => (
           <div key={idx} className="flex justify-between text-xs font-body">
@@ -60,11 +72,13 @@ export default function OrderCard({ order, onUpdate }) {
           </div>
         ))}
       </div>
+      
       {order.notes && (
         <p className="text-xs text-muted-foreground italic bg-background/30 rounded p-2">
           📝 {order.notes}
         </p>
       )}
+      
       <div className="flex justify-between items-center pt-1">
         <span className="font-heading text-sm font-bold text-primary">
           Totale: €{order.total?.toFixed(2)}
