@@ -29,17 +29,17 @@ export default function Home() {
     <div className="min-h-screen bg-background pb-24">
       <Header />
       
-      {/* SCRITTA SENZA CASELLA */}
+      {/* SCRITTA SENZA CASELLA - più in alto */}
       {!isOpen && (
-        <div className="mx-4 mt-1 text-center">
-          <p className="text-destructive font-body text-xs font-bold">
+        <div className="mx-4 mt-4 text-center">
+          <p className="text-destructive font-body text-sm font-bold">
             🔴 Siamo chiusi
           </p>
         </div>
       )}
       {isOpen && (
-        <div className="mx-4 mt-1 text-center">
-          <p className="text-green-400 font-body text-xs font-bold">
+        <div className="mx-4 mt-4 text-center">
+          <p className="text-green-400 font-body text-sm font-bold">
             🟢 Siamo aperti
           </p>
         </div>
