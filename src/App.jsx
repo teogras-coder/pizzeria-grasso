@@ -10,7 +10,7 @@ import Cart from '@/pages/Cart';
 import Admin from '@/pages/Admin';
 import AdminPin from '@/pages/AdminPin';
 import { seedDemoData } from '@/lib/apiClient';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // Protezione route admin - controlla se autenticato
 function AdminRoute() {
@@ -19,6 +19,18 @@ function AdminRoute() {
 }
 
 const AuthenticatedApp = () => {
+  // STATO APERTO/CHIUSO - salvato in localStorage
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = localStorage.getItem('pizzeria_isOpen');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const toggleOpen = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    localStorage.setItem('pizzeria_isOpen', JSON.stringify(newState));
+  };
+
   useEffect(() => {
     seedDemoData();
   }, []);
