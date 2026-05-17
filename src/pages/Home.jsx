@@ -29,16 +29,16 @@ export default function Home() {
     <div className="min-h-screen bg-background pb-24">
       <Header />
       
-      {/* BANNER COMPATTO - solo scritta */}
+      {/* SCRITTA SENZA CASELLA */}
       {!isOpen && (
-        <div className="mx-4 mt-1 bg-destructive/15 border border-destructive/30 rounded-md py-1.5 px-2 text-center">
+        <div className="mx-4 mt-1 text-center">
           <p className="text-destructive font-body text-xs font-bold">
             🔴 Siamo chiusi
           </p>
         </div>
       )}
       {isOpen && (
-        <div className="mx-4 mt-1 bg-green-900/20 border border-green-600/30 rounded-md py-1.5 px-2 text-center">
+        <div className="mx-4 mt-1 text-center">
           <p className="text-green-400 font-body text-xs font-bold">
             🟢 Siamo aperti
           </p>
