@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ClipboardList, UtensilsCrossed, Settings } from 'lucide-react';
+import { ArrowLeft, ClipboardList, UtensilsCrossed, Settings, Tag } from 'lucide-react';
 
 const tabs = [
   { id: 'ordini', label: 'Ordini', icon: ClipboardList },
   { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
+  { id: 'coupon', label: 'Coupon', icon: Tag },
   { id: 'impostazioni', label: 'Impostazioni', icon: Settings },
 ];
 
