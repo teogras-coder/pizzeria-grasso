@@ -3,6 +3,7 @@ import AdminHeader from '@/components/admin/AdminHeader';
 import OrderCard from '@/components/admin/OrderCard';
 import MenuManager from '@/components/admin/MenuManager';
 import SettingsPanel from '@/components/admin/SettingsPanel';
+import CouponManager from '@/components/admin/CouponManager';
 import { getOrders } from '@/lib/apiClient';
 
 export default function Admin() {
@@ -47,6 +48,7 @@ export default function Admin() {
           </div>
         )}
         {activeTab === 'menu' && <MenuManager />}
+        {activeTab === 'coupon' && <CouponManager />}
         {activeTab === 'impostazioni' && <SettingsPanel />}
       </div>
     </div>
