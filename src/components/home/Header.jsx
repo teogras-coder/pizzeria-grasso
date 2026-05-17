@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Settings } from 'lucide-react';
 
 const MAIN_IMAGE_KEY = 'pizzeria_main_image';
 const defaultMainImage = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80';
@@ -22,28 +24,37 @@ export default function Header() {
       <img 
         src={mainImage} 
         alt="Antica Pizzeria Grasso"
-        className="w-full h-40 object-cover"
+        className="w-full h-36 object-cover"
       />
       
-      {/* SFUMATURA SCURA PER LEGGERE IL TESTO */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      {/* SFUMATURA */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
       
-      {/* LOGO E TESTO IN ALTO A SINISTRA */}
-      <div className="absolute top-4 left-4">
-        <div className="bg-primary/90 backdrop-blur-sm rounded-lg px-3 py-2">
-          <h1 className="font-heading text-lg font-bold text-primary-foreground">
-            🍕 Antica Pizzeria Grasso
+      {/* LOGO E NOME IN ALTO A SINISTRA */}
+      <div className="absolute top-3 left-3">
+        <div className="bg-primary/80 backdrop-blur-sm rounded-lg px-3 py-2">
+          <h1 className="font-heading text-base font-bold text-primary-foreground">
+            🍕 Antica Pizzeria
           </h1>
+          <p className="font-heading text-xs font-bold text-primary-foreground/90">
+            Grasso
+          </p>
         </div>
       </div>
       
+      {/* LINK ADMIN IN ALTO A DESTRA - CLICCABILE! */}
+      <Link 
+        to="/admin-pin"
+        className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background border border-border rounded-lg px-3 py-2 flex items-center gap-1.5 transition-colors"
+      >
+        <Settings className="w-4 h-4 text-primary" />
+        <span className="font-body text-xs font-bold text-foreground">Admin</span>
+      </Link>
+      
       {/* INDIRIZZO IN BASSO */}
-      <div className="absolute bottom-3 left-4 right-4">
-        <p className="font-body text-xs text-white/90 drop-shadow">
-          📍 Via Antiche Mura Otto, 71043 Manfredonia (FG)
-        </p>
-        <p className="font-body text-xs text-white/70 drop-shadow">
-          📞 0884 660377
+      <div className="absolute bottom-2 left-3">
+        <p className="font-body text-[10px] text-white/80">
+          📍 Manfredonia (FG) • 0884 660377
         </p>
       </div>
     </div>
