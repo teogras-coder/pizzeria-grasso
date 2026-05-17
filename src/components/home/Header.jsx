@@ -1,25 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+
+const MAIN_IMAGE_KEY = 'pizzeria_main_image';
+const defaultMainImage = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80';
+
+const getMainImage = () => {
+  return localStorage.getItem(MAIN_IMAGE_KEY) || defaultMainImage;
+};
 
 export default function Header() {
+  const [mainImage, setMainImage] = useState(getMainImage());
+
+  useEffect(() => {
+    const handleUpdate = () => setMainImage(getMainImage());
+    window.addEventListener('main-image-updated', handleUpdate);
+    return () => window.removeEventListener('main-image-updated', handleUpdate);
+  }, []);
+
   return (
-    <div className="relative w-full">
-      <div className="bg-gradient-to-r from-primary/90 via-primary to-primary/90 py-3 px-4 flex items-center justify-center gap-3 rounded-b-2xl shadow-lg">
-        <div className="flex flex-col items-center">
-          <Link to="/admin">
-            <span className="font-heading text-2xl font-bold text-primary-foreground tracking-wide cursor-pointer hover:opacity-80 transition-opacity">
-              Antica Pizzeria Grasso
-            </span>
-          </Link>
-        </div>
-      </div>
-      <div className="relative w-full h-48 overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80"
-          alt="Pizza Napoletana"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+    <div className="relative">
+      <img 
+        src={mainImage} 
+        alt="Antica Pizzeria Grasso"
+        className="w-full h-48 object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+      <div className="absolute bottom-4 left-4 right-4">
+        <h1 className="font-heading text-2xl font-bold text-primary-foreground drop-shadow-lg">
+          Antica Pizzeria Grasso
+        </h1>
+        <p className="font-body text-sm text-primary-foreground/80 drop-shadow">
+          Manfredonia (FG) - Via Antiche Mura Otto
+        </p>
       </div>
     </div>
   );
