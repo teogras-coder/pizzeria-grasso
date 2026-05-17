@@ -18,9 +18,33 @@ const categories = [
 
 export default function Home() {
   const { cartCount } = useCart();
+  
+  // Legge lo stato aperto/chiuso da localStorage
+  const isOpen = React.useMemo(() => {
+    const saved = localStorage.getItem('pizzeria_isOpen');
+    return saved !== null ? JSON.parse(saved) : true;
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <Header />
+      
+      {/* BANNER APERTO/CHIUSO */}
+      {!isOpen && (
+        <div className="mx-4 mt-2 bg-destructive/20 border border-destructive/40 rounded-lg p-3 text-center">
+          <p className="text-destructive font-body text-sm font-bold">
+            🔴 Al momento siamo chiusi. Gli ordini verranno elaborati all'apertura.
+          </p>
+        </div>
+      )}
+      {isOpen && (
+        <div className="mx-4 mt-2 bg-green-900/30 border border-green-600/40 rounded-lg p-3 text-center">
+          <p className="text-green-400 font-body text-sm font-bold">
+            🟢 Siamo aperti! Ordina ora.
+          </p>
+        </div>
+      )}
+
       <div className="px-4 space-y-3 -mt-4 relative z-10">
         {categories.map((cat) => <CategoryCard key={cat.title} {...cat} />)}
       </div>
