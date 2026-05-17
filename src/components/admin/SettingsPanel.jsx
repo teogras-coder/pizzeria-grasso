@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Store, Clock, Lock } from 'lucide-react';
+import { Store, Clock, Hash, RotateCcw } from 'lucide-react';
 import PinSettings from './PinSettings';
+import { getNextOrderNumber, resetOrderCounter } from '@/lib/apiClient';
 
 export default function SettingsPanel() {
   const [isOpen, setIsOpen] = useState(() => {
@@ -49,6 +50,37 @@ export default function SettingsPanel() {
           {isOpen 
             ? 'I clienti possono effettuare ordini.' 
             : 'I clienti vedranno un avviso di chiusura.'}
+        </p>
+      </div>
+
+      {/* CARD NUMERI ORDINE */}
+      <div className="bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Hash className="w-5 h-5 text-primary" />
+          <h3 className="font-heading font-bold text-foreground">Numeri Ordine</h3>
+        </div>
+        
+        <div className="bg-background/50 rounded-lg p-3 mb-3">
+          <p className="text-muted-foreground text-xs font-body">
+            Prossimo ordine: <span className="text-primary font-bold text-lg">#{getNextOrderNumber()}</span>
+          </p>
+        </div>
+        
+        <button
+          onClick={() => {
+            if (window.confirm('Sei sicuro di voler azzerare i numeri ordine? Il prossimo ordine sarà #1.')) {
+              resetOrderCounter();
+              window.location.reload();
+            }
+          }}
+          className="w-full bg-destructive/20 hover:bg-destructive/30 text-destructive border border-destructive/40 font-heading py-2.5 rounded-md transition-colors flex items-center justify-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Azzera Numeri Ordine
+        </button>
+        
+        <p className="text-muted-foreground text-xs font-body mt-2">
+          Attenzione: questa azione non può essere annullata!
         </p>
       </div>
 
