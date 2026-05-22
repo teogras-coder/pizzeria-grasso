@@ -465,14 +465,14 @@
 
     <script>
         const firebaseConfig = {
-    apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
-    authDomain: "teogra-c8cf5.firebaseapp.com",
-    databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "teogra-c8cf5",
-    storageBucket: "teogra-c8cf5.firebasestorage.app",
-    messagingSenderId: "686300112893",
-    appId: "1:686300112893:web:e147b82f91374f12db1b94"
-};
+            apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
+            authDomain: "teogra-c8cf5.firebaseapp.com",
+            databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "teogra-c8cf5",
+            storageBucket: "teogra-c8cf5.firebasestorage.app",
+            messagingSenderId: "686300112893",
+            appId: "1:686300112893:web:e147b82f91374f12db1b94"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const storage = firebase.storage();
@@ -522,7 +522,7 @@
 
         let appData = {
             categories: {
-                pizze:    { name: "🍕 Pizze Napoli", icon: "fa-pizza-slice",       emoji: "🍕" },
+                pizze:    { name: "🍕 Pizza Napoli", icon: "fa-pizza-slice",       emoji: "🍕" },
                 focacce:  { name: "🥖 Focacce",      icon: "fa-bread-slice",       emoji: "🥖" },
                 frittura: { name: "🍤 Frittura",     icon: "fa-drumstick-bite",    emoji: "🍤" },
                 bibite:   { name: "🥤 Bibite",       icon: "fa-glass-martini-alt", emoji: "🥤" }
@@ -554,10 +554,10 @@
             images: {
                 hero: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",
                 categories: { 
-                    pizze: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80", 
-                    focacce: "https://images.unsplash.com/photo-1573140401552-388e7e2f00b8?w=400&q=80", 
-                    frittura: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&q=80", 
-                    bibite: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80" 
+                    pizze: "https://i.ibb.co/SwZJCWsh/pizza-napoli.jpg", 
+                    focacce: "https://i.ibb.co/PspxmnY8/focacce.jpg", 
+                    frittura: "https://i.ibb.co/Ps0qCSdd/frittura.jpg", 
+                    bibite: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop&q=80" 
                 }
             }
         };
@@ -775,21 +775,15 @@
             if (mode === 'scheduled') setupMinTime();
         }
 
-        // 🆕 SLOT OGNI 5 MINUTI - NESSUN LIMITE MINIMO/MAX
         function setupMinTime() {
             const timeInput = document.getElementById('scheduledTime');
-            // Step di 5 minuti (300 secondi)
             timeInput.step = "300";
-            
-            // Imposta valore di default all'orario attuale arrotondato ai 5 minuti successivi
             const now = new Date();
             const currentMinutes = now.getMinutes();
             const roundedMinutes = Math.ceil(currentMinutes / 5) * 5;
             now.setMinutes(roundedMinutes, 0, 0);
-            
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
-            
             if (!timeInput.value) {
                 timeInput.value = `${h}:${m}`;
             }
@@ -872,12 +866,10 @@
             return cleaned.length >= 9 && cleaned.length <= 15;
         }
 
-        // 🆕 NESSUNA VALIDAZIONE MIN/MAX - SOLO VERIFICA FORMATO
         function getScheduledTimeStr() {
             if (timeMode === 'asap') return 'ASAP';
             const t = document.getElementById('scheduledTime').value;
             if (!t) return 'ASAP';
-            // Nessuna validazione: l'utente può scegliere qualsiasi orario
             return t;
         }
 
