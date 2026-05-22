@@ -149,7 +149,7 @@
         .admin-tab.active { background: var(--gold); color: var(--dark); box-shadow: 0 3px 0 var(--gold-dark); }
         .admin-panel-content { display: none; }
         .admin-panel-content.active { display: block; }
-        .admin-group { margin-bottom: 18px; }  
+        .admin-group { margin-bottom: 18px; }
         .admin-group label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
         .admin-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 0.9rem; }
         .admin-input:focus { outline: none; border-color: var(--gold-light); }
