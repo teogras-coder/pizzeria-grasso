@@ -142,7 +142,9 @@
         .time-option.active { background: var(--gold-dark); color: var(--dark); }
         .time-picker-wrap { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; display: none; }
         .time-picker-wrap.show { display: block; }
-        .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; scrollbar-color: var(--gold-dark) transparent; }
+        .admin-tabs::-webkit-scrollbar { height: 4px; }
+        .admin-tabs::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
         .admin-tab { background: var(--card); border: none; color: #8a7a5a; padding: 10px 15px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
         .admin-tab.active { background: var(--gold); color: var(--dark); }
         .admin-panel-content.active { display: block; }
