@@ -142,10 +142,10 @@
         .time-option.active { background: var(--gold-dark); color: var(--dark); }
         .time-picker-wrap { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; display: none; }
         .time-picker-wrap.show { display: block; }
-        .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .admin-tab { background: var(--card); border: none; color: #8a7a5a; padding: 10px 15px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
-        .admin-tab.active { background: var(--gold); color: var(--dark); }
-        .admin-panel-content { display: none; }
+        .admin-tabs { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; max-height: 45vh; overflow-y: auto; padding-right: 5px; }
+        .admin-tab { background: var(--card); border: none; color: #8a7a5a; padding: 12px 15px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; }
+        .admin-tab.active { background: var(--gold); color: var(--dark); box-shadow: 0 3px 0 #8b6508; }
+        .admin-tab:active { transform: translateY(2px); box-shadow: none; }
         .admin-panel-content.active { display: block; }
         .admin-group { margin-bottom: 18px; }
         .admin-group label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
