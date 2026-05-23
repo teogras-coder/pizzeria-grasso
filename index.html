@@ -7,12 +7,17 @@
     <meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
     <link rel="canonical" href="https://teogra-c8cf5.web.app/">
     
-    <!-- LOGO PNG QUADRATO 3D -->
-    <link rel="icon" type="image/png" href="logo-app.png">
-    <link rel="apple-touch-icon" href="logo-app.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="logo-app.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="logo-app.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="logo-app.png">
+    <!-- PWA MANIFEST & ICONE -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-512.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-512.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
+    <meta name="theme-color" content="#d4a84b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Fallback SVG inline -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%F0%9F%8D%95%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
@@ -34,11 +39,6 @@
       "url": "https://teogra-c8cf5.web.app/"
     }
     </script>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#d4a84b">
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -187,40 +187,10 @@
         .promo-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .promo-card-title { color: var(--gold-light); font-weight: 700; font-size: 1rem; flex: 1; }
         .promo-products-list { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        /* ✅ FIX: Caselle promo contenute e responsive */
-        .promo-product-row { 
-            display: grid; 
-            grid-template-columns: 2.5fr 1fr 0.8fr auto; 
-            gap: 6px; 
-            margin-bottom: 6px; 
-            align-items: center;
-            width: 100%;
-        }
-        .promo-product-row select, 
-        .promo-product-row input { 
-            padding: 6px 4px; 
-            border-radius: 4px; 
-            border: 1px solid var(--gold-dark); 
-            background: var(--card); 
-            color: var(--cream); 
-            font-size: 0.75rem;
-            width: 100%;
-            min-width: 0; /* Previene overflow */
-        }
-        .promo-product-row select {
-            max-width: 100%;
-        }
-        .promo-product-row button { 
-            background: #e74c3c; 
-            color: white; 
-            border: none; 
-            width: 28px; 
-            height: 28px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            font-size: 0.7rem;
-            flex-shrink: 0;
-        }
+        .promo-product-row { display: grid; grid-template-columns: 2.5fr 1fr 0.8fr auto; gap: 6px; margin-bottom: 6px; align-items: center; width: 100%; }
+        .promo-product-row select, .promo-product-row input { padding: 6px 4px; border-radius: 4px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.75rem; width: 100%; min-width: 0; }
+        .promo-product-row select { max-width: 100%; }
+        .promo-product-row button { background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; flex-shrink: 0; }
         .add-promo-product-btn { width: 100%; padding: 8px; border-radius: 6px; border: 1px dashed var(--gold); background: transparent; color: var(--gold); font-size: 0.8rem; cursor: pointer; margin-top: 5px; }
         .promo-status-badge { padding: 3px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
         .promo-active { background: rgba(74,222,128,0.2); color: #4ade80; }
@@ -239,6 +209,35 @@
         .delivery-fee-input-row .currency { color: var(--gold); font-size: 1.3rem; font-weight: 700; }
         .delivery-fee-input-row input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 1.1rem; font-weight: 700; text-align: center; }
         .delivery-fee-info { color: #8a7a5a; font-size: 0.75rem; margin-top: 8px; line-height: 1.5; }
+        /* ORDINI ADMIN */
+        .order-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
+        .order-card.new-order { border-left: 4px solid #f87171; animation: pulseNew 2s infinite; }
+        .order-card.preparing { border-left: 4px solid #fbbf24; }
+        .order-card.ready { border-left: 4px solid #4ade80; }
+        .order-card.delivered { border-left: 4px solid #60a5fa; opacity: 0.7; }
+        @keyframes pulseNew { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 50%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .order-id { color: var(--gold); font-weight: 700; font-size: 0.95rem; }
+        .order-time { color: #8a7a5a; font-size: 0.75rem; }
+        .order-status-badge { padding: 3px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .status-new { background: rgba(248,113,113,0.2); color: #f87171; }
+        .status-preparing { background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .status-ready { background: rgba(74,222,128,0.2); color: #4ade80; }
+        .status-delivered { background: rgba(96,165,250,0.2); color: #60a5fa; }
+        .order-customer { color: var(--cream); font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+        .order-details { color: #a08b6d; font-size: 0.8rem; margin-bottom: 8px; }
+        .order-items { background: rgba(0,0,0,0.15); border-radius: 8px; padding: 8px; margin-bottom: 10px; }
+        .order-items div { color: var(--cream); font-size: 0.8rem; padding: 2px 0; }
+        .order-total { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 10px; }
+        .order-total span:first-child { color: #a08b6d; }
+        .order-total span:last-child { color: var(--gold); font-size: 1.1rem; }
+        .order-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .order-action-btn { flex: 1; min-width: 80px; padding: 8px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
+        .btn-preparing { background: #fbbf24; color: var(--dark); }
+        .btn-ready { background: #4ade80; color: var(--dark); }
+        .btn-delivered { background: #60a5fa; color: white; }
+        .btn-delete-order { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+        .orders-empty { text-align: center; color: #8a7a5a; padding: 30px 0; }
         .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s ease; border: 1px solid rgba(212,168,75,0.2); pointer-events: none; text-align: center; max-width: 90%; }
         .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .app-footer { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); padding: 20px; text-align: center; border-top: 2px solid var(--gold-dark); }
@@ -354,7 +353,8 @@
                 <button class="close-btn-3d" onclick="closeAdmin()">×</button>
             </div>
             <div class="admin-tabs">
-                <button class="admin-tab active" onclick="switchAdminTab(event,'branding')">🏷️ Brand</button>
+                <button class="admin-tab active" onclick="switchAdminTab(event,'orders')">📦 Ordini</button>
+                <button class="admin-tab" onclick="switchAdminTab(event,'branding')">🏷️ Brand</button>
                 <button class="admin-tab" onclick="switchAdminTab(event,'promotions')">🎁 Promo</button>
                 <button class="admin-tab" onclick="switchAdminTab(event,'services')">🚚 Servizi</button>
                 <button class="admin-tab" onclick="switchAdminTab(event,'categories')">📂 Categorie</button>
@@ -365,7 +365,17 @@
                 <button class="admin-tab" onclick="switchAdminTab(event,'security')">🔒 Sicurezza</button>
             </div>
 
-            <div id="admin-branding" class="admin-panel-content active">
+            <!-- TAB ORDINI -->
+            <div id="admin-orders" class="admin-panel-content active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="color:var(--gold); margin:0;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h3>
+                    <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
+                </div>
+                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine. Gli ordini vengono salvati automaticamente.</p>
+                <div id="ordersList"></div>
+            </div>
+
+            <div id="admin-branding" class="admin-panel-content">
                 <div class="admin-group"><label>Nome Pizzeria</label><input type="text" id="brandName" class="admin-input" placeholder="Antica Pizzeria Grasso"></div>
                 <div class="admin-group"><label>Frase Sotto</label><input type="text" id="brandSubtitle" class="admin-input" placeholder="Dal 1980 • Tradizione"></div>
                 <div class="admin-group"><label>Città</label><input type="text" id="brandCity" class="admin-input" placeholder="Manfredonia"></div>
@@ -373,7 +383,7 @@
 
             <div id="admin-promotions" class="admin-panel-content">
                 <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-gift"></i> Gestione Promozioni</h3>
-                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">💡 Scegli i prodotti dal menu a tendina. Il contatore si aggiorna SOLO all'invio dell'ordine su WhatsApp.</p>
+                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">💡 Scegli i prodotti dal menu a tendina. Il contatore si aggiorna SOLO all'invio dell'ordine.</p>
                 <div id="promotionsAdminList"></div>
                 <div style="background:var(--card-light); padding:15px; border-radius:12px; margin-top:15px; border:1px dashed var(--gold-dark);">
                     <h4 style="color:var(--gold); margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Nuova Promozione</h4>
@@ -458,6 +468,11 @@
 
     <div class="toast-3d" id="toast"></div>
 
+    <!-- Audio notifica nuovo ordine -->
+    <audio id="newOrderSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgipW..." type="audio/wav">
+    </audio>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
@@ -472,6 +487,24 @@
         const db = firebase.database();
         const storage = firebase.storage();
 
+        // Suono notifica generato via Web Audio API (nessun file esterno necessario)
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.4);
+            } catch(e) {}
+        }
+
         const DEFAULT_BIBITE = [
             { name: "Coca Cola", price: 2.00, desc: "Lattina 33cl" }, { name: "Sprite", price: 2.00, desc: "Lattina 33cl" }, { name: "Fanta", price: 2.00, desc: "Lattina 33cl" },
             { name: "Coca Cola Zero", price: 2.00, desc: "Lattina 33cl" }, { name: "Estathè Limone", price: 2.50, desc: "Bottiglietta" }, { name: "Estathè Pesca", price: 2.50, desc: "Bottiglietta" },
@@ -481,9 +514,12 @@
         ];
 
         let appData = {
+            // ✅ CATEGORIE INVERTITE: Focacce PRIMA di Pizza Napoli
             categories: {
-                pizze: { name: "🍕 Pizza Napoli", icon: "fa-pizza-slice" }, focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
-                frittura: { name: "🍤 Frittura", icon: "fa-drumstick-bite" }, bibite: { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
+                focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
+                pizze: { name: "🍕 Pizza Napoli", icon: "fa-pizza-slice" },
+                frittura: { name: "🍤 Frittura", icon: "fa-drumstick-bite" },
+                bibite: { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
             },
             menu: {
                 pizze: [
@@ -514,9 +550,15 @@
             promotions: {},
             settings: { whatsappNumber: "+390884660377", visiblePhone: "0884660377", manualStatus: "auto", hours: "11:00-15:00,18:00-23:00", specialClosures: "", adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, deliveryFee: 2.00 },
             branding: { name: "Antica Pizzeria Grasso", subtitle: "Dal 1980 • Tradizione", city: "Manfredonia" },
+            // ✅ IMMAGINI SCAMBIATE: Pizza ha foto focaccia, Focaccia ha foto pizza + Nuova immagine bibite
             images: {
                 hero: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",
-                categories: { pizze: "https://i.ibb.co/PspxmnY8/IMG-0083.jpg", focacce: "https://i.ibb.co/SwZJCWsh/IMG-0078.jpg", frittura: "https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg", bibite: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&q=80" }
+                categories: {
+                    pizze: "https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",
+                    focacce: "https://i.ibb.co/PspxmnY8/IMG-0083.jpg",
+                    frittura: "https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",
+                    bibite: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"
+                }
             }
         };
 
@@ -524,6 +566,8 @@
         let orderType = 'delivery';
         let timeMode = 'asap';
         let openCategories = new Set();
+        let knownOrderIds = new Set();
+        let ordersListenerActive = false;
 
         let adminClicks = 0, adminClickTimer;
         document.getElementById('secretAdminBtn').addEventListener('click', () => {
@@ -550,6 +594,22 @@
             db.ref('images').on('value', snap => { if(snap.exists()) appData.images = snap.val(); applyImages(); });
             db.ref('branding').on('value', snap => { if(snap.exists()) appData.branding = { ...appData.branding, ...snap.val() }; applyBranding(); });
             db.ref('promotions').on('value', snap => { appData.promotions = snap.exists() ? snap.val() : {}; renderPromotionsBanner(); renderAdminPromotions(); });
+            
+            // ✅ LISTENER ORDINI IN TEMPO REALE
+            db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snap => {
+                const orders = {};
+                snap.forEach(child => { orders[child.key] = child.val(); });
+                renderAdminOrders(orders);
+                
+                // Suono per nuovi ordini
+                Object.keys(orders).forEach(id => {
+                    if (!knownOrderIds.has(id) && knownOrderIds.size > 0) {
+                        playNotificationSound();
+                        showToast('🔔 Nuovo ordine ricevuto!');
+                    }
+                    knownOrderIds.add(id);
+                });
+            });
         }
 
         function loadFromFirebase() {
@@ -559,6 +619,87 @@
             db.ref('images').once('value').then(s => { if(s.exists()) appData.images = s.val(); });
             db.ref('branding').once('value').then(s => { if(s.exists()) appData.branding = {...appData.branding, ...s.val()}; });
             db.ref('promotions').once('value').then(s => { appData.promotions = s.exists() ? s.val() : {}; });
+            // Carica ordini esistenti per non suonare al primo caricamento
+            db.ref('ordini').once('value').then(s => {
+                if (s.exists()) {
+                    s.forEach(child => { knownOrderIds.add(child.key); });
+                }
+            });
+        }
+
+        // ✅ RENDER ADMIN ORDINI
+        function renderAdminOrders(orders) {
+            const list = document.getElementById('ordersList');
+            const countEl = document.getElementById('ordersCount');
+            const entries = Object.entries(orders).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+            
+            const activeOrders = entries.filter(([id, o]) => o.status !== 'delivered');
+            countEl.textContent = activeOrders.length;
+            
+            if (entries.length === 0) {
+                list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem; margin-bottom:10px; display:block;"></i>Nessun ordine ancora</div>';
+                return;
+            }
+            
+            list.innerHTML = entries.map(([id, o]) => {
+                const statusClass = o.status || 'new';
+                const statusLabels = { new: 'Nuovo', preparing: 'In Preparazione', ready: 'Pronto', delivered: 'Consegnato' };
+                const statusLabel = statusLabels[statusClass] || 'Nuovo';
+                const date = new Date(o.timestamp || 0);
+                const timeStr = date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+                
+                let itemsHtml = '';
+                if (o.items && Array.isArray(o.items)) {
+                    itemsHtml = o.items.map(i => `<div>▸ ${i.name} ×${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('');
+                }
+                
+                let actionsHtml = '';
+                if (statusClass === 'new') {
+                    actionsHtml = `<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 In Prep</button>
+                                   <button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                } else if (statusClass === 'preparing') {
+                    actionsHtml = `<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button>
+                                   <button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                } else if (statusClass === 'ready') {
+                    actionsHtml = `<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Consegnato</button>
+                                   <button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                } else {
+                    actionsHtml = `<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                }
+                
+                return `
+                    <div class="order-card ${statusClass}">
+                        <div class="order-header">
+                            <span class="order-id">${o.orderId || id}</span>
+                            <span class="order-time">${dateStr} ${timeStr}</span>
+                            <span class="order-status-badge status-${statusClass}">${statusLabel}</span>
+                        </div>
+                        <div class="order-customer"><i class="fas fa-user"></i> ${o.customerName || 'N/A'} • 📞 ${o.customerPhone || 'N/A'}</div>
+                        <div class="order-details">
+                            <i class="fas fa-${o.type === 'delivery' ? 'motorcycle' : 'store'}"></i> ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}
+                            ${o.scheduledTime ? ' • ⏰ ' + o.scheduledTime : ''}
+                            ${o.type === 'delivery' && o.address ? '<br><i class="fas fa-map-marker-alt"></i> ' + o.address : ''}
+                            ${o.notes ? '<br><i class="fas fa-sticky-note"></i> ' + o.notes : ''}
+                        </div>
+                        <div class="order-items">${itemsHtml}</div>
+                        <div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div>
+                        <div class="order-actions">${actionsHtml}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        function updateOrderStatus(orderId, status) {
+            db.ref(`ordini/${orderId}/status`).set(status);
+            const labels = { preparing: '🍕 In preparazione', ready: '✅ Pronto', delivered: '🛵 Consegnato' };
+            showToast(labels[status] || 'Stato aggiornato');
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('Eliminare questo ordine?')) {
+                db.ref(`ordini/${orderId}`).remove();
+                showToast('🗑️ Ordine eliminato');
+            }
         }
 
         function applyBranding() {
@@ -602,60 +743,31 @@
         function addPromoToCart(promoId) {
             const promo = appData.promotions[promoId];
             if (!promo) { showToast('❌ Promo non trovata'); return; }
-            
             const today = new Date().toISOString().split('T')[0];
-            if (!promo.active || promo.startDate > today || promo.endDate < today || (promo.currentUses || 0) >= promo.maxUses) {
-                showToast('⚠️ Promo scaduta o esaurita!');
-                return;
-            }
+            if (!promo.active || promo.startDate > today || promo.endDate < today || (promo.currentUses || 0) >= promo.maxUses) { showToast('⚠️ Promo scaduta o esaurita!'); return; }
+            if (!promo.products || promo.products.length === 0) { showToast('⚠️ Questa promo non ha prodotti configurati'); return; }
 
-            if (!promo.products || promo.products.length === 0) {
-                showToast('⚠️ Questa promo non ha prodotti configurati');
-                return;
-            }
-
-            // ✅ Calcolo intelligente del totale
             let totalPrice = 0;
             if (promo.products.length === 1) {
                 const p = promo.products[0];
-                // Se il titolo contiene "1x" o "x1", consideriamo il prezzo come fisso per l'intera promo
                 const isFixedPrice = /1x\d+|x1|\b1\b.*\b(?:offerta|promo)/i.test(promo.title);
-                if (isFixedPrice && p.qty === 1) {
-                    totalPrice = p.price; // prezzo fisso, ignora qty
-                } else {
-                    totalPrice = p.price * p.qty; // normale moltiplicazione
-                }
+                if (isFixedPrice && p.qty === 1) totalPrice = p.price;
+                else totalPrice = p.price * p.qty;
             } else {
-                // Più prodotti: somma normale
                 totalPrice = promo.products.reduce((s, p) => s + (p.price * p.qty), 0);
             }
 
-            const promoCartEntry = {
-                promoId: promoId,
-                promoTitle: promo.title,
-                products: promo.products.map(p => ({ ...p })),
-                totalPrice: totalPrice,
-                isPromo: true,
-                cartTimestamp: Date.now()
-            };
-
+            const promoCartEntry = { promoId, promoTitle: promo.title, products: promo.products.map(p => ({ ...p })), totalPrice, isPromo: true, cartTimestamp: Date.now() };
             const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === promoId);
-            if (existingIdx >= 0) {
-                if (confirm(`Hai già questa promo nel carrello. Vuoi aggiungerne un'altra?`)) {
-                    cart.push(promoCartEntry);
-                } else { return; }
-            } else {
-                cart.push(promoCartEntry);
-            }
+            if (existingIdx >= 0) { if (confirm(`Hai già questa promo nel carrello. Vuoi aggiungerne un'altra?`)) cart.push(promoCartEntry); else return; }
+            else cart.push(promoCartEntry);
 
             updateCartBadge();
             showToast(`🎁 ${promo.title} aggiunta al carrello!`);
             openCart();
         }
 
-        function getCategoryDisplayName(catKey) {
-            return (appData.categories[catKey] && appData.categories[catKey].name) || catKey;
-        }
+        function getCategoryDisplayName(catKey) { return (appData.categories[catKey] && appData.categories[catKey].name) || catKey; }
 
         function renderCategories() {
             const list = document.getElementById('categoriesList');
@@ -677,10 +789,7 @@
                     </div>`;
             }).join('');
             const sel = document.getElementById('categorySelect');
-            if(sel) {
-                sel.innerHTML = '<option value="">Seleziona categoria...</option>' + 
-                    Object.keys(appData.categories).map(c => `<option value="${c}">${appData.categories[c].name}</option>`).join('');
-            }
+            if(sel) sel.innerHTML = '<option value="">Seleziona categoria...</option>' + Object.keys(appData.categories).map(c => `<option value="${c}">${appData.categories[c].name}</option>`).join('');
         }
 
         function showCategory(cat) {
@@ -698,6 +807,7 @@
 
         function showHome() { document.getElementById('mainMenu').style.display = 'block'; document.getElementById('productsView').style.display = 'none'; }
         function applyImages() { if (appData.images.hero) document.getElementById('heroImg').src = appData.images.hero; renderCategories(); }
+        
         function updateStatusBanner() {
             const banner = document.getElementById('statusBanner'); const text = document.getElementById('statusText');
             const isOpen = checkIfOpen();
@@ -726,13 +836,8 @@
 
         function updateServicesUI() {
             const deliveryBtn = document.getElementById('deliveryBtn');
-            if (appData.settings.deliveryEnabled === false) {
-                deliveryBtn.classList.add('disabled');
-                deliveryBtn.onclick = () => showToast('🚫 Delivery non disponibile');
-            } else {
-                deliveryBtn.classList.remove('disabled');
-                deliveryBtn.onclick = () => checkStatusBeforeOrder('delivery');
-            }
+            if (appData.settings.deliveryEnabled === false) { deliveryBtn.classList.add('disabled'); deliveryBtn.onclick = () => showToast('🚫 Delivery non disponibile'); }
+            else { deliveryBtn.classList.remove('disabled'); deliveryBtn.onclick = () => checkStatusBeforeOrder('delivery'); }
         }
 
         function checkStatusBeforeOrder(type) {
@@ -754,10 +859,7 @@
 
         function updateCartBadge() {
             let count = 0;
-            cart.forEach(i => {
-                if (i.isPromo) count += 1;
-                else count += (i.qty || 0);
-            });
+            cart.forEach(i => { if (i.isPromo) count += 1; else count += (i.qty || 0); });
             const badge = document.getElementById('cartBadge');
             if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; }
             try { localStorage.setItem('pizzeria_cart_v3', JSON.stringify(cart)); } catch(e) {}
@@ -765,25 +867,17 @@
 
         function clearCart() {
             if(cart.length === 0) return;
-            if(confirm("Svuotare il carrello?")) {
-                cart = [];
-                updateCartBadge(); closeCart();
-                showToast("🗑️ Carrello svuotato");
-            }
+            if(confirm("Svuotare il carrello?")) { cart = []; updateCartBadge(); closeCart(); showToast("🗑️ Carrello svuotato"); }
         }
 
         function updateCartTotals() {
             let productsTotal = 0;
-            cart.forEach(i => {
-                if (i.isPromo) productsTotal += i.totalPrice;
-                else productsTotal += (i.price * i.qty);
-            });
+            cart.forEach(i => { if (i.isPromo) productsTotal += i.totalPrice; else productsTotal += (i.price * i.qty); });
             const deliveryFee = (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) ? (parseFloat(appData.settings.deliveryFee) || 0) : 0;
             const finalTotal = productsTotal + deliveryFee;
-            const feeRow = document.getElementById('deliveryFeeRow');
-            const feeValue = document.getElementById('deliveryFeeValue');
+            const feeRow = document.getElementById('deliveryFeeRow'); const feeValue = document.getElementById('deliveryFeeValue');
             if (deliveryFee > 0 && cart.length > 0) { feeRow.style.display = 'flex'; feeValue.textContent = `€${deliveryFee.toFixed(2)}`; }
-            else { feeRow.style.display = 'none'; }
+            else feeRow.style.display = 'none';
             document.getElementById('totalAmount').textContent = `€${finalTotal.toFixed(2)}`;
         }
 
@@ -806,20 +900,16 @@
         }
 
         function setupMinTime() {
-            const inp = document.getElementById('scheduledTime');
-            const now = new Date();
+            const inp = document.getElementById('scheduledTime'); const now = new Date();
             now.setMinutes(Math.ceil(now.getMinutes() / 5) * 5, 0, 0);
             if (!inp.value) inp.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
         function openCart() {
             if (!checkIfOpen()) { showToast('⚠️ Siamo chiusi!'); return; }
-            const modal = document.getElementById('cartModal');
-            const itemsDiv = document.getElementById('cartItems');
-            const totalSec = document.getElementById('cartTotalSection');
-            const checkBtn = document.getElementById('checkoutBtn');
-            const clearBtn = document.getElementById('clearCartBtn');
-            const custForm = document.getElementById('customerForm');
+            const modal = document.getElementById('cartModal'); const itemsDiv = document.getElementById('cartItems');
+            const totalSec = document.getElementById('cartTotalSection'); const checkBtn = document.getElementById('checkoutBtn');
+            const clearBtn = document.getElementById('clearCartBtn'); const custForm = document.getElementById('customerForm');
             const typeToggle = document.getElementById('orderTypeToggle');
 
             if (cart.length === 0) {
@@ -829,42 +919,18 @@
                 document.getElementById('deliveryFeeRow').style.display = 'none';
             } else {
                 let html = '';
-                
                 cart.forEach((item, idx) => {
                     if (item.isPromo) {
-                        html += `
-                            <div class="promo-card-item">
-                                <div class="promo-card-item-header">
-                                    <div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${item.promoTitle}</div>
-                                    <button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${idx})"><i class="fas fa-times"></i></button>
-                                </div>
-                                <div class="promo-card-item-products">
-                                    ${item.products.map(p => `<div>▸ ${p.name} ×${p.qty} - €${(p.price * p.qty).toFixed(2)}</div>`).join('')}
-                                </div>
-                                <div class="promo-card-item-total">
-                                    <span style="color:#ff6b6b; font-weight:700;">Totale promo</span>
-                                    <span style="color:#ff6b6b; font-weight:700;">€${item.totalPrice.toFixed(2)}</span>
-                                </div>
-                            </div>`;
+                        html += `<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${item.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${idx})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${item.products.map(p => `<div>▸ ${p.name} ×${p.qty} - €${(p.price * p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b; font-weight:700;">Totale promo</span><span style="color:#ff6b6b; font-weight:700;">€${item.totalPrice.toFixed(2)}</span></div></div>`;
                     }
                 });
-                
                 cart.forEach((item, idx) => {
-                    if (!item.isPromo) {
-                        html += `
-                            <div class="cart-item-3d">
-                                <span class="cart-item-name">${item.name} × ${item.qty}</span>
-                                <span class="cart-item-price">€${(item.price * item.qty).toFixed(2)}</span>
-                            </div>`;
-                    }
+                    if (!item.isPromo) html += `<div class="cart-item-3d"><span class="cart-item-name">${item.name} × ${item.qty}</span><span class="cart-item-price">€${(item.price * item.qty).toFixed(2)}</span></div>`;
                 });
-                
                 itemsDiv.innerHTML = html;
                 totalSec.style.display = 'flex'; checkBtn.style.display = 'block'; clearBtn.style.display = 'flex';
                 custForm.style.display = 'block'; typeToggle.style.display = 'flex';
-                
-                const delEn = appData.settings.deliveryEnabled !== false;
-                const picEn = appData.settings.pickupEnabled !== false;
+                const delEn = appData.settings.deliveryEnabled !== false; const picEn = appData.settings.pickupEnabled !== false;
                 document.getElementById('typeDelivery').classList.toggle('disabled', !delEn);
                 document.getElementById('typePickup').classList.toggle('disabled', !picEn);
                 document.getElementById('typeDelivery').onclick = delEn ? () => selectOrderType('delivery') : () => showToast('🚫 Delivery non disponibile');
@@ -877,15 +943,7 @@
             modal.classList.add('active');
         }
 
-        function removePromoFromCartAtIndex(idx) {
-            if (cart[idx] && cart[idx].isPromo) {
-                cart.splice(idx, 1);
-                updateCartBadge();
-                openCart();
-                showToast('🗑️ Promo rimossa');
-            }
-        }
-
+        function removePromoFromCartAtIndex(idx) { if (cart[idx] && cart[idx].isPromo) { cart.splice(idx, 1); updateCartBadge(); openCart(); showToast('🗑️ Promo rimossa'); } }
         function closeCart() { document.getElementById('cartModal').classList.remove('active'); }
         
         function getGPSLocation() {
@@ -915,88 +973,96 @@
             if (orderType === 'delivery' && !address) { showToast('❌ Inserisci l\'indirizzo!'); return; }
             
             let productsTotal = 0;
-            cart.forEach(i => {
-                if (i.isPromo) productsTotal += i.totalPrice;
-                else productsTotal += (i.price * i.qty);
-            });
+            cart.forEach(i => { if (i.isPromo) productsTotal += i.totalPrice; else productsTotal += (i.price * i.qty); });
             const deliveryFee = (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) ? (parseFloat(appData.settings.deliveryFee) || 0) : 0;
             const finalTotal = productsTotal + deliveryFee;
             const scheduledTime = timeMode === 'asap' ? 'ASAP' : (document.getElementById('scheduledTime').value || 'ASAP');
             const orderId = 'ORD-' + Math.floor(Math.random() * 9000 + 1000);
             
+            // Costruisci array items per Firebase
+            const orderItems = [];
+            cart.forEach(i => {
+                if (i.isPromo) {
+                    orderItems.push({ name: `🎁 ${i.promoTitle}`, qty: 1, price: i.totalPrice, isPromo: true });
+                } else {
+                    orderItems.push({ name: i.name, qty: i.qty, price: i.price, cat: i.cat });
+                }
+            });
+            
             let summary = `📋 RIEPILOGO\n\n🔢 ${orderId}\n📦 ${orderType === 'delivery' ? 'Consegna' : 'Ritiro'}\n⏰ ${scheduledTime}\n👤 ${name}\n📞 ${phone}`;
             if (orderType === 'delivery') summary += `\n📍 ${address}`;
-            
             const promoItems = cart.filter(i => i.isPromo);
             const normalItems = cart.filter(i => !i.isPromo);
-            
-            if (promoItems.length > 0) {
-                summary += `\n\n🎁 PROMO:`;
-                promoItems.forEach(p => { summary += `\n   • ${p.promoTitle} - €${p.totalPrice.toFixed(2)}`; });
-            }
-            if (normalItems.length > 0) {
-                summary += `\n\n🛒 Prodotti:`;
-                normalItems.forEach(i => { summary += `\n   • ${i.name} ×${i.qty}`; });
-            }
+            if (promoItems.length > 0) { summary += `\n\n🎁 PROMO:`; promoItems.forEach(p => { summary += `\n   • ${p.promoTitle} - €${p.totalPrice.toFixed(2)}`; }); }
+            if (normalItems.length > 0) { summary += `\n\n🛒 Prodotti:`; normalItems.forEach(i => { summary += `\n   • ${i.name} ×${i.qty}`; }); }
             summary += `\n\n💰 Subtotale: €${productsTotal.toFixed(2)}`;
             if (deliveryFee > 0) summary += `\n🛵 Consegna: €${deliveryFee.toFixed(2)}`;
             summary += `\n\n💰 TOTALE: €${finalTotal.toFixed(2)}\n\nConfermi?`;
 
-            if (confirm(summary)) sendWhatsAppOrder({ name, phone, address, notes, type: orderType, orderId, scheduledTime, orderTimeStr: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }), productsTotal, deliveryFee, finalTotal });
+            if (confirm(summary)) sendOrder({ name, phone, address, notes, type: orderType, orderId, scheduledTime, orderTimeStr: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }), productsTotal, deliveryFee, finalTotal, items: orderItems });
         }
 
-        function sendWhatsAppOrder(data) {
-            const waNum = (appData.settings.whatsappNumber || '').replace(/\D/g,'');
-            if (!waNum) { showToast('❌ Numero WhatsApp non configurato!'); return; }
-            const tipoStr = data.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO';
-            const etaLabel = data.type === 'delivery' ? 'Consegna' : 'Ritiro';
-            
-            let msg = `🍕 *NUOVO ORDINE*\n━━━━━━━━━━━━━━━━━━\n\n`;
-            msg += `🔢 *N° Ordine:* ${data.orderId}\n🕐 *Ordinato:* ${data.orderTimeStr}\n`;
-            msg += `⏰ *${etaLabel}:* ${data.scheduledTime}\n📦 *Tipo:* ${tipoStr}\n\n`;
-            msg += `👤 *Cliente:*\n   • ${data.name}\n   • 📞 ${data.phone}\n`;
-            if (data.type === 'delivery') msg += `   • 📍 ${data.address}\n`;
-            if (data.notes) msg += `   • 📝 ${data.notes}\n`;
-            
-            const promoItems = cart.filter(i => i.isPromo);
-            const normalItems = cart.filter(i => !i.isPromo);
-            
-            if (promoItems.length > 0) {
-                msg += `\n━━━━━━━━━━━━━━━━━━\n🎁 *PROMO APPLICATE*\n━━━━━━━━━━━━━━━━━━\n`;
-                promoItems.forEach(p => {
-                    msg += `\n🎁 *${p.promoTitle}*\n`;
-                    p.products.forEach(pr => { msg += `   ▸ ${pr.name} ×${pr.qty} = *€${(pr.price * pr.qty).toFixed(2)}*\n`; });
-                    msg += `   ─── Totale: *€${p.totalPrice.toFixed(2)}*\n`;
-                });
-            }
-            
-            if (normalItems.length > 0) {
-                msg += `\n━━━━━━━━━━━━━━━━━━\n📋 *PRODOTTI ORDINATI*\n━━━━━━━━━━━━━━━━━━\n`;
-                const grouped = {};
-                normalItems.forEach(i => { if (!grouped[i.cat]) grouped[i.cat] = []; grouped[i.cat].push(i); });
-                Object.keys(grouped).forEach(cat => {
-                    const items = grouped[cat]; const sub = items.reduce((s, i) => s + (i.price * i.qty), 0);
-                    msg += `\n📂 *${getCategoryDisplayName(cat)}*\n`;
-                    items.forEach(i => { msg += `   ▸ ${i.name} ×${i.qty} = *€${(i.price*i.qty).toFixed(2)}*\n`; });
-                    msg += `   ─── Subtotale: €${sub.toFixed(2)}\n`;
-                });
-            }
-
-            msg += `\n━━━━━━━━━━━━━━━━━━\n🛒 *Subtotale:* €${data.productsTotal.toFixed(2)}\n`;
-            if (data.deliveryFee > 0) msg += `🛵 *Consegna:* €${data.deliveryFee.toFixed(2)}\n`;
-            msg += `\n💰 *TOTALE: €${data.finalTotal.toFixed(2)}*\n━━━━━━━━━━━━━━━━━━\n\n_Grazie da ${appData.branding.name || 'Antica Pizzeria Grasso'}!_ 🍕`;
-
-            // ✅ INCREMENTO CONTATORE PROMO SOLO QUI - quando l'ordine parte davvero
-            promoItems.forEach(item => {
-                db.ref(`promotions/${item.promoId}/currentUses`).transaction(v => (v || 0) + 1);
+        // ✅ INVIO ORDINE: Firebase + WhatsApp
+        function sendOrder(data) {
+            // 1. SALVA SU FIREBASE DATABASE
+            const orderRef = db.ref('ordini').push();
+            orderRef.set({
+                orderId: data.orderId,
+                customerName: data.name,
+                customerPhone: data.phone,
+                address: data.address || '',
+                notes: data.notes || '',
+                type: data.type,
+                scheduledTime: data.scheduledTime,
+                items: data.items,
+                productsTotal: data.productsTotal,
+                deliveryFee: data.deliveryFee,
+                finalTotal: data.finalTotal,
+                status: 'new',
+                timestamp: Date.now(),
+                createdAt: new Date().toISOString()
             });
+
+            // 2. INCREMENTO CONTATORE PROMO
+            const promoItems = cart.filter(i => i.isPromo);
+            promoItems.forEach(item => { db.ref(`promotions/${item.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
+
+            // 3. PREPARA MESSAGGIO WHATSAPP (backup)
+            const waNum = (appData.settings.whatsappNumber || '').replace(/\D/g,'');
+            if (waNum) {
+                const tipoStr = data.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO';
+                const etaLabel = data.type === 'delivery' ? 'Consegna' : 'Ritiro';
+                let msg = `🍕 *NUOVO ORDINE*\n━━━━━━━━━━━━━━━━━━\n\n`;
+                msg += `🔢 *N° Ordine:* ${data.orderId}\n🕐 *Ordinato:* ${data.orderTimeStr}\n`;
+                msg += `⏰ *${etaLabel}:* ${data.scheduledTime}\n📦 *Tipo:* ${tipoStr}\n\n`;
+                msg += `👤 *Cliente:*\n   • ${data.name}\n   • 📞 ${data.phone}\n`;
+                if (data.type === 'delivery') msg += `   • 📍 ${data.address}\n`;
+                if (data.notes) msg += `   • 📝 ${data.notes}\n`;
+                
+                if (promoItems.length > 0) {
+                    msg += `\n━━━━━━━━━━━━━━━━━━\n🎁 *PROMO APPLICATE*\n━━━━━━━━━━━━━━━━━━\n`;
+                    promoItems.forEach(p => { msg += `\n🎁 *${p.promoTitle}*\n`; p.products.forEach(pr => { msg += `   ▸ ${pr.name} ×${pr.qty} = *€${(pr.price * pr.qty).toFixed(2)}*\n`; }); msg += `   ─── Totale: *€${p.totalPrice.toFixed(2)}*\n`; });
+                }
+                const normalItems = cart.filter(i => !i.isPromo);
+                if (normalItems.length > 0) {
+                    msg += `\n━━━━━━━━━━━━━━━━━━\n📋 *PRODOTTI ORDINATI*\n━━━━━━━━━━━━━━━━━━\n`;
+                    const grouped = {};
+                    normalItems.forEach(i => { if (!grouped[i.cat]) grouped[i.cat] = []; grouped[i.cat].push(i); });
+                    Object.keys(grouped).forEach(cat => { const items = grouped[cat]; const sub = items.reduce((s, i) => s + (i.price * i.qty), 0); msg += `\n📂 *${getCategoryDisplayName(cat)}*\n`; items.forEach(i => { msg += `   ▸ ${i.name} ×${i.qty} = *€${(i.price*i.qty).toFixed(2)}*\n`; }); msg += `   ─── Subtotale: €${sub.toFixed(2)}\n`; });
+                }
+                msg += `\n━━━━━━━━━━━━━━━━━━\n🛒 *Subtotale:* €${data.productsTotal.toFixed(2)}\n`;
+                if (data.deliveryFee > 0) msg += `🛵 *Consegna:* €${data.deliveryFee.toFixed(2)}\n`;
+                msg += `\n💰 *TOTALE: €${data.finalTotal.toFixed(2)}*\n━━━━━━━━━━━━━━━━━━\n\n_Grazie da ${appData.branding.name || 'Antica Pizzeria Grasso'}!_ 🍕`;
+                
+                const waUrl = `https://api.whatsapp.com/send?phone=${waNum}&text=${encodeURIComponent(msg)}`;
+                try { const w = window.open(waUrl, '_blank'); if (!w || w.closed) window.location.href = waUrl; } catch(e) { window.location.href = waUrl; }
+            }
 
             cart = []; updateCartBadge(); closeCart();
             document.getElementById('customerName').value = ''; document.getElementById('customerPhone').value = '';
             document.getElementById('customerAddress').value = ''; document.getElementById('customerNotes').value = '';
             document.getElementById('scheduledTime').value = ''; selectTimeMode('asap');
-            const waUrl = `https://api.whatsapp.com/send?phone=${waNum}&text=${encodeURIComponent(msg)}`;
-            try { const w = window.open(waUrl, '_blank'); if (!w || w.closed) window.location.href = waUrl; else showToast('✅ Ordine inviato!'); } catch(e) { window.location.href = waUrl; }
+            showToast('✅ Ordine inviato e salvato!');
         }
 
         function openAdmin() {
@@ -1018,67 +1084,30 @@
             else { el.classList.remove('closed'); label.textContent = "Auto"; }
         }
 
-        // 🎯 MENU A TENDINA con prodotti dalle categorie
         function addPromoProductRow(containerId, nameVal = '', priceVal = '', qtyVal = '1') {
-            const container = document.getElementById(containerId);
-            const row = document.createElement('div');
-            row.className = 'promo-product-row';
-            
+            const container = document.getElementById(containerId); const row = document.createElement('div'); row.className = 'promo-product-row';
             let optionsHtml = '<option value="">-- Seleziona --</option>';
             Object.keys(appData.categories).forEach(cat => {
-                const catInfo = appData.categories[cat];
-                const products = appData.menu[cat] || [];
-                if (products.length > 0) {
-                    optionsHtml += `<optgroup label="${catInfo.name}">`;
-                    products.forEach(p => {
-                        const optValue = `${p.name}|||${p.price}`;
-                        const selected = (p.name === nameVal) ? 'selected' : '';
-                        optionsHtml += `<option value="${optValue}" ${selected}>${p.name} - €${p.price.toFixed(2)}</option>`;
-                    });
-                    optionsHtml += `</optgroup>`;
-                }
+                const catInfo = appData.categories[cat]; const products = appData.menu[cat] || [];
+                if (products.length > 0) { optionsHtml += `<optgroup label="${catInfo.name}">`; products.forEach(p => { const optValue = `${p.name}|||${p.price}`; const selected = (p.name === nameVal) ? 'selected' : ''; optionsHtml += `<option value="${optValue}" ${selected}>${p.name} - €${p.price.toFixed(2)}</option>`; }); optionsHtml += `</optgroup>`; }
             });
-            
-            row.innerHTML = `
-                <select onchange="onPromoProductSelect(this)" data-product-name="${nameVal}">${optionsHtml}</select>
-                <input type="number" step="0.50" placeholder="€" value="${priceVal}" class="promo-price-input">
-                <input type="number" min="1" placeholder="Q.tà" value="${qtyVal}">
-                <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            `;
+            row.innerHTML = `<select onchange="onPromoProductSelect(this)" data-product-name="${nameVal}">${optionsHtml}</select><input type="number" step="0.50" placeholder="€" value="${priceVal}" class="promo-price-input"><input type="number" min="1" placeholder="Q.tà" value="${qtyVal}"><button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
             container.appendChild(row);
         }
 
         function onPromoProductSelect(selectEl) {
-            const row = selectEl.closest('.promo-product-row');
-            const priceInput = row.querySelector('.promo-price-input');
-            if (selectEl.value) {
-                const [name, price] = selectEl.value.split('|||');
-                selectEl.setAttribute('data-product-name', name);
-                if (priceInput && !priceInput.value) {
-                    priceInput.value = price;
-                }
-            }
+            const row = selectEl.closest('.promo-product-row'); const priceInput = row.querySelector('.promo-price-input');
+            if (selectEl.value) { const [name, price] = selectEl.value.split('|||'); selectEl.setAttribute('data-product-name', name); if (priceInput && !priceInput.value) priceInput.value = price; }
         }
 
         function getPromoProductsFromContainer(containerId) {
-            const rows = document.querySelectorAll(`#${containerId} .promo-product-row`);
-            const products = [];
-            rows.forEach(row => {
-                const select = row.querySelector('select');
-                const inputs = row.querySelectorAll('input');
-                const name = select ? (select.getAttribute('data-product-name') || '') : '';
-                const price = parseFloat(inputs[0].value);
-                const qty = parseInt(inputs[1].value) || 1;
-                if (name && !isNaN(price) && price >= 0) {
-                    products.push({ name, price, qty });
-                }
-            });
+            const rows = document.querySelectorAll(`#${containerId} .promo-product-row`); const products = [];
+            rows.forEach(row => { const select = row.querySelector('select'); const inputs = row.querySelectorAll('input'); const name = select ? (select.getAttribute('data-product-name') || '') : ''; const price = parseFloat(inputs[0].value); const qty = parseInt(inputs[1].value) || 1; if (name && !isNaN(price) && price >= 0) products.push({ name, price, qty }); });
             return products;
         }
 
         function renderAdminPromotions() {
-            const list = document.getElementById('promotionsAdminList');
-            const promos = Object.entries(appData.promotions || {});
+            const list = document.getElementById('promotionsAdminList'); const promos = Object.entries(appData.promotions || {});
             if (promos.length === 0) { list.innerHTML = '<p style="color:#8a7a5a; text-align:center; padding:20px;">Nessuna promozione creata</p>'; return; }
             const today = new Date().toISOString().split('T')[0];
             list.innerHTML = promos.map(([id, p]) => {
@@ -1092,102 +1121,33 @@
                 else { status = 'Attiva'; statusClass = 'promo-active'; }
                 return `
                     <div class="promo-card">
-                        <div class="promo-card-header">
-                            <div class="promo-card-title">${p.title} <span style="color:#ff6b6b;">- €${totalPrice.toFixed(2)}</span></div>
-                            <span class="promo-status-badge ${statusClass}">${status}</span>
-                        </div>
+                        <div class="promo-card-header"><div class="promo-card-title">${p.title} <span style="color:#ff6b6b;">- €${totalPrice.toFixed(2)}</span></div><span class="promo-status-badge ${statusClass}">${status}</span></div>
                         ${p.message ? `<div style="color:#8a7a5a; font-size:0.85rem; margin-bottom:8px;">${p.message}</div>` : ''}
-                        <div class="promo-products-list">
-                            <strong style="color:var(--gold); font-size:0.8rem;">Prodotti inclusi:</strong>
-                            <div id="promoProducts_${id}" style="margin-top:8px;">
-                                ${(p.products || []).map((pr, idx) => `
-                                    <div class="promo-product-row">
-                                        <select onchange="onPromoProductSelect(this); savePromoProducts('${id}')" data-product-name="${pr.name}">
-                                            <option value="">-- Seleziona --</option>
-                                            ${Object.keys(appData.categories).map(cat => {
-                                                const catInfo = appData.categories[cat];
-                                                const products = appData.menu[cat] || [];
-                                                if (products.length === 0) return '';
-                                                return `<optgroup label="${catInfo.name}">` + products.map(prod => {
-                                                    const optValue = `${prod.name}|||${prod.price}`;
-                                                    const selected = (prod.name === pr.name) ? 'selected' : '';
-                                                    return `<option value="${optValue}" ${selected}>${prod.name} - €${prod.price.toFixed(2)}</option>`;
-                                                }).join('') + `</optgroup>`;
-                                            }).join('')}
-                                        </select>
-                                        <input type="number" step="0.50" value="${pr.price}" class="promo-price-input" onchange="savePromoProducts('${id}')">
-                                        <input type="number" min="1" value="${pr.qty}" onchange="savePromoProducts('${id}')">
-                                        <button onclick="removePromoProduct('${id}', ${idx})"><i class="fas fa-times"></i></button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <button class="add-promo-product-btn" onclick="addPromoProductRow('promoProducts_${id}'); attachPromoProductSave('${id}')"><i class="fas fa-plus"></i> Aggiungi prodotto</button>
-                        </div>
-                        <div class="promo-card-stats">
-                            <div class="promo-stat"><span class="promo-stat-value">${uses}</span><span class="promo-stat-label">Usati</span></div>
-                            <div class="promo-stat"><span class="promo-stat-value">${left}</span><span class="promo-stat-label">Rimasti</span></div>
-                            <div class="promo-stat"><span class="promo-stat-value">${p.maxUses}</span><span class="promo-stat-label">Totali</span></div>
-                        </div>
-                        <div class="promo-card-dates">
-                            <input type="date" value="${p.startDate}" onchange="updatePromo('${id}','startDate',this.value)">
-                            <input type="date" value="${p.endDate}" onchange="updatePromo('${id}','endDate',this.value)">
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:10px;">
-                            <input type="number" value="${p.maxUses}" min="1" onchange="updatePromo('${id}','maxUses',parseInt(this.value))" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream); font-size:0.85rem;">
-                            <button onclick="resetPromoUses('${id}')" style="padding:8px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--gold); cursor:pointer;"><i class="fas fa-sync"></i></button>
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:10px;">
-                            <button onclick="togglePromo('${id}')" style="flex:1; padding:10px; border-radius:8px; border:none; background:${p.active ? '#f87171' : '#4ade80'}; color:${p.active ? 'white' : 'var(--dark)'}; font-weight:700; cursor:pointer;">${p.active ? '⏸️ Disattiva' : '▶️ Attiva'}</button>
-                            <button class="delete-product-btn" onclick="deletePromo('${id}')" style="width:40px; height:40px;"><i class="fas fa-trash"></i></button>
-                        </div>
+                        <div class="promo-products-list"><strong style="color:var(--gold); font-size:0.8rem;">Prodotti inclusi:</strong><div id="promoProducts_${id}" style="margin-top:8px;">
+                            ${(p.products || []).map((pr, idx) => `<div class="promo-product-row"><select onchange="onPromoProductSelect(this); savePromoProducts('${id}')" data-product-name="${pr.name}"><option value="">-- Seleziona --</option>${Object.keys(appData.categories).map(cat => { const catInfo = appData.categories[cat]; const products = appData.menu[cat] || []; if (products.length === 0) return ''; return `<optgroup label="${catInfo.name}">` + products.map(prod => { const optValue = `${prod.name}|||${prod.price}`; const selected = (prod.name === pr.name) ? 'selected' : ''; return `<option value="${optValue}" ${selected}>${prod.name} - €${prod.price.toFixed(2)}</option>`; }).join('') + `</optgroup>`; }).join('')}</select><input type="number" step="0.50" value="${pr.price}" class="promo-price-input" onchange="savePromoProducts('${id}')"><input type="number" min="1" value="${pr.qty}" onchange="savePromoProducts('${id}')"><button onclick="removePromoProduct('${id}', ${idx})"><i class="fas fa-times"></i></button></div>`).join('')}
+                        </div><button class="add-promo-product-btn" onclick="addPromoProductRow('promoProducts_${id}'); attachPromoProductSave('${id}')"><i class="fas fa-plus"></i> Aggiungi prodotto</button></div>
+                        <div class="promo-card-stats"><div class="promo-stat"><span class="promo-stat-value">${uses}</span><span class="promo-stat-label">Usati</span></div><div class="promo-stat"><span class="promo-stat-value">${left}</span><span class="promo-stat-label">Rimasti</span></div><div class="promo-stat"><span class="promo-stat-value">${p.maxUses}</span><span class="promo-stat-label">Totali</span></div></div>
+                        <div class="promo-card-dates"><input type="date" value="${p.startDate}" onchange="updatePromo('${id}','startDate',this.value)"><input type="date" value="${p.endDate}" onchange="updatePromo('${id}','endDate',this.value)"></div>
+                        <div style="display:flex; gap:8px; margin-top:10px;"><input type="number" value="${p.maxUses}" min="1" onchange="updatePromo('${id}','maxUses',parseInt(this.value))" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream); font-size:0.85rem;"><button onclick="resetPromoUses('${id}')" style="padding:8px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--gold); cursor:pointer;"><i class="fas fa-sync"></i></button></div>
+                        <div style="display:flex; gap:8px; margin-top:10px;"><button onclick="togglePromo('${id}')" style="flex:1; padding:10px; border-radius:8px; border:none; background:${p.active ? '#f87171' : '#4ade80'}; color:${p.active ? 'white' : 'var(--dark)'}; font-weight:700; cursor:pointer;">${p.active ? '⏸️ Disattiva' : '▶️ Attiva'}</button><button class="delete-product-btn" onclick="deletePromo('${id}')" style="width:40px; height:40px;"><i class="fas fa-trash"></i></button></div>
                     </div>`;
             }).join('');
         }
 
-        function attachPromoProductSave(promoId) {
-            setTimeout(() => savePromoProducts(promoId), 500);
-        }
-
-        function removePromoProduct(promoId, idx) {
-            if (!confirm("Rimuovere questo prodotto dalla promo?")) return;
-            appData.promotions[promoId].products.splice(idx, 1);
-            db.ref(`promotions/${promoId}/products`).set(appData.promotions[promoId].products);
-            renderAdminPromotions();
-            renderPromotionsBanner();
-        }
-
-        function savePromoProducts(promoId) {
-            const products = getPromoProductsFromContainer(`promoProducts_${promoId}`);
-            db.ref(`promotions/${promoId}/products`).set(products);
-            renderAdminPromotions();
-            renderPromotionsBanner();
-        }
+        function attachPromoProductSave(promoId) { setTimeout(() => savePromoProducts(promoId), 500); }
+        function removePromoProduct(promoId, idx) { if (!confirm("Rimuovere questo prodotto dalla promo?")) return; appData.promotions[promoId].products.splice(idx, 1); db.ref(`promotions/${promoId}/products`).set(appData.promotions[promoId].products); renderAdminPromotions(); renderPromotionsBanner(); }
+        function savePromoProducts(promoId) { const products = getPromoProductsFromContainer(`promoProducts_${promoId}`); db.ref(`promotions/${promoId}/products`).set(products); renderAdminPromotions(); renderPromotionsBanner(); }
 
         function createPromotion() {
-            const title = document.getElementById('newPromoTitle').value.trim();
-            const message = document.getElementById('newPromoMessage').value.trim();
-            const start = document.getElementById('newPromoStart').value;
-            const end = document.getElementById('newPromoEnd').value;
-            const maxUses = parseInt(document.getElementById('newPromoMaxUses').value);
-            const products = getPromoProductsFromContainer('newPromoProductsList');
-            
-            if (!title) { showToast('❌ Inserisci il titolo!'); return; }
-            if (!start || !end) { showToast('❌ Inserisci le date!'); return; }
-            if (start > end) { showToast('❌ Data fine dopo inizio!'); return; }
-            if (!maxUses || maxUses < 1) { showToast('❌ Max utilizzi non valido!'); return; }
+            const title = document.getElementById('newPromoTitle').value.trim(); const message = document.getElementById('newPromoMessage').value.trim();
+            const start = document.getElementById('newPromoStart').value; const end = document.getElementById('newPromoEnd').value;
+            const maxUses = parseInt(document.getElementById('newPromoMaxUses').value); const products = getPromoProductsFromContainer('newPromoProductsList');
+            if (!title) { showToast('❌ Inserisci il titolo!'); return; } if (!start || !end) { showToast('❌ Inserisci le date!'); return; }
+            if (start > end) { showToast('❌ Data fine dopo inizio!'); return; } if (!maxUses || maxUses < 1) { showToast('❌ Max utilizzi non valido!'); return; }
             if (products.length === 0) { showToast('❌ Aggiungi almeno un prodotto!'); return; }
-            
             const id = 'promo_' + Date.now();
-            db.ref(`promotions/${id}`).set({
-                title, message, startDate: start, endDate: end,
-                maxUses, currentUses: 0, active: true, products, createdAt: Date.now()
-            });
-            document.getElementById('newPromoTitle').value = '';
-            document.getElementById('newPromoMessage').value = '';
-            document.getElementById('newPromoStart').value = '';
-            document.getElementById('newPromoEnd').value = '';
-            document.getElementById('newPromoMaxUses').value = '';
-            document.getElementById('newPromoProductsList').innerHTML = '';
+            db.ref(`promotions/${id}`).set({ title, message, startDate: start, endDate: end, maxUses, currentUses: 0, active: true, products, createdAt: Date.now() });
+            document.getElementById('newPromoTitle').value = ''; document.getElementById('newPromoMessage').value = ''; document.getElementById('newPromoStart').value = ''; document.getElementById('newPromoEnd').value = ''; document.getElementById('newPromoMaxUses').value = ''; document.getElementById('newPromoProductsList').innerHTML = '';
             showToast('✅ Promozione creata!');
         }
 
@@ -1198,22 +1158,14 @@
 
         function renderAdminCategories() {
             const list = document.getElementById('categoriesAdminList');
-            list.innerHTML = Object.keys(appData.categories).map(key => {
-                const c = appData.categories[key];
-                return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name || key}</span><button class="delete-product-btn" onclick="deleteCategory('${key}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name || ''}" onchange="updateCategory('${key}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon || ''}" onchange="updateCategory('${key}','icon',this.value)" placeholder="Icona"></div></div>`;
-            }).join('');
+            list.innerHTML = Object.keys(appData.categories).map(key => { const c = appData.categories[key]; return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name || key}</span><button class="delete-product-btn" onclick="deleteCategory('${key}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name || ''}" onchange="updateCategory('${key}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon || ''}" onchange="updateCategory('${key}','icon',this.value)" placeholder="Icona"></div></div>`; }).join('');
         }
 
         function addCategory() {
-            const name = prompt("Nome categoria:"); if (!name) return;
-            const icon = prompt("Icona FontAwesome:", "fa-utensils") || "fa-utensils";
-            const key = prompt("Chiave tecnica (minuscole):");
+            const name = prompt("Nome categoria:"); if (!name) return; const icon = prompt("Icona FontAwesome:", "fa-utensils") || "fa-utensils"; const key = prompt("Chiave tecnica (minuscole):");
             if (!key || !/^[a-z][a-z0-9_]*$/.test(key) || appData.categories[key]) { showToast('❌ Chiave non valida!'); return; }
-            appData.categories[key] = { name, icon };
-            if (!appData.menu[key]) appData.menu[key] = [];
-            if (!appData.images.categories[key]) appData.images.categories[key] = '';
-            db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images);
-            showToast('✅ Categoria aggiunta!');
+            appData.categories[key] = { name, icon }; if (!appData.menu[key]) appData.menu[key] = []; if (!appData.images.categories[key]) appData.images.categories[key] = '';
+            db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images); showToast('✅ Categoria aggiunta!');
         }
         function updateCategory(key, field, value) { appData.categories[key][field] = value; db.ref('categories').set(appData.categories); }
         function deleteCategory(key) { if (!confirm(`Eliminare "${appData.categories[key].name}"?`)) return; delete appData.categories[key]; delete appData.menu[key]; if (appData.images.categories) delete appData.images.categories[key]; db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images); }
