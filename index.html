@@ -15,6 +15,25 @@
     <link rel="apple-touch-icon" sizes="152x152" href="icon-512.png">
     <link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
     <meta name="theme-color" content="#d4a84b">
+    <!-- PALETTE COLORI DINAMICHE -->
+<script>
+const colorPalettes = {
+  autunno: { gold:"#d4a84b", goldLight:"#f0d78c", goldDark:"#b8860b", dark:"#1a1209", brown:"#2d1f12", cream:"#f5e6c8" },
+  inverno: { gold:"#a8c3d4", goldLight:"#d4e6f0", goldDark:"#5a7b8c", dark:"#0c121a", brown:"#1a2530", cream:"#e6f0f5" },
+  primavera: { gold:"#8cd4a8", goldLight:"#e6f5e6", goldDark:"#4a8c5a", dark:"#0a1a12", brown:"#1a2d1f", cream:"#f5f5e6" },
+  estate: { gold:"#e8a84b", goldLight:"#ffe0a0", goldDark:"#c47a20", dark:"#1a1005", brown:"#3d2510", cream:"#fff5e0" }
+};
+let currentPalette = 'autunno';
+try { const s = localStorage.getItem('pizzeria_palette'); if(s && colorPalettes[s]) currentPalette = s; } catch(e){}
+const p = colorPalettes[currentPalette];
+const r = document.documentElement.style;
+r.setProperty('--gold', p.gold);
+r.setProperty('--gold-light', p.goldLight);
+r.setProperty('--gold-dark', p.goldDark);
+r.setProperty('--dark', p.dark);
+r.setProperty('--brown', p.brown);
+r.setProperty('--cream', p.cream);
+</script>
     <!-- ANTI-CACHE: Forza sempre il caricamento dell'ultima versione -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
