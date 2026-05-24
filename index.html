@@ -55,7 +55,7 @@
         :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; overflow: hidden; }
-        body { background: #0a0704; display: flex; justify-content: center; font-family: 'Montserrat', sans-serif; }
+        body { background: var(--dark); display: flex; justify-content: center; font-family: 'Montserrat', sans-serif; }
         .phone-frame { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); position: relative; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
         .header { background: linear-gradient(180deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%); padding: 25px 20px 20px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2); position: relative; z-index: 20; flex-shrink: 0; }
         .logo-main { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; color: var(--dark); letter-spacing: 1px; line-height: 1.1; }
@@ -64,10 +64,12 @@
         .secret-admin-zone { position: absolute; top: 10px; right: 10px; width: 60px; height: 60px; z-index: 30; cursor: pointer; background: transparent; }
         .status-banner { padding: 0; margin: 10px 0 0 18px; text-align: left; font-weight: 800; font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; }
         .status-open { color: #4ade80; } .status-closed { color: #f87171; }
-        .offers-banner { background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%); color: #5a2d2d; padding: 14px 20px; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; border-bottom: 2px solid rgba(0,0,0,0.1); cursor: pointer; position: relative; }
+        .offers-banner { background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%); color: #5a2d2d; padding: 16px 20px; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; border-bottom: 2px solid rgba(0,0,0,0.1); cursor: pointer; position: relative; }
         .offers-banner.show { display: block; animation: slideDown 0.4s ease; }
         .offers-banner .close-offer { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; }
-        .promo-remaining { display: block; font-size: 0.7rem; margin-top: 5px; opacity: 0.8; font-weight: 600; }
+        .promo-title { font-size: 1.15rem; font-weight: 800; line-height: 1.3; display: block; }
+        .promo-message { font-size: 0.85rem; font-weight: 600; margin-top: 6px; opacity: 0.9; display: block; }
+        .promo-remaining { display: block; font-size: 0.7rem; margin-top: 6px; opacity: 0.85; font-weight: 600; }
         @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
         .hero-section { position: relative; height: 240px; overflow: hidden; flex-shrink: 0; }
         .hero-img, .hero-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
@@ -342,8 +344,8 @@
                 <div class="form-group"><label>Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
                 <div class="form-group"><label>Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
                 <div class="form-group" id="addressGroup" style="display:none;">
-                    <label>Indirizzo di Consegna *</label>
-                    <input type="text" id="customerAddress" placeholder="Via Roma 123">
+                    <label>Indirizzo di Consegna (Via e Civico) *</label>
+                    <input type="text" id="customerAddress" placeholder="Es: Via Roma 123, Piano 2">
                     <button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> Usa la mia posizione GPS</button>
                 </div>
                 <div class="form-group"><label>Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
@@ -580,7 +582,21 @@
 
         function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
         function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
-        function renderPromotionsBanner(){const b=document.getElementById('offersBanner'),t=document.getElementById('offerText'),r=document.getElementById('promoRemaining'),a=getActivePromotion();if(a){b.classList.add('show');const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);t.textContent=`🎁 ${a.title} - €${tp.toFixed(2)}`+(a.message?` • ${a.message}`:'');r.textContent=`⚡ Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca!`;b.onclick=()=>addPromoToCart(a.id);}else{b.classList.remove('show');b.onclick=null;}}
+        
+        function renderPromotionsBanner(){
+            const b=document.getElementById('offersBanner'), t=document.getElementById('offerText'), r=document.getElementById('promoRemaining'), a=getActivePromotion();
+            if(a){
+                b.classList.add('show');
+                const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);
+                t.innerHTML=`<span class="promo-title">🎁 ${a.title} - €${tp.toFixed(2)}</span>${a.message?`<span class="promo-message">${a.message}</span>`:''}`;
+                r.textContent=`⚡ Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca per aggiungere!`;
+                b.onclick=()=>addPromoToCart(a.id);
+            }else{
+                b.classList.remove('show');
+                b.onclick=null;
+            }
+        }
+        
         function getActivePromotion(){const td=new Date().toISOString().split('T')[0],ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0).sort((a,b)=>new Date(a[1].endDate)-new Date(b[1].endDate));return ps.length?{id:ps[0][0],...ps[0][1]}:null;}
         function addPromoToCart(pid){const p=appData.promotions[pid];if(!p){showToast('❌ Non trovata');return;}const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast('⚠️ Scaduta/Esaurita');return;}if(!p.products||!p.products.length){showToast('⚠️ No prodotti');return;}
         let tp=p.products.length===1?(/1x\d+|x1|\b1\b.*\b(?:offerta|promo)/i.test(p.title)&&p.products[0].qty===1?p.products[0].price:p.products[0].price*p.products[0].qty):p.products.reduce((s,x)=>s+(x.price*x.qty),0);
