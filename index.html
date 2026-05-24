@@ -16,7 +16,7 @@
     <link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
     <meta name="theme-color" content="#d4a84b">
     
-    <!-- ANTI-CACHE: Forza sempre il caricamento dell'ultima versione -->
+    <!-- ANTI-CACHE -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -24,7 +24,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Fallback SVG inline -->
+    <!-- Fallback SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%F0%9F%8D%95%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
     
     <meta property="og:type" content="restaurant">
@@ -248,38 +248,32 @@
         .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .app-footer { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); padding: 20px; text-align: center; border-top: 2px solid var(--gold-dark); }
         .footer-info { color: #8a7a5a; font-size: 0.75rem; letter-spacing: 1px; }
+        .progress-bar { background:var(--card); border-radius:4px; height:8px; overflow:hidden; margin-top:10px; }
+        .progress-fill { background:linear-gradient(90deg, var(--gold), var(--gold-light)); height:100%; width:0%; transition:width 0.3s; border-radius:4px; }
     </style>
 </head>
 <body>
 
     <div class="phone-frame">
         <div class="secret-admin-zone" id="secretAdminBtn"></div>
-
         <header class="header">
             <div class="logo-main" id="headerTitle">Antica Pizzeria<span class="logo-grasso">GRASSO</span></div>
             <div class="logo-sub" id="headerSubtitle">Dal 1980 • Tradizione</div>
         </header>
-
-        <div id="statusBanner" class="status-banner status-closed">
-            <span id="statusText">Caricamento...</span>
-        </div>
-
+        <div id="statusBanner" class="status-banner status-closed"><span id="statusText">Caricamento...</span></div>
         <div id="offersBanner" class="offers-banner">
             <span id="offerText"></span>
             <span class="promo-remaining" id="promoRemaining"></span>
             <i class="fas fa-times close-offer" onclick="event.stopPropagation(); document.getElementById('offersBanner').classList.remove('show')"></i>
         </div>
-
         <div class="hero-section">
             <video id="heroVideo" class="hero-video" autoplay loop muted playsinline style="display:none;"></video>
             <img id="heroImg" class="hero-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pizza">
             <div class="hero-overlay"></div>
         </div>
-
         <div id="mainMenu">
             <div class="section-divider"><span>Il Nostro Menu</span></div>
             <div class="menu-list" id="categoriesList"></div>
-
             <div class="section-divider"><span>Servizi</span></div>
             <div class="actions-section">
                 <button class="action-btn-3d btn-phone" onclick="callPhone()"><i class="fas fa-phone-alt"></i> Chiamate & Prenotazioni</button>
@@ -287,14 +281,12 @@
                 <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> Ritiro in Pizzeria</button>
             </div>
         </div>
-
         <div id="productsView" class="products-view">
             <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
             <h2 id="categoryTitle" class="category-title">Categoria</h2>
             <div id="productList"></div>
             <button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; margin-bottom:30px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
         </div>
-
         <footer class="app-footer">
             <div class="footer-info" id="footerInfo">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
         </footer>
@@ -320,12 +312,10 @@
                 <span class="cart-total-label">Totale</span>
                 <span class="cart-total-amount" id="totalAmount">€0.00</span>
             </div>
-
             <div class="order-type-toggle" id="orderTypeToggle" style="display:none;">
                 <div class="type-option active" id="typeDelivery" onclick="selectOrderType('delivery')"><i class="fas fa-motorcycle"></i> Consegna a domicilio</div>
                 <div class="type-option" id="typePickup" onclick="selectOrderType('pickup')"><i class="fas fa-store"></i> Ritiro in pizzeria</div>
             </div>
-
             <div class="customer-form" id="customerForm" style="display:none;">
                 <h3 style="color:var(--gold); margin-bottom:15px; font-size:1.1rem;"><i class="fas fa-user"></i> I Tuoi Dati</h3>
                 <div class="form-group">
@@ -348,7 +338,6 @@
                 </div>
                 <div class="form-group"><label>Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
             </div>
-
             <button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
             <button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fab fa-whatsapp"></i> Conferma e Ordina</button>
         </div>
@@ -374,13 +363,12 @@
                 <button class="admin-tab" onclick="switchAdminTab(event,'palette')">🎨 Colori & Video</button>
             </div>
 
-            <!-- TAB ORDINI -->
             <div id="admin-orders" class="admin-panel-content active">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="color:var(--gold); margin:0;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h3>
                     <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
                 </div>
-                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine. Gli ordini vengono salvati automaticamente.</p>
+                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine.</p>
                 <div id="ordersList"></div>
             </div>
 
@@ -392,7 +380,7 @@
 
             <div id="admin-promotions" class="admin-panel-content">
                 <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-gift"></i> Gestione Promozioni</h3>
-                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">💡 Scegli i prodotti dal menu a tendina. Il contatore si aggiorna SOLO all'invio dell'ordine.</p>
+                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">💡 Scegli i prodotti dal menu a tendina.</p>
                 <div id="promotionsAdminList"></div>
                 <div style="background:var(--card-light); padding:15px; border-radius:12px; margin-top:15px; border:1px dashed var(--gold-dark);">
                     <h4 style="color:var(--gold); margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Nuova Promozione</h4>
@@ -403,11 +391,7 @@
                         <div class="admin-group"><label>Data Fine *</label><input type="date" id="newPromoEnd" class="admin-input"></div>
                     </div>
                     <div class="admin-group"><label>Numero Max Utilizzi *</label><input type="number" id="newPromoMaxUses" class="admin-input" placeholder="50" min="1"></div>
-                    <div class="admin-group">
-                        <label>Prodotti inclusi nella promo *</label>
-                        <div id="newPromoProductsList"></div>
-                        <button type="button" class="add-promo-product-btn" onclick="addPromoProductRow('newPromoProductsList')"><i class="fas fa-plus"></i> Aggiungi prodotto</button>
-                    </div>
+                    <div class="admin-group"><label>Prodotti inclusi *</label><div id="newPromoProductsList"></div><button type="button" class="add-promo-product-btn" onclick="addPromoProductRow('newPromoProductsList')"><i class="fas fa-plus"></i> Aggiungi prodotto</button></div>
                     <button class="admin-save add-product-btn" onclick="createPromotion()"><i class="fas fa-plus"></i> Crea Promozione</button>
                 </div>
             </div>
@@ -435,26 +419,12 @@
             </div>
 
             <div id="admin-images" class="admin-panel-content">
-                <div class="admin-group">
-                    <label>Immagine Hero</label>
-                    <div class="img-upload-area" onclick="document.getElementById('adminHeroUpload').click()"><i class="fas fa-cloud-upload-alt"></i><p>Tocca per caricare</p><img id="adminHeroPreview" class="img-preview" src="" style="display:none;"></div>
-                    <input type="file" id="adminHeroUpload" accept="image/*" style="display:none;" onchange="uploadHeroImage(this)">
-                </div>
-                <div class="admin-group">
-                    <label>Foto Categorie</label>
-                    <select id="categorySelect" class="admin-input" onchange="loadCategoryImageInput()"><option value="">Seleziona categoria...</option></select>
-                    <div id="categoryImageArea" style="display:none; margin-top:10px;">
-                        <div class="img-upload-area" onclick="document.getElementById('categoryImageInput').click()"><i class="fas fa-cloud-upload-alt"></i><p>Tocca per caricare</p><img id="adminCatPreview" class="img-preview" src="" style="display:none;"></div>
-                        <input type="file" id="categoryImageInput" accept="image/*" style="display:none;" onchange="uploadCategoryImage(this)">
-                    </div>
-                </div>
+                <div class="admin-group"><label>Immagine Hero</label><div class="img-upload-area" onclick="document.getElementById('adminHeroUpload').click()"><i class="fas fa-cloud-upload-alt"></i><p>Tocca per caricare</p><img id="adminHeroPreview" class="img-preview" src="" style="display:none;"></div><input type="file" id="adminHeroUpload" accept="image/*" style="display:none;" onchange="uploadHeroImage(this)"></div>
+                <div class="admin-group"><label>Foto Categorie</label><select id="categorySelect" class="admin-input" onchange="loadCategoryImageInput()"><option value="">Seleziona categoria...</option></select><div id="categoryImageArea" style="display:none; margin-top:10px;"><div class="img-upload-area" onclick="document.getElementById('categoryImageInput').click()"><i class="fas fa-cloud-upload-alt"></i><p>Tocca per caricare</p><img id="adminCatPreview" class="img-preview" src="" style="display:none;"></div><input type="file" id="categoryImageInput" accept="image/*" style="display:none;" onchange="uploadCategoryImage(this)"></div></div>
             </div>
 
             <div id="admin-hours" class="admin-panel-content">
-                <div class="admin-group">
-                    <label>Stato Manuale</label>
-                    <div class="admin-toggle"><span id="manualStatusLabel">Auto</span><div class="toggle-switch" id="manualStatusToggle" onclick="cycleManualStatus()"></div></div>
-                </div>
+                <div class="admin-group"><label>Stato Manuale</label><div class="admin-toggle"><span id="manualStatusLabel">Auto</span><div class="toggle-switch" id="manualStatusToggle" onclick="cycleManualStatus()"></div></div></div>
                 <div class="admin-group"><label>Orari (HH:MM-HH:MM)</label><textarea id="hoursInput" class="admin-input" rows="4" placeholder="11:00-15:00,18:00-23:00"></textarea></div>
                 <div class="admin-group"><label>Chiusure Speciali (YYYY-MM-DD)</label><input type="text" id="specialClosures" class="admin-input" placeholder="2026-12-25, 2027-01-01"></div>
             </div>
@@ -471,39 +441,36 @@
                 <div class="admin-group"><label>Conferma Nuovo PIN</label><input type="password" id="confirmPin" class="admin-input"></div>
             </div>
 
-            <!-- TAB PALETTE & VIDEO -->
             <div id="admin-palette" class="admin-panel-content">
                 <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-palette"></i> Palette Colori</h3>
-                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Scegli il tema del sito. Il cambiamento è immediato per tutti gli utenti.</p>
-                
+                <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Scegli il tema. Cambiamento immediato per tutti.</p>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div onclick="changePalette('autunno')" style="background:linear-gradient(135deg, #d4a84b 0%, #2d1f12 100%); padding:20px; border-radius:12px; cursor:pointer; border:3px solid var(--gold); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-leaf" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Autunno
-                    </div>
-                    <div onclick="changePalette('inverno')" style="background:linear-gradient(135deg, #a8c3d4 0%, #1a2530 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-snowflake" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Inverno
-                    </div>
-                    <div onclick="changePalette('primavera')" style="background:linear-gradient(135deg, #8cd4a8 0%, #1a2d1f 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-seedling" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Primavera
-                    </div>
-                    <div onclick="changePalette('estate')" style="background:linear-gradient(135deg, #e8a84b 0%, #3d2510 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-sun" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Estate
-                    </div>
+                    <div onclick="changePalette('autunno')" style="background:linear-gradient(135deg, #d4a84b 0%, #2d1f12 100%); padding:16px; border-radius:12px; cursor:pointer; border:3px solid var(--gold); text-align:center; color:white; font-weight:700;"><i class="fas fa-leaf" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Autunno</div>
+                    <div onclick="changePalette('inverno')" style="background:linear-gradient(135deg, #a8c3d4 0%, #1a2530 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-snowflake" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Inverno</div>
+                    <div onclick="changePalette('primavera')" style="background:linear-gradient(135deg, #8cd4a8 0%, #1a2d1f 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-seedling" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Primavera</div>
+                    <div onclick="changePalette('estate')" style="background:linear-gradient(135deg, #e8a84b 0%, #3d2510 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-sun" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Estate</div>
+                    <div onclick="changePalette('natale')" style="background:linear-gradient(135deg, #c41e3a 0%, #0f2018 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-tree" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Natale</div>
+                    <div onclick="changePalette('san_valentino')" style="background:linear-gradient(135deg, #ff4d6d 0%, #1a0a0f 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-heart" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>San Valentino</div>
+                    <div onclick="changePalette('notte')" style="background:linear-gradient(135deg, #7209b7 0%, #050510 100%); padding:16px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;"><i class="fas fa-moon" style="font-size:1.5rem; display:block; margin-bottom:5px;"></i>Notte</div>
                 </div>
-                
-                <div style="margin-top:15px; padding:12px; background:rgba(212,168,75,0.1); border-radius:8px; border-left:3px solid var(--gold);">
-                    <strong style="color:var(--gold);"><i class="fas fa-info-circle"></i> Palette attuale:</strong> 
-                    <span id="currentPaletteName" style="color:var(--cream); margin-left:8px;">Caricamento...</span>
-                </div>
+                <div style="margin-top:15px; padding:12px; background:rgba(212,168,75,0.1); border-radius:8px; border-left:3px solid var(--gold);"><strong style="color:var(--gold);"><i class="fas fa-info-circle"></i> Attuale:</strong> <span id="currentPaletteName" style="color:var(--cream); margin-left:8px;">Caricamento...</span></div>
 
                 <div style="margin-top:20px; padding:15px; background:var(--card); border-radius:12px; border:1px solid var(--gold-dark);">
-                    <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:8px;"><i class="fas fa-film"></i> Video Ricorrenza (URL MP4)</label>
+                    <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:8px;"><i class="fas fa-film"></i> Video Ricorrenza</label>
                     <input type="text" id="heroVideoInput" class="admin-input" placeholder="https://...link-al-tuo-video.mp4">
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button onclick="activateHeroVideo()" style="flex:1; background:#4ade80; color:var(--dark); border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">▶️ Attiva Video</button>
-                        <button onclick="deactivateHeroVideo()" style="flex:1; background:#f87171; color:white; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">🛑 Immagine fissa</button>
+                    <div style="margin-top:10px; padding:12px; background:var(--card-light); border-radius:8px; border:2px dashed var(--gold-dark);">
+                        <label style="color:var(--gold-light); font-size:0.85rem; display:block; margin-bottom:8px;"><i class="fas fa-upload"></i> Oppure carica dal cellulare:</label>
+                        <input type="file" id="videoFileInput" accept="video/*" capture="environment" style="display:none;" onchange="uploadVideoFromPhone(this)">
+                        <button onclick="document.getElementById('videoFileInput').click()" style="width:100%; background:linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color:var(--dark); border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;"><i class="fas fa-camera"></i> Registra o Carica Video</button>
+                        <div id="videoUploadProgress" style="display:none; margin-top:10px;">
+                            <div class="progress-bar"><div id="videoProgressBar" class="progress-fill"></div></div>
+                            <p style="color:#8a7a5a; font-size:0.75rem; margin-top:5px; text-align:center;">Caricamento in corso...</p>
+                        </div>
                     </div>
-                    <p style="color:#8a7a5a; font-size:0.7rem; margin-top:5px;">💡 Usa video brevi (<5MB) in formato .mp4 per caricamento istantaneo.</p>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="activateHeroVideo()" style="flex:1; background:#4ade80; color:var(--dark); border:none; padding:8px; border-radius:8px; font-weight:700; cursor:pointer;">▶️ Attiva</button>
+                        <button onclick="deactivateHeroVideo()" style="flex:1; background:#f87171; color:white; border:none; padding:8px; border-radius:8px; font-weight:700; cursor:pointer;">🛑 Fissa</button>
+                    </div>
                 </div>
             </div>
 
@@ -514,302 +481,155 @@
     <div class="toast-3d" id="toast"></div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
-            authDomain: "teogra-c8cf5.firebaseapp.com",
-            databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "teogra-c8cf5",
-            storageBucket: "teogra-c8cf5.firebasestorage.app",
-            messagingSenderId: "686300112893",
-            appId: "1:686300112893:web:e147b82f91374f12db1b94"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const storage = firebase.storage();
+        const db = firebase.database(), storage = firebase.storage();
 
-        function playNotificationSound() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.frequency.setValueAtTime(880, ctx.currentTime);
-                osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
-                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-                osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
-            } catch(e) {}
-        }
+        function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
 
-        const DEFAULT_BIBITE = [
-            { name: "Coca Cola", price: 2.00, desc: "Lattina 33cl" }, { name: "Sprite", price: 2.00, desc: "Lattina 33cl" }, { name: "Fanta", price: 2.00, desc: "Lattina 33cl" },
-            { name: "Coca Cola Zero", price: 2.00, desc: "Lattina 33cl" }, { name: "Estathè Limone", price: 2.50, desc: "Bottiglietta" }, { name: "Estathè Pesca", price: 2.50, desc: "Bottiglietta" },
-            { name: "Pepsi", price: 2.00, desc: "Lattina 33cl" }, { name: "Peroni 33cl", price: 2.00, desc: "Birra" }, { name: "Peroni 66cl", price: 3.00, desc: "Birra" },
-            { name: "Tennent's 33cl", price: 3.50, desc: "Birra" }, { name: "Dreher Limone 33cl", price: 2.50, desc: "Birra aromatizzata" },
-            { name: "Acqua Naturale", price: 1.00, desc: "50cl" }, { name: "Acqua Frizzante", price: 1.00, desc: "50cl" }
-        ];
+        const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
 
         let appData = {
-            categories: {
-                focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
-                pizze: { name: "🍕 Pizza Napoli", icon: "fa-pizza-slice" },
-                frittura: { name: "🍤 Frittura", icon: "fa-drumstick-bite" },
-                bibite: { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
-            },
+            categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍤 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
             menu: {
-                pizze: [
-                    { name: "Pomodorino e Mozzarella", price: 6.00, desc: "" }, { name: "Marinara", price: 4.00, desc: "" }, { name: "Patate", price: 8.00, desc: "" },
-                    { name: "Vegetariana", price: 8.00, desc: "Zucchine, melanzane, pomodoro" }, { name: "Salsiccia e Patate", price: 8.00, desc: "" }, { name: "Prosciutto e Patate", price: 8.00, desc: "" },
-                    { name: "Margherita", price: 5.00, desc: "" }, { name: "Würstel", price: 7.00, desc: "" }, { name: "Prosciutto Cotto", price: 7.00, desc: "" },
-                    { name: "Salame Piccante", price: 7.00, desc: "" }, { name: "Melanzane", price: 8.00, desc: "" }, { name: "Zucchine", price: 8.00, desc: "" },
-                    { name: "Salsiccia e Caciocavallo", price: 8.00, desc: "" }, { name: "Salsiccia e Funghi", price: 8.00, desc: "" }, { name: "Salsiccia e Peperoni", price: 8.00, desc: "" },
-                    { name: "Tonno e Capperi", price: 8.00, desc: "" }, { name: "Salame Piccante e Salsiccia", price: 8.00, desc: "" }, { name: "Fornarina", price: 3.00, desc: "" },
-                    { name: "Quattro Formaggi", price: 8.00, desc: "Mozzarella, scamorza affumicata" }
-                ],
-                focacce: [
-                    { name: "Pomodoro Fresco", price: 8.00, desc: "" }, { name: "Pomodoro Pelato", price: 8.00, desc: "" }, { name: "Patate", price: 8.00, desc: "" },
-                    { name: "Vegetariana", price: 8.00, desc: "Zucchine, melanzane, pomodoro" }, { name: "Salsiccia e Patate", price: 8.00, desc: "" }, { name: "Prosciutto e Patate", price: 8.00, desc: "" },
-                    { name: "Mozzarella", price: 8.00, desc: "" }, { name: "Würstel", price: 8.00, desc: "" }, { name: "Prosciutto Cotto", price: 8.00, desc: "" },
-                    { name: "Salame Piccante", price: 8.00, desc: "" }, { name: "Melanzane", price: 8.00, desc: "" }, { name: "Zucchine", price: 8.00, desc: "" },
-                    { name: "Salsiccia e Caciocavallo", price: 8.00, desc: "" }, { name: "Salsiccia e Funghi", price: 8.00, desc: "" }, { name: "Salsiccia e Peperoni", price: 8.00, desc: "" },
-                    { name: "Tonno e Capperi", price: 8.00, desc: "" }, { name: "Salame Piccante e Salsiccia", price: 8.00, desc: "" }, { name: "Bianca", price: 6.00, desc: "" },
-                    { name: "Cipolla, Olive e Capperi", price: 8.00, desc: "" }, { name: "Quattro Formaggi", price: 8.00, desc: "Caciocavallo, gorgonzola, mozzarella, scamorza" }
-                ],
-                frittura: [
-                    { name: "Patatina Piccola", price: 2.00, desc: "" }, { name: "Patatina Grande", price: 3.00, desc: "" }, { name: "Scagliozzi (5 pz)", price: 1.00, desc: "" },
-                    { name: "Olive Ascolane (4 pz)", price: 2.00, desc: "" }, { name: "Panzerottini (4 pz)", price: 2.00, desc: "" }, { name: "Mozzarelline (4 pz)", price: 2.00, desc: "" },
-                    { name: "Chele di Granchio (5 pz)", price: 3.00, desc: "" }, { name: "Crocchette di Patate (5 pz)", price: 2.50, desc: "" }
-                ],
-                bibite: [...DEFAULT_BIBITE]
+                pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
+                focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
+                frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
+                bibite:[...DEFAULT_BIBITE]
             },
-            promotions: {},
-            settings: { whatsappNumber: "+390884660377", visiblePhone: "0884660377", manualStatus: "auto", hours: "11:00-15:00,18:00-23:00", specialClosures: "", adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, deliveryFee: 2.00 },
-            branding: { name: "Antica Pizzeria Grasso", subtitle: "Dal 1980 • Tradizione", city: "Manfredonia" },
-            images: {
-                hero: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",
-                categories: {
-                    pizze: "https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",
-                    focacce: "https://i.ibb.co/PspxmnY8/IMG-0083.jpg",
-                    frittura: "https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",
-                    bibite: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"
-                }
-            }
+            promotions:{},
+            settings:{whatsappNumber:"+390884660377",visiblePhone:"0884660377",manualStatus:"auto",hours:"11:00-15:00,18:00-23:00",specialClosures:"",adminPin:"1234",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00},
+            branding:{name:"Antica Pizzeria Grasso",subtitle:"Dal 1980 • Tradizione",city:"Manfredonia"},
+            images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{pizze:"https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",focacce:"https://i.ibb.co/PspxmnY8/IMG-0083.jpg",frittura:"https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",bibite:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"}}
         };
 
-        let cart = [], orderType = 'delivery', timeMode = 'asap', openCategories = new Set(), knownOrderIds = new Set();
-        let adminClicks = 0, adminClickTimer;
+        let cart=[], orderType='delivery', timeMode='asap', openCategories=new Set(), knownOrderIds=new Set(), adminClicks=0, adminClickTimer;
 
-        document.getElementById('secretAdminBtn').addEventListener('click', () => {
-            adminClicks++; clearTimeout(adminClickTimer);
-            adminClickTimer = setTimeout(() => { adminClicks = 0; }, 1500);
-            if (adminClicks === 4) { adminClicks = 0; openAdmin(); }
-        });
+        document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
+        function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 
-        function callPhone() { window.location.href = `tel:${appData.settings.visiblePhone || "0884660377"}`; }
+        document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFromFirebase();
-            setupRealtimeListeners();
-            try { const saved = localStorage.getItem('pizzeria_cart_v3'); if (saved) { const parsed = JSON.parse(saved); if (Array.isArray(parsed) && parsed.length > 0) { cart = parsed; updateCartBadge(); } } } catch(e) {}
-        });
-
-        function setupRealtimeListeners() {
-            db.ref('categories').on('value', snap => { if(snap.exists()) appData.categories = snap.val(); renderCategories(); renderAdminCategories(); renderAdminProducts(); });
-            db.ref('menu').on('value', snap => { if(snap.exists()) appData.menu = snap.val(); renderCategories(); renderAdminProducts(); });
-            db.ref('settings').on('value', snap => { if(snap.exists()) appData.settings = { ...appData.settings, ...snap.val() }; updateStatusBanner(); updateFooter(); updateServicesUI(); });
-            db.ref('images').on('value', snap => { if(snap.exists()) appData.images = snap.val(); applyImages(); });
-            db.ref('branding').on('value', snap => { if(snap.exists()) appData.branding = { ...appData.branding, ...snap.val() }; applyBranding(); });
-            db.ref('promotions').on('value', snap => { appData.promotions = snap.exists() ? snap.val() : {}; renderPromotionsBanner(); renderAdminPromotions(); });
-            db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snap => {
-                const orders = {}; snap.forEach(child => { orders[child.key] = child.val(); });
-                renderAdminOrders(orders);
-                Object.keys(orders).forEach(id => {
-                    if (!knownOrderIds.has(id) && knownOrderIds.size > 0) { playNotificationSound(); showToast('🔔 Nuovo ordine ricevuto!'); }
-                    knownOrderIds.add(id);
-                });
+        function setupRealtimeListeners(){
+            db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val();renderCategories();renderAdminCategories();renderAdminProducts();}});
+            db.ref('menu').on('value', s=>{if(s.exists()){appData.menu=s.val();renderCategories();renderAdminProducts();}});
+            db.ref('settings').on('value', s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI();}});
+            db.ref('images').on('value', s=>{if(s.exists()){appData.images=s.val();applyImages();}});
+            db.ref('branding').on('value', s=>{if(s.exists()){appData.branding={...appData.branding,...s.val()};applyBranding();}});
+            db.ref('promotions').on('value', s=>{appData.promotions=s.exists()?s.val():{};renderPromotionsBanner();renderAdminPromotions();});
+            db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s=>{
+                const o={};s.forEach(c=>{o[c.key]=c.val();}); renderAdminOrders(o);
+                Object.keys(o).forEach(id=>{if(!knownOrderIds.has(id)&&knownOrderIds.size>0){playNotificationSound();showToast('🔔 Nuovo ordine!');}knownOrderIds.add(id);});
             });
-            db.ref('settings/colorPalette').on('value', snap => {
-                const palette = snap.val() || 'autunno'; applyPalette(palette);
-                const el = document.getElementById('currentPaletteName'); if(el) el.textContent = palette.charAt(0).toUpperCase() + palette.slice(1);
-            });
-            db.ref('settings/heroVideoUrl').on('value', snap => {
-                const url = snap.val();
-                const videoEl = document.getElementById('heroVideo');
-                const imgEl = document.getElementById('heroImg');
-                if (url) {
-                    videoEl.src = url; videoEl.style.display = 'block'; videoEl.play().catch(()=>{}); imgEl.style.display = 'none';
-                } else {
-                    videoEl.style.display = 'none'; videoEl.pause(); imgEl.style.display = 'block';
-                }
+            db.ref('settings/colorPalette').on('value', s=>{const p=s.val()||'autunno';applyPalette(p);const e=document.getElementById('currentPaletteName');if(e)e.textContent=p.charAt(0).toUpperCase()+p.slice(1);});
+            db.ref('settings/heroVideoUrl').on('value', s=>{
+                const u=s.val(),v=document.getElementById('heroVideo'),i=document.getElementById('heroImg');
+                if(u){v.src=u;v.style.display='block';v.play().catch(()=>{});i.style.display='none';}else{v.style.display='none';v.pause();i.style.display='block';}
             });
         }
 
-        function loadFromFirebase() {
-            db.ref('categories').once('value').then(s => { if(s.exists()) appData.categories = s.val(); });
-            db.ref('menu').once('value').then(s => { if(s.exists()) appData.menu = s.val(); });
-            db.ref('settings').once('value').then(s => { if(s.exists()) appData.settings = {...appData.settings, ...s.val()}; });
-            db.ref('images').once('value').then(s => { if(s.exists()) appData.images = s.val(); });
-            db.ref('branding').once('value').then(s => { if(s.exists()) appData.branding = {...appData.branding, ...s.val()}; });
-            db.ref('promotions').once('value').then(s => { appData.promotions = s.exists() ? s.val() : {}; });
-            db.ref('ordini').once('value').then(s => { if (s.exists()) s.forEach(child => { knownOrderIds.add(child.key); }); });
+        function loadFromFirebase(){
+            db.ref('categories').once('value').then(s=>{if(s.exists())appData.categories=s.val();});
+            db.ref('menu').once('value').then(s=>{if(s.exists())appData.menu=s.val();});
+            db.ref('settings').once('value').then(s=>{if(s.exists())appData.settings={...appData.settings,...s.val()};});
+            db.ref('images').once('value').then(s=>{if(s.exists())appData.images=s.val();});
+            db.ref('branding').once('value').then(s=>{if(s.exists())appData.branding={...appData.branding,...s.val()};});
+            db.ref('promotions').once('value').then(s=>{appData.promotions=s.exists()?s.val():{};});
+            db.ref('ordini').once('value').then(s=>{if(s.exists())s.forEach(c=>{knownOrderIds.add(c.key);});});
         }
 
-        function renderAdminOrders(orders) {
-            const list = document.getElementById('ordersList'), countEl = document.getElementById('ordersCount');
-            const entries = Object.entries(orders).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-            const activeOrders = entries.filter(([id, o]) => o.status !== 'delivered');
-            countEl.textContent = activeOrders.length;
-            if (entries.length === 0) { list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem; margin-bottom:10px; display:block;"></i>Nessun ordine ancora</div>'; return; }
-            list.innerHTML = entries.map(([id, o]) => {
-                const statusClass = o.status || 'new';
-                const statusLabels = { new: 'Nuovo', preparing: 'In Preparazione', ready: 'Pronto', delivered: 'Consegnato' };
-                const date = new Date(o.timestamp || 0), timeStr = date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }), dateStr = date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-                let itemsHtml = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>▸ ${i.name} ×${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('') : '';
-                let actionsHtml = '';
-                if (statusClass === 'new') actionsHtml = `<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 In Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-                else if (statusClass === 'preparing') actionsHtml = `<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-                else if (statusClass === 'ready') actionsHtml = `<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Consegnato</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-                else actionsHtml = `<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-                return `<div class="order-card ${statusClass}"><div class="order-header"><span class="order-id">${o.orderId || id}</span><span class="order-time">${dateStr} ${timeStr}</span><span class="order-status-badge status-${statusClass}">${statusLabels[statusClass]}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName || 'N/A'} • 📞 ${o.customerPhone || 'N/A'}</div><div class="order-details"><i class="fas fa-${o.type === 'delivery' ? 'motorcycle' : 'store'}"></i> ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}${o.scheduledTime ? ' • ⏰ ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br><i class="fas fa-map-marker-alt"></i> ' + o.address : ''}${o.notes ? '<br><i class="fas fa-sticky-note"></i> ' + o.notes : ''}</div><div class="order-items">${itemsHtml}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div><div class="order-actions">${actionsHtml}</div></div>`;
+        function renderAdminOrders(orders){
+            const l=document.getElementById('ordersList'),c=document.getElementById('ordersCount'),e=Object.entries(orders).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
+            c.textContent=e.filter(x=>x[1].status!=='delivered').length;
+            if(!e.length){l.innerHTML='<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>';return;}
+            l.innerHTML=e.map(([id,o])=>{
+                const st=o.status||'new',lb={new:'Nuovo',preparing:'In Prep',ready:'Pronto',delivered:'Consegnato'}[st],dt=new Date(o.timestamp||0),ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+                let ih=o.items&&Array.isArray(o.items)?o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join(''):'';
+                let ah='';
+                if(st==='new')ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                else if(st==='preparing')ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                else if(st==='ready')ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+                return `<div class="order-card ${st}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span><span class="order-status-badge status-${st}">${lb}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} • 📞 ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' • ⏰ '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
             }).join('');
         }
+        function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:'🍕 In prep',ready:'✅ Pronto',delivered:'🛵 Consegnato'}[st]||'Aggiornato');}
+        function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Eliminato');}}
 
-        function updateOrderStatus(orderId, status) { db.ref(`ordini/${orderId}/status`).set(status); showToast({ preparing: '🍕 In preparazione', ready: '✅ Pronto', delivered: '🛵 Consegnato' }[status] || 'Stato aggiornato'); }
-        function deleteOrder(orderId) { if (confirm('Eliminare questo ordine?')) { db.ref(`ordini/${orderId}`).remove(); showToast('🗑️ Ordine eliminato'); } }
+        function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
+        function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
+        function renderPromotionsBanner(){const b=document.getElementById('offersBanner'),t=document.getElementById('offerText'),r=document.getElementById('promoRemaining'),a=getActivePromotion();if(a){b.classList.add('show');const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);t.textContent=`🎁 ${a.title} - €${tp.toFixed(2)}`+(a.message?` • ${a.message}`:'');r.textContent=`⚡ Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca!`;b.onclick=()=>addPromoToCart(a.id);}else{b.classList.remove('show');b.onclick=null;}}
+        function getActivePromotion(){const td=new Date().toISOString().split('T')[0],ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0).sort((a,b)=>new Date(a[1].endDate)-new Date(b[1].endDate));return ps.length?{id:ps[0][0],...ps[0][1]}:null;}
+        function addPromoToCart(pid){const p=appData.promotions[pid];if(!p){showToast('❌ Non trovata');return;}const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast('⚠️ Scaduta/Esaurita');return;}if(!p.products||!p.products.length){showToast('⚠️ No prodotti');return;}
+        let tp=p.products.length===1?(/1x\d+|x1|\b1\b.*\b(?:offerta|promo)/i.test(p.title)&&p.products[0].qty===1?p.products[0].price:p.products[0].price*p.products[0].qty):p.products.reduce((s,x)=>s+(x.price*x.qty),0);
+        const e={promoId:pid,promoTitle:p.title,products:p.products.map(x=>({...x})),totalPrice:tp,isPromo:true,cartTimestamp:Date.now()},idx=cart.findIndex(c=>c.isPromo&&c.promoId===pid);
+        if(idx>=0){if(confirm('Aggiungerne un\'altra?'))cart.push(e);else return;}else cart.push(e);
+        updateCartBadge();showToast(`🎁 ${p.title} aggiunta!`);openCart();}
+        function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
+        function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(i.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');const sel=document.getElementById('categorySelect');if(sel)sel.innerHTML='<option value="">Seleziona...</option>'+Object.keys(appData.categories).map(c=>`<option value="${c}">${appData.categories[c].name}</option>`).join('');}
+        function showCategory(c){if(!appData.menu||!appData.menu[c]){showToast('⚠️ Non disp.');return;}document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);document.getElementById('productList').innerHTML=appData.menu[c].map((p,i)=>`<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc||''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div><button class="add-btn-3d" onclick="addToCart('${c}',${i})">+ Aggiungi</button></div>`).join('');window.scrollTo(0,0);}
+        function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';}
+        function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
+        function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
+        function checkIfOpen(){const s=appData.settings;if(s.manualStatus==='open')return true;if(s.manualStatus==='closed')return false;const n=new Date(),d=n.toISOString().split('T')[0];if(s.specialClosures&&s.specialClosures.split(',').map(x=>x.trim()).includes(d))return false;const h=s.hours||"11:00-15:00,18:00-23:00",r=h.split(',').map(x=>x.trim()).filter(Boolean),cm=n.getHours()*60+n.getMinutes();for(let rng of r){const p=rng.split('-');if(p.length!==2)continue;const[sh,sm]=p[0].split(':').map(Number),[eh,em]=p[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(cm>=sh*60+sm&&cm<eh*60+em)return true;}return false;}
+        function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
+        function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
+        function addToCart(c,i){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex)ex.qty++;else cart.push({...it,cat:c,qty:1,isPromo:false});updateCartBadge();showToast(`🛒 ${it.name} aggiunta!`);}
+        function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const b=document.getElementById('cartBadge');if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
+        function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('🗑️ Svuotato');}}
+        function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
+        function selectOrderType(t){orderType=t;document.getElementById('typeDelivery').classList.toggle('active',t==='delivery');document.getElementById('typePickup').classList.toggle('active',t==='pickup');document.getElementById('timeTypeLabel').textContent=t==='delivery'?'consegna':'ritiro';if(t==='delivery')document.getElementById('addressGroup').style.display='block';else{document.getElementById('addressGroup').style.display='none';document.getElementById('customerAddress').value='';}updateCartTotals();}
+        function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime();}
+        function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
+        function openCart(){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
+        if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';}else{let h='';cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${i})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${x.products.map(p=>`<div>▸ ${p.name} ×${p.qty} - €${(p.price*p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b;font-weight:700;">Totale</span><span style="color:#ff6b6b;font-weight:700;">€${x.totalPrice.toFixed(2)}</span></div></div>`;});cart.forEach((x,i)=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;});it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex';const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe);document.getElementById('typeDelivery').onclick=de?()=>selectOrderType('delivery'):()=>showToast('🚫 No');document.getElementById('typePickup').onclick=pe?()=>selectOrderType('pickup'):()=>showToast('🚫 No');if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType);selectTimeMode(timeMode);updateCartTotals();}m.classList.add('active');}
+        function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
+        function closeCart(){document.getElementById('cartModal').classList.remove('active');}
+        function getGPSLocation(){const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress');if(!navigator.geolocation){showToast('📱 No GPS');return;}b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';navigator.geolocation.getCurrentPosition(async p=>{try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}&zoom=18&addressdetails=1`),d=await r.json(),a=d.address;i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;showToast('📍 Trovata!');}catch(e){i.value=`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;}b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';},()=>{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';showToast('❌ Permesso negato');},{enableHighAccuracy:true,timeout:15000});}
+        function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
+        function confirmAndSendOrder(){const n=document.getElementById('customerName').value.trim(),p=document.getElementById('customerPhone').value.trim(),a=document.getElementById('customerAddress').value.trim(),nt=document.getElementById('customerNotes').value.trim();if(!n){showToast('❌ Nome!');return;}if(!p||!validatePhoneNumber(p)){showToast('❌ Tel!');return;}if(orderType==='delivery'&&!a){showToast('❌ Indirizzo!');return;}let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oid='ORD-'+Math.floor(Math.random()*9000+1000),oi=[];cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});});let s=`📋 RIEPILOGO\n\n🔢 ${oid}\n📦 ${orderType==='delivery'?'Consegna':'Ritiro'}\n⏰ ${st}\n👤 ${n}\n📞 ${p}`;if(orderType==='delivery')s+=`\n📍 ${a}`;const pi=cart.filter(i=>i.isPromo),ni=cart.filter(i=>!i.isPromo);if(pi.length){s+=`\n\n🎁 PROMO:`;pi.forEach(x=>{s+=`\n   • ${x.promoTitle} - €${x.totalPrice.toFixed(2)}`;});}if(ni.length){s+=`\n\n🛒 Prodotti:`;ni.forEach(x=>{s+=`\n   • ${x.name} ×${x.qty}`;});}s+=`\n\n💰 Sub: €${pt.toFixed(2)}`;if(df>0)s+=`\n🛵 Cons: €${df.toFixed(2)}`;s+=`\n\n💰 TOT: €${ft.toFixed(2)}\n\nConfermi?`;if(confirm(s))sendOrder({name:n,phone:p,address:a,notes:nt,type:orderType,orderId:oid,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi});}
+        function sendOrder(d){const r=db.ref('ordini').push();r.set({orderId:d.orderId,customerName:d.name,customerPhone:d.phone,address:d.address||'',notes:d.notes||'',type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString()});const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);});const wn=(appData.settings.whatsappNumber||'').replace(/\D/g,'');if(wn){const ts=d.type==='delivery'?'🚚 CONSEGNA':'🏪 RITIRO',el=d.type==='delivery'?'Consegna':'Ritiro';let m=`🍕 *NUOVO ORDINE*\n━━━━━━━━━━━━━━━━━━\n\n🔢 *N°:* ${d.orderId}\n🕐 *Ord:* ${d.orderTimeStr}\n⏰ *${el}:* ${d.scheduledTime}\n📦 *Tipo:* ${ts}\n\n👤 *Cliente:*\n   • ${d.name}\n   • 📞 ${d.phone}\n`;if(d.type==='delivery')m+=`   • 📍 ${d.address}\n`;if(d.notes)m+=`   • 📝 ${d.notes}\n`;if(pi.length){m+=`\n━━━━━━━━━━━━━━━━━━\n🎁 *PROMO*\n━━━━━━━━━━━━━━━━━━\n`;pi.forEach(p=>{m+=`\n🎁 *${p.promoTitle}*\n`;p.products.forEach(pr=>{m+=`   ▸ ${pr.name} ×${pr.qty} = *€${(pr.price*pr.qty).toFixed(2)}*\n`;});m+=`   ─── Tot: *€${p.totalPrice.toFixed(2)}*\n`;});}const ni=cart.filter(i=>!i.isPromo);if(ni.length){m+=`\n━━━━━━━━━━━━━━━━━━\n📋 *PRODOTTI*\n━━━━━━━━━━━━━━━━━━\n`;const g={};ni.forEach(i=>{if(!g[i.cat])g[i.cat]=[];g[i.cat].push(i);});Object.keys(g).forEach(c=>{const it=g[c],sb=it.reduce((s,i)=>s+(i.price*i.qty),0);m+=`\n📂 *${getCategoryDisplayName(c)}*\n`;it.forEach(i=>{m+=`   ▸ ${i.name} ×${i.qty} = *€${(i.price*i.qty).toFixed(2)}*\n`;});m+=`   ─── Sub: €${sb.toFixed(2)}\n`;});}m+=`\n━━━━━━━━━━━━━━━━━━\n🛒 *Sub:* €${d.productsTotal.toFixed(2)}\n`;if(d.deliveryFee>0)m+=`🛵 *Cons:* €${d.deliveryFee.toFixed(2)}\n`;m+=`\n💰 *TOT: €${d.finalTotal.toFixed(2)}*\n━━━━━━━━━━━━━━━━━━\n\n_Grazie da ${appData.branding.name||'Antica Pizzeria Grasso'}!_ 🍕`;const w=`https://api.whatsapp.com/send?phone=${wn}&text=${encodeURIComponent(m)}`;try{const x=window.open(w,'_blank');if(!x||x.closed)window.location.href=w;}catch(e){window.location.href=w;}}cart=[];updateCartBadge();closeCart();document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';selectTimeMode('asap');showToast('✅ Ordine inviato!');}
+        function openAdmin(){const p=prompt("🔐 PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();updateAdminImagePreviews();}else if(p!==null)showToast("🔒 Errato");}
+        function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
+        function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
+        function toggleSwitch(el){el.classList.toggle('on');}
+        function cycleManualStatus(){const e=document.getElementById('manualStatusToggle'),l=document.getElementById('manualStatusLabel');if(!e.classList.contains('on')&&!e.classList.contains('closed')){e.classList.add('on');l.textContent="✅ APERTO";}else if(e.classList.contains('on')){e.classList.remove('on');e.classList.add('closed');l.textContent="❌ CHIUSO";}else{e.classList.remove('closed');l.textContent="Auto";}}
+        function addPromoProductRow(cid,nv='',pv='',qv='1'){const c=document.getElementById(cid),r=document.createElement('div');r.className='promo-product-row';let oh='<option value="">-- Seleziona --</option>';Object.keys(appData.categories).forEach(ct=>{const ci=appData.categories[ct],pr=appData.menu[ct]||[];if(pr.length){oh+=`<optgroup label="${ci.name}">`;pr.forEach(p=>{const ov=`${p.name}|||${p.price}`,sl=(p.name===nv)?'selected':'';oh+=`<option value="${ov}" ${sl}>${p.name} - €${p.price.toFixed(2)}</option>`;});oh+=`</optgroup>`;}});r.innerHTML=`<select onchange="onPromoProductSelect(this)" data-product-name="${nv}">${oh}</select><input type="number" step="0.50" placeholder="€" value="${pv}" class="promo-price-input"><input type="number" min="1" placeholder="Q.tà" value="${qv}"><button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;c.appendChild(r);}
+        function onPromoProductSelect(sel){const r=sel.closest('.promo-product-row'),pi=r.querySelector('.promo-price-input');if(sel.value){const[n,p]=sel.value.split('|||');sel.setAttribute('data-product-name',n);if(pi&&!pi.value)pi.value=p;}}
+        function getPromoProductsFromContainer(cid){const rows=document.querySelectorAll(`#${cid} .promo-product-row`),ps=[];rows.forEach(r=>{const s=r.querySelector('select'),ins=r.querySelectorAll('input'),n=s?(s.getAttribute('data-product-name')||''):'',p=parseFloat(ins[0].value),q=parseInt(ins[1].value)||1;if(n&&!isNaN(p)&&p>=0)ps.push({name:n,price:p,qty:q});});return ps;}
+        function renderAdminPromotions(){const l=document.getElementById('promotionsAdminList'),ps=Object.entries(appData.promotions||{});if(!ps.length){l.innerHTML='<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessuna promo</p>';return;}const td=new Date().toISOString().split('T')[0];l.innerHTML=ps.map(([id,p])=>{const u=p.currentUses||0,lf=p.maxUses-u,tp=(p.products||[]).reduce((s,pr)=>s+(pr.price*pr.qty),0);let st='',sc='';if(!p.active){st='Off';sc='promo-expired';}else if(u>=p.maxUses){st='Esaurita';sc='promo-exhausted';}else if(p.startDate>td){st='In attesa';sc='promo-pending';}else if(p.endDate<td){st='Scaduta';sc='promo-expired';}else{st='Attiva';sc='promo-active';}return `<div class="promo-card"><div class="promo-card-header"><div class="promo-card-title">${p.title} <span style="color:#ff6b6b;">- €${tp.toFixed(2)}</span></div><span class="promo-status-badge ${sc}">${st}</span></div>${p.message?`<div style="color:#8a7a5a;font-size:0.85rem;margin-bottom:8px;">${p.message}</div>`:''}<div class="promo-products-list"><strong style="color:var(--gold);font-size:0.8rem;">Prodotti:</strong><div id="promoProducts_${id}" style="margin-top:8px;">${(p.products||[]).map((pr,idx)=>`<div class="promo-product-row"><select onchange="onPromoProductSelect(this);savePromoProducts('${id}')" data-product-name="${pr.name}"><option value="">--</option>${Object.keys(appData.categories).map(ct=>{const ci=appData.categories[ct],prds=appData.menu[ct]||[];if(!prds.length)return '';return `<optgroup label="${ci.name}">`+prds.map(pd=>{const ov=`${pd.name}|||${pd.price}`,sl=(pd.name===pr.name)?'selected':'';return `<option value="${ov}" ${sl}>${pd.name} - €${pd.price.toFixed(2)}</option>`;}).join('')+`</optgroup>`;}).join('')}</select><input type="number" step="0.50" value="${pr.price}" class="promo-price-input" onchange="savePromoProducts('${id}')"><input type="number" min="1" value="${pr.qty}" onchange="savePromoProducts('${id}')"><button onclick="removePromoProduct('${id}',${idx})"><i class="fas fa-times"></i></button></div>`).join('')}</div><button class="add-promo-product-btn" onclick="addPromoProductRow('promoProducts_${id}');attachPromoProductSave('${id}')"><i class="fas fa-plus"></i> Aggiungi</button></div><div class="promo-card-stats"><div class="promo-stat"><span class="promo-stat-value">${u}</span><span class="promo-stat-label">Usati</span></div><div class="promo-stat"><span class="promo-stat-value">${lf}</span><span class="promo-stat-label">Rimasti</span></div><div class="promo-stat"><span class="promo-stat-value">${p.maxUses}</span><span class="promo-stat-label">Totali</span></div></div><div class="promo-card-dates"><input type="date" value="${p.startDate}" onchange="updatePromo('${id}','startDate',this.value)"><input type="date" value="${p.endDate}" onchange="updatePromo('${id}','endDate',this.value)"></div><div style="display:flex;gap:8px;margin-top:10px;"><input type="number" value="${p.maxUses}" min="1" onchange="updatePromo('${id}','maxUses',parseInt(this.value))" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:0.85rem;"><button onclick="resetPromoUses('${id}')" style="padding:8px 12px;border-radius:6px;border:1px solid var(--gold-dark);background:var(--card);color:var(--gold);cursor:pointer;"><i class="fas fa-sync"></i></button></div><div style="display:flex;gap:8px;margin-top:10px;"><button onclick="togglePromo('${id}')" style="flex:1;padding:10px;border-radius:8px;border:none;background:${p.active?'#f87171':'#4ade80'};color:${p.active?'white':'var(--dark)'};font-weight:700;cursor:pointer;">${p.active?'⏸️ Off':'▶️ On'}</button><button class="delete-product-btn" onclick="deletePromo('${id}')" style="width:40px;height:40px;"><i class="fas fa-trash"></i></button></div></div>`;}).join('');}
+        function attachPromoProductSave(pid){setTimeout(()=>savePromoProducts(pid),500);}
+        function removePromoProduct(pid,idx){if(!confirm("Rimuovere?"))return;appData.promotions[pid].products.splice(idx,1);db.ref(`promotions/${pid}/products`).set(appData.promotions[pid].products);renderAdminPromotions();renderPromotionsBanner();}
+        function savePromoProducts(pid){const ps=getPromoProductsFromContainer(`promoProducts_${pid}`);db.ref(`promotions/${pid}/products`).set(ps);renderAdminPromotions();renderPromotionsBanner();}
+        function createPromotion(){const t=document.getElementById('newPromoTitle').value.trim(),m=document.getElementById('newPromoMessage').value.trim(),s=document.getElementById('newPromoStart').value,e=document.getElementById('newPromoEnd').value,mx=parseInt(document.getElementById('newPromoMaxUses').value),ps=getPromoProductsFromContainer('newPromoProductsList');if(!t){showToast('❌ Titolo');return;}if(!s||!e){showToast('❌ Date');return;}if(s>e){showToast('❌ Date');return;}if(!mx||mx<1){showToast('❌ Max');return;}if(!ps.length){showToast('❌ Prodotti');return;}const id='promo_'+Date.now();db.ref(`promotions/${id}`).set({title:t,message:m,startDate:s,endDate:e,maxUses:mx,currentUses:0,active:true,products:ps,createdAt:Date.now()});document.getElementById('newPromoTitle').value='';document.getElementById('newPromoMessage').value='';document.getElementById('newPromoStart').value='';document.getElementById('newPromoEnd').value='';document.getElementById('newPromoMaxUses').value='';document.getElementById('newPromoProductsList').innerHTML='';showToast('✅ Creata!');}
+        function updatePromo(id,f,v){db.ref(`promotions/${id}/${f}`).set(v);}
+        function togglePromo(id){db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active);}
+        function resetPromoUses(id){if(confirm("Resettare a 0?")){db.ref(`promotions/${id}/currentUses`).set(0);showToast('🔄 Resettato');}}
+        function deletePromo(id){if(confirm("Eliminare?")){db.ref(`promotions/${id}`).remove();showToast('🗑️ Eliminata');}}
+        function renderAdminCategories(){const l=document.getElementById('categoriesAdminList');l.innerHTML=Object.keys(appData.categories).map(k=>{const c=appData.categories[k];return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name||k}</span><button class="delete-product-btn" onclick="deleteCategory('${k}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name||''}" onchange="updateCategory('${k}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon||''}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona"></div></div>`;}).join('');}
+        function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast('❌ Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
+        function updateCategory(k,f,v){appData.categories[k][f]=v;db.ref('categories').set(appData.categories);}
+        function deleteCategory(k){if(!confirm(`Eliminare "${appData.categories[k].name}"?`))return;delete appData.categories[k];delete appData.menu[k];if(appData.images.categories)delete appData.images.categories[k];db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);}
+        function renderAdminProducts(){let h='';Object.keys(appData.categories).forEach(c=>{const ci=appData.categories[c],cn=ci.name,ic=ci.icon||'fa-utensils',pr=appData.menu[c]||[],op=openCategories.has(c);h+=`<div class="admin-category-accordion ${op?'open':''}" id="accordion-${c}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${c}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ic}"></i></div><span class="admin-category-header-title">${cn}</span></div><span class="admin-category-header-count">${pr.length}</span></div><div class="admin-category-body">${pr.map((p,i)=>`<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">${p.name}</span><button class="delete-product-btn" onclick="deleteProduct('${c}',${i})"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="${p.name}" onchange="updateProduct('${c}',${i},'name',this.value)" placeholder="Nome"><input type="text" value="${p.desc||''}" onchange="updateProduct('${c}',${i},'desc',this.value)" placeholder="Desc"><input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${c}',${i},'price',parseFloat(this.value))" placeholder="Prezzo"></div></div>`).join('')}<button class="admin-save add-product-btn" style="margin-top:10px;" onclick="addProduct('${c}')"><i class="fas fa-plus"></i> Aggiungi</button></div></div>`;});document.getElementById('adminProducts').innerHTML=h;}
+        function toggleCategoryAccordion(c){if(openCategories.has(c))openCategories.delete(c);else openCategories.add(c);const e=document.getElementById(`accordion-${c}`);if(e)e.classList.toggle('open');}
+        function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
+        function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
+        function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
+        function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent="❌ CHIUSO";}else lb.textContent="Auto";}
+        function loadCategoryImageInput(){document.getElementById('categoryImageArea').style.display=document.getElementById('categorySelect').value?'block':'none';}
+        function uploadHeroImage(input){if(!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.hero=e.target.result;document.getElementById('heroImg').src=e.target.result;const p=document.getElementById('adminHeroPreview');if(p){p.src=e.target.result;p.style.display='block'}};r.readAsDataURL(f);storage.ref(`images/hero_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.hero=u;db.ref('images/hero').set(u)}));}
+        function uploadCategoryImage(input){const c=document.getElementById('categorySelect').value;if(!c||!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.categories[c]=e.target.result;renderCategories();const p=document.getElementById('adminCatPreview');if(p){p.src=e.target.result;p.style.display='block'}};r.readAsDataURL(f);storage.ref(`images/cat_${c}_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.categories[c]=u;db.ref(`images/categories/${c}`).set(u)}));}
+        function updateAdminImagePreviews(){const p=document.getElementById('adminHeroPreview');if(p&&appData.images.hero){p.src=appData.images.hero;p.style.display='block'}}
+        function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast("❌ Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
+        function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+        window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='adminModal')closeAdmin();}
 
-        function applyBranding() {
-            const name = appData.branding.name || "Antica Pizzeria Grasso", mainEl = document.getElementById('headerTitle');
-            if (name.toLowerCase().includes('grasso')) mainEl.innerHTML = `${name.replace(/grasso/i, '').trim()}<span class="logo-grasso">GRASSO</span>`;
-            else mainEl.textContent = name;
-            document.getElementById('headerSubtitle').textContent = appData.branding.subtitle || "Dal 1980 • Tradizione";
-        }
-        function updateFooter() { document.getElementById('footerInfo').innerHTML = `${appData.branding.city || "Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone || "0884660377"}</span>`; }
-
-        function renderPromotionsBanner() {
-            const banner = document.getElementById('offersBanner'), txt = document.getElementById('offerText'), remaining = document.getElementById('promoRemaining'), activePromo = getActivePromotion();
-            if (activePromo) {
-                banner.classList.add('show');
-                const totalPrice = (activePromo.products || []).reduce((s, p) => s + (p.price * p.qty), 0);
-                txt.textContent = `🎁 ${activePromo.title} - €${totalPrice.toFixed(2)}` + (activePromo.message ? ` • ${activePromo.message}` : '');
-                remaining.textContent = `⚡ Rimasti ${activePromo.maxUses - (activePromo.currentUses || 0)} • Tocca per aggiungere al carrello!`;
-                banner.onclick = () => addPromoToCart(activePromo.id);
-            } else { banner.classList.remove('show'); banner.onclick = null; }
-        }
-
-        function getActivePromotion() {
-            const today = new Date().toISOString().split('T')[0];
-            const promos = Object.entries(appData.promotions || {}).filter(([id, p]) => p.active && p.startDate <= today && p.endDate >= today && (p.currentUses || 0) < p.maxUses && p.products && p.products.length > 0).sort((a, b) => new Date(a[1].endDate) - new Date(b[1].endDate));
-            return promos.length > 0 ? { id: promos[0][0], ...promos[0][1] } : null;
-        }
-
-        function addPromoToCart(promoId) {
-            const promo = appData.promotions[promoId]; if (!promo) { showToast('❌ Promo non trovata'); return; }
-            const today = new Date().toISOString().split('T')[0];
-            if (!promo.active || promo.startDate > today || promo.endDate < today || (promo.currentUses || 0) >= promo.maxUses) { showToast('⚠️ Promo scaduta o esaurita!'); return; }
-            if (!promo.products || promo.products.length === 0) { showToast('⚠️ Questa promo non ha prodotti configurati'); return; }
-            let totalPrice = promo.products.length === 1 ? (/1x\d+|x1|\b1\b.*\b(?:offerta|promo)/i.test(promo.title) && promo.products[0].qty === 1 ? promo.products[0].price : promo.products[0].price * promo.products[0].qty) : promo.products.reduce((s, p) => s + (p.price * p.qty), 0);
-            const promoCartEntry = { promoId, promoTitle: promo.title, products: promo.products.map(p => ({ ...p })), totalPrice, isPromo: true, cartTimestamp: Date.now() };
-            const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === promoId);
-            if (existingIdx >= 0) { if (confirm(`Hai già questa promo nel carrello. Vuoi aggiungerne un'altra?`)) cart.push(promoCartEntry); else return; } else cart.push(promoCartEntry);
-            updateCartBadge(); showToast(`🎁 ${promo.title} aggiunta al carrello!`); openCart();
-        }
-
-        function getCategoryDisplayName(catKey) { return (appData.categories[catKey] && appData.categories[catKey].name) || catKey; }
-        function renderCategories() {
-            const list = document.getElementById('categoriesList');
-            list.innerHTML = Object.keys(appData.categories).map(cat => {
-                const products = appData.menu[cat] || [], catInfo = appData.categories[cat], imgSrc = (appData.images.categories && appData.images.categories[cat]) || '';
-                return `<div class="menu-btn-3d" onclick="showCategory('${cat}')"><div class="category-img-container"><img class="category-img" src="${imgSrc}" alt="${cat}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(catInfo.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${catInfo.icon || 'fa-utensils'}"></i></div><div class="btn-content"><h3>${catInfo.name}</h3><p>${products.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;
-            }).join('');
-            const sel = document.getElementById('categorySelect'); if(sel) sel.innerHTML = '<option value="">Seleziona categoria...</option>' + Object.keys(appData.categories).map(c => `<option value="${c}">${appData.categories[c].name}</option>`).join('');
-        }
-        function showCategory(cat) { if (!appData.menu || !appData.menu[cat]) { showToast('⚠️ Categoria non disponibile'); return; } document.getElementById('mainMenu').style.display = 'none'; document.getElementById('productsView').style.display = 'block'; document.getElementById('categoryTitle').textContent = getCategoryDisplayName(cat); document.getElementById('productList').innerHTML = appData.menu[cat].map((p, i) => `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div><button class="add-btn-3d" onclick="addToCart('${cat}', ${i})">+ Aggiungi</button></div>`).join(''); window.scrollTo(0,0); }
-        function showHome() { document.getElementById('mainMenu').style.display = 'block'; document.getElementById('productsView').style.display = 'none'; }
-        function applyImages() { if (appData.images.hero) document.getElementById('heroImg').src = appData.images.hero; renderCategories(); }
-        function updateStatusBanner() { const banner = document.getElementById('statusBanner'), text = document.getElementById('statusText'), isOpen = checkIfOpen(); banner.className = `status-banner ${isOpen ? 'status-open' : 'status-closed'}`; text.textContent = isOpen ? 'APERTO' : 'CHIUSO'; }
-        function checkIfOpen() { const s = appData.settings; if (s.manualStatus === 'open') return true; if (s.manualStatus === 'closed') return false; const now = new Date(), dateStr = now.toISOString().split('T')[0]; if (s.specialClosures && s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr)) return false; const hoursStr = s.hours || "11:00-15:00,18:00-23:00", ranges = hoursStr.split(',').map(r => r.trim()).filter(Boolean), currentMins = now.getHours() * 60 + now.getMinutes(); for (let range of ranges) { const parts = range.split('-'); if (parts.length !== 2) continue; const [sh, sm] = parts[0].split(':').map(Number), [eh, em] = parts[1].split(':').map(Number); if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue; if (currentMins >= sh*60+sm && currentMins < eh*60+em) return true; } return false; }
-        function updateServicesUI() { const deliveryBtn = document.getElementById('deliveryBtn'); if (appData.settings.deliveryEnabled === false) { deliveryBtn.classList.add('disabled'); deliveryBtn.onclick = () => showToast('🚫 Delivery non disponibile'); } else { deliveryBtn.classList.remove('disabled'); deliveryBtn.onclick = () => checkStatusBeforeOrder('delivery'); } }
-        function checkStatusBeforeOrder(type) { if (!checkIfOpen()) { showToast('⚠️ Siamo chiusi!'); return; } if (type === 'delivery' && appData.settings.deliveryEnabled === false) { showToast('🚫 Delivery non disponibile'); return; } if (type === 'pickup' && appData.settings.pickupEnabled === false) { showToast('🚫 Ritiro non disponibile'); return; } orderType = type; openCart(); }
-        function addToCart(cat, idx) { if (!appData.menu || !appData.menu[cat] || !appData.menu[cat][idx]) { showToast('⚠️ Errore'); return; } const item = appData.menu[cat][idx], existing = cart.find(c => !c.isPromo && c.name === item.name && c.cat === cat); if (existing) existing.qty++; else cart.push({ ...item, cat, qty: 1, isPromo: false }); updateCartBadge(); showToast(`🛒 ${item.name} aggiunta!`); }
-        function updateCartBadge() { let count = 0; cart.forEach(i => { if (i.isPromo) count += 1; else count += (i.qty || 0); }); const badge = document.getElementById('cartBadge'); if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; } try { localStorage.setItem('pizzeria_cart_v3', JSON.stringify(cart)); } catch(e) {} }
-        function clearCart() { if(cart.length === 0) return; if(confirm("Svuotare il carrello?")) { cart = []; updateCartBadge(); closeCart(); showToast("🗑️ Carrello svuotato"); } }
-        function updateCartTotals() { let productsTotal = 0; cart.forEach(i => { if (i.isPromo) productsTotal += i.totalPrice; else productsTotal += (i.price * i.qty); }); const deliveryFee = (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) ? (parseFloat(appData.settings.deliveryFee) || 0) : 0, finalTotal = productsTotal + deliveryFee, feeRow = document.getElementById('deliveryFeeRow'), feeValue = document.getElementById('deliveryFeeValue'); if (deliveryFee > 0 && cart.length > 0) { feeRow.style.display = 'flex'; feeValue.textContent = `€${deliveryFee.toFixed(2)}`; } else feeRow.style.display = 'none'; document.getElementById('totalAmount').textContent = `€${finalTotal.toFixed(2)}`; }
-        function selectOrderType(type) { orderType = type; document.getElementById('typeDelivery').classList.toggle('active', type === 'delivery'); document.getElementById('typePickup').classList.toggle('active', type === 'pickup'); document.getElementById('timeTypeLabel').textContent = type === 'delivery' ? 'consegna' : 'ritiro'; if (type === 'delivery') document.getElementById('addressGroup').style.display = 'block'; else { document.getElementById('addressGroup').style.display = 'none'; document.getElementById('customerAddress').value = ''; } updateCartTotals(); }
-        function selectTimeMode(mode) { timeMode = mode; document.getElementById('timeAsap').classList.toggle('active', mode === 'asap'); document.getElementById('timeScheduled').classList.toggle('active', mode === 'scheduled'); document.getElementById('timePickerWrap').classList.toggle('show', mode === 'scheduled'); if (mode === 'scheduled') setupMinTime(); }
-        function setupMinTime() { const inp = document.getElementById('scheduledTime'), now = new Date(); now.setMinutes(Math.ceil(now.getMinutes() / 5) * 5, 0, 0); if (!inp.value) inp.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; }
-        function openCart() { if (!checkIfOpen()) { showToast('⚠️ Siamo chiusi!'); return; } const modal = document.getElementById('cartModal'), itemsDiv = document.getElementById('cartItems'), totalSec = document.getElementById('cartTotalSection'), checkBtn = document.getElementById('checkoutBtn'), clearBtn = document.getElementById('clearCartBtn'), custForm = document.getElementById('customerForm'), typeToggle = document.getElementById('orderTypeToggle'); if (cart.length === 0) { itemsDiv.innerHTML = '<p style="text-align:center; color:#8a7a5a; padding:20px 0;">Il carrello è vuoto</p>'; totalSec.style.display = 'none'; checkBtn.style.display = 'none'; clearBtn.style.display = 'none'; custForm.style.display = 'none'; typeToggle.style.display = 'none'; document.getElementById('deliveryFeeRow').style.display = 'none'; } else { let html = ''; cart.forEach((item, idx) => { if (item.isPromo) html += `<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${item.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${idx})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${item.products.map(p => `<div>▸ ${p.name} ×${p.qty} - €${(p.price * p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b; font-weight:700;">Totale promo</span><span style="color:#ff6b6b; font-weight:700;">€${item.totalPrice.toFixed(2)}</span></div></div>`; }); cart.forEach((item, idx) => { if (!item.isPromo) html += `<div class="cart-item-3d"><span class="cart-item-name">${item.name} × ${item.qty}</span><span class="cart-item-price">€${(item.price * item.qty).toFixed(2)}</span></div>`; }); itemsDiv.innerHTML = html; totalSec.style.display = 'flex'; checkBtn.style.display = 'block'; clearBtn.style.display = 'flex'; custForm.style.display = 'block'; typeToggle.style.display = 'flex'; const delEn = appData.settings.deliveryEnabled !== false, picEn = appData.settings.pickupEnabled !== false; document.getElementById('typeDelivery').classList.toggle('disabled', !delEn); document.getElementById('typePickup').classList.toggle('disabled', !picEn); document.getElementById('typeDelivery').onclick = delEn ? () => selectOrderType('delivery') : () => showToast('🚫 Delivery non disponibile'); document.getElementById('typePickup').onclick = picEn ? () => selectOrderType('pickup') : () => showToast('🚫 Ritiro non disponibile'); if (!delEn && picEn) selectOrderType('pickup'); else if (delEn && !picEn) selectOrderType('delivery'); else selectOrderType(orderType); selectTimeMode(timeMode); updateCartTotals(); } modal.classList.add('active'); }
-        function removePromoFromCartAtIndex(idx) { if (cart[idx] && cart[idx].isPromo) { cart.splice(idx, 1); updateCartBadge(); openCart(); showToast('🗑️ Promo rimossa'); } }
-        function closeCart() { document.getElementById('cartModal').classList.remove('active'); }
-        function getGPSLocation() { const btn = document.getElementById('gpsBtn'), inp = document.getElementById('customerAddress'); if (!navigator.geolocation) { showToast('📱 GPS non supportato'); return; } btn.classList.add('loading'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rilevamento...'; navigator.geolocation.getCurrentPosition(async (pos) => { try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=18&addressdetails=1`), d = await r.json(), addr = d.address; inp.value = [addr.road, addr.house_number, addr.city || addr.town].filter(Boolean).join(', ') || `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); } catch(e) { inp.value = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`; } btn.classList.remove('loading'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Usa la mia posizione GPS'; }, () => { btn.classList.remove('loading'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Usa la mia posizione GPS'; showToast('❌ Permesso GPS negato'); }, { enableHighAccuracy: true, timeout: 15000 }); }
-        function validatePhoneNumber(p) { const c = p.replace(/\D/g,''); return c.length >= 9 && c.length <= 15; }
-        function confirmAndSendOrder() { const name = document.getElementById('customerName').value.trim(), phone = document.getElementById('customerPhone').value.trim(), address = document.getElementById('customerAddress').value.trim(), notes = document.getElementById('customerNotes').value.trim(); if (!name) { showToast('❌ Inserisci il nome!'); return; } if (!phone || !validatePhoneNumber(phone)) { showToast('❌ Telefono non valido!'); return; } if (orderType === 'delivery' && !address) { showToast('❌ Inserisci l\'indirizzo!'); return; } let productsTotal = 0; cart.forEach(i => { if (i.isPromo) productsTotal += i.totalPrice; else productsTotal += (i.price * i.qty); }); const deliveryFee = (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) ? (parseFloat(appData.settings.deliveryFee) || 0) : 0, finalTotal = productsTotal + deliveryFee, scheduledTime = timeMode === 'asap' ? 'Subito' : (document.getElementById('scheduledTime').value || 'Subito'), orderId = 'ORD-' + Math.floor(Math.random() * 9000 + 1000), orderItems = []; cart.forEach(i => { if (i.isPromo) orderItems.push({ name: `🎁 ${i.promoTitle}`, qty: 1, price: i.totalPrice, isPromo: true }); else orderItems.push({ name: i.name, qty: i.qty, price: i.price, cat: i.cat }); }); let summary = `📋 RIEPILOGO\n\n🔢 ${orderId}\n📦 ${orderType === 'delivery' ? 'Consegna' : 'Ritiro'}\n⏰ ${scheduledTime}\n👤 ${name}\n📞 ${phone}`; if (orderType === 'delivery') summary += `\n📍 ${address}`; const promoItems = cart.filter(i => i.isPromo), normalItems = cart.filter(i => !i.isPromo); if (promoItems.length > 0) { summary += `\n\n🎁 PROMO:`; promoItems.forEach(p => { summary += `\n   • ${p.promoTitle} - €${p.totalPrice.toFixed(2)}`; }); } if (normalItems.length > 0) { summary += `\n\n🛒 Prodotti:`; normalItems.forEach(i => { summary += `\n   • ${i.name} ×${i.qty}`; }); } summary += `\n\n💰 Subtotale: €${productsTotal.toFixed(2)}`; if (deliveryFee > 0) summary += `\n🛵 Consegna: €${deliveryFee.toFixed(2)}`; summary += `\n\n💰 TOTALE: €${finalTotal.toFixed(2)}\n\nConfermi?`; if (confirm(summary)) sendOrder({ name, phone, address, notes, type: orderType, orderId, scheduledTime, orderTimeStr: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }), productsTotal, deliveryFee, finalTotal, items: orderItems }); }
-        function sendOrder(data) { const orderRef = db.ref('ordini').push(); orderRef.set({ orderId: data.orderId, customerName: data.name, customerPhone: data.phone, address: data.address || '', notes: data.notes || '', type: data.type, scheduledTime: data.scheduledTime, items: data.items, productsTotal: data.productsTotal, deliveryFee: data.deliveryFee, finalTotal: data.finalTotal, status: 'new', timestamp: Date.now(), createdAt: new Date().toISOString() }); const promoItems = cart.filter(i => i.isPromo); promoItems.forEach(item => { db.ref(`promotions/${item.promoId}/currentUses`).transaction(v => (v || 0) + 1); }); const waNum = (appData.settings.whatsappNumber || '').replace(/\D/g,''); if (waNum) { const tipoStr = data.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO', etaLabel = data.type === 'delivery' ? 'Consegna' : 'Ritiro'; let msg = `🍕 *NUOVO ORDINE*\n━━━━━━━━━━━━━━━━━━\n\n🔢 *N° Ordine:* ${data.orderId}\n🕐 *Ordinato:* ${data.orderTimeStr}\n⏰ *${etaLabel}:* ${data.scheduledTime}\n📦 *Tipo:* ${tipoStr}\n\n👤 *Cliente:*\n   • ${data.name}\n   • 📞 ${data.phone}\n`; if (data.type === 'delivery') msg += `   • 📍 ${data.address}\n`; if (data.notes) msg += `   • 📝 ${data.notes}\n`; if (promoItems.length > 0) { msg += `\n━━━━━━━━━━━━━━━━━━\n🎁 *PROMO APPLICATE*\n━━━━━━━━━━━━━━━━━━\n`; promoItems.forEach(p => { msg += `\n🎁 *${p.promoTitle}*\n`; p.products.forEach(pr => { msg += `   ▸ ${pr.name} ×${pr.qty} = *€${(pr.price * pr.qty).toFixed(2)}*\n`; }); msg += `   ─── Totale: *€${p.totalPrice.toFixed(2)}*\n`; }); } const normalItems = cart.filter(i => !i.isPromo); if (normalItems.length > 0) { msg += `\n━━━━━━━━━━━━━━━━━━\n📋 *PRODOTTI ORDINATI*\n━━━━━━━━━━━━━━━━━━\n`; const grouped = {}; normalItems.forEach(i => { if (!grouped[i.cat]) grouped[i.cat] = []; grouped[i.cat].push(i); }); Object.keys(grouped).forEach(cat => { const items = grouped[cat], sub = items.reduce((s, i) => s + (i.price * i.qty), 0); msg += `\n📂 *${getCategoryDisplayName(cat)}*\n`; items.forEach(i => { msg += `   ▸ ${i.name} ×${i.qty} = *€${(i.price*i.qty).toFixed(2)}*\n`; }); msg += `   ─── Subtotale: €${sub.toFixed(2)}\n`; }); } msg += `\n━━━━━━━━━━━━━━━━━━\n🛒 *Subtotale:* €${data.productsTotal.toFixed(2)}\n`; if (data.deliveryFee > 0) msg += `🛵 *Consegna:* €${data.deliveryFee.toFixed(2)}\n`; msg += `\n💰 *TOTALE: €${data.finalTotal.toFixed(2)}*\n━━━━━━━━━━━━━━━━━━\n\n_Grazie da ${appData.branding.name || 'Antica Pizzeria Grasso'}!_ 🍕`; const waUrl = `https://api.whatsapp.com/send?phone=${waNum}&text=${encodeURIComponent(msg)}`; try { const w = window.open(waUrl, '_blank'); if (!w || w.closed) window.location.href = waUrl; } catch(e) { window.location.href = waUrl; } } cart = []; updateCartBadge(); closeCart(); document.getElementById('customerName').value = ''; document.getElementById('customerPhone').value = ''; document.getElementById('customerAddress').value = ''; document.getElementById('customerNotes').value = ''; document.getElementById('scheduledTime').value = ''; selectTimeMode('asap'); showToast('✅ Ordine inviato e salvato!'); }
-        function openAdmin() { const pass = prompt("🔐 PIN Admin:"); if (pass === (appData.settings.adminPin || "1234")) { document.getElementById('adminModal').classList.add('active'); renderAdminProducts(); renderAdminCategories(); renderAdminPromotions(); loadAdminSettings(); updateAdminImagePreviews(); } else if (pass !== null) showToast("🔒 PIN Errato"); }
-        function closeAdmin() { document.getElementById('adminModal').classList.remove('active'); }
-        function switchAdminTab(e, tab) { document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.admin-panel-content').forEach(c => c.classList.remove('active')); e.target.classList.add('active'); document.getElementById(`admin-${tab}`).classList.add('active'); }
-        function toggleSwitch(el) { el.classList.toggle('on'); }
-        function cycleManualStatus() { const el = document.getElementById('manualStatusToggle'), label = document.getElementById('manualStatusLabel'); if (!el.classList.contains('on') && !el.classList.contains('closed')) { el.classList.add('on'); label.textContent = "✅ APERTO forzato"; } else if (el.classList.contains('on')) { el.classList.remove('on'); el.classList.add('closed'); label.textContent = "❌ CHIUSO forzato"; } else { el.classList.remove('closed'); label.textContent = "Auto"; } }
-        function addPromoProductRow(containerId, nameVal = '', priceVal = '', qtyVal = '1') { const container = document.getElementById(containerId), row = document.createElement('div'); row.className = 'promo-product-row'; let optionsHtml = '<option value="">-- Seleziona --</option>'; Object.keys(appData.categories).forEach(cat => { const catInfo = appData.categories[cat], products = appData.menu[cat] || []; if (products.length > 0) { optionsHtml += `<optgroup label="${catInfo.name}">`; products.forEach(p => { const optValue = `${p.name}|||${p.price}`, selected = (p.name === nameVal) ? 'selected' : ''; optionsHtml += `<option value="${optValue}" ${selected}>${p.name} - €${p.price.toFixed(2)}</option>`; }); optionsHtml += `</optgroup>`; } }); row.innerHTML = `<select onchange="onPromoProductSelect(this)" data-product-name="${nameVal}">${optionsHtml}</select><input type="number" step="0.50" placeholder="€" value="${priceVal}" class="promo-price-input"><input type="number" min="1" placeholder="Q.tà" value="${qtyVal}"><button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`; container.appendChild(row); }
-        function onPromoProductSelect(selectEl) { const row = selectEl.closest('.promo-product-row'), priceInput = row.querySelector('.promo-price-input'); if (selectEl.value) { const [name, price] = selectEl.value.split('|||'); selectEl.setAttribute('data-product-name', name); if (priceInput && !priceInput.value) priceInput.value = price; } }
-        function getPromoProductsFromContainer(containerId) { const rows = document.querySelectorAll(`#${containerId} .promo-product-row`), products = []; rows.forEach(row => { const select = row.querySelector('select'), inputs = row.querySelectorAll('input'), name = select ? (select.getAttribute('data-product-name') || '') : '', price = parseFloat(inputs[0].value), qty = parseInt(inputs[1].value) || 1; if (name && !isNaN(price) && price >= 0) products.push({ name, price, qty }); }); return products; }
-        function renderAdminPromotions() { const list = document.getElementById('promotionsAdminList'), promos = Object.entries(appData.promotions || {}); if (promos.length === 0) { list.innerHTML = '<p style="color:#8a7a5a; text-align:center; padding:20px;">Nessuna promozione creata</p>'; return; } const today = new Date().toISOString().split('T')[0]; list.innerHTML = promos.map(([id, p]) => { const uses = p.currentUses || 0, left = p.maxUses - uses, totalPrice = (p.products || []).reduce((s, pr) => s + (pr.price * pr.qty), 0); let status = '', statusClass = ''; if (!p.active) { status = 'Disattivata'; statusClass = 'promo-expired'; } else if (uses >= p.maxUses) { status = 'Esaurita'; statusClass = 'promo-exhausted'; } else if (p.startDate > today) { status = 'In attesa'; statusClass = 'promo-pending'; } else if (p.endDate < today) { status = 'Scaduta'; statusClass = 'promo-expired'; } else { status = 'Attiva'; statusClass = 'promo-active'; } return `<div class="promo-card"><div class="promo-card-header"><div class="promo-card-title">${p.title} <span style="color:#ff6b6b;">- €${totalPrice.toFixed(2)}</span></div><span class="promo-status-badge ${statusClass}">${status}</span></div>${p.message ? `<div style="color:#8a7a5a; font-size:0.85rem; margin-bottom:8px;">${p.message}</div>` : ''}<div class="promo-products-list"><strong style="color:var(--gold); font-size:0.8rem;">Prodotti inclusi:</strong><div id="promoProducts_${id}" style="margin-top:8px;">${(p.products || []).map((pr, idx) => `<div class="promo-product-row"><select onchange="onPromoProductSelect(this); savePromoProducts('${id}')" data-product-name="${pr.name}"><option value="">-- Seleziona --</option>${Object.keys(appData.categories).map(cat => { const catInfo = appData.categories[cat], products = appData.menu[cat] || []; if (products.length === 0) return ''; return `<optgroup label="${catInfo.name}">` + products.map(prod => { const optValue = `${prod.name}|||${prod.price}`, selected = (prod.name === pr.name) ? 'selected' : ''; return `<option value="${optValue}" ${selected}>${prod.name} - €${prod.price.toFixed(2)}</option>`; }).join('') + `</optgroup>`; }).join('')}</select><input type="number" step="0.50" value="${pr.price}" class="promo-price-input" onchange="savePromoProducts('${id}')"><input type="number" min="1" value="${pr.qty}" onchange="savePromoProducts('${id}')"><button onclick="removePromoProduct('${id}', ${idx})"><i class="fas fa-times"></i></button></div>`).join('')}</div><button class="add-promo-product-btn" onclick="addPromoProductRow('promoProducts_${id}'); attachPromoProductSave('${id}')"><i class="fas fa-plus"></i> Aggiungi prodotto</button></div><div class="promo-card-stats"><div class="promo-stat"><span class="promo-stat-value">${uses}</span><span class="promo-stat-label">Usati</span></div><div class="promo-stat"><span class="promo-stat-value">${left}</span><span class="promo-stat-label">Rimasti</span></div><div class="promo-stat"><span class="promo-stat-value">${p.maxUses}</span><span class="promo-stat-label">Totali</span></div></div><div class="promo-card-dates"><input type="date" value="${p.startDate}" onchange="updatePromo('${id}','startDate',this.value)"><input type="date" value="${p.endDate}" onchange="updatePromo('${id}','endDate',this.value)"></div><div style="display:flex; gap:8px; margin-top:10px;"><input type="number" value="${p.maxUses}" min="1" onchange="updatePromo('${id}','maxUses',parseInt(this.value))" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream); font-size:0.85rem;"><button onclick="resetPromoUses('${id}')" style="padding:8px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--gold); cursor:pointer;"><i class="fas fa-sync"></i></button></div><div style="display:flex; gap:8px; margin-top:10px;"><button onclick="togglePromo('${id}')" style="flex:1; padding:10px; border-radius:8px; border:none; background:${p.active ? '#f87171' : '#4ade80'}; color:${p.active ? 'white' : 'var(--dark)'}; font-weight:700; cursor:pointer;">${p.active ? '⏸️ Disattiva' : '▶️ Attiva'}</button><button class="delete-product-btn" onclick="deletePromo('${id}')" style="width:40px; height:40px;"><i class="fas fa-trash"></i></button></div></div>`; }).join(''); }
-        function attachPromoProductSave(promoId) { setTimeout(() => savePromoProducts(promoId), 500); }
-        function removePromoProduct(promoId, idx) { if (!confirm("Rimuovere questo prodotto dalla promo?")) return; appData.promotions[promoId].products.splice(idx, 1); db.ref(`promotions/${promoId}/products`).set(appData.promotions[promoId].products); renderAdminPromotions(); renderPromotionsBanner(); }
-        function savePromoProducts(promoId) { const products = getPromoProductsFromContainer(`promoProducts_${promoId}`); db.ref(`promotions/${promoId}/products`).set(products); renderAdminPromotions(); renderPromotionsBanner(); }
-        function createPromotion() { const title = document.getElementById('newPromoTitle').value.trim(), message = document.getElementById('newPromoMessage').value.trim(), start = document.getElementById('newPromoStart').value, end = document.getElementById('newPromoEnd').value, maxUses = parseInt(document.getElementById('newPromoMaxUses').value), products = getPromoProductsFromContainer('newPromoProductsList'); if (!title) { showToast('❌ Inserisci il titolo!'); return; } if (!start || !end) { showToast('❌ Inserisci le date!'); return; } if (start > end) { showToast('❌ Data fine dopo inizio!'); return; } if (!maxUses || maxUses < 1) { showToast('❌ Max utilizzi non valido!'); return; } if (products.length === 0) { showToast('❌ Aggiungi almeno un prodotto!'); return; } const id = 'promo_' + Date.now(); db.ref(`promotions/${id}`).set({ title, message, startDate: start, endDate: end, maxUses, currentUses: 0, active: true, products, createdAt: Date.now() }); document.getElementById('newPromoTitle').value = ''; document.getElementById('newPromoMessage').value = ''; document.getElementById('newPromoStart').value = ''; document.getElementById('newPromoEnd').value = ''; document.getElementById('newPromoMaxUses').value = ''; document.getElementById('newPromoProductsList').innerHTML = ''; showToast('✅ Promozione creata!'); }
-        function updatePromo(id, field, value) { db.ref(`promotions/${id}/${field}`).set(value); }
-        function togglePromo(id) { db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active); }
-        function resetPromoUses(id) { if (confirm("Resettare il contatore a 0?")) { db.ref(`promotions/${id}/currentUses`).set(0); showToast('🔄 Contatore resettato'); } }
-        function deletePromo(id) { if (confirm("Eliminare questa promozione?")) { db.ref(`promotions/${id}`).remove(); showToast('🗑️ Promozione eliminata'); } }
-        function renderAdminCategories() { const list = document.getElementById('categoriesAdminList'); list.innerHTML = Object.keys(appData.categories).map(key => { const c = appData.categories[key]; return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name || key}</span><button class="delete-product-btn" onclick="deleteCategory('${key}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name || ''}" onchange="updateCategory('${key}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon || ''}" onchange="updateCategory('${key}','icon',this.value)" placeholder="Icona"></div></div>`; }).join(''); }
-        function addCategory() { const name = prompt("Nome categoria:"); if (!name) return; const icon = prompt("Icona FontAwesome:", "fa-utensils") || "fa-utensils", key = prompt("Chiave tecnica (minuscole):"); if (!key || !/^[a-z][a-z0-9_]*$/.test(key) || appData.categories[key]) { showToast('❌ Chiave non valida!'); return; } appData.categories[key] = { name, icon }; if (!appData.menu[key]) appData.menu[key] = []; if (!appData.images.categories[key]) appData.images.categories[key] = ''; db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images); showToast('✅ Categoria aggiunta!'); }
-        function updateCategory(key, field, value) { appData.categories[key][field] = value; db.ref('categories').set(appData.categories); }
-        function deleteCategory(key) { if (!confirm(`Eliminare "${appData.categories[key].name}"?`)) return; delete appData.categories[key]; delete appData.menu[key]; if (appData.images.categories) delete appData.images.categories[key]; db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images); }
-        function renderAdminProducts() { let html = ''; Object.keys(appData.categories).forEach(cat => { const catInfo = appData.categories[cat], catName = catInfo.name, catIcon = catInfo.icon || 'fa-utensils', products = appData.menu[cat] || [], isOpen = openCategories.has(cat); html += `<div class="admin-category-accordion ${isOpen ? 'open' : ''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${catIcon}"></i></div><span class="admin-category-header-title">${catName}</span></div><span class="admin-category-header-count">${products.length}</span></div><div class="admin-category-body">${products.map((p, i) => `<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">${p.name}</span><button class="delete-product-btn" onclick="deleteProduct('${cat}', ${i})"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="${p.name}" onchange="updateProduct('${cat}', ${i}, 'name', this.value)" placeholder="Nome"><input type="text" value="${p.desc || ''}" onchange="updateProduct('${cat}', ${i}, 'desc', this.value)" placeholder="Descrizione"><input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${cat}', ${i}, 'price', parseFloat(this.value))" placeholder="Prezzo"></div></div>`).join('')}<button class="admin-save add-product-btn" style="margin-top:10px;" onclick="addProduct('${cat}')"><i class="fas fa-plus"></i> Aggiungi</button></div></div>`; }); document.getElementById('adminProducts').innerHTML = html; }
-        function toggleCategoryAccordion(cat) { if (openCategories.has(cat)) openCategories.delete(cat); else openCategories.add(cat); const el = document.getElementById(`accordion-${cat}`); if (el) el.classList.toggle('open'); }
-        function addProduct(cat) { const n=prompt("Nome:"); if(!n)return; const p=parseFloat(prompt("Prezzo:","5.00"))||5, d=prompt("Desc:","")||""; if(!appData.menu[cat]) appData.menu[cat]=[]; appData.menu[cat].push({name:n,price:p,desc:d}); db.ref('menu').set(appData.menu); renderAdminProducts(); showToast('✅ Aggiunto'); }
-        function deleteProduct(cat, idx) { if(confirm(`Eliminare?`)){ appData.menu[cat].splice(idx,1); db.ref('menu').set(appData.menu); renderAdminProducts(); } }
-        function updateProduct(cat, idx, field, value) { appData.menu[cat][idx][field]=value; db.ref('menu').set(appData.menu); }
-        function loadAdminSettings() { const s=appData.settings, b=appData.branding; document.getElementById('brandName').value=b.name||''; document.getElementById('brandSubtitle').value=b.subtitle||''; document.getElementById('brandCity').value=b.city||''; document.getElementById('hoursInput').value=s.hours; document.getElementById('specialClosures').value=s.specialClosures; document.getElementById('whatsappNumber').value=s.whatsappNumber; document.getElementById('visiblePhone').value=s.visiblePhone; document.getElementById('deliveryToggle').classList.toggle('on', s.deliveryEnabled !== false); document.getElementById('pickupToggle').classList.toggle('on', s.pickupEnabled !== false); document.getElementById('deliveryFeeInput').value = s.deliveryFee !== undefined ? s.deliveryFee : 2.00; const mst = document.getElementById('manualStatusToggle'), label = document.getElementById('manualStatusLabel'); mst.classList.remove('on','closed'); if (s.manualStatus === 'open') { mst.classList.add('on'); label.textContent = "✅ APERTO forzato"; } else if (s.manualStatus === 'closed') { mst.classList.add('closed'); label.textContent = "❌ CHIUSO forzato"; } else label.textContent = "Auto"; }
-        function loadCategoryImageInput() { document.getElementById('categoryImageArea').style.display=document.getElementById('categorySelect').value?'block':'none'; }
-        function uploadHeroImage(input) { if(!input.files[0])return; const f=input.files[0], r=new FileReader(); r.onload=e=>{ appData.images.hero=e.target.result; document.getElementById('heroImg').src=e.target.result; const p=document.getElementById('adminHeroPreview'); if(p){p.src=e.target.result;p.style.display='block'} }; r.readAsDataURL(f); storage.ref(`images/hero_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.hero=u;db.ref('images/hero').set(u)})); }
-        function uploadCategoryImage(input) { const cat=document.getElementById('categorySelect').value; if(!cat||!input.files[0])return; const f=input.files[0], r=new FileReader(); r.onload=e=>{ appData.images.categories[cat]=e.target.result; renderCategories(); const p=document.getElementById('adminCatPreview'); if(p){p.src=e.target.result;p.style.display='block'} }; r.readAsDataURL(f); storage.ref(`images/cat_${cat}_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.categories[cat]=u;db.ref(`images/categories/${cat}`).set(u)})); }
-        function updateAdminImagePreviews() { const p=document.getElementById('adminHeroPreview'); if(p&&appData.images.hero){p.src=appData.images.hero;p.style.display='block'} }
-        function saveAllSettings() { const cp=document.getElementById('currentPin').value, np=document.getElementById('newPin').value, cf=document.getElementById('confirmPin').value; if(np) { if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato!");return;} if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre!");return;} if(np!==cf){showToast("❌ Non coincidono!");return;} appData.settings.adminPin=np; db.ref('settings/adminPin').set(np); showToast("✅ PIN modificato!"); } db.ref('branding').update({ name: document.getElementById('brandName').value || "Antica Pizzeria Grasso", subtitle: document.getElementById('brandSubtitle').value || "Dal 1980 • Tradizione", city: document.getElementById('brandCity').value || "Manfredonia" }); const mst = document.getElementById('manualStatusToggle'); let manualStatus = 'auto'; if (mst.classList.contains('on')) manualStatus = 'open'; else if (mst.classList.contains('closed')) manualStatus = 'closed'; const deliveryFeeValue = parseFloat(document.getElementById('deliveryFeeInput').value), deliveryFee = isNaN(deliveryFeeValue) || deliveryFeeValue < 0 ? 0 : deliveryFeeValue; db.ref('settings').update({ hours: document.getElementById('hoursInput').value, specialClosures: document.getElementById('specialClosures').value, whatsappNumber: document.getElementById('whatsappNumber').value, visiblePhone: document.getElementById('visiblePhone').value, manualStatus, deliveryEnabled: document.getElementById('deliveryToggle').classList.contains('on'), pickupEnabled: document.getElementById('pickupToggle').classList.contains('on'), deliveryFee: deliveryFee }); db.ref('menu').set(appData.menu); db.ref('images').set(appData.images); db.ref('categories').set(appData.categories); applyBranding(); updateFooter(); renderCategories(); updateStatusBanner(); updateServicesUI(); showToast('✅ Tutto salvato!'); }
-        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
-        window.onclick = e => { if(e.target.id==='cartModal')closeCart(); if(e.target.id==='adminModal')closeAdmin(); }
-
-        // 🎨 PALETTE & 🎬 VIDEO HERO LOGIC
-        function changePalette(paletteName) {
-            db.ref('settings/colorPalette').set(paletteName);
-            applyPalette(paletteName);
-            showToast('🎨 Palette aggiornata!');
-            const label = document.getElementById('currentPaletteName');
-            if(label) label.textContent = paletteName.charAt(0).toUpperCase() + paletteName.slice(1);
-        }
-        function applyPalette(paletteName) {
-            const palettes = {
-                autunno: { gold:"#d4a84b", goldLight:"#f0d78c", goldDark:"#b8860b", dark:"#1a1209", brown:"#2d1f12", cream:"#f5e6c8" },
-                inverno: { gold:"#a8c3d4", goldLight:"#d4e6f0", goldDark:"#5a7b8c", dark:"#0c121a", brown:"#1a2530", cream:"#e6f0f5" },
-                primavera: { gold:"#8cd4a8", goldLight:"#e6f5e6", goldDark:"#4a8c5a", dark:"#0a1a12", brown:"#1a2d1f", cream:"#f5f5e6" },
-                estate: { gold:"#e8a84b", goldLight:"#ffe0a0", goldDark:"#c47a20", dark:"#1a1005", brown:"#3d2510", cream:"#fff5e0" }
-            };
-            const p = palettes[paletteName] || palettes.autunno, r = document.documentElement.style;
-            r.setProperty('--gold', p.gold); r.setProperty('--gold-light', p.goldLight); r.setProperty('--gold-dark', p.goldDark);
-            r.setProperty('--dark', p.dark); r.setProperty('--brown', p.brown); r.setProperty('--cream', p.cream);
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', p.gold);
-        }
-        function activateHeroVideo() {
-            const url = document.getElementById('heroVideoInput').value;
-            if(!url) { showToast('❌ Inserisci un link al video!'); return; }
-            db.ref('settings/heroVideoUrl').set(url);
-            showToast('🎬 Video attivato!');
-        }
-        function deactivateHeroVideo() {
-            db.ref('settings/heroVideoUrl').remove();
-            showToast('🖼️ Immagine ripristinata!');
-        }
+        // 🎨 PALETTE & 🎬 VIDEO LOGIC
+        function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast('🎨 Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+n.slice(1);}
+        function applyPalette(n){const p={autunno:{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},inverno:{gold:"#a8c3d4",goldLight:"#d4e6f0",goldDark:"#5a7b8c",dark:"#0c121a",brown:"#1a2530",cream:"#e6f0f5"},primavera:{gold:"#8cd4a8",goldLight:"#e6f5e6",goldDark:"#4a8c5a",dark:"#0a1a12",brown:"#1a2d1f",cream:"#f5f5e6"},estate:{gold:"#e8a84b",goldLight:"#ffe0a0",goldDark:"#c47a20",dark:"#1a1005",brown:"#3d2510",cream:"#fff5e0"},natale:{gold:"#c41e3a",goldLight:"#ff6b6b",goldDark:"#8a1c2b",dark:"#0f2018",brown:"#1a3325",cream:"#f5f0e6"},san_valentino:{gold:"#ff4d6d",goldLight:"#ffccd5",goldDark:"#c9184a",dark:"#1a0a0f",brown:"#2d1520",cream:"#fff0f3"},notte:{gold:"#7209b7",goldLight:"#b5179e",goldDark:"#3a0ca3",dark:"#050510",brown:"#0b0b1a",cream:"#e0e7ff"}}[n]||{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},r=document.documentElement.style;r.setProperty('--gold',p.gold);r.setProperty('--gold-light',p.goldLight);r.setProperty('--gold-dark',p.goldDark);r.setProperty('--dark',p.dark);r.setProperty('--brown',p.brown);r.setProperty('--cream',p.cream);document.querySelector('meta[name="theme-color"]').setAttribute('content',p.gold);}
+        function activateHeroVideo(){const u=document.getElementById('heroVideoInput').value;if(!u){showToast('❌ Link!');return;}db.ref('settings/heroVideoUrl').set(u);showToast('🎬 Attivato!');}
+        function deactivateHeroVideo(){db.ref('settings/heroVideoUrl').remove();showToast('🖼️ Fissa!');}
+        function uploadVideoFromPhone(input){const f=input.files[0];if(!f)return;if(f.size>15*1024*1024){showToast('❌ Max 15MB');return;}document.getElementById('videoUploadProgress').style.display='block';const pb=document.getElementById('videoProgressBar'),ts=Date.now(),ref=storage.ref(`hero_videos/video_${ts}.mp4`),task=ref.put(f);task.on('state_changed',s=>{pb.style.width=`${(s.bytesTransferred/s.totalBytes)*100}%`;},e=>{showToast('❌ Errore: '+e.message);document.getElementById('videoUploadProgress').style.display='none';},()=>{task.snapshot.ref.getDownloadURL().then(u=>{db.ref('settings/heroVideoUrl').set(u);showToast('✅ Video caricato!');document.getElementById('videoUploadProgress').style.display='none';pb.style.width='0%';});});}
     </script>
 </body>
 </html>
