@@ -69,15 +69,9 @@
         .offers-banner .close-offer { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; }
         .promo-remaining { display: block; font-size: 0.7rem; margin-top: 5px; opacity: 0.8; font-weight: 600; }
         @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
-                <div class="hero-section">
-            <!-- ✅ NUOVO: Video per ricorrenze -->
-            <video id="heroVideo" autoplay loop muted playsinline style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:1;"></video>
-            
-            <img id="heroImg" class="hero-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pizza" style="position:relative; z-index:2;">
-            <div class="hero-overlay" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index:3;"></div>
-        </div>
-        .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); }
+        .hero-section { position: relative; height: 240px; overflow: hidden; }
+        .hero-img, .hero-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
         .section-divider { display: flex; align-items: center; padding: 20px 25px 10px; }
         .section-divider span { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); }
         .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark), transparent); margin: 0 15px; }
@@ -277,6 +271,7 @@
         </div>
 
         <div class="hero-section">
+            <video id="heroVideo" class="hero-video" autoplay loop muted playsinline style="display:none;"></video>
             <img id="heroImg" class="hero-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pizza">
             <div class="hero-overlay"></div>
         </div>
@@ -376,7 +371,7 @@
                 <button class="admin-tab" onclick="switchAdminTab(event,'hours')">⏰ Orari</button>
                 <button class="admin-tab" onclick="switchAdminTab(event,'whatsapp')">📱 WhatsApp</button>
                 <button class="admin-tab" onclick="switchAdminTab(event,'security')">🔒 Sicurezza</button>
-                <button class="admin-tab" onclick="switchAdminTab(event,'palette')">🎨 Colori</button>
+                <button class="admin-tab" onclick="switchAdminTab(event,'palette')">🎨 Colori & Video</button>
             </div>
 
             <!-- TAB ORDINI -->
@@ -476,27 +471,23 @@
                 <div class="admin-group"><label>Conferma Nuovo PIN</label><input type="password" id="confirmPin" class="admin-input"></div>
             </div>
 
-            <!-- TAB PALETTE COLORI -->
+            <!-- TAB PALETTE & VIDEO -->
             <div id="admin-palette" class="admin-panel-content">
                 <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-palette"></i> Palette Colori</h3>
                 <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Scegli il tema del sito. Il cambiamento è immediato per tutti gli utenti.</p>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                     <div onclick="changePalette('autunno')" style="background:linear-gradient(135deg, #d4a84b 0%, #2d1f12 100%); padding:20px; border-radius:12px; cursor:pointer; border:3px solid var(--gold); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-leaf" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
-                        Autunno
+                        <i class="fas fa-leaf" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Autunno
                     </div>
                     <div onclick="changePalette('inverno')" style="background:linear-gradient(135deg, #a8c3d4 0%, #1a2530 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-snowflake" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
-                        Inverno
+                        <i class="fas fa-snowflake" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Inverno
                     </div>
                     <div onclick="changePalette('primavera')" style="background:linear-gradient(135deg, #8cd4a8 0%, #1a2d1f 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-seedling" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
-                        Primavera
+                        <i class="fas fa-seedling" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Primavera
                     </div>
                     <div onclick="changePalette('estate')" style="background:linear-gradient(135deg, #e8a84b 0%, #3d2510 100%); padding:20px; border-radius:12px; cursor:pointer; border:2px solid rgba(255,255,255,0.3); text-align:center; color:white; font-weight:700;">
-                        <i class="fas fa-sun" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
-                        Estate
+                        <i class="fas fa-sun" style="font-size:2rem; display:block; margin-bottom:8px;"></i> Estate
                     </div>
                 </div>
                 
@@ -504,20 +495,16 @@
                     <strong style="color:var(--gold);"><i class="fas fa-info-circle"></i> Palette attuale:</strong> 
                     <span id="currentPaletteName" style="color:var(--cream); margin-left:8px;">Caricamento...</span>
                 </div>
-                            </div> <!-- Chiude il box "Palette attuale" -->
-            
-            <!-- ✅ INCOLLATO QUI: Controllo Video Hero -->
-            <div style="margin-top:20px; padding:15px; background:var(--card); border-radius:12px; border:1px solid var(--gold-dark);">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:8px;"><i class="fas fa-film"></i> Video Ricorrenza (URL MP4)</label>
-                <input type="text" id="heroVideoInput" class="admin-input" placeholder="https://...link-al-tuo-video.mp4">
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button onclick="activateHeroVideo()" style="flex:1; background:#4ade80; color:var(--dark); border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">▶️ Attiva Video</button>
-                    <button onclick="deactivateHeroVideo()" style="flex:1; background:#f87171; color:white; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">🛑 Immagine fissa</button>
-                </div>
-                <p style="color:#8a7a5a; font-size:0.7rem; margin-top:5px;">💡 Usa video brevi (<5MB) in formato .mp4 per caricamento istantaneo.</p>
-            </div>
 
-        </div> <!-- Chiude #admin-palette -->
+                <div style="margin-top:20px; padding:15px; background:var(--card); border-radius:12px; border:1px solid var(--gold-dark);">
+                    <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:8px;"><i class="fas fa-film"></i> Video Ricorrenza (URL MP4)</label>
+                    <input type="text" id="heroVideoInput" class="admin-input" placeholder="https://...link-al-tuo-video.mp4">
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="activateHeroVideo()" style="flex:1; background:#4ade80; color:var(--dark); border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">▶️ Attiva Video</button>
+                        <button onclick="deactivateHeroVideo()" style="flex:1; background:#f87171; color:white; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">🛑 Immagine fissa</button>
+                    </div>
+                    <p style="color:#8a7a5a; font-size:0.7rem; margin-top:5px;">💡 Usa video brevi (<5MB) in formato .mp4 per caricamento istantaneo.</p>
+                </div>
             </div>
 
             <button class="admin-save" onclick="saveAllSettings()"><i class="fas fa-save"></i> Salva Modifiche</button>
@@ -642,12 +629,19 @@
                     knownOrderIds.add(id);
                 });
             });
-            // Listener per cambio palette in tempo reale
             db.ref('settings/colorPalette').on('value', snap => {
-                const palette = snap.val() || 'autunno';
-                applyPalette(palette);
-                const el = document.getElementById('currentPaletteName');
-                if(el) el.textContent = palette.charAt(0).toUpperCase() + palette.slice(1);
+                const palette = snap.val() || 'autunno'; applyPalette(palette);
+                const el = document.getElementById('currentPaletteName'); if(el) el.textContent = palette.charAt(0).toUpperCase() + palette.slice(1);
+            });
+            db.ref('settings/heroVideoUrl').on('value', snap => {
+                const url = snap.val();
+                const videoEl = document.getElementById('heroVideo');
+                const imgEl = document.getElementById('heroImg');
+                if (url) {
+                    videoEl.src = url; videoEl.style.display = 'block'; videoEl.play().catch(()=>{}); imgEl.style.display = 'none';
+                } else {
+                    videoEl.style.display = 'none'; videoEl.pause(); imgEl.style.display = 'block';
+                }
             });
         }
 
@@ -786,7 +780,7 @@
         function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
         window.onclick = e => { if(e.target.id==='cartModal')closeCart(); if(e.target.id==='adminModal')closeAdmin(); }
 
-        // 🎨 FUNZIONI PALETTE COLORI
+        // 🎨 PALETTE & 🎬 VIDEO HERO LOGIC
         function changePalette(paletteName) {
             db.ref('settings/colorPalette').set(paletteName);
             applyPalette(paletteName);
@@ -806,9 +800,6 @@
             r.setProperty('--dark', p.dark); r.setProperty('--brown', p.brown); r.setProperty('--cream', p.cream);
             document.querySelector('meta[name="theme-color"]').setAttribute('content', p.gold);
         }
-                } // ← Questa è la parentesi di chiusura di applyPalette
-
-        // 🎬 LOGICA VIDEO HERO (Incolla sotto la })
         function activateHeroVideo() {
             const url = document.getElementById('heroVideoInput').value;
             if(!url) { showToast('❌ Inserisci un link al video!'); return; }
@@ -819,22 +810,6 @@
             db.ref('settings/heroVideoUrl').remove();
             showToast('🖼️ Immagine ripristinata!');
         }
-        db.ref('settings/heroVideoUrl').on('value', snap => {
-            const url = snap.val();
-            const videoEl = document.getElementById('heroVideo');
-            const imgEl = document.getElementById('heroImg');
-            if (url) {
-                videoEl.src = url;
-                videoEl.style.display = 'block';
-                videoEl.play().catch(()=>{});
-                imgEl.style.display = 'none';
-            } else {
-                videoEl.style.display = 'none';
-                videoEl.pause();
-                imgEl.style.display = 'block';
-            }
-        });
-    </script>
     </script>
 </body>
 </html>
