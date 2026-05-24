@@ -7,7 +7,6 @@
     <meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
     <link rel="canonical" href="https://teogra-c8cf5.web.app/">
     
-    <!-- PWA MANIFEST & ICONE -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-512.png">
@@ -16,18 +15,15 @@
     <link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
     <meta name="theme-color" content="#d4a84b">
     
-    <!-- ANDROID: Nasconde barre browser -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pizzeria Grasso">
     
-    <!-- ANTI-CACHE -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <!-- Fallback SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%F0%9F%8D%95%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
     
     <meta property="og:type" content="restaurant">
@@ -60,7 +56,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; overflow: hidden; }
         body { background: #0a0704; display: flex; justify-content: center; font-family: 'Montserrat', sans-serif; }
-        .phone-frame { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; /* Dynamic viewport height per Android */ background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); position: relative; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+        .phone-frame { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); position: relative; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
         .header { background: linear-gradient(180deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%); padding: 25px 20px 20px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2); position: relative; z-index: 20; flex-shrink: 0; }
         .logo-main { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; color: var(--dark); letter-spacing: 1px; line-height: 1.1; }
         .logo-grasso { display: block; font-size: 1.3rem; letter-spacing: 6px; margin-top: 4px; color: var(--brown); font-weight: 700; }
@@ -100,7 +96,6 @@
         .back-btn-3d { background: var(--card-light); border: none; color: var(--gold); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 20px 0; box-shadow: 0 4px 0 var(--shadow); }
         .category-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 20px; }
         
-        /* 🔍 BARRA DI RICERCA */
         .search-bar-3d { position: relative; margin-bottom: 20px; }
         .search-bar-3d input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 14px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 1rem; outline: none; box-shadow: 0 4px 0 var(--shadow); }
         .search-bar-3d i { position: absolute; left: 15px; top: 14px; color: var(--gold); z-index: 2; }
@@ -172,6 +167,8 @@
         .toggle-switch.closed { background: #f87171; }
         .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: 0.3s; }
         .toggle-switch.on::after, .toggle-switch.closed::after { left: 25px; }
+        .day-toggle { padding: 10px 4px; border-radius: 8px; background: var(--card); border: 1px solid var(--gold-dark); color: #8a7a5a; text-align: center; font-size: 0.8rem; cursor: pointer; user-select: none; transition: all 0.2s; }
+        .day-toggle.active { background: var(--gold-dark); color: var(--dark); border-color: var(--gold); font-weight: 700; }
         .admin-category-accordion { background: var(--card-light); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); overflow: hidden; }
         .admin-category-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; user-select: none; }
         .admin-category-header-left { display: flex; align-items: center; gap: 10px; flex: 1; }
@@ -225,7 +222,6 @@
         .delivery-fee-input-row .currency { color: var(--gold); font-size: 1.3rem; font-weight: 700; }
         .delivery-fee-input-row input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 1.1rem; font-weight: 700; text-align: center; }
         .delivery-fee-info { color: #8a7a5a; font-size: 0.75rem; margin-top: 8px; line-height: 1.5; }
-        /* ORDINI ADMIN */
         .order-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
         .order-card.new-order { border-left: 4px solid #f87171; animation: pulseNew 2s infinite; }
         .order-card.preparing { border-left: 4px solid #fbbf24; }
@@ -294,13 +290,10 @@
         <div id="productsView" class="products-view">
             <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
             <h2 id="categoryTitle" class="category-title">Categoria</h2>
-            
-            <!-- 🔍 BARRA DI RICERCA -->
             <div class="search-bar-3d">
                 <i class="fas fa-search"></i>
                 <input type="text" id="productSearch" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
             </div>
-            
             <div id="productList"></div>
             <button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; margin-bottom:30px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
         </div>
@@ -442,6 +435,18 @@
 
             <div id="admin-hours" class="admin-panel-content">
                 <div class="admin-group"><label>Stato Manuale</label><div class="admin-toggle"><span id="manualStatusLabel">Auto</span><div class="toggle-switch" id="manualStatusToggle" onclick="cycleManualStatus()"></div></div></div>
+                <div class="admin-group"><label>Giorni di Apertura</label>
+                    <div class="days-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px;">
+                        <div class="day-toggle" data-day="lun" onclick="toggleDay(this)">Lun</div>
+                        <div class="day-toggle" data-day="mar" onclick="toggleDay(this)">Mar</div>
+                        <div class="day-toggle" data-day="mer" onclick="toggleDay(this)">Mer</div>
+                        <div class="day-toggle" data-day="gio" onclick="toggleDay(this)">Gio</div>
+                        <div class="day-toggle" data-day="ven" onclick="toggleDay(this)">Ven</div>
+                        <div class="day-toggle" data-day="sab" onclick="toggleDay(this)">Sab</div>
+                        <div class="day-toggle" data-day="dom" onclick="toggleDay(this)">Dom</div>
+                    </div>
+                    <p style="color:#8a7a5a; font-size:0.7rem; margin-top:5px;">Seleziona i giorni aperti. Se vuoto = sempre aperto.</p>
+                </div>
                 <div class="admin-group"><label>Orari (HH:MM-HH:MM)</label><textarea id="hoursInput" class="admin-input" rows="4" placeholder="11:00-15:00,18:00-23:00"></textarea></div>
                 <div class="admin-group"><label>Chiusure Speciali (YYYY-MM-DD)</label><input type="text" id="specialClosures" class="admin-input" placeholder="2026-12-25, 2027-01-01"></div>
             </div>
@@ -515,7 +520,7 @@
                 bibite:[...DEFAULT_BIBITE]
             },
             promotions:{},
-            settings:{whatsappNumber:"+390884660377",visiblePhone:"0884660377",manualStatus:"auto",hours:"11:00-15:00,18:00-23:00",specialClosures:"",adminPin:"1234",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00},
+            settings:{whatsappNumber:"+390884660377",visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",specialClosures:"",adminPin:"1234",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00},
             branding:{name:"Antica Pizzeria Grasso",subtitle:"Dal 1980 • Tradizione",city:"Manfredonia"},
             images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{pizze:"https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",focacce:"https://i.ibb.co/PspxmnY8/IMG-0083.jpg",frittura:"https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",bibite:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"}}
         };
@@ -622,8 +627,34 @@
         
         function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';currentSearchCat='';}
         function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
+        
+        function checkIfOpen(){
+            const s = appData.settings;
+            if (s.manualStatus === 'open') return true;
+            if (s.manualStatus === 'closed') return false;
+            
+            const days = ['dom','lun','mar','mer','gio','ven','sab'];
+            const today = days[new Date().getDay()];
+            if (s.openDays && s.openDays.length > 0 && !s.openDays.includes(today)) return false;
+            
+            const dateStr = new Date().toISOString().split('T')[0];
+            if (s.specialClosures && s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr)) return false;
+            
+            const hoursStr = s.hours || "11:00-15:00,18:00-23:00";
+            const ranges = hoursStr.split(',').map(r => r.trim()).filter(Boolean);
+            const currentMins = new Date().getHours() * 60 + new Date().getMinutes();
+            for (let range of ranges) {
+                const parts = range.split('-');
+                if (parts.length !== 2) continue;
+                const [sh, sm] = parts[0].split(':').map(Number);
+                const [eh, em] = parts[1].split(':').map(Number);
+                if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue;
+                if (currentMins >= sh*60+sm && currentMins < eh*60+em) return true;
+            }
+            return false;
+        }
+        
         function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
-        function checkIfOpen(){const s=appData.settings;if(s.manualStatus==='open')return true;if(s.manualStatus==='closed')return false;const n=new Date(),d=n.toISOString().split('T')[0];if(s.specialClosures&&s.specialClosures.split(',').map(x=>x.trim()).includes(d))return false;const h=s.hours||"11:00-15:00,18:00-23:00",r=h.split(',').map(x=>x.trim()).filter(Boolean),cm=n.getHours()*60+n.getMinutes();for(let rng of r){const p=rng.split('-');if(p.length!==2)continue;const[sh,sm]=p[0].split(':').map(Number),[eh,em]=p[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(cm>=sh*60+sm&&cm<eh*60+em)return true;}return false;}
         function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
         function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
         function addToCart(c,i){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex)ex.qty++;else cart.push({...it,cat:c,qty:1,isPromo:false});updateCartBadge();showToast(`🛒 ${it.name} aggiunta!`);}
@@ -646,6 +677,7 @@
         function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
         function toggleSwitch(el){el.classList.toggle('on');}
         function cycleManualStatus(){const e=document.getElementById('manualStatusToggle'),l=document.getElementById('manualStatusLabel');if(!e.classList.contains('on')&&!e.classList.contains('closed')){e.classList.add('on');l.textContent="✅ APERTO";}else if(e.classList.contains('on')){e.classList.remove('on');e.classList.add('closed');l.textContent="❌ CHIUSO";}else{e.classList.remove('closed');l.textContent="Auto";}}
+        function toggleDay(el){el.classList.toggle('active');}
         function addPromoProductRow(cid,nv='',pv='',qv='1'){const c=document.getElementById(cid),r=document.createElement('div');r.className='promo-product-row';let oh='<option value="">-- Seleziona --</option>';Object.keys(appData.categories).forEach(ct=>{const ci=appData.categories[ct],pr=appData.menu[ct]||[];if(pr.length){oh+=`<optgroup label="${ci.name}">`;pr.forEach(p=>{const ov=`${p.name}|||${p.price}`,sl=(p.name===nv)?'selected':'';oh+=`<option value="${ov}" ${sl}>${p.name} - €${p.price.toFixed(2)}</option>`;});oh+=`</optgroup>`;}});r.innerHTML=`<select onchange="onPromoProductSelect(this)" data-product-name="${nv}">${oh}</select><input type="number" step="0.50" placeholder="€" value="${pv}" class="promo-price-input"><input type="number" min="1" placeholder="Q.tà" value="${qv}"><button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;c.appendChild(r);}
         function onPromoProductSelect(sel){const r=sel.closest('.promo-product-row'),pi=r.querySelector('.promo-price-input');if(sel.value){const[n,p]=sel.value.split('|||');sel.setAttribute('data-product-name',n);if(pi&&!pi.value)pi.value=p;}}
         function getPromoProductsFromContainer(cid){const rows=document.querySelectorAll(`#${cid} .promo-product-row`),ps=[];rows.forEach(r=>{const s=r.querySelector('select'),ins=r.querySelectorAll('input'),n=s?(s.getAttribute('data-product-name')||''):'',p=parseFloat(ins[0].value),q=parseInt(ins[1].value)||1;if(n&&!isNaN(p)&&p>=0)ps.push({name:n,price:p,qty:q});});return ps;}
@@ -667,12 +699,26 @@
         function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
         function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
         function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
-        function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent="❌ CHIUSO";}else lb.textContent="Auto";}
+        function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent="❌ CHIUSO";}else lb.textContent="Auto";
+            const openDays = s.openDays ? s.openDays.split(',') : [];
+            document.querySelectorAll('.day-toggle').forEach(el => {
+                if (openDays.includes(el.dataset.day)) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
         function loadCategoryImageInput(){document.getElementById('categoryImageArea').style.display=document.getElementById('categorySelect').value?'block':'none';}
         function uploadHeroImage(input){if(!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.hero=e.target.result;document.getElementById('heroImg').src=e.target.result;const p=document.getElementById('adminHeroPreview');if(p){p.src=e.target.result;p.style.display='block'}};r.readAsDataURL(f);storage.ref(`images/hero_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.hero=u;db.ref('images/hero').set(u)}));}
         function uploadCategoryImage(input){const c=document.getElementById('categorySelect').value;if(!c||!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.categories[c]=e.target.result;renderCategories();const p=document.getElementById('adminCatPreview');if(p){p.src=e.target.result;p.style.display='block'}};r.readAsDataURL(f);storage.ref(`images/cat_${c}_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.categories[c]=u;db.ref(`images/categories/${c}`).set(u)}));}
         function updateAdminImagePreviews(){const p=document.getElementById('adminHeroPreview');if(p&&appData.images.hero){p.src=appData.images.hero;p.style.display='block'}}
-        function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast("❌ Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
+        function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast("❌ Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}
+            const openDays = Array.from(document.querySelectorAll('.day-toggle.active')).map(el => el.dataset.day).join(',');
+            db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});
+            const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';
+            const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;
+            db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,openDays:openDays,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df});
+            db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);
+            applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');
+        }
         function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
         window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='adminModal')closeAdmin();}
 
