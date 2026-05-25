@@ -17,6 +17,9 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 20px; }
 
 .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 15px 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.header-content { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.header-logo { height: 45px; width: 45px; object-fit: contain; border-radius: 10px; background: white; padding: 4px; }
+.header-logo-emoji { font-size: 2rem; }
 .header h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 3px; }
 .header p { font-size: 0.85rem; opacity: 0.95; }
 .logout-btn { position: absolute; right: 15px; top: 12px; background: rgba(0,0,0,0.2); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
@@ -25,7 +28,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
 .login-box { background: var(--card); padding: 30px 25px; border-radius: 16px; width: 100%; max-width: 320px; box-shadow: var(--shadow); border: 1px solid var(--primary-dark); }
-.login-box .logo { font-size: 3rem; margin-bottom: 15px; }
+.login-logo { width: 120px; height: 120px; object-fit: contain; margin-bottom: 15px; border-radius: 20px; background: white; padding: 10px; box-shadow: 0 4px 15px rgba(212,136,6,0.3); }
+.login-logo-emoji { font-size: 4rem; margin-bottom: 15px; }
 .login-box h2 { color: var(--primary); margin-bottom: 10px; }
 .login-box p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
 .pin-input { width: 100%; padding: 14px; font-size: 1.4rem; text-align: center; letter-spacing: 12px; border: 2px solid var(--primary); border-radius: 12px; background: var(--bg); color: var(--text); margin-bottom: 15px; font-weight: 600; }
@@ -52,7 +56,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .order-card:active { transform: scale(0.99); }
 .order-card.status-accepted { border-left-color: var(--accepted); }
 .order-card.status-delivered { border-left-color: var(--delivered); opacity: 0.7; }
-.order-card.status-cancelled { border-left-color: var(--danger); opacity: 0.5; }
 .order-card.new { animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,136,6,0.4); } 50% { box-shadow: 0 0 0 10px rgba(212,136,6,0); } }
 
@@ -96,6 +99,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 @media (max-width: 480px) {
 .header h1 { font-size: 1.15rem; }
+.header-logo { height: 38px; width: 38px; }
 .order-actions .btn { min-width: 75px; padding: 8px 10px; font-size: 0.8rem; }
 }
 </style>
@@ -104,8 +108,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <div class="header">
 <button class="logout-btn" onclick="logout()">🚪 Esci</button>
-<h1>🛵 Grasso Delivery</h1>
-<p>App Fattorini • Antica Pizzeria Grasso</p>
+<div class="header-content">
+    <img id="headerLogo" src="" alt="Logo" class="header-logo" style="display:none;">
+    <span id="headerLogoEmoji" class="header-logo-emoji">🛵</span>
+    <div>
+        <h1>Grasso Delivery</h1>
+        <p>Area Fattorini • Antica Pizzeria Grasso</p>
+    </div>
+</div>
 </div>
 
 <div class="new-order-alert" id="newOrderAlert">🔔 Nuovo Ordine!</div>
@@ -114,12 +124,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
-<div class="logo">🛵</div>
-<h2>Accesso Fattorini</h2>
-<p>Inserisci il tuo codice PIN</p>
-<input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric" autocomplete="one-time-code">
-<button class="btn btn-primary" onclick="login()">Accedi</button>
-<p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary)">PIN: chiedi al titolare</p>
+    <img id="loginLogo" src="" alt="Logo" class="login-logo" style="display:none;">
+    <div id="loginLogoEmoji" class="login-logo-emoji">🛵</div>
+    <h2>Accesso Fattorini</h2>
+    <p>Inserisci il tuo codice PIN</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric" autocomplete="one-time-code">
+    <button class="btn btn-primary" onclick="login()">Accedi</button>
+    <p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary)">PIN: chiedi al titolare</p>
 </div>
 </div>
 
@@ -175,18 +186,36 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
+// 🖼️ LOGO FATTORINI (caricato da Firebase)
+db.ref('settings/driverLogo').on('value', snapshot => {
+    const logoUrl = snapshot.val();
+    if (logoUrl) {
+        // Header logo
+        const headerLogo = document.getElementById('headerLogo');
+        const headerEmoji = document.getElementById('headerLogoEmoji');
+        headerLogo.src = logoUrl;
+        headerLogo.style.display = 'block';
+        headerEmoji.style.display = 'none';
+        
+        // Login logo
+        const loginLogo = document.getElementById('loginLogo');
+        const loginEmoji = document.getElementById('loginLogoEmoji');
+        loginLogo.src = logoUrl;
+        loginLogo.style.display = 'block';
+        loginEmoji.style.display = 'none';
+    }
+});
+
 // 👤 CONFIGURAZIONE FATTORINI DINAMICA (da Firebase)
-let drivers = {}; // Verrà popolato dal database
+let drivers = {};
 let driversLoaded = false;
 
-// Carica i fattorini da Firebase in tempo reale
 db.ref('drivers').on('value', snapshot => {
     const data = snapshot.val();
     if (data && Object.keys(data).length > 0) {
         drivers = data;
         driversLoaded = true;
     } else {
-        // Fallback se il database è vuoto (prima configurazione)
         drivers = { '1111': 'Marco', '2222': 'Luca', '3333': 'Pippo' };
         driversLoaded = true;
     }
@@ -220,7 +249,7 @@ function toggleSound() {
     document.getElementById('soundToggle').classList.toggle('muted', !audioEnabled);
 }
 
-// 🔐 LOGIN CON NOME (legge da Firebase)
+// 🔐 LOGIN
 function login() {
     const pin = document.getElementById('pinInput').value;
     
@@ -234,7 +263,7 @@ function login() {
     if (driverName) {
         currentUser = driverName;
         localStorage.setItem('grasso_driver_session', currentUser);
-        localStorage.setItem('grasso_driver_pin', pin); // Salviamo il PIN per sincronizzazione
+        localStorage.setItem('grasso_driver_pin', pin);
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         showToast(`👋 Benvenuto, ${driverName}!`);
@@ -251,22 +280,22 @@ function logout() {
     location.reload();
 }
 
-// ✅ Controlla sessione salvata
 if (localStorage.getItem('grasso_driver_session')) {
     const savedName = localStorage.getItem('grasso_driver_session');
     const savedPin = localStorage.getItem('grasso_driver_pin');
     
-    // Verifica che il PIN sia ancora valido (nel caso il titolare lo abbia cambiato)
-    if (savedPin && drivers[savedPin] === savedName) {
-        currentUser = savedName;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        initDashboard();
-    } else {
-        // Se il PIN non è più valido, richiedi login
-        localStorage.removeItem('grasso_driver_session');
-        localStorage.removeItem('grasso_driver_pin');
-    }
+    // Verifica ritardata (aspetta che drivers sia caricato)
+    setTimeout(() => {
+        if (savedPin && drivers[savedPin] === savedName) {
+            currentUser = savedName;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            initDashboard();
+        } else if (driversLoaded) {
+            localStorage.removeItem('grasso_driver_session');
+            localStorage.removeItem('grasso_driver_pin');
+        }
+    }, 500);
 }
 
 // 📊 Dashboard Init
@@ -281,7 +310,6 @@ function initDashboard() {
     });
 }
 
-//  Controlla nuovi ordini
 function checkNewOrders() {
     const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
     if (pending.length > lastOrderCount && lastOrderCount > 0) {
@@ -293,7 +321,6 @@ function checkNewOrders() {
     if (lastOrderCount === 0) lastOrderCount = pending.length;
 }
 
-// 📈 Aggiorna statistiche
 function updateStats() {
     const all = Object.values(ordersData);
     const today = new Date().toDateString();
@@ -305,7 +332,6 @@ function updateStats() {
     document.getElementById('todayTotal').textContent = '€' + total.toFixed(2);
 }
 
-// 🔀 Filtra ordini
 function filterOrders(filter) {
     currentFilter = filter;
     document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
@@ -313,7 +339,6 @@ function filterOrders(filter) {
     renderOrders();
 }
 
-//  Renderizza ordini
 function renderOrders() {
     const container = document.getElementById('ordersContainer');
     let orders = Object.entries(ordersData).map(([id, data]) => ({ id, ...data }));
@@ -346,7 +371,7 @@ function renderOrders() {
         <span class="status-badge status-${statusClass}">${statusText}</span>
         </div>
         <div class="order-customer">👤 ${order.customerName || 'Cliente'}</div>
-        <div class="order-address"> ${order.type === 'delivery' ? (order.address || 'Indirizzo non specificato') : ' Ritiro in pizzeria'}</div>
+        <div class="order-address">📍 ${order.type === 'delivery' ? (order.address || 'Indirizzo non specificato') : '🏪 Ritiro in pizzeria'}</div>
         <div class="order-items">${items}</div>
         <div class="order-total">€${total}</div>
         <div class="order-actions" onclick="event.stopPropagation()">
@@ -356,7 +381,6 @@ function renderOrders() {
     }).join('');
 }
 
-// ️ Pulsanti azione per ordine
 function getActionButtons(order) {
     const status = order.status || 'new';
     if (status === 'new' || status === 'pending') {
@@ -372,7 +396,6 @@ function getActionButtons(order) {
     return `<span style="color:var(--text-secondary); font-size:0.85rem">In attesa...</span>`;
 }
 
-//  Accetta ordine
 function acceptOrder(orderId) {
     if (!confirm('✅ Accettare questo ordine?')) return;
     db.ref('ordini/' + orderId).update({
@@ -386,7 +409,6 @@ function acceptOrder(orderId) {
     });
 }
 
-// ✅ Completa ordine
 function completeOrder(orderId) {
     if (!confirm('✅ Confermi la consegna?')) return;
     db.ref('ordini/' + orderId).update({
@@ -399,15 +421,13 @@ function completeOrder(orderId) {
     });
 }
 
-// 📞 Chiama cliente
 function callCustomer(phone) {
-    if (!phone) { showToast(' Numero non disponibile'); return; }
+    if (!phone) { showToast('📞 Numero non disponibile'); return; }
     if (confirm(`📞 Chiamare ${phone}?`)) {
         window.location.href = 'tel:' + phone.replace(/\D/g, '');
     }
 }
 
-// 🔍 Mostra dettaglio ordine
 function showDetail(orderId) {
     const order = ordersData[orderId];
     if (!order) return;
@@ -416,6 +436,8 @@ function showDetail(orderId) {
     const body = document.getElementById('modalBody');
     const status = order.status || 'new';
     const statusText = { new: '⏳ Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato' }[status] || status;
+
+    document.getElementById('modalOrderId').textContent = (order.orderId || orderId).slice(-6).toUpperCase();
 
     body.innerHTML = `
     <div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName || 'N/D'}</span></div>
@@ -438,7 +460,7 @@ function showDetail(orderId) {
     ${status === 'new' || status === 'pending' ? `<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()">🛵 Accetta Ordine</button>` : ''}
     ${status === 'accepted' && order.assignedTo === currentUser ? `
     <button class="btn btn-success" onclick="completeOrder('${orderId}'); closeModal()" style="flex:1">✅ Conferma Consegna</button>
-    <button class="btn btn-warning" onclick="callCustomer('${order.customerPhone || ''}'); closeModal()" style="flex:1"> Chiama</button>
+    <button class="btn btn-warning" onclick="callCustomer('${order.customerPhone || ''}'); closeModal()" style="flex:1">📞 Chiama</button>
     ` : ''}
     </div>
     `;
@@ -449,7 +471,6 @@ function closeModal() {
     document.getElementById('detailModal').classList.remove('active');
 }
 
-// 🍞 Toast notification
 function showToast(msg) {
     const toast = document.createElement('div');
     toast.textContent = msg;
@@ -459,12 +480,10 @@ function showToast(msg) {
     setTimeout(() => toast.remove(), 2300);
 }
 
-// ⌨️ Enter per login
 document.getElementById('pinInput')?.addEventListener('keypress', e => {
     if (e.key === 'Enter') login();
 });
 
-// 🔊 Attiva audio al primo tocco
 document.addEventListener('touchstart', initAudio, { once: true });
 document.addEventListener('click', initAudio, { once: true });
 </script>
