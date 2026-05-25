@@ -3,275 +3,489 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Grasso Delivery - Fattorini</title>
+<title>Grasso Delivery - App Fattorini</title>
 <style>
 :root {
---primary: #D48806; --primary-dark: #B87305;
---bg: #1a1a1a; --card: #2a2a2a; --text: #fff; --text-secondary: #b0b0b0;
+--primary: #D48806; --primary-dark: #B87305; --primary-light: #F4E5C2;
+--bg: #1a1a1a; --card: #2a2a2a; --card-light: #3a3a3a;
+--text: #ffffff; --text-secondary: #b0b0b0; --border: #444;
 --success: #28a745; --warning: #ffc107; --danger: #dc3545;
 --pending: #ff9800; --accepted: #2196f3; --delivered: #4caf50;
+--shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-.header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-.header h1 { font-size: 1.3em; margin-bottom: 3px; }
-.header p { font-size: 0.85em; opacity: 0.9; }
-.logout-btn { position: absolute; right: 15px; top: 15px; background: rgba(0,0,0,0.3); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.85em; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 20px; }
+
+/* Header */
+.header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 15px 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.header h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 3px; }
+.header p { font-size: 0.85rem; opacity: 0.95; }
+.logout-btn { position: absolute; right: 15px; top: 12px; background: rgba(0,0,0,0.2); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
+
+/* Container */
 .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-/* Login */
-.login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-.login-box { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 350px; }
-.login-box .logo { font-size: 3em; margin-bottom: 10px; }
-.login-box h2 { margin-bottom: 20px; color: var(--primary); }
-.pin-input { width: 100%; padding: 15px; font-size: 1.5em; text-align: center; letter-spacing: 10px; border: 2px solid var(--primary); border-radius: 10px; background: var(--bg); color: var(--text); margin-bottom: 15px; }
-.pin-input:focus { outline: none; border-color: var(--primary-dark); }
-.btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; }
+
+/* Login Screen */
+.login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
+.login-box { background: var(--card); padding: 30px 25px; border-radius: 16px; width: 100%; max-width: 320px; box-shadow: var(--shadow); border: 1px solid var(--primary-dark); }
+.login-box .logo { font-size: 3rem; margin-bottom: 15px; }
+.login-box h2 { color: var(--primary); margin-bottom: 10px; }
+.login-box p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
+.pin-input { width: 100%; padding: 14px; font-size: 1.4rem; text-align: center; letter-spacing: 12px; border: 2px solid var(--primary); border-radius: 12px; background: var(--bg); color: var(--text); margin-bottom: 15px; font-weight: 600; }
+.pin-input:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(212,136,6,0.2); }
+.btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .btn-primary { background: var(--primary); color: white; }
+.btn-primary:active { transform: scale(0.98); }
 .btn-success { background: var(--success); color: white; }
 .btn-warning { background: var(--warning); color: #000; }
 .btn-danger { background: var(--danger); color: white; }
-.btn-sm { padding: 10px; font-size: 0.9em; width: auto; }
+.btn-sm { padding: 8px 14px; font-size: 0.85rem; width: auto; min-width: 90px; }
+
 /* Dashboard */
 .dashboard { display: none; }
-.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-.stat-card { background: var(--card); padding: 15px; border-radius: 10px; text-align: center; }
-.stat-card .number { font-size: 2em; font-weight: bold; color: var(--primary); }
-.stat-card .label { font-size: 0.85em; color: var(--text-secondary); }
-.filter-tabs { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-.filter-tab { padding: 8px 15px; border-radius: 20px; border: none; background: var(--card); color: var(--text-secondary); cursor: pointer; white-space: nowrap; font-size: 0.9em; }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+.stat-card .number { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+.stat-card .label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+
+/* Filter Tabs */
+.filter-tabs { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+.filter-tabs::-webkit-scrollbar { display: none; }
+.filter-tab { padding: 8px 14px; border-radius: 20px; border: none; background: var(--card); color: var(--text-secondary); cursor: pointer; white-space: nowrap; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
 .filter-tab.active { background: var(--primary); color: white; }
-.order-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 4px solid var(--pending); cursor: pointer; }
+
+/* Order Card */
+.order-card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--pending); box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; }
+.order-card:active { transform: scale(0.99); }
 .order-card.status-accepted { border-left-color: var(--accepted); }
-.order-card.status-delivered { border-left-color: var(--delivered); }
-.order-card.status-cancelled { border-left-color: var(--cancelled); }
+.order-card.status-delivered { border-left-color: var(--delivered); opacity: 0.7; }
+.order-card.status-cancelled { border-left-color: var(--danger); opacity: 0.5; }
+.order-card.new { animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,136,6,0.4); } 50% { box-shadow: 0 0 0 10px rgba(212,136,6,0); } }
+
 .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.order-id { font-weight: bold; color: var(--primary); }
-.order-time { font-size: 0.85em; color: var(--text-secondary); }
-.order-customer { font-size: 1.1em; margin-bottom: 8px; }
-.order-address { color: var(--text-secondary); font-size: 0.9em; margin-bottom: 8px; }
-.order-items { background: var(--bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; }
-.order-total { font-size: 1.2em; font-weight: bold; color: var(--success); text-align: right; margin-bottom: 10px; }
+.order-id { font-weight: 700; color: var(--primary); font-size: 0.95rem; }
+.order-time { font-size: 0.8rem; color: var(--text-secondary); }
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.status-pending { background: rgba(255,152,0,0.15); color: var(--pending); }
+.status-accepted { background: rgba(33,150,243,0.15); color: var(--accepted); }
+.status-delivered { background: rgba(76,175,80,0.15); color: var(--delivered); }
+
+.order-customer { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+.order-address { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.order-items { background: var(--bg); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 0.9rem; max-height: 80px; overflow-y: auto; }
+.order-items div { padding: 2px 0; }
+.order-total { font-size: 1.2rem; font-weight: 700; color: var(--success); text-align: right; margin-bottom: 12px; }
+
 .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.order-actions .btn { flex: 1; min-width: 120px; }
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
-.status-pending { background: rgba(255,152,0,0.2); color: var(--pending); }
-.status-accepted { background: rgba(33,150,243,0.2); color: var(--accepted); }
-.status-delivered { background: rgba(76,175,80,0.2); color: var(--delivered); }
-.empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
-.empty-state .icon { font-size: 3em; margin-bottom: 15px; }
-.new-order-alert { position: fixed; top: 80px; right: 15px; background: var(--danger); color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: pulse 1s infinite; z-index: 1000; display: none; }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.order-actions .btn { flex: 1; min-width: 85px; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-secondary); }
+.empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+
+/* New Order Alert */
+.new-order-alert { position: fixed; top: 70px; right: 15px; background: var(--danger); color: white; padding: 12px 18px; border-radius: 12px; box-shadow: var(--shadow); z-index: 1000; display: none; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
 /* Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 15px; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; justify-content: center; align-items: center; padding: 15px; }
 .modal-overlay.active { display: flex; }
-.modal-content { background: var(--card); border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 20px; }
-.modal-close { float: right; background: none; border: none; color: var(--text); font-size: 1.5em; cursor: pointer; }
-.hidden { display: none !important; }
+.modal-content { background: var(--card); border-radius: 16px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 20px; border: 1px solid var(--primary-dark); }
+.modal-close { float: right; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.modal-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.modal-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
+.modal-row strong { color: var(--text-secondary); }
+.modal-notes { background: rgba(255,193,7,0.1); padding: 10px; border-radius: 10px; margin: 12px 0; font-size: 0.9rem; border-left: 3px solid var(--warning); }
+.modal-items { margin: 15px 0; padding-top: 15px; border-top: 1px solid var(--border); }
+.modal-items div { padding: 4px 0; font-size: 0.9rem; }
+.modal-total { text-align: right; font-size: 1.3rem; font-weight: 700; color: var(--success); margin: 15px 0; }
+
+/* Sound Toggle */
+.sound-toggle { position: fixed; bottom: 20px; left: 20px; background: var(--card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; z-index: 90; }
+.sound-toggle.muted { opacity: 0.6; }
+
+/* Responsive */
+@media (max-width: 480px) {
+.header h1 { font-size: 1.15rem; }
+.order-actions .btn { min-width: 75px; padding: 8px 10px; font-size: 0.8rem; }
+}
 </style>
 </head>
 <body>
 
+<!-- Header -->
 <div class="header">
 <button class="logout-btn" onclick="logout()">🚪 Esci</button>
 <h1>🛵 Grasso Delivery</h1>
-<p>App Fattorini - Antica Pizzeria Grasso</p>
+<p>App Fattorini • Antica Pizzeria Grasso</p>
 </div>
 
+<!-- New Order Alert -->
 <div class="new-order-alert" id="newOrderAlert">🔔 Nuovo Ordine!</div>
 
-<!-- LOGIN -->
+<!-- Sound Toggle -->
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Suoni: ON</div>
+
+<!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo">🛵</div>
 <h2>Accesso Fattorini</h2>
-<p style="margin-bottom:15px; color:var(--text-secondary)">Inserisci il tuo PIN</p>
-<input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric">
+<p>Inserisci il tuo codice PIN</p>
+<input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric" autocomplete="one-time-code">
 <button class="btn btn-primary" onclick="login()">Accedi</button>
-<p style="margin-top:15px; font-size:0.8em; color:var(--text-secondary)">PIN predefinito: 1234</p>
+<p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary)">PIN predefinito: 1234</p>
 </div>
 </div>
 
-<!-- DASHBOARD -->
+<!-- Dashboard -->
 <div class="container dashboard" id="dashboard">
+<!-- Stats -->
 <div class="stats">
-<div class="stat-card"><div class="number" id="pendingCount">0</div><div class="label">In Attesa</div></div>
-<div class="stat-card"><div class="number" id="myCount">0</div><div class="label">Miei Ordini</div></div>
-<div class="stat-card"><div class="number" id="deliveredCount">0</div><div class="label">Consegnati</div></div>
-<div class="stat-card"><div class="number" id="todayTotal">€0</div><div class="label">Totale Oggi</div></div>
+<div class="stat-card">
+<div class="number" id="pendingCount">0</div>
+<div class="label">In Attesa</div>
 </div>
+<div class="stat-card">
+<div class="number" id="myCount">0</div>
+<div class="label">Miei Ordini</div>
+</div>
+<div class="stat-card">
+<div class="number" id="deliveredCount">0</div>
+<div class="label">Consegnati Oggi</div>
+</div>
+<div class="stat-card">
+<div class="number" id="todayTotal">€0</div>
+<div class="label">Totale Oggi</div>
+</div>
+</div>
+
+<!-- Filter Tabs -->
 <div class="filter-tabs">
 <button class="filter-tab active" onclick="filterOrders('all')">Tutti</button>
-<button class="filter-tab" onclick="filterOrders('pending')">In Attesa</button>
-<button class="filter-tab" onclick="filterOrders('accepted')">Miei</button>
-<button class="filter-tab" onclick="filterOrders('delivered')">Consegnati</button>
+<button class="filter-tab" onclick="filterOrders('pending')">⏳ In Attesa</button>
+<button class="filter-tab" onclick="filterOrders('accepted')">🛵 Miei</button>
+<button class="filter-tab" onclick="filterOrders('delivered')">✅ Consegnati</button>
 </div>
+
+<!-- Orders List -->
 <div id="ordersContainer">
-<div class="empty-state"><div class="icon">📦</div><p>Nessun ordine al momento</p></div>
+<div class="empty-state">
+<div class="icon">📦</div>
+<p>Nessun ordine al momento</p>
+<p style="font-size:0.85rem; margin-top:8px; opacity:0.7">Gli ordini appariranno qui in tempo reale</p>
+</div>
 </div>
 </div>
 
-<!-- DETAIL MODAL -->
-<div class="modal-overlay" id="detailModal">
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
 <div class="modal-content">
 <button class="modal-close" onclick="closeModal()">&times;</button>
+<div class="modal-title">Ordine #<span id="modalOrderId"></span></div>
 <div id="modalBody"></div>
 </div>
 </div>
 
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <script>
-// 🔥 CONFIGURAZIONE FIREBASE - STESSA DI index.html
+// 🔥 FIREBASE CONFIG - STESSA DI index.html
 const firebaseConfig = {
-apiKey: "LA_TUA_API_KEY_QUI",
-authDomain: "TUO_PROGETTO.firebaseapp.com",
-databaseURL: "https://TUO_PROGETTO-default-rtdb.firebaseio.com",
-projectId: "TUO_PROGETTO",
-storageBucket: "TUO_PROGETTO.appspot.com",
-messagingSenderId: "TUO_SENDER_ID",
-appId: "TUO_APP_ID"
+apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
+authDomain: "teogra-c8cf5.firebaseapp.com",
+databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "teogra-c8cf5",
+storageBucket: "teogra-c8cf5.firebasestorage.app",
+messagingSenderId: "686300112893",
+appId: "1:686300112893:web:e147b82f91374f12db1b94"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// 📊 Stato App
 let currentUser = null;
 let currentFilter = 'all';
 let ordersData = {};
+let audioEnabled = true;
 let audioContext = null;
+let lastOrderCount = 0;
 
-// 🔊 Suono notifica
-function playNotificationSound() {
+// 🔊 Suono Notifica
+function initAudio() {
 try {
 if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const osc = audioContext.createOscillator(), gain = audioContext.createGain();
-osc.connect(gain); gain.connect(audioContext.destination);
-osc.frequency.value = 800; osc.type = 'sine'; gain.gain.value = 0.3;
-osc.start(); setTimeout(() => osc.stop(), 200);
+} catch(e) { audioEnabled = false; }
+}
+function playNotificationSound() {
+if (!audioEnabled) return;
+initAudio();
+try {
+const c = audioContext;
+const osc1 = c.createOscillator(), gain1 = c.createGain();
+osc1.connect(gain1); gain1.connect(c.destination);
+osc1.frequency.value = 880; osc1.type = 'sine'; gain1.gain.value = 0.25;
+osc1.start(c.currentTime); osc1.stop(c.currentTime + 0.15);
 setTimeout(() => {
-const osc2 = audioContext.createOscillator(), gain2 = audioContext.createGain();
-osc2.connect(gain2); gain2.connect(audioContext.destination);
-osc2.frequency.value = 1000; osc2.type = 'sine'; gain2.gain.value = 0.3;
-osc2.start(); setTimeout(() => osc2.stop(), 200);
-}, 300);
+const osc2 = c.createOscillator(), gain2 = c.createGain();
+osc2.connect(gain2); gain2.connect(c.destination);
+osc2.frequency.value = 1100; osc2.type = 'sine'; gain2.gain.value = 0.25;
+osc2.start(c.currentTime); osc2.stop(c.currentTime + 0.15);
+}, 100);
 } catch(e) {}
+}
+function toggleSound() {
+audioEnabled = !audioEnabled;
+document.getElementById('soundToggle').textContent = `🔊 Suoni: ${audioEnabled ? 'ON' : 'OFF'}`;
+document.getElementById('soundToggle').classList.toggle('muted', !audioEnabled);
 }
 
 // 🔐 Login
+// 👤 CONFIGURAZIONE FATTORINI
+const drivers = {
+    '1111': 'Paolo',    // PIN Paolo
+    '2222': 'Daniele,     // PIN Daniele
+    '3333': 'Andrea'     // PIN Andrea
+};
+
+// 🔐 LOGIN CON NOME
 function login() {
-const pin = document.getElementById('pinInput').value;
-const validPins = ['1234', '123456']; // Modifica qui i PIN fattorini
-if (validPins.includes(pin)) {
-currentUser = 'fattorino_' + Date.now();
-localStorage.setItem('grasso_fattorino_session', currentUser);
+    const pin = document.getElementById('pinInput').value;
+    const driverName = drivers[pin];
+    
+    if (driverName) {
+        currentUser = driverName;
+        localStorage.setItem('grasso_driver_session', currentUser);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        showToast(`👋 Benvenuto, ${driverName}!`);
+        initDashboard();
+    } else {
+        alert('❌ PIN non valido!');
+        document.getElementById('pinInput').value = '';
+    }
+} else {
+alert('❌ PIN non valido!');
+document.getElementById('pinInput').value = '';
+document.getElementById('pinInput').focus();
+}
+}
+function logout() {
+localStorage.removeItem('grasso_driver_session');
+location.reload();
+}
+
+// ✅ Controlla sessione salvata
+if (localStorage.getItem('grasso_driver_session')) {
+currentUser = localStorage.getItem('grasso_driver_session');
 document.getElementById('loginScreen').style.display = 'none';
 document.getElementById('dashboard').style.display = 'block';
 initDashboard();
-} else { alert('PIN non valido!'); document.getElementById('pinInput').value = ''; }
-}
-function logout() { localStorage.removeItem('grasso_fattorino_session'); location.reload(); }
-
-// ✅ Controlla sessione
-if (localStorage.getItem('grasso_fattorino_session')) {
-currentUser = localStorage.getItem('grasso_fattorino_session');
-document.getElementById('loginScreen').style.display = 'none';
-document.getElementById('dashboard').style.display = 'block';
-initDashboard();
 }
 
-// 📊 Dashboard
+// 📊 Dashboard Init
 function initDashboard() {
-db.ref('orders').on('value', snapshot => {
-ordersData = snapshot.val() || {};
-renderOrders(); updateStats(); checkNewOrders();
+// Ascolta ordini in tempo reale
+db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
+const data = {};
+snapshot.forEach(child => { data[child.key] = child.val(); });
+ordersData = data;
+renderOrders();
+updateStats();
+checkNewOrders();
 });
 }
-let lastOrderCount = 0;
+
+// 🔔 Controlla nuovi ordini
 function checkNewOrders() {
-const pending = Object.values(ordersData).filter(o => o.status === 'pending');
+const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
 if (pending.length > lastOrderCount && lastOrderCount > 0) {
-playNotificationSound();
+if (audioEnabled) playNotificationSound();
 const alert = document.getElementById('newOrderAlert');
 alert.style.display = 'block';
 setTimeout(() => alert.style.display = 'none', 3000);
 }
 if (lastOrderCount === 0) lastOrderCount = pending.length;
 }
+
+// 📈 Aggiorna statistiche
 function updateStats() {
 const all = Object.values(ordersData);
 const today = new Date().toDateString();
 const todayOrders = all.filter(o => new Date(o.timestamp || Date.now()).toDateString() === today);
-document.getElementById('pendingCount').textContent = all.filter(o => o.status === 'pending').length;
+document.getElementById('pendingCount').textContent = all.filter(o => o.status === 'new' || o.status === 'pending').length;
 document.getElementById('myCount').textContent = all.filter(o => o.assignedTo === currentUser && o.status === 'accepted').length;
 document.getElementById('deliveredCount').textContent = todayOrders.filter(o => o.status === 'delivered').length;
-const total = todayOrders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + (o.total || 0), 0);
+const total = todayOrders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + (o.finalTotal || o.total || 0), 0);
 document.getElementById('todayTotal').textContent = '€' + total.toFixed(2);
 }
+
+// 🔀 Filtra ordini
 function filterOrders(filter) {
 currentFilter = filter;
 document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
 event.target.classList.add('active');
 renderOrders();
 }
+
+// 📋 Renderizza ordini
 function renderOrders() {
 const container = document.getElementById('ordersContainer');
-let orders = Object.entries(ordersData).map(([id, data]) => ({id, ...data}));
-if (currentFilter === 'pending') orders = orders.filter(o => o.status === 'pending');
+let orders = Object.entries(ordersData).map(([id, data]) => ({ id, ...data }));
+
+// Applica filtro
+if (currentFilter === 'pending') orders = orders.filter(o => o.status === 'new' || o.status === 'pending');
 else if (currentFilter === 'accepted') orders = orders.filter(o => o.assignedTo === currentUser && o.status === 'accepted');
 else if (currentFilter === 'delivered') orders = orders.filter(o => o.status === 'delivered');
+
+// Ordina per timestamp (più recenti prima)
 orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
 if (orders.length === 0) {
 container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Nessun ordine in questa categoria</p></div>';
 return;
 }
-container.innerHTML = orders.map(order => `
-<div class="order-card status-${order.status}" onclick="showDetail('${order.id}')">
+
+container.innerHTML = orders.map(order => {
+const status = order.status || 'new';
+const statusText = { new: '⏳ Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato', cancelled: '❌ Annullato' }[status] || status;
+const statusClass = { new: 'pending', pending: 'pending', accepted: 'accepted', delivered: 'delivered', cancelled: 'cancelled' }[status] || 'pending';
+const time = order.timestamp ? new Date(order.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+const items = (order.items || []).map(i => `${i.name}${i.qty ? ' ×' + i.qty : ''}`).join(', ') || 'Nessun prodotto';
+const total = (order.finalTotal || order.total || 0).toFixed(2);
+const isNew = (status === 'new' || status === 'pending') && !order.assignedTo;
+
+return `
+<div class="order-card status-${statusClass} ${isNew ? 'new' : ''}" onclick="showDetail('${order.id}')">
 <div class="order-header">
-<span class="order-id">#${order.id.slice(-4).toUpperCase()}</span>
-<span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
+<span class="order-id">#${(order.orderId || order.id || '').slice(-6).toUpperCase()}</span>
+<span class="order-time">${time}</span>
+<span class="status-badge status-${statusClass}">${statusText}</span>
 </div>
-<div class="order-customer">👤 ${order.customerName || 'N/D'}</div>
-<div class="order-address">📍 ${order.address || 'Ritiro in pizzeria'}</div>
-<div class="order-items">${(order.items || []).map(i => i.name || i).join(', ')}</div>
-<div class="order-total">€${(order.total || 0).toFixed(2)}</div>
-<div class="order-actions" onclick="event.stopPropagation()">${getActionButtons(order)}</div>
-</div>`).join('');
-}
-function getStatusText(s) { return {pending:'⏳ In Attesa', accepted:'🛵 In Consegna', delivered:'✅ Consegnato', cancelled:'❌ Annullato'}[s] || s; }
-function getActionButtons(order) {
-if (order.status === 'pending') return `<button class="btn btn-primary btn-sm" onclick="acceptOrder('${order.id}')">🛵 Accetta</button>`;
-if (order.status === 'accepted' && order.assignedTo === currentUser) return `<button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">✅ Consegnato</button><button class="btn btn-warning btn-sm" onclick="callCustomer('${order.phone}')">📞 Chiama</button><button class="btn btn-danger btn-sm" onclick="cancelOrder('${order.id}')">❌ Annulla</button>`;
-if (order.status === 'delivered') return `<span style="color:var(--success); font-size:0.9em">✅ Completato</span>`;
-return '';
-}
-function acceptOrder(id) { if (!confirm('Accettare questo ordine?')) return; db.ref('orders/' + id).update({ status: 'accepted', assignedTo: currentUser, acceptedAt: Date.now() }); }
-function completeOrder(id) { if (!confirm('Confermi la consegna?')) return; db.ref('orders/' + id).update({ status: 'delivered', deliveredAt: Date.now() }).then(() => alert('Ordine consegnato! ✅')); }
-function cancelOrder(id) { if (!confirm('Annullare questo ordine?')) return; db.ref('orders/' + id).update({ status: 'cancelled', cancelledAt: Date.now() }); }
-function callCustomer(phone) { if (phone) window.location.href = 'tel:' + phone; }
-function showDetail(id) {
-const order = ordersData[id]; if (!order) return;
-const modal = document.getElementById('detailModal');
-document.getElementById('modalBody').innerHTML = `
-<h2 style="margin-bottom:15px">Ordine #${id.slice(-4).toUpperCase()}</h2>
-<p><strong>👤 Cliente:</strong> ${order.customerName || 'N/D'}</p>
-<p><strong>📞 Telefono:</strong> ${order.phone || 'N/D'}</p>
-<p><strong>📍 Indirizzo:</strong> ${order.address || 'Ritiro in pizzeria'}</p>
-<p><strong>🕐 Orario:</strong> ${order.deliveryTime || 'Subito'}</p>
-<p><strong>Stato:</strong> ${getStatusText(order.status)}</p>
-${order.notes ? `<p style="margin-top:10px; padding:10px; background:rgba(255,193,7,0.1); border-radius:8px"><strong>📝 Note:</strong><br>${order.notes}</p>` : ''}
-<div style="margin-top:15px; padding-top:15px; border-top:1px solid #444">
-<h3>Prodotti:</h3>
-${(order.items || []).map((item, i) => `<p>${i+1}. ${item.name || item} ${item.qty ? 'x'+item.qty : ''} - €${(item.price||0).toFixed(2)}</p>`).join('')}
-<p style="text-align:right; font-size:1.3em; font-weight:bold; color:var(--success); margin-top:10px">Totale: €${(order.total||0).toFixed(2)}</p>
+<div class="order-customer">👤 ${order.customerName || 'Cliente'}</div>
+<div class="order-address">📍 ${order.type === 'delivery' ? (order.address || 'Indirizzo non specificato') : '🏪 Ritiro in pizzeria'}</div>
+<div class="order-items">${items}</div>
+<div class="order-total">€${total}</div>
+<div class="order-actions" onclick="event.stopPropagation()">
+${getActionButtons(order)}
 </div>
-<div style="margin-top:20px">
-${order.status === 'pending' ? `<button class="btn btn-primary" onclick="acceptOrder('${id}'); closeModal()">🛵 Accetta Ordine</button>` : ''}
-${order.status === 'accepted' && order.assignedTo === currentUser ? `<button class="btn btn-success" onclick="completeOrder('${id}'); closeModal()" style="margin-bottom:10px">✅ Conferma Consegna</button><button class="btn btn-warning" onclick="callCustomer('${order.phone}'); closeModal()">📞 Chiama Cliente</button>` : ''}
 </div>`;
+}).join('');
+}
+
+// 🎛️ Pulsanti azione per ordine
+function getActionButtons(order) {
+const status = order.status || 'new';
+if (status === 'new' || status === 'pending') {
+return `<button class="btn btn-primary btn-sm" onclick="acceptOrder('${order.id}')">🛵 Accetta</button>`;
+} else if (status === 'accepted' && order.assignedTo === currentUser) {
+return `
+<button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">✅ Consegnato</button>
+<button class="btn btn-warning btn-sm" onclick="callCustomer('${order.customerPhone || ''}')">📞 Chiama</button>
+`;
+} else if (status === 'delivered') {
+return `<span style="color:var(--success); font-size:0.85rem; font-weight:600">✅ Completato</span>`;
+}
+return `<span style="color:var(--text-secondary); font-size:0.85rem">In attesa...</span>`;
+}
+
+// 🛵 Accetta ordine
+function acceptOrder(orderId) {
+if (!confirm('✅ Accettare questo ordine?')) return;
+db.ref('ordini/' + orderId).update({
+status: 'accepted',
+assignedTo: currentUser,
+acceptedAt: Date.now(),
+acceptedBy: currentUser
+}).then(() => {
+showToast('🛵 Ordine accettato!');
+renderOrders();
+});
+}
+
+// ✅ Completa ordine
+function completeOrder(orderId) {
+if (!confirm('✅ Confermi la consegna?')) return;
+db.ref('ordini/' + orderId).update({
+status: 'delivered',
+deliveredAt: Date.now(),
+deliveredBy: currentUser
+}).then(() => {
+showToast('✅ Ordine consegnato!');
+renderOrders();
+});
+}
+
+// 📞 Chiama cliente
+function callCustomer(phone) {
+if (!phone) { showToast('📞 Numero non disponibile'); return; }
+if (confirm(`📞 Chiamare ${phone}?`)) {
+window.location.href = 'tel:' + phone.replace(/\D/g, '');
+}
+}
+
+// 🔍 Mostra dettaglio ordine
+function showDetail(orderId) {
+const order = ordersData[orderId];
+if (!order) return;
+
+const modal = document.getElementById('detailModal');
+const body = document.getElementById('modalBody');
+const status = order.status || 'new';
+const statusText = { new: '⏳ Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato' }[status] || status;
+
+body.innerHTML = `
+<div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName || 'N/D'}</span></div>
+<div class="modal-row"><strong>Telefono:</strong> <span><a href="tel:${order.customerPhone || ''}" style="color:var(--primary)">${order.customerPhone || 'N/D'}</a></span></div>
+<div class="modal-row"><strong>Tipo:</strong> <span>${order.type === 'delivery' ? '🚚 Consegna' : '🏪 Ritiro'}</span></div>
+${order.type === 'delivery' ? `<div class="modal-row"><strong>Indirizzo:</strong> <span>${order.address || 'N/D'}</span></div>` : ''}
+<div class="modal-row"><strong>Orario:</strong> <span>${order.scheduledTime || 'Subito'}</span></div>
+<div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
+${order.notes ? `<div class="modal-notes">📝 <strong>Note:</strong><br>${order.notes}</div>` : ''}
+
+<div class="modal-items">
+<strong>Prodotti:</strong>
+${(order.items || []).map((item, i) => `<div>${i+1}. ${item.name} ${item.qty ? '×' + item.qty : ''} - €${(item.price * (item.qty||1)).toFixed(2)}</div>`).join('')}
+</div>
+
+<div class="modal-total">Totale: €${(order.finalTotal || order.total || 0).toFixed(2)}</div>
+
+<div style="display:flex; gap:10px; margin-top:20px;">
+${status === 'new' || status === 'pending' ? `<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()">🛵 Accetta Ordine</button>` : ''}
+${status === 'accepted' && order.assignedTo === currentUser ? `
+<button class="btn btn-success" onclick="completeOrder('${orderId}'); closeModal()" style="flex:1">✅ Conferma Consegna</button>
+<button class="btn btn-warning" onclick="callCustomer('${order.customerPhone || ''}'); closeModal()" style="flex:1">📞 Chiama</button>
+` : ''}
+</div>
+`;
 modal.classList.add('active');
 }
-function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
-document.getElementById('pinInput').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+
+function closeModal() {
+document.getElementById('detailModal').classList.remove('active');
+}
+
+// 🍞 Toast notification
+function showToast(msg) {
+const toast = document.createElement('div');
+toast.textContent = msg;
+toast.style.cssText = `position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text); padding:12px 20px; border-radius:12px; font-weight:500; z-index:1000; box-shadow:var(--shadow); border:1px solid var(--primary-dark); animation:slideIn 0.3s ease;`;
+document.body.appendChild(toast);
+setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2000);
+setTimeout(() => toast.remove(), 2300);
+}
+
+// ⌨️ Enter per login
+document.getElementById('pinInput')?.addEventListener('keypress', e => {
+if (e.key === 'Enter') login();
+});
+
+// 🔊 Attiva audio al primo tocco
+document.addEventListener('touchstart', initAudio, { once: true });
+document.addEventListener('click', initAudio, { once: true });
 </script>
 </body>
 </html>
