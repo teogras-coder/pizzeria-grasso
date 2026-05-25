@@ -7,6 +7,7 @@
 <meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
 <link rel="canonical" href="https://teogra-c8cf5.web.app/">
 
+<!-- PWA / Home Screen -->
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-512.png">
@@ -14,7 +15,6 @@
 <link rel="apple-touch-icon" sizes="152x152" href="icon-512.png">
 <link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
 <meta name="theme-color" content="#d4a84b">
-
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -79,8 +79,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark), transparent); margin: 0 15px; }
 .menu-list { padding: 10px 20px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .menu-btn-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 50%, var(--brown) 100%); border-radius: 16px; overflow: hidden; cursor: pointer; color: white; position: relative; transition: all 0.2s ease; box-shadow: 0 6px 0 var(--shadow), 0 8px 15px rgba(0,0,0,0.6); border: 1px solid rgba(212,168,75,0.15); aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.category-img-container { width: 100%; height: 90px; overflow: hidden; position: relative; flex-shrink: 0; }
-.category-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
+.category-img-container { width: 100%; height: 70px; overflow: hidden; position: relative; flex-shrink: 0; }
+.category-img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(0.85); }
 .category-img-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(42,30,19,0.8) 100%); }
 .menu-btn-content { padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
 .menu-btn-3d .icon-circle { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--dark); margin-right: 15px; box-shadow: 0 4px 0 var(--gold-dark); }
@@ -176,10 +176,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .day-toggle { padding: 10px 4px; border-radius: 8px; background: var(--card); border: 1px solid var(--gold-dark); color: #8a7a5a; text-align: center; font-size: 0.8rem; cursor: pointer; user-select: none; transition: all 0.2s; }
 .day-toggle.active { background: var(--gold-dark); color: var(--dark); border-color: var(--gold); font-weight: 700; }
 .admin-category-accordion { background: var(--card-light); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); overflow: hidden; }
-.admin-category-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; user-select: none; }
+.admin-category-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; cursor: pointer; user-select: none; }
 .admin-category-header-left { display: flex; align-items: center; gap: 10px; flex: 1; }
 .admin-category-header-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; color: var(--dark); font-size: 1rem; }
-.admin-category-header-title { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; }
+.admin-category-header-title { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; }
 .admin-category-header-count { background: var(--gold-dark); color: var(--dark); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-left: auto; margin-right: 10px; }
 .admin-category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 14px; }
 .admin-category-accordion.open .admin-category-body { max-height: 5000px; padding: 14px; border-top: 1px solid rgba(212,168,75,0.1); }
@@ -228,6 +228,25 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .delivery-fee-input-row .currency { color: var(--gold); font-size: 1.3rem; font-weight: 700; }
 .delivery-fee-input-row input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 1.1rem; font-weight: 700; text-align: center; }
 .delivery-fee-info { color: #8a7a5a; font-size: 0.75rem; margin-top: 8px; line-height: 1.5; }
+
+/* ✅ Ordini raggruppati - NUOVO CSS */
+.orders-group-title { 
+    background: var(--gold-dark); 
+    color: var(--dark); 
+    padding: 8px 14px; 
+    border-radius: 8px; 
+    font-weight: 700; 
+    font-size: 0.85rem; 
+    margin: 15px 0 8px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.orders-group-title.new { background: #f87171; color: white; }
+.orders-group-title.preparing { background: #fbbf24; color: var(--dark); }
+.orders-group-title.ready { background: #4ade80; color: var(--dark); }
+.orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
+
 .order-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
 .order-card.new-order { border-left: 4px solid #f87171; animation: pulseNew 2s infinite; }
 .order-card.preparing { border-left: 4px solid #fbbf24; }
@@ -276,6 +295,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .driver-row { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
 .driver-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
 .driver-row .delete-product-btn { width: 32px; height: 32px; }
+
+/* ✅ Admin: immagini categorie più compatte */
+.admin-category-accordion .category-img { height: 50px; border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -441,6 +463,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
 </div>
 <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine.</p>
+<!-- ✅ Tasto Azzera Ordini -->
+<button onclick="clearAllOrders()" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:6px;"><i class="fas fa-trash"></i> Azzera Ordini</button>
 <div id="ordersList"></div>
 </div>
 
@@ -644,21 +668,62 @@ db.ref('promotions').once('value').then(s=>{appData.promotions=s.exists()?s.val(
 db.ref('ordini').once('value').then(s=>{if(s.exists())s.forEach(c=>{knownOrderIds.add(c.key);});});
 }
 
+// ✅ FUNZIONE renderAdminOrders AGGIORNATA (ordini raggruppati + tasto azzera)
 function renderAdminOrders(orders){
-const l=document.getElementById('ordersList'),c=document.getElementById('ordersCount'),e=Object.entries(orders).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
-c.textContent=e.filter(x=>x[1].status!=='delivered').length;
-if(!e.length){l.innerHTML='<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>';return;}
-l.innerHTML=e.map(([id,o])=>{
-const st=o.status||'new',lb={new:'Nuovo',preparing:'In Prep',ready:'Pronto',delivered:'Consegnato'}[st],dt=new Date(o.timestamp||0),ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
-let ih=o.items&&Array.isArray(o.items)?o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join(''):'';
-let ah='';
-if(st==='new')ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-else if(st==='preparing')ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-else if(st==='ready')ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-return `<div class="order-card ${st}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span><span class="order-status-badge status-${st}">${lb}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} • 📞 ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' • ⏰ '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
-}).join('');
+    const l=document.getElementById('ordersList'), c=document.getElementById('ordersCount');
+    
+    // Raggruppa ordini per stato
+    const gruppi = { new:[], preparing:[], ready:[], delivered:[] };
+    Object.entries(orders||{}).forEach(([id,o])=>{ 
+        const st=o.status||'new'; 
+        if(gruppi[st]) gruppi[st].push([id,o]); 
+    });
+    
+    // Ordina ogni gruppo per timestamp decrescente
+    Object.keys(gruppi).forEach(k=>gruppi[k].sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0)));
+    
+    // Conta ordini non consegnati
+    const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length;
+    c.textContent = attivi;
+    
+    if (!attivi && !gruppi.delivered.length) {
+        l.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>';
+        return;
+    }
+    
+    // Genera HTML raggruppato
+    const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:'🔵 Consegnati' };
+    let html = '';
+    
+    Object.keys(gruppi).forEach(stato=>{
+        if (!gruppi[stato].length) return;
+        html += `<div class="orders-group-title ${stato}"><i class="fas fa-${stato==='new'?'bell':stato==='preparing'?'fire':stato==='ready'?'check': 'truck'}"></i> ${titoli[stato]} (${gruppi[stato].length})</div>`;
+        
+        html += gruppi[stato].map(([id,o])=>{
+            const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+            let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
+            let ah='';
+            if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            return `<div class="order-card ${stato}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} • 📞 ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' • ⏰ '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
+        }).join('');
+    });
+    
+    l.innerHTML = html;
 }
+
+// ✅ Nuova funzione: Azzera tutti gli ordini
+function clearAllOrders(){
+    if(confirm('⚠️ ELIMINARE TUTTI GLI ORDINI? Questa azione è irreversibile.')){
+        db.ref('ordini').remove().then(()=>{
+            knownOrderIds.clear();
+            showToast('🗑️ Tutti gli ordini eliminati');
+        }).catch(e=>showToast('❌ Errore: '+e.message));
+    }
+}
+
 function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:'🍕 In prep',ready:'✅ Pronto',delivered:'🛵 Consegnato'}[st]||'Aggiornato');}
 function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Eliminato');}}
 
@@ -760,13 +825,18 @@ function closeCart(){document.getElementById('cartModal').classList.remove('acti
 function getGPSLocation(){const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress');if(!navigator.geolocation){showToast('📱 No GPS');return;}b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';navigator.geolocation.getCurrentPosition(async p=>{try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}&zoom=18&addressdetails=1`),d=await r.json(),a=d.address;i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;showToast('📍 Trovata!');}catch(e){i.value=`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;}b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';},()=>{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';showToast('❌ Permesso negato');},{enableHighAccuracy:true,timeout:15000});}
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
 
+// ✅ FUNZIONE inviaAvvisoWhatsApp AGGIORNATA (link corretto + fix schermata bianca)
 function inviaAvvisoWhatsApp(ordine) {
-const telefonoDestinatario = (appData.settings.whatsappNumber || "+390884660377").replace(/\D/g,'');
-const tipo = ordine.type === 'delivery' ? '🚚 Consegna' : '🏪 Ritiro';
-const indirizzo = ordine.type === 'delivery' ? `\n📍 *Indirizzo:* ${sanitizeWA(ordine.address)}` : '';
-const note = ordine.notes ? `\n📝 *Note:* ${sanitizeWA(ordine.notes)}` : '';
-const prodotti = (ordine.items || []).map(i => `• ${sanitizeWA(i.name)} ×${i.qty || 1}`).join('\n');
-const messaggio = `🚨 *NUOVO ORDINE DA EVADERE* 🚨
+    const telefonoDestinatario = (appData.settings.whatsappNumber || "+390884660377").replace(/\D/g,'');
+    const tipo = ordine.type === 'delivery' ? '🚚 Consegna' : '🏪 Ritiro';
+    const indirizzo = ordine.type === 'delivery' ? `\n📍 *Indirizzo:* ${sanitizeWA(ordine.address)}` : '';
+    const note = ordine.notes ? `\n📝 *Note:* ${sanitizeWA(ordine.notes)}` : '';
+    const prodotti = (ordine.items || []).map(i => `• ${sanitizeWA(i.name)} ×${i.qty || 1}`).join('\n');
+    
+    // ✅ Link corretto con dominio vercel.app
+    const linkFattorini = 'https://pizzeriagrasso.vercel.app/fattorini.html';
+    
+    const messaggio = `🚨 *NUOVO ORDINE DA EVADERE* 🚨
 🔢 *N°:* ${ordine.orderId}
 👤 *Cliente:* ${sanitizeWA(ordine.name)}
 📞 *Telefono:* ${sanitizeWA(ordine.phone)}
@@ -777,10 +847,31 @@ ${prodotti}
 
 💰 *TOTALE:* €${ordine.finalTotal.toFixed(2)}
 
-🛵 *APRI APP FATTORINI:* https://teogra-c8cf5.web.app/fattorini.html`;
-const linkWA = `https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`;
-const nuovaScheda = window.open(linkWA, '_blank');
-if (!nuovaScheda || nuovaScheda.closed) window.location.href = linkWA;
+🛵 *APRI APP FATTORINI:* ${linkFattorini}
+
+🖨️ *STAMPA AUTOMATICA:* Il Raspberry stamperà in automatico appena l'ordine arriva.`;
+
+    const linkWA = `https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`;
+    
+    // ✅ Fix schermata bianca: su mobile usa intent, su desktop fallback sicuro
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (isMobile) {
+        // Su mobile: apri WhatsApp e torna subito all'app
+        window.location.href = linkWA;
+        setTimeout(() => { 
+            closeCart(); 
+            showToast('🔄 Torna all\'app dopo aver inviato'); 
+        }, 1500);
+    } else {
+        // Su desktop: apri in nuova scheda e chiudi il carrello
+        const nuovaScheda = window.open(linkWA, '_blank');
+        closeCart();
+        if (!nuovaScheda || nuovaScheda.closed) {
+            window.location.href = linkWA;
+        } else {
+            showToast('📩 WhatsApp aperto. Torna qui dopo l\'invio.');
+        }
+    }
 }
 
 function confirmAndSendOrder(){
@@ -817,12 +908,25 @@ sendOrder(ordineCompleto);
 function sendOrder(d){
 localStorage.setItem('lastOrderTime', Date.now());
 const r=db.ref('ordini').push();
+
+// ✅ Formato stampa 80mm
+const printFormat = {
+    width: 80,
+    header: "ANTICA PIZZERIA GRASSO\nManfredonia • Tel. 0884 660377\n" + "=".repeat(32),
+    items: (d.items||[]).map(i=>`${i.name.padEnd(25)} x${i.qty||1} €${(i.price*(i.qty||1)).toFixed(2)}`).join('\n'),
+    footer: "-".repeat(32) + `\nTOTALE: €${d.finalTotal.toFixed(2)}\n` + 
+            (d.type==='delivery' ? `Consegna: ${d.address}\n` : 'Ritiro in pizzeria\n') +
+            `Ordine: ${d.orderId} • ${new Date().toLocaleString('it-IT')}\n` +
+            "Grazie per la fiducia! 🍕"
+};
+
 r.set({
 orderId:d.orderId, customerName: sanitizeWA(d.name), customerPhone: sanitizeWA(d.phone),
 address: orderType==='delivery' ? sanitizeWA(d.address) : '',
 notes: sanitizeWA(d.notes), type:d.type, scheduledTime:d.scheduledTime,
 items:d.items, productsTotal:d.productsTotal, deliveryFee:d.deliveryFee,
-finalTotal:d.finalTotal, status:'new', timestamp:Date.now(), createdAt:new Date().toISOString(), stampato: false
+finalTotal:d.finalTotal, status:'new', timestamp:Date.now(), createdAt:new Date().toISOString(), stampato: false,
+printFormat: printFormat  // ✅ Campo per la stampa 80mm
 });
 const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);});
 cart=[];updateCartBadge();closeCart();document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false;selectTimeMode('asap');showToast('✅ Ordine inviato!');
@@ -834,6 +938,7 @@ function toggleSwitch(el){el.classList.toggle('on');}
 function cycleManualStatus(){const e=document.getElementById('manualStatusToggle'),l=document.getElementById('manualStatusLabel');if(!e.classList.contains('on')&&!e.classList.contains('closed')){e.classList.add('on');l.textContent="✅ APERTO";}else if(e.classList.contains('on')){e.classList.remove('on');e.classList.add('closed');l.textContent="❌ CHIUSO";}else{e.classList.remove('closed');l.textContent="Auto";}}
 function toggleDay(el){el.classList.toggle('active');}
 
+// ✅ FUNZIONI FATTORINI AGGIORNATE (PIN a 4 cifre esatte)
 function loadDriversAdmin() {
 db.ref('drivers').once('value').then(snapshot => {
 const drivers = snapshot.val() || { '1111': 'Marco', '2222': 'Luca', '3333': 'Pippo' };
@@ -841,7 +946,7 @@ const container = document.getElementById('driversList');
 container.innerHTML = Object.entries(drivers).map(([pin, name]) => `
 <div class="driver-row" data-pin="${pin}">
 <input type="text" class="driver-name" value="${name}" placeholder="Nome fattorino">
-<input type="text" class="driver-pin" value="${pin}" placeholder="PIN" maxlength="6" pattern="\d{4,}">
+<input type="text" class="driver-pin" value="${pin}" placeholder="PIN (4 cifre)" maxlength="4" pattern="\d{4}" inputmode="numeric">
 <button class="delete-product-btn" onclick="removeDriverRow(this)" title="Rimuovi"><i class="fas fa-trash"></i></button>
 </div>
 `).join('');
@@ -854,7 +959,7 @@ row.className = 'driver-row';
 row.dataset.pin = Date.now();
 row.innerHTML = `
 <input type="text" class="driver-name" placeholder="Nome fattorino">
-<input type="text" class="driver-pin" placeholder="PIN (min 4 cifre)" maxlength="6" pattern="\d{4,}">
+<input type="text" class="driver-pin" placeholder="PIN (4 cifre)" maxlength="4" pattern="\d{4}" inputmode="numeric">
 <button class="delete-product-btn" onclick="removeDriverRow(this)" title="Rimuovi"><i class="fas fa-trash"></i></button>
 `;
 container.appendChild(row);
@@ -869,7 +974,8 @@ document.querySelectorAll('.driver-row').forEach(row => {
 const name = row.querySelector('.driver-name').value.trim();
 const pin = row.querySelector('.driver-pin').value.trim();
 if (!name || !pin) { showToast('⚠️ Compila tutti i campi'); hasError = true; return; }
-if (!/^\d{4,}$/.test(pin)) { showToast('⚠️ PIN: minimo 4 cifre'); hasError = true; return; }
+// ✅ Controllo PIN: esattamente 4 cifre
+if (!/^\d{4}$/.test(pin)) { showToast('⚠️ PIN: esattamente 4 cifre'); hasError = true; return; }
 driversList[pin] = name;
 });
 if (hasError) return;
