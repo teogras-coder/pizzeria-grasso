@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Grasso Delivery - App Fattorini</title>
+<title>Grasso Delivery - Area Fattorini</title>
 <style>
 :root {
 --primary: #D48806; --primary-dark: #B87305; --primary-light: #F4E5C2;
@@ -38,7 +38,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-primary:active { transform: scale(0.98); }
 .btn-success { background: var(--success); color: white; }
 .btn-warning { background: var(--warning); color: #000; }
-.btn-danger { background: var(--danger); color: white; }
 .btn-sm { padding: 8px 14px; font-size: 0.85rem; width: auto; min-width: 90px; }
 
 /* Dashboard */
@@ -122,7 +121,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <!-- New Order Alert -->
-<div class="new-order-alert" id="newOrderAlert">🔔 Nuovo Ordine!</div>
+<div class="new-order-alert" id="newOrderAlert"> Nuovo Ordine!</div>
 
 <!-- Sound Toggle -->
 <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Suoni: ON</div>
@@ -135,7 +134,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <p>Inserisci il tuo codice PIN</p>
 <input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric" autocomplete="one-time-code">
 <button class="btn btn-primary" onclick="login()">Accedi</button>
-<p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary)">PIN predefinito: 1234</p>
+<p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary)">PIN predefinito: 1111</p>
 </div>
 </div>
 
@@ -193,7 +192,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
-// 🔥 FIREBASE CONFIG - STESSA DI index.html
+// 🔥 FIREBASE CONFIG (Le tue credenziali)
 const firebaseConfig = {
 apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
 authDomain: "teogra-c8cf5.firebaseapp.com",
@@ -214,44 +213,14 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🔊 Suono Notifica
-function initAudio() {
-try {
-if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-} catch(e) { audioEnabled = false; }
-}
-function playNotificationSound() {
-if (!audioEnabled) return;
-initAudio();
-try {
-const c = audioContext;
-const osc1 = c.createOscillator(), gain1 = c.createGain();
-osc1.connect(gain1); gain1.connect(c.destination);
-osc1.frequency.value = 880; osc1.type = 'sine'; gain1.gain.value = 0.25;
-osc1.start(c.currentTime); osc1.stop(c.currentTime + 0.15);
-setTimeout(() => {
-const osc2 = c.createOscillator(), gain2 = c.createGain();
-osc2.connect(gain2); gain2.connect(c.destination);
-osc2.frequency.value = 1100; osc2.type = 'sine'; gain2.gain.value = 0.25;
-osc2.start(c.currentTime); osc2.stop(c.currentTime + 0.15);
-}, 100);
-} catch(e) {}
-}
-function toggleSound() {
-audioEnabled = !audioEnabled;
-document.getElementById('soundToggle').textContent = `🔊 Suoni: ${audioEnabled ? 'ON' : 'OFF'}`;
-document.getElementById('soundToggle').classList.toggle('muted', !audioEnabled);
-}
-
-// 🔐 Login
-// 👤 CONFIGURAZIONE FATTORINI
+// 👤 CONFIGURAZIONE FATTORINI (Nome e PIN)
 const drivers = {
-    '1111': 'Paolo',    // PIN Paolo
-    '2222': 'Daniele,     // PIN Daniele
-    '3333': 'Andrea'     // PIN Andrea
+    '1111': 'Marco',    
+    '2222': 'Luca',     
+    '3333': 'Pippo'    
 };
 
-// 🔐 LOGIN CON NOME
+//  LOGIN CON NOME
 function login() {
     const pin = document.getElementById('pinInput').value;
     const driverName = drivers[pin];
@@ -264,223 +233,248 @@ function login() {
         showToast(`👋 Benvenuto, ${driverName}!`);
         initDashboard();
     } else {
-        alert('❌ PIN non valido!');
+        alert(' PIN non valido!');
         document.getElementById('pinInput').value = '';
     }
-} else {
-alert('❌ PIN non valido!');
-document.getElementById('pinInput').value = '';
-document.getElementById('pinInput').focus();
 }
-}
+
 function logout() {
-localStorage.removeItem('grasso_driver_session');
-location.reload();
+    localStorage.removeItem('grasso_driver_session');
+    location.reload();
 }
 
 // ✅ Controlla sessione salvata
 if (localStorage.getItem('grasso_driver_session')) {
-currentUser = localStorage.getItem('grasso_driver_session');
-document.getElementById('loginScreen').style.display = 'none';
-document.getElementById('dashboard').style.display = 'block';
-initDashboard();
+    currentUser = localStorage.getItem('grasso_driver_session');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    initDashboard();
 }
 
-// 📊 Dashboard Init
+// 🔊 Suono Notifica
+function initAudio() {
+    try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) { audioEnabled = false; }
+}
+function playNotificationSound() {
+    if (!audioEnabled) return;
+    initAudio();
+    try {
+        const c = audioContext;
+        const osc1 = c.createOscillator(), gain1 = c.createGain();
+        osc1.connect(gain1); gain1.connect(c.destination);
+        osc1.frequency.value = 880; osc1.type = 'sine'; gain1.gain.value = 0.25;
+        osc1.start(c.currentTime); osc1.stop(c.currentTime + 0.15);
+        setTimeout(() => {
+            const osc2 = c.createOscillator(), gain2 = c.createGain();
+            osc2.connect(gain2); gain2.connect(c.destination);
+            osc2.frequency.value = 1100; osc2.type = 'sine'; gain2.gain.value = 0.25;
+            osc2.start(c.currentTime); osc2.stop(c.currentTime + 0.15);
+        }, 100);
+    } catch(e) {}
+}
+function toggleSound() {
+    audioEnabled = !audioEnabled;
+    document.getElementById('soundToggle').textContent = `🔊 Suoni: ${audioEnabled ? 'ON' : 'OFF'}`;
+    document.getElementById('soundToggle').classList.toggle('muted', !audioEnabled);
+}
+
+//  Dashboard Init
 function initDashboard() {
-// Ascolta ordini in tempo reale
-db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
-const data = {};
-snapshot.forEach(child => { data[child.key] = child.val(); });
-ordersData = data;
-renderOrders();
-updateStats();
-checkNewOrders();
-});
+    // Ascolta ordini in tempo reale
+    db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
+        const data = {};
+        snapshot.forEach(child => { data[child.key] = child.val(); });
+        ordersData = data;
+        renderOrders();
+        updateStats();
+        checkNewOrders();
+    });
 }
 
 // 🔔 Controlla nuovi ordini
 function checkNewOrders() {
-const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
-if (pending.length > lastOrderCount && lastOrderCount > 0) {
-if (audioEnabled) playNotificationSound();
-const alert = document.getElementById('newOrderAlert');
-alert.style.display = 'block';
-setTimeout(() => alert.style.display = 'none', 3000);
-}
-if (lastOrderCount === 0) lastOrderCount = pending.length;
+    const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
+    if (pending.length > lastOrderCount && lastOrderCount > 0) {
+        if (audioEnabled) playNotificationSound();
+        const alert = document.getElementById('newOrderAlert');
+        alert.style.display = 'block';
+        setTimeout(() => alert.style.display = 'none', 3000);
+    }
+    if (lastOrderCount === 0) lastOrderCount = pending.length;
 }
 
 // 📈 Aggiorna statistiche
 function updateStats() {
-const all = Object.values(ordersData);
-const today = new Date().toDateString();
-const todayOrders = all.filter(o => new Date(o.timestamp || Date.now()).toDateString() === today);
-document.getElementById('pendingCount').textContent = all.filter(o => o.status === 'new' || o.status === 'pending').length;
-document.getElementById('myCount').textContent = all.filter(o => o.assignedTo === currentUser && o.status === 'accepted').length;
-document.getElementById('deliveredCount').textContent = todayOrders.filter(o => o.status === 'delivered').length;
-const total = todayOrders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + (o.finalTotal || o.total || 0), 0);
-document.getElementById('todayTotal').textContent = '€' + total.toFixed(2);
+    const all = Object.values(ordersData);
+    const today = new Date().toDateString();
+    const todayOrders = all.filter(o => new Date(o.timestamp || Date.now()).toDateString() === today);
+    document.getElementById('pendingCount').textContent = all.filter(o => o.status === 'new' || o.status === 'pending').length;
+    document.getElementById('myCount').textContent = all.filter(o => o.assignedTo === currentUser && o.status === 'accepted').length;
+    document.getElementById('deliveredCount').textContent = todayOrders.filter(o => o.status === 'delivered').length;
+    const total = todayOrders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + (o.finalTotal || o.total || 0), 0);
+    document.getElementById('todayTotal').textContent = '€' + total.toFixed(2);
 }
 
-// 🔀 Filtra ordini
+//  Filtra ordini
 function filterOrders(filter) {
-currentFilter = filter;
-document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-event.target.classList.add('active');
-renderOrders();
+    currentFilter = filter;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    renderOrders();
 }
 
 // 📋 Renderizza ordini
 function renderOrders() {
-const container = document.getElementById('ordersContainer');
-let orders = Object.entries(ordersData).map(([id, data]) => ({ id, ...data }));
+    const container = document.getElementById('ordersContainer');
+    let orders = Object.entries(ordersData).map(([id, data]) => ({ id, ...data }));
 
-// Applica filtro
-if (currentFilter === 'pending') orders = orders.filter(o => o.status === 'new' || o.status === 'pending');
-else if (currentFilter === 'accepted') orders = orders.filter(o => o.assignedTo === currentUser && o.status === 'accepted');
-else if (currentFilter === 'delivered') orders = orders.filter(o => o.status === 'delivered');
+    // Applica filtro
+    if (currentFilter === 'pending') orders = orders.filter(o => o.status === 'new' || o.status === 'pending');
+    else if (currentFilter === 'accepted') orders = orders.filter(o => o.assignedTo === currentUser && o.status === 'accepted');
+    else if (currentFilter === 'delivered') orders = orders.filter(o => o.status === 'delivered');
 
-// Ordina per timestamp (più recenti prima)
-orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    // Ordina per timestamp (più recenti prima)
+    orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-if (orders.length === 0) {
-container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Nessun ordine in questa categoria</p></div>';
-return;
-}
+    if (orders.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon"></div><p>Nessun ordine in questa categoria</p></div>';
+        return;
+    }
 
-container.innerHTML = orders.map(order => {
-const status = order.status || 'new';
-const statusText = { new: '⏳ Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato', cancelled: '❌ Annullato' }[status] || status;
-const statusClass = { new: 'pending', pending: 'pending', accepted: 'accepted', delivered: 'delivered', cancelled: 'cancelled' }[status] || 'pending';
-const time = order.timestamp ? new Date(order.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
-const items = (order.items || []).map(i => `${i.name}${i.qty ? ' ×' + i.qty : ''}`).join(', ') || 'Nessun prodotto';
-const total = (order.finalTotal || order.total || 0).toFixed(2);
-const isNew = (status === 'new' || status === 'pending') && !order.assignedTo;
+    container.innerHTML = orders.map(order => {
+        const status = order.status || 'new';
+        const statusText = { new: ' Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato', cancelled: '❌ Annullato' }[status] || status;
+        const statusClass = { new: 'pending', pending: 'pending', accepted: 'accepted', delivered: 'delivered', cancelled: 'cancelled' }[status] || 'pending';
+        const time = order.timestamp ? new Date(order.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+        const items = (order.items || []).map(i => `${i.name}${i.qty ? ' ×' + i.qty : ''}`).join(', ') || 'Nessun prodotto';
+        const total = (order.finalTotal || order.total || 0).toFixed(2);
+        const isNew = (status === 'new' || status === 'pending') && !order.assignedTo;
 
-return `
-<div class="order-card status-${statusClass} ${isNew ? 'new' : ''}" onclick="showDetail('${order.id}')">
-<div class="order-header">
-<span class="order-id">#${(order.orderId || order.id || '').slice(-6).toUpperCase()}</span>
-<span class="order-time">${time}</span>
-<span class="status-badge status-${statusClass}">${statusText}</span>
-</div>
-<div class="order-customer">👤 ${order.customerName || 'Cliente'}</div>
-<div class="order-address">📍 ${order.type === 'delivery' ? (order.address || 'Indirizzo non specificato') : '🏪 Ritiro in pizzeria'}</div>
-<div class="order-items">${items}</div>
-<div class="order-total">€${total}</div>
-<div class="order-actions" onclick="event.stopPropagation()">
-${getActionButtons(order)}
-</div>
-</div>`;
-}).join('');
+        return `
+        <div class="order-card status-${statusClass} ${isNew ? 'new' : ''}" onclick="showDetail('${order.id}')">
+        <div class="order-header">
+        <span class="order-id">#${(order.orderId || order.id || '').slice(-6).toUpperCase()}</span>
+        <span class="order-time">${time}</span>
+        <span class="status-badge status-${statusClass}">${statusText}</span>
+        </div>
+        <div class="order-customer">👤 ${order.customerName || 'Cliente'}</div>
+        <div class="order-address">📍 ${order.type === 'delivery' ? (order.address || 'Indirizzo non specificato') : '🏪 Ritiro in pizzeria'}</div>
+        <div class="order-items">${items}</div>
+        <div class="order-total">€${total}</div>
+        <div class="order-actions" onclick="event.stopPropagation()">
+        ${getActionButtons(order)}
+        </div>
+        </div>`;
+    }).join('');
 }
 
 // 🎛️ Pulsanti azione per ordine
 function getActionButtons(order) {
-const status = order.status || 'new';
-if (status === 'new' || status === 'pending') {
-return `<button class="btn btn-primary btn-sm" onclick="acceptOrder('${order.id}')">🛵 Accetta</button>`;
-} else if (status === 'accepted' && order.assignedTo === currentUser) {
-return `
-<button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">✅ Consegnato</button>
-<button class="btn btn-warning btn-sm" onclick="callCustomer('${order.customerPhone || ''}')">📞 Chiama</button>
-`;
-} else if (status === 'delivered') {
-return `<span style="color:var(--success); font-size:0.85rem; font-weight:600">✅ Completato</span>`;
-}
-return `<span style="color:var(--text-secondary); font-size:0.85rem">In attesa...</span>`;
+    const status = order.status || 'new';
+    if (status === 'new' || status === 'pending') {
+        return `<button class="btn btn-primary btn-sm" onclick="acceptOrder('${order.id}')"> Accetta</button>`;
+    } else if (status === 'accepted' && order.assignedTo === currentUser) {
+        return `
+        <button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">✅ Consegnato</button>
+        <button class="btn btn-warning btn-sm" onclick="callCustomer('${order.customerPhone || ''}')">📞 Chiama</button>
+        `;
+    } else if (status === 'delivered') {
+        return `<span style="color:var(--success); font-size:0.85rem; font-weight:600">✅ Completato</span>`;
+    }
+    return `<span style="color:var(--text-secondary); font-size:0.85rem">In attesa...</span>`;
 }
 
 // 🛵 Accetta ordine
 function acceptOrder(orderId) {
-if (!confirm('✅ Accettare questo ordine?')) return;
-db.ref('ordini/' + orderId).update({
-status: 'accepted',
-assignedTo: currentUser,
-acceptedAt: Date.now(),
-acceptedBy: currentUser
-}).then(() => {
-showToast('🛵 Ordine accettato!');
-renderOrders();
-});
+    if (!confirm('✅ Accettare questo ordine?')) return;
+    db.ref('ordini/' + orderId).update({
+        status: 'accepted',
+        assignedTo: currentUser,
+        acceptedAt: Date.now(),
+        acceptedBy: currentUser
+    }).then(() => {
+        showToast('🛵 Ordine accettato!');
+        renderOrders();
+    });
 }
 
 // ✅ Completa ordine
 function completeOrder(orderId) {
-if (!confirm('✅ Confermi la consegna?')) return;
-db.ref('ordini/' + orderId).update({
-status: 'delivered',
-deliveredAt: Date.now(),
-deliveredBy: currentUser
-}).then(() => {
-showToast('✅ Ordine consegnato!');
-renderOrders();
-});
+    if (!confirm('✅ Confermi la consegna?')) return;
+    db.ref('ordini/' + orderId).update({
+        status: 'delivered',
+        deliveredAt: Date.now(),
+        deliveredBy: currentUser
+    }).then(() => {
+        showToast('✅ Ordine consegnato!');
+        renderOrders();
+    });
 }
 
 // 📞 Chiama cliente
 function callCustomer(phone) {
-if (!phone) { showToast('📞 Numero non disponibile'); return; }
-if (confirm(`📞 Chiamare ${phone}?`)) {
-window.location.href = 'tel:' + phone.replace(/\D/g, '');
-}
+    if (!phone) { showToast('📞 Numero non disponibile'); return; }
+    if (confirm(`📞 Chiamare ${phone}?`)) {
+        window.location.href = 'tel:' + phone.replace(/\D/g, '');
+    }
 }
 
 // 🔍 Mostra dettaglio ordine
 function showDetail(orderId) {
-const order = ordersData[orderId];
-if (!order) return;
+    const order = ordersData[orderId];
+    if (!order) return;
 
-const modal = document.getElementById('detailModal');
-const body = document.getElementById('modalBody');
-const status = order.status || 'new';
-const statusText = { new: '⏳ Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato' }[status] || status;
+    const modal = document.getElementById('detailModal');
+    const body = document.getElementById('modalBody');
+    const status = order.status || 'new';
+    const statusText = { new: ' Nuovo', pending: '⏳ In Attesa', accepted: '🛵 In Corso', delivered: '✅ Consegnato' }[status] || status;
 
-body.innerHTML = `
-<div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName || 'N/D'}</span></div>
-<div class="modal-row"><strong>Telefono:</strong> <span><a href="tel:${order.customerPhone || ''}" style="color:var(--primary)">${order.customerPhone || 'N/D'}</a></span></div>
-<div class="modal-row"><strong>Tipo:</strong> <span>${order.type === 'delivery' ? '🚚 Consegna' : '🏪 Ritiro'}</span></div>
-${order.type === 'delivery' ? `<div class="modal-row"><strong>Indirizzo:</strong> <span>${order.address || 'N/D'}</span></div>` : ''}
-<div class="modal-row"><strong>Orario:</strong> <span>${order.scheduledTime || 'Subito'}</span></div>
-<div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
-${order.notes ? `<div class="modal-notes">📝 <strong>Note:</strong><br>${order.notes}</div>` : ''}
+    body.innerHTML = `
+    <div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName || 'N/D'}</span></div>
+    <div class="modal-row"><strong>Telefono:</strong> <span><a href="tel:${order.customerPhone || ''}" style="color:var(--primary)">${order.customerPhone || 'N/D'}</a></span></div>
+    <div class="modal-row"><strong>Tipo:</strong> <span>${order.type === 'delivery' ? '🚚 Consegna' : '🏪 Ritiro'}</span></div>
+    ${order.type === 'delivery' ? `<div class="modal-row"><strong>Indirizzo:</strong> <span>${order.address || 'N/D'}</span></div>` : ''}
+    <div class="modal-row"><strong>Orario:</strong> <span>${order.scheduledTime || 'Subito'}</span></div>
+    <div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
+    ${order.notes ? `<div class="modal-notes">📝 <strong>Note:</strong><br>${order.notes}</div>` : ''}
 
-<div class="modal-items">
-<strong>Prodotti:</strong>
-${(order.items || []).map((item, i) => `<div>${i+1}. ${item.name} ${item.qty ? '×' + item.qty : ''} - €${(item.price * (item.qty||1)).toFixed(2)}</div>`).join('')}
-</div>
+    <div class="modal-items">
+    <strong>Prodotti:</strong>
+    ${(order.items || []).map((item, i) => `<div>${i+1}. ${item.name} ${item.qty ? '×' + item.qty : ''} - €${(item.price * (item.qty||1)).toFixed(2)}</div>`).join('')}
+    </div>
 
-<div class="modal-total">Totale: €${(order.finalTotal || order.total || 0).toFixed(2)}</div>
+    <div class="modal-total">Totale: €${(order.finalTotal || order.total || 0).toFixed(2)}</div>
 
-<div style="display:flex; gap:10px; margin-top:20px;">
-${status === 'new' || status === 'pending' ? `<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()">🛵 Accetta Ordine</button>` : ''}
-${status === 'accepted' && order.assignedTo === currentUser ? `
-<button class="btn btn-success" onclick="completeOrder('${orderId}'); closeModal()" style="flex:1">✅ Conferma Consegna</button>
-<button class="btn btn-warning" onclick="callCustomer('${order.customerPhone || ''}'); closeModal()" style="flex:1">📞 Chiama</button>
-` : ''}
-</div>
-`;
-modal.classList.add('active');
+    <div style="display:flex; gap:10px; margin-top:20px;">
+    ${status === 'new' || status === 'pending' ? `<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()"> Accetta Ordine</button>` : ''}
+    ${status === 'accepted' && order.assignedTo === currentUser ? `
+    <button class="btn btn-success" onclick="completeOrder('${orderId}'); closeModal()" style="flex:1">✅ Conferma Consegna</button>
+    <button class="btn btn-warning" onclick="callCustomer('${order.customerPhone || ''}'); closeModal()" style="flex:1"> Chiama</button>
+    ` : ''}
+    </div>
+    `;
+    modal.classList.add('active');
 }
 
 function closeModal() {
-document.getElementById('detailModal').classList.remove('active');
+    document.getElementById('detailModal').classList.remove('active');
 }
 
 // 🍞 Toast notification
 function showToast(msg) {
-const toast = document.createElement('div');
-toast.textContent = msg;
-toast.style.cssText = `position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text); padding:12px 20px; border-radius:12px; font-weight:500; z-index:1000; box-shadow:var(--shadow); border:1px solid var(--primary-dark); animation:slideIn 0.3s ease;`;
-document.body.appendChild(toast);
-setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2000);
-setTimeout(() => toast.remove(), 2300);
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = `position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text); padding:12px 20px; border-radius:12px; font-weight:500; z-index:1000; box-shadow:var(--shadow); border:1px solid var(--primary-dark); animation:slideIn 0.3s ease;`;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2000);
+    setTimeout(() => toast.remove(), 2300);
 }
 
-// ⌨️ Enter per login
+// ️ Enter per login
 document.getElementById('pinInput')?.addEventListener('keypress', e => {
-if (e.key === 'Enter') login();
+    if (e.key === 'Enter') login();
 });
 
 // 🔊 Attiva audio al primo tocco
