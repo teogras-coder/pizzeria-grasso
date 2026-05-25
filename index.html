@@ -857,5 +857,36 @@
         function deactivateHeroVideo(){db.ref('settings/heroVideoUrl').remove();showToast('🖼️ Fissa!');}
         function uploadVideoFromPhone(input){const f=input.files[0];if(!f)return;if(f.size>15*1024*1024){showToast('❌ Max 15MB');return;}document.getElementById('videoUploadProgress').style.display='block';const pb=document.getElementById('videoProgressBar'),ts=Date.now(),ref=storage.ref(`hero_videos/video_${ts}.mp4`),task=ref.put(f);task.on('state_changed',s=>{pb.style.width=`${(s.bytesTransferred/s.totalBytes)*100}%`;},e=>{showToast('❌ Errore: '+e.message);document.getElementById('videoUploadProgress').style.display='none';},()=>{task.snapshot.ref.getDownloadURL().then(u=>{db.ref('settings/heroVideoUrl').set(u);showToast('✅ Video caricato!');document.getElementById('videoUploadProgress').style.display='none';pb.style.width='0%';});});}
     </script>
+
+    <!-- 💾 AUTO-MEMORIZZAZIONE DATI CLIENTE (GDPR-SAFE) -->
+<script>
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Trova i campi (cerca per ID o placeholder)
+        const nomeEl = document.getElementById('nome') || document.querySelector('input[placeholder*="Nome"]');
+        const telEl  = document.getElementById('telefono') || document.querySelector('input[placeholder*="Telefono"]');
+        const addrEl = document.getElementById('indirizzo') || document.querySelector('input[placeholder*="Indirizzo"]');
+        
+        // 1. CARICA DATI SALVATI all'avvio
+        if(nomeEl && localStorage.getItem('pg_nome')) nomeEl.value = localStorage.getItem('pg_nome');
+        if(telEl  && localStorage.getItem('pg_tel'))  telEl.value  = localStorage.getItem('pg_tel');
+        if(addrEl && localStorage.getItem('pg_addr')) addrEl.value = localStorage.getItem('pg_addr');
+
+        // 2. SALVA DATI quando clicca "Conferma e Ordina"
+        // Cerca il pulsante e intercetta il click PRIMA dell'invio a Firebase
+        const btnOrdina = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Conferma'));
+        if(btnOrdina) {
+            btnOrdina.addEventListener('click', function() {
+                const privacy = document.querySelector('input[type="checkbox"]');
+                if(privacy && privacy.checked) {
+                    if(nomeEl && nomeEl.value) localStorage.setItem('pg_nome', nomeEl.value.trim());
+                    if(telEl  && telEl.value)  localStorage.setItem('pg_tel',  telEl.value.trim());
+                    if(addrEl && addrEl.value) localStorage.setItem('pg_addr', addrEl.value.trim());
+                }
+            }, true); // true = si attiva prima della tua funzione Firebase
+        }
+    });
+})();
+</script>
 </body>
 </html>
