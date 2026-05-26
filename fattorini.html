@@ -181,7 +181,6 @@ appId: "1:686300112893:web:e147b82f91374f12db1b94"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// 📊 Stato App
 let currentUser = null;
 let currentFilter = 'all';
 let ordersData = {};
@@ -189,7 +188,7 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🖼️ LOGO FATTORINI
+// 🖼️ LOGO
 db.ref('settings/driverLogo').on('value', snapshot => {
     const logoUrl = snapshot.val();
     if (logoUrl) {
@@ -197,7 +196,7 @@ db.ref('settings/driverLogo').on('value', snapshot => {
     }
 });
 
-// 👤 FATTORINI DINAMICI
+// 👤 FATTORINI
 let drivers = {};
 let driversLoaded = false;
 db.ref('drivers').on('value', snapshot => {
@@ -242,14 +241,12 @@ if(localStorage.getItem('grasso_driver_session')) {
     setTimeout(()=>{ if(sp && drivers[sp]===sn) { currentUser=sn; document.getElementById('loginScreen').style.display='none'; document.getElementById('dashboard').style.display='block'; initDashboard(); } else if(driversLoaded) { localStorage.removeItem('grasso_driver_session'); localStorage.removeItem('grasso_driver_pin'); } }, 500);
 }
 
-// 📊 Dashboard
+// 📊 Dashboard - ✅ SOLO DELIVERY
 function initDashboard() {
-    // ✅ FILTRO: solo ordini di CONSEGNA (type === 'delivery')
     db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
         const data = {};
         snapshot.forEach(child => { 
             const val = child.val();
-            // Mostra SOLO se è delivery
             if(val.type === 'delivery') data[child.key] = val;
         });
         ordersData = data;
@@ -261,10 +258,36 @@ function checkNewOrders() {
     const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
     if(pending.length > lastOrderCount && lastOrderCount > 0) {
         if(audioEnabled) playNotificationSound();
+        sendPushNotification('🍕 Nuovo Ordine!', 'Clicca per vedere i dettagli');
         const alert = document.getElementById('newOrderAlert'); alert.style.display='block';
         setTimeout(()=>alert.style.display='none', 3000);
     }
     if(lastOrderCount===0) lastOrderCount=pending.length;
+}
+
+// 🔔 Notifiche Push
+document.addEventListener('DOMContentLoaded', function() {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+        setTimeout(() => {
+            if(confirm(' Vuoi ricevere avvisi anche a telefono bloccato?\n\nPremi "Consenti" sulla prossima schermata.')) {
+                Notification.requestPermission().then(perm => {
+                    if(perm === 'granted') showToast('✅ Notifiche attive!');
+                });
+            }
+        }, 3000);
+    }
+});
+
+function sendPushNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body: body,
+            icon: 'https://teogra-c8cf5.web.app/icon-192.png',
+            badge: 'https://teogra-c8cf5.web.app/icon-192.png',
+            tag: 'new-order',
+            requireInteraction: true
+        });
+    }
 }
 
 function updateStats() {
@@ -284,23 +307,17 @@ function filterOrders(filter) {
     renderOrders();
 }
 
-// ✅ FUNZIONE NAVIGAZIONE GOOGLE MAPS
+// ️ Navigazione Google Maps
 function navigateToOrder(order) {
     let dest = '';
-    // Se ci sono coordinate GPS precise, usale (più accurato)
     if(order.coordinates && typeof order.coordinates === 'string' && order.coordinates.includes(',')) {
         const [lat, lng] = order.coordinates.split(',').map(Number);
-        if(!isNaN(lat) && !isNaN(lng)) {
-            dest = `${lat},${lng}`;
-        }
+        if(!isNaN(lat) && !isNaN(lng)) dest = `${lat},${lng}`;
     }
-    // Fallback: usa l'indirizzo testuale
     if(!dest && order.address) {
         dest = encodeURIComponent(order.address + ', Manfredonia, Italy');
     }
-    if(!dest) { showToast('📍 Indirizzo non disponibile'); return; }
-    
-    // Apri Google Maps per la navigazione
+    if(!dest) { showToast(' Indirizzo non disponibile'); return; }
     const url = `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`;
     window.open(url, '_blank');
     showToast('🗺️ Apertura Google Maps...');
@@ -340,7 +357,7 @@ function renderOrders() {
         </div>
         <div class="order-customer">👤 ${order.customerName||'Cliente'}</div>
         <div class="order-address ${hasGps?'has-gps':''}">
-        ${hasGps?'<span class="gps-icon">📍</span>':''}
+        ${hasGps?'<span class="gps-icon"></span>':''}
         ${order.address || 'Indirizzo non specificato'}
         </div>
         <div class="order-items">${items}</div>
@@ -356,7 +373,6 @@ function getActionButtons(order) {
     const status = order.status || 'new';
     let buttons = '';
     
-    // Pulsante NAVIGA sempre visibile per le consegne
     if(order.address) {
         buttons += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation(); navigateToOrder(${JSON.stringify(order).replace(/'/g,"\\'")})">🗺️ Naviga</button>`;
     }
@@ -388,12 +404,12 @@ function showDetail(orderId) {
     body.innerHTML = `
     <div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName||'N/D'}</span></div>
     <div class="modal-row"><strong>Telefono:</strong> <span><a href="tel:${order.customerPhone||''}" style="color:var(--primary)">${order.customerPhone||'N/D'}</a></span></div>
-    <div class="modal-row"><strong>Tipo:</strong> <span>🚚 Consegna</span></div>
+    <div class="modal-row"><strong>Tipo:</strong> <span> Consegna</span></div>
     <div class="modal-row"><strong>Indirizzo:</strong> <span class="${hasGps?'has-gps':''}">${hasGps?'📍 ':''}${order.address||'N/D'}</span></div>
     <div class="modal-row"><strong>Orario:</strong> <span>${order.scheduledTime||'Subito'}</span></div>
     <div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
     <div class="modal-row"><strong>Assegnato a:</strong> <span>${order.assignedTo||'Nessuno'}</span></div>
-    ${order.notes?`<div class="modal-notes">📝 <strong>Note:</strong><br>${order.notes}</div>`:''}
+    ${order.notes?`<div class="modal-notes"> <strong>Note:</strong><br>${order.notes}</div>`:''}
     <div class="modal-items"><strong>Prodotti:</strong>${(order.items||[]).map((item,i)=>`<div>${i+1}. ${item.name} ${item.qty?'×'+item.qty:''} - €${(item.price*(item.qty||1)).toFixed(2)}</div>`).join('')}</div>
     <div class="modal-total">Totale: €${(order.finalTotal||order.total||0).toFixed(2)}</div>
     
