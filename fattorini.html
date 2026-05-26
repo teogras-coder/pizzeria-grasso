@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ✅ MODIFICHE PWA / MANIFEST AGGIUNTE QUI -->
+<link rel="manifest" href="/manifest-fattorini.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fattorini">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- FINE MODIFICHE -->
 <title>Grasso Delivery - Area Fattorini</title>
 <style>
 :root {
@@ -111,7 +117,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <body>
 
 <div class="header">
-<button class="logout-btn" onclick="logout()">🚪 Esci</button>
+<button class="logout-btn" onclick="logout()"> Esci</button>
 <div class="header-content">
     <img id="headerLogo" src="" alt="Logo" class="header-logo" style="display:none;">
     <span id="headerLogoEmoji" class="header-logo-emoji">🛵</span>
@@ -123,7 +129,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <div class="new-order-alert" id="newOrderAlert">🔔 Nuovo Ordine!</div>
-<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Suoni: ON</div>
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()"> Suoni: ON</div>
 
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
@@ -196,7 +202,7 @@ db.ref('settings/driverLogo').on('value', snapshot => {
     }
 });
 
-// 👤 FATTORINI
+//  FATTORINI
 let drivers = {};
 let driversLoaded = false;
 db.ref('drivers').on('value', snapshot => {
@@ -216,7 +222,7 @@ function playNotificationSound() {
         setTimeout(()=>{const o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.frequency.value=1100;g2.gain.value=0.25;o2.start(c.currentTime);o2.stop(c.currentTime+0.15);},100);
     } catch(e){}
 }
-function toggleSound() { audioEnabled=!audioEnabled; document.getElementById('soundToggle').textContent=`🔊 Suoni: ${audioEnabled?'ON':'OFF'}`; document.getElementById('soundToggle').classList.toggle('muted',!audioEnabled); }
+function toggleSound() { audioEnabled=!audioEnabled; document.getElementById('soundToggle').textContent=` Suoni: ${audioEnabled?'ON':'OFF'}`; document.getElementById('soundToggle').classList.toggle('muted',!audioEnabled); }
 
 // 🔐 Login
 function login() {
@@ -258,7 +264,7 @@ function checkNewOrders() {
     const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
     if(pending.length > lastOrderCount && lastOrderCount > 0) {
         if(audioEnabled) playNotificationSound();
-        sendPushNotification('🍕 Nuovo Ordine!', 'Clicca per vedere i dettagli');
+        sendPushNotification(' Nuovo Ordine!', 'Clicca per vedere i dettagli');
         const alert = document.getElementById('newOrderAlert'); alert.style.display='block';
         setTimeout(()=>alert.style.display='none', 3000);
     }
@@ -269,7 +275,7 @@ function checkNewOrders() {
 document.addEventListener('DOMContentLoaded', function() {
     if ('Notification' in window && Notification.permission !== 'granted') {
         setTimeout(() => {
-            if(confirm(' Vuoi ricevere avvisi anche a telefono bloccato?\n\nPremi "Consenti" sulla prossima schermata.')) {
+            if(confirm('Vuoi ricevere avvisi anche a telefono bloccato?\n\nPremi "Consenti" sulla prossima schermata.')) {
                 Notification.requestPermission().then(perm => {
                     if(perm === 'granted') showToast('✅ Notifiche attive!');
                 });
@@ -307,7 +313,7 @@ function filterOrders(filter) {
     renderOrders();
 }
 
-// ️ Navigazione Google Maps
+// 🗺️ Navigazione Google Maps
 function navigateToOrder(order) {
     let dest = '';
     if(order.coordinates && typeof order.coordinates === 'string' && order.coordinates.includes(',')) {
@@ -317,7 +323,7 @@ function navigateToOrder(order) {
     if(!dest && order.address) {
         dest = encodeURIComponent(order.address + ', Manfredonia, Italy');
     }
-    if(!dest) { showToast(' Indirizzo non disponibile'); return; }
+    if(!dest) { showToast('❌ Indirizzo non disponibile'); return; }
     const url = `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`;
     window.open(url, '_blank');
     showToast('🗺️ Apertura Google Maps...');
@@ -340,7 +346,7 @@ function renderOrders() {
 
     container.innerHTML = orders.map(order => {
         const status = order.status || 'new';
-        const statusText = {new:'⏳ Nuovo',pending:'⏳ In Attesa',accepted:'🛵 In Corso',delivered:'✅ Consegnato',cancelled:'❌ Annullato'}[status]||status;
+        const statusText = {new:'⏳ Nuovo',pending:'⏳ In Attesa',accepted:'🛵 In Corso',delivered:'✅ Consegnato',cancelled:' Annullato'}[status]||status;
         const statusClass = {new:'pending',pending:'pending',accepted:'accepted',delivered:'delivered',cancelled:'cancelled'}[status]||'pending';
         const time = order.timestamp ? new Date(order.timestamp).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '--:--';
         const items = (order.items||[]).map(i=>`${i.name}${i.qty?' ×'+i.qty:''}`).join(', ') || 'Nessun prodotto';
@@ -357,7 +363,7 @@ function renderOrders() {
         </div>
         <div class="order-customer">👤 ${order.customerName||'Cliente'}</div>
         <div class="order-address ${hasGps?'has-gps':''}">
-        ${hasGps?'<span class="gps-icon"></span>':''}
+        ${hasGps?'<span class="gps-icon">📍</span>':''}
         ${order.address || 'Indirizzo non specificato'}
         </div>
         <div class="order-items">${items}</div>
@@ -409,7 +415,7 @@ function showDetail(orderId) {
     <div class="modal-row"><strong>Orario:</strong> <span>${order.scheduledTime||'Subito'}</span></div>
     <div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
     <div class="modal-row"><strong>Assegnato a:</strong> <span>${order.assignedTo||'Nessuno'}</span></div>
-    ${order.notes?`<div class="modal-notes"> <strong>Note:</strong><br>${order.notes}</div>`:''}
+    ${order.notes?`<div class="modal-notes"> 📝 <strong>Note:</strong><br>${order.notes}</div>`:''}
     <div class="modal-items"><strong>Prodotti:</strong>${(order.items||[]).map((item,i)=>`<div>${i+1}. ${item.name} ${item.qty?'×'+item.qty:''} - €${(item.price*(item.qty||1)).toFixed(2)}</div>`).join('')}</div>
     <div class="modal-total">Totale: €${(order.finalTotal||order.total||0).toFixed(2)}</div>
     
