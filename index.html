@@ -373,7 +373,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="myOrdersView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title">📦 I Miei Ordini</h2>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Gli ordini più vecchi di 30 giorni vengono eliminati automaticamente.</p>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti.</p>
 <button class="btn-clear-history" onclick="clearLocalHistory()" style="margin-bottom:15px; width:100%;"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
 <div id="myOrdersList"></div>
 </div>
@@ -767,7 +767,6 @@ if(orderId && orderId !== 'Anonimo') {
     const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
     const existsLocally = localOrders.some(o => o.orderId === orderId);
     if(!existsLocally) {
-        // Fallback: controlla nel DB solo se è un admin o se l'utente ha inserito manualmente (non dovrebbe succedere)
         showToast('❌ Ordine non trovato nello storico.');
         return;
     }
@@ -782,7 +781,6 @@ db.ref('recensioni').push({
     status: 'pending'
 }).then(()=>{
     if(pendingReviewOrderId) {
-        // Segna come recensito nello storico locale
         let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
         localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o);
         localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
@@ -821,8 +819,8 @@ try {
         items: orderData.items.map(i=>i.name).join(', '),
         reviewed: false
     });
-    // Tieni solo gli ultimi 20 ordini per leggerezza
-    if(orders.length > 20) orders = orders.slice(0, 20);
+    // ✅ LIMITIAMO A SOLO 5 ORDINI RECENTI PER NON INTASARE
+    if(orders.length > 5) orders = orders.slice(0, 5);
     localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
     renderMyOrders();
 } catch(e){}
@@ -1057,7 +1055,7 @@ function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&
 function inviaAvvisoWhatsApp(ordine){ const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,''); const tipo=ordine.type==='delivery'?'🚚 Consegna':'🏪 Ritiro'; const indirizzo=ordine.type==='delivery'?`\n📍 *Indirizzo:* ${sanitizeWA(ordine.address)}`:''; const note=ordine.notes?`\n📝 *Note:* ${sanitizeWA(ordine.notes)}`:''; const prodotti=(ordine.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n'); const messaggio=`🚨 *NUOVO ORDINE DA EVADERE* \n *N°:* ${ordine.orderId}\n *Cliente:* ${sanitizeWA(ordine.name)}\n📞 *Telefono:* ${sanitizeWA(ordine.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n *PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ordine.finalTotal.toFixed(2)}`; const linkWA=`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`; const isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent); if(isMobile){window.location.href=linkWA;setTimeout(()=>{closeCart();showToast(' Torna all\'app dopo aver inviato');},1500);}else{const ns=window.open(linkWA,'_blank');closeCart();if(!ns||ns.closed){window.location.href=linkWA;}else{showToast('📩 WhatsApp aperto.');}} }
 function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast(' Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('❌ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast('❌ Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oid='ORD-'+Math.floor(Math.random()*9000+1000),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:` ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,orderId:oid,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; inviaAvvisoWhatsApp(oc); sendOrder(oc); }
 function sendOrder(d){ localStorage.setItem('lastOrderTime',Date.now()); const r=db.ref('ordini').push(); const coords=document.getElementById('customerCoords')?.value||null; const printFormat={width:80,header:"ANTICA PIZZERIA GRASSO\nManfredonia • Tel. 0884 660377\n"+"=".repeat(32),items:(d.items||[]).map(i=>`${i.name.padEnd(25)} x${i.qty||1} €${(i.price*(i.qty||1)).toFixed(2)}`).join('\n'),footer:"-".repeat(32)+`\nTOTALE: €${d.finalTotal.toFixed(2)}\n`+(d.type==='delivery'?`Consegna: ${d.address}\n`:'Ritiro in pizzeria\n')+`Ordine: ${d.orderId} • ${new Date().toLocaleString('it-IT')}\n`+"Grazie per la fiducia! 🍕"}; r.set({orderId:d.orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:orderType==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat:printFormat}); 
-// 💾 Salva nello storico locale
+// 💾 Salva nello storico locale (MAX 5 ORDINI)
 saveOrderToLocal(d);
 const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); cart=[];updateCartBadge();closeCart(); document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false; selectTimeMode('asap');showToast('✅ Ordine inviato!'); }
 function openAdmin(){const p=prompt("🔐 PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast("🔒 Errato");}
