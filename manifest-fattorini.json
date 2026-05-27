@@ -1,7 +1,6 @@
 {
   "name": "Grasso Delivery - Fattorini",
   "short_name": "Fattorini",
-  "description": "Area riservata fattorini - Antica Pizzeria Grasso",
   "start_url": "/fattorini.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
@@ -9,13 +8,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/logos/logofattorini-192.png",
+      "src": "/logofattorini192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/logos/logofattorini-512.png",
+      "src": "/logofattorini512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
