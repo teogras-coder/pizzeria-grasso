@@ -63,7 +63,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .promo-remaining { display: block; font-size: 0.7rem; margin-top: 6px; opacity: 0.85; font-weight: 600; }
 @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
 .hero-section { position: relative; height: 240px; overflow: hidden; flex-shrink: 0; }
-.hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
+.hero-img, .hero-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
 .section-divider { display: flex; align-items: center; padding: 20px 25px 10px; }
 .section-divider span { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); }
@@ -92,12 +92,11 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .search-bar-3d { position: relative; margin-bottom: 20px; }
 .search-bar-3d input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 14px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 1rem; outline: none; box-shadow: 0 4px 0 var(--shadow); }
 .search-bar-3d i { position: absolute; left: 15px; top: 14px; color: var(--gold); z-index: 2; }
-.product-card-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--brown) 100%); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 0 var(--shadow); border: 1px solid rgba(212,168,75,0.1); gap: 10px; }
-.product-info { flex: 1; min-width: 0; }
+.product-card-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--brown) 100%); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 0 var(--shadow); border: 1px solid rgba(212,168,75,0.1); }
 .product-info h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream); margin-bottom: 4px; }
 .product-info p { font-size: 0.75rem; color: #8a7a5a; margin-bottom: 6px; }
 .product-price { font-size: 1.15rem; font-weight: 700; color: var(--gold); }
-.add-btn-3d { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); flex-shrink: 0; }
+.add-btn-3d { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .add-btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
 .qty-counter-3d { display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 10px; padding: 4px; border: 1px solid var(--gold-dark); box-shadow: 0 2px 0 var(--shadow); flex-shrink: 0; }
 .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 var(--gold-dark); }
@@ -130,8 +129,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
 .cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
 .cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
-.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, #25D366 0%, #128C7E 100%); color: white; font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 #075E54; }
-.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 #075E54; }
+.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
+.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--gold-dark); }
 .clear-cart-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.3); background: transparent; color: #f87171; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .order-type-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
 .type-option { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
@@ -330,41 +329,16 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: default; }
 .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 
-/* === GESTICALE ADMIN SU DESKTOP/TABLET === */
+/* === GESTIONALE LARGO SU PC/TABLET === */
 @media (min-width: 768px) {
-    .phone-frame {
-        max-width: 100% !important;
-        width: 100% !important;
-        border-radius: 0 !important;
-    }
-    #adminModal .modal-content-3d {
-        max-width: 950px !important;
-        width: 95% !important;
-        max-height: 92vh !important;
-    }
-    #adminProducts {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 12px !important;
-    }
-    .admin-tabs {
-        flex-wrap: wrap !important;
-        gap: 6px !important;
-    }
-    .admin-tab {
-        padding: 10px 18px !important;
-        font-size: 0.9rem !important;
-    }
+    .phone-frame { max-width: 100% !important; width: 100% !important; border-radius: 0 !important; }
+    #adminModal .modal-content-3d { max-width: 1100px !important; width: 95% !important; max-height: 90vh !important; }
+    #adminProducts { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 15px !important; }
+    .admin-tabs { flex-wrap: wrap !important; }
     .order-card { padding: 16px !important; }
-    .order-items div { font-size: 0.88rem !important; }
-    .admin-input, .admin-group textarea {
-        font-size: 1rem !important;
-        padding: 14px !important;
-    }
-    .promo-product-row {
-        grid-template-columns: 2fr 1fr 0.8fr auto !important;
-        gap: 8px !important;
-    }
+    .order-items div { font-size: 0.9rem !important; }
+    .admin-input { font-size: 1rem !important; padding: 14px !important; }
+    .promo-product-row { grid-template-columns: 2fr 1fr 0.8fr auto !important; gap: 8px !important; }
 }
 </style>
 </head>
@@ -382,6 +356,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <i class="fas fa-times close-offer" onclick="event.stopPropagation(); document.getElementById('offersBanner').classList.remove('show')"></i>
 </div>
 <div class="hero-section">
+<video id="heroVideo" class="hero-video" autoplay loop muted playsinline style="display:none;"></video>
 <img id="heroImg" class="hero-img" src="focaccia.jpg" alt="Pizza">
 <div class="hero-overlay"></div>
 </div>
@@ -481,7 +456,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 </div>
 <button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fab fa-whatsapp"></i> Conferma e Ordina</button>
+<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-check-circle"></i> CONFERMA ORDINE</button>
 </div>
 </div>
 <div class="modal-3d" id="reviewModal">
@@ -751,6 +726,10 @@ isFirstLoad = false;
 }
 });
 db.ref('settings/colorPalette').on('value', s=>{const p=s.val()||'autunno';applyPalette(p);const e=document.getElementById('currentPaletteName');if(e)e.textContent=p.charAt(0).toUpperCase()+p.slice(1);});
+db.ref('settings/heroVideoUrl').on('value', s=>{
+const u=s.val(),v=document.getElementById('heroVideo'),i=document.getElementById('heroImg');
+if(u){v.src=u;v.style.display='block';v.play().catch(()=>{});i.style.display='none';}else{v.style.display='none';v.pause();i.style.display='block';}
+});
 db.ref('recensioni').on('value', s=>{ loadReviewsPublic(); loadAdminReviews(); });
 }
 function loadFromFirebase(){
@@ -1032,49 +1011,14 @@ renderProductList(c);
 window.scrollTo(0,0);
 setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
-function getCartQty(cat, name) {
-    const item = cart.find(x => !x.isPromo && x.cat === cat && x.name === name);
-    return item ? item.qty : 0;
-}
-function changeQty(cat, index, delta) {
-    if(!appData.menu || !appData.menu[cat] || !appData.menu[cat][index]) return;
-    const it = appData.menu[cat][index];
-    const ex = cart.find(x => !x.isPromo && x.name === it.name && x.cat === cat);
-    if (ex) {
-        ex.qty += delta;
-        if (ex.qty <= 0) {
-            cart = cart.filter(x => x !== ex);
-        }
-    } else if (delta > 0) {
-        cart.push({...it, cat:cat, qty:1, isPromo:false});
-    }
-    updateCartBadge();
-    if(currentSearchCat === cat) renderProductList(cat, document.getElementById('productSearch').value);
-}
 function renderProductList(cat, filterTerm) {
-    if (!cat || !appData.menu || !appData.menu[cat]) return;
-    const term = (filterTerm || '').toLowerCase();
-    const list = document.getElementById('productList');
-    if(!list) return;
-    const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
-    if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
-    list.innerHTML = filtered.map((p, i) => {
-        const realIndex = appData.menu[cat].indexOf(p);
-        const qty = getCartQty(cat, p.name);
-        let actionBtn = '';
-        if (qty === 0) {
-            actionBtn = `<button class="add-btn-3d" onclick="addToCart('${cat}', ${realIndex})">+ Aggiungi</button>`;
-        } else {
-            actionBtn = `
-                <div class="qty-counter-3d">
-                    <button class="qty-btn minus" onclick="changeQty('${cat}', ${realIndex}, -1)">-</button>
-                    <span class="qty-value">${qty}</span>
-                    <button class="qty-btn plus" onclick="changeQty('${cat}', ${realIndex}, 1)">+</button>
-                </div>
-            `;
-        }
-        return `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${actionBtn}</div>`;
-    }).join('');
+if (!cat || !appData.menu || !appData.menu[cat]) return;
+const term = (filterTerm || '').toLowerCase();
+const list = document.getElementById('productList');
+if(!list) return;
+const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
+if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
+list.innerHTML = filtered.map((p, i) => `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div><button class="add-btn-3d" onclick="addToCart('${cat}', ${appData.menu[cat].indexOf(p)})">+ Aggiungi</button></div>`).join('');
 }
 function filterProducts(term){ if(currentSearchCat) renderProductList(currentSearchCat, term || ''); }
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
@@ -1083,7 +1027,7 @@ function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')ret
 function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast(' No ritiro');return;}orderType=t;openCart();}
-function addToCart(c,i){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex)ex.qty++;else cart.push({...it,cat:c,qty:1,isPromo:false});updateCartBadge();showToast(` ${it.name} aggiunta!`);if(currentSearchCat === c) renderProductList(c, document.getElementById('productSearch').value);}
+function addToCart(c,i){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex)ex.qty++;else cart.push({...it,cat:c,qty:1,isPromo:false});updateCartBadge();showToast(` ${it.name} aggiunta!`);}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const b=document.getElementById('cartBadge');if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('️ Svuotato');}}
 function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
@@ -1095,138 +1039,91 @@ function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(
 function closeCart(){document.getElementById('cartModal').classList.remove('active');}
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-// --- INIZIO NUOVO SISTEMA ORDINI ---
+
+// ✅ SISTEMA ORDINI DIRETTO (SENZA WHATSAPP)
 function confirmAndSendOrder(){
-if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;}
-const pc=document.getElementById('privacyConsent');
-if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;}
-if(document.getElementById('honeypot').value!=='')return;
-const n=document.getElementById('customerName').value.trim();
-const p=document.getElementById('customerPhone').value.trim();
-const a=document.getElementById('customerAddress').value.trim();
-const nt=document.getElementById('customerNotes').value.trim();
-if(!n){showToast('❌ Nome');return;}
-const ph=p.replace(/\D/g,'');
-if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;}
-let pt=0; cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
-const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
-const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
-if(orderType==='delivery'){
-if(a.length<10){showToast('❌ Indirizzo');return;}
-if(pt+df<minO){showToast(`️ Minimo: €${minO}`);return;}
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;}
+    const pc=document.getElementById('privacyConsent');
+    if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;}
+    if(document.getElementById('honeypot').value!=='')return;
+    const n=document.getElementById('customerName').value.trim();
+    const p=document.getElementById('customerPhone').value.trim();
+    const a=document.getElementById('customerAddress').value.trim();
+    const nt=document.getElementById('customerNotes').value.trim();
+    if(!n){showToast('❌ Nome');return;}
+    const ph=p.replace(/\D/g,'');
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;}
+    let pt=0; cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
+    const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
+    const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
+    if(orderType==='delivery'){
+        if(a.length<10){showToast('❌ Indirizzo');return;}
+        if(pt+df<minO){showToast(`️ Minimo: €${minO}`);return;}
+    }
+    if(cart.length===0){showToast('🛒 Carrello vuoto');return;}
+
+    const ft=pt+df, st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito');
+    const oid='ORD-'+Math.floor(Math.random()*9000+1000);
+    const oi=[];
+    cart.forEach(i=>{
+        if(i.isPromo) oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});
+        else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
+    });
+
+    const btn = document.getElementById('checkoutBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+    btn.disabled = true;
+
+    const coords = document.getElementById('customerCoords')?.value || null;
+
+    // ✅ SCRIVI DIRETTAMENTE SU FIREBASE
+    const r = db.ref('ordini').push();
+    r.set({
+        orderId: oid,
+        customerName: sanitizeWA(n),
+        customerPhone: sanitizeWA(ph),
+        address: orderType==='delivery' ? sanitizeWA(a) : '',
+        notes: sanitizeWA(nt),
+        type: orderType,
+        scheduledTime: st,
+        items: oi,
+        productsTotal: pt,
+        deliveryFee: df,
+        finalTotal: ft,
+        status: 'new',
+        timestamp: Date.now(),
+        createdAt: new Date().toISOString(),
+        stampato: true, // ✅ IL RASPBERRY STAMPA SUBITO
+        coordinates: coords
+    }).then(() => {
+        // ✅ Pulizia e feedback immediato
+        const pi = cart.filter(i => i.isPromo);
+        pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
+        saveOrderToLocal({ orderId: oid, finalTotal: ft, items: oi });
+        localStorage.setItem('lastOrderTime', Date.now());
+        
+        cart = []; updateCartBadge(); closeCart();
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerPhone').value = '';
+        document.getElementById('customerAddress').value = '';
+        document.getElementById('customerNotes').value = '';
+        document.getElementById('scheduledTime').value = '';
+        document.getElementById('privacyConsent').checked = false;
+        selectTimeMode('asap');
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('✅ Ordine inviato in cucina!');
+    }).catch(err => {
+        console.error(err);
+        showToast('❌ Errore di rete: ' + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
-const ft=pt+df, st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito');
-const oid='ORD-'+Math.floor(Math.random()*9000+1000);
-const oi=[];
-cart.forEach(i=>{
-if(i.isPromo) oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});
-else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
-});
-const pendingOrder = {
-name:n, phone:ph, address:a, notes:nt, type:orderType,
-orderId:oid, scheduledTime:st, productsTotal:pt,
-deliveryFee:df, finalTotal:ft, items:oi
-};
-sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
-showPendingOrderModal();
-}
-function aproWhatsApp() {
-const pending = JSON.parse(sessionStorage.getItem('pendingOrder'));
-if(!pending) return;
-const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
-const tipo=pending.type==='delivery'?' Consegna':'🏪 Ritiro';
-const indirizzo=pending.type==='delivery'?`\n*Indirizzo:* ${sanitizeWA(pending.address)}`:'';
-const note=pending.notes?`\n📝 *Note:* ${sanitizeWA(pending.notes)}`:'';
-const prodotti=(pending.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
-const messaggio=`🔔 *NUOVO ORDINE*\n*N°:* ${pending.orderId}\n*Cliente:* ${sanitizeWA(pending.name)}\n*Tel:* ${sanitizeWA(pending.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${pending.finalTotal.toFixed(2)}`;
-window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
-}
-function confermaDopoWhatsApp() {
-const pending = JSON.parse(sessionStorage.getItem('pendingOrder'));
-if(!pending) { showToast('⚠️ Errore: nessun ordine in sospeso'); return; }
-showToast(' Invio alla cucina...');
-const r = db.ref('ordini').push();
-r.set({
-orderId: pending.orderId,
-customerName: sanitizeWA(pending.name),
-customerPhone: sanitizeWA(pending.phone),
-address: pending.type==='delivery' ? sanitizeWA(pending.address) : '',
-notes: sanitizeWA(pending.notes),
-type: pending.type,
-scheduledTime: pending.scheduledTime,
-items: pending.items,
-productsTotal: pending.productsTotal,
-deliveryFee: pending.deliveryFee,
-finalTotal: pending.finalTotal,
-status: 'new',
-timestamp: Date.now(),
-createdAt: new Date().toISOString(),
-stampato: true
-}).then(() => {
-showToast('✅ Ordine inviato alla cucina!');
-const pi = cart.filter(i => i.isPromo);
-pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
-saveOrderToLocal({ orderId: pending.orderId, finalTotal: pending.finalTotal, items: pending.items });
-localStorage.setItem('lastOrderTime', Date.now());
-cart = []; updateCartBadge(); closeCart();
-document.getElementById('customerName').value = '';
-document.getElementById('customerPhone').value = '';
-document.getElementById('customerAddress').value = '';
-document.getElementById('customerNotes').value = '';
-document.getElementById('scheduledTime').value = '';
-document.getElementById('privacyConsent').checked = false;
-selectTimeMode('asap');
-sessionStorage.removeItem('pendingOrder');
-const box = document.getElementById('whatsappConfirmBox');
-if(box) box.remove();
-}).catch(err => {
-console.error(err);
-showToast('❌ Errore di rete: ' + err.message);
-});
-}
-function showPendingOrderModal() {
-const oldBox = document.getElementById('whatsappConfirmBox');
-if(oldBox) oldBox.remove();
-const confirmBox = document.createElement('div');
-confirmBox.id = 'whatsappConfirmBox';
-confirmBox.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-confirmBox.innerHTML = `
-<div style="background:var(--card-light);padding:25px;border-radius:16px;width:90%;max-width:350px;text-align:center;border:2px solid var(--gold);">
-<div style="font-size:3rem;margin-bottom:10px;">📲</div>
-<h3 style="color:var(--gold);margin-bottom:8px;">Invia l'ordine</h3>
-<p style="color:var(--cream);font-size:0.9rem;margin-bottom:15px;">Clicca qui sotto, invia il messaggio su WhatsApp, e poi torna qui.</p>
-<button onclick="aproWhatsApp()" style="width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(180deg,#25D366 0%,#128C7E 100%);color:white;font-weight:700;font-size:1rem;margin-bottom:10px;cursor:pointer;"> 1. Apri WhatsApp</button>
-<button onclick="confermaDopoWhatsApp()" style="width:100%;padding:15px;border-radius:12px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-weight:700;font-size:1rem;cursor:pointer;"> 2. Ho inviato su WhatsApp</button>
-<button onclick="annullaOrdine()" style="width:100%;margin-top:15px;background:transparent;border:none;color:#666;font-size:0.8rem;cursor:pointer;">Annulla</button>
-</div>
-`;
-document.body.appendChild(confirmBox);
-}
-function annullaOrdine() {
-sessionStorage.removeItem('pendingOrder');
-const box = document.getElementById('whatsappConfirmBox');
-if(box) box.remove();
-showToast('Ordine annullato');
-}
-window.addEventListener('load', function() {
-if(sessionStorage.getItem('pendingOrder')) {
-showPendingOrderModal();
-}
-});
-// --- FINE NUOVO SISTEMA ORDINI ---
-function sendOrder(d){
-localStorage.setItem('lastOrderTime',Date.now());
-const r=db.ref('ordini').push();
-const coords=document.getElementById('customerCoords')?.value||null;
-r.set({
-orderId:d.orderId, customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
-address:orderType==='delivery'?sanitizeWA(d.address):'', notes:sanitizeWA(d.notes),
-type:d.type, scheduledTime: d.scheduledTime || 'Subito', items:d.items,
-productsTotal:d.productsTotal, deliveryFee:d.deliveryFee, finalTotal:d.finalTotal,
-status:'new', timestamp:Date.now(), createdAt:new Date().toISOString(), stampato:true, coordinates:coords
-});
-return r;
-}
+// --- FINE SISTEMA ORDINI DIRETTO ---
+
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast(" Errato");}
 function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
 function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
@@ -1267,8 +1164,11 @@ function updateAdminImagePreviews(){const p=document.getElementById('adminHeroPr
 function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast(" Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}const od=Array.from(document.querySelectorAll('.day-toggle.active')).map(el=>el.dataset.day).join(',');db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;const minOv=parseFloat(document.getElementById('minDeliveryInput').value),minO=isNaN(minOv)||minOv<0?0:minOv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,openDays:od,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df,minDeliveryOrder:minO});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='adminModal')closeAdmin();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();}
-function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast(' Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+n.slice(1);}
+function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast(' Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+p.slice(1);}
 function applyPalette(n){const p={autunno:{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},inverno:{gold:"#a8c3d4",goldLight:"#d4e6f0",goldDark:"#5a7b8c",dark:"#0c121a",brown:"#1a2530",cream:"#e6f0f5"},primavera:{gold:"#8cd4a8",goldLight:"#e6f5e6",goldDark:"#4a8c5a",dark:"#0a1a12",brown:"#1a2d1f",cream:"#f5f5e6"},estate:{gold:"#e8a84b",goldLight:"#ffe0a0",goldDark:"#c47a20",dark:"#1a1005",brown:"#3d2510",cream:"#fff5e0"},natale:{gold:"#c41e3a",goldLight:"#ff6b6b",goldDark:"#8a1c2b",dark:"#0f2018",brown:"#1a3325",cream:"#f5f0e6"},san_valentino:{gold:"#ff4d6d",goldLight:"#ffccd5",goldDark:"#c9184a",dark:"#1a0a0f",brown:"#2d1520",cream:"#fff0f3"},notte:{gold:"#7209b7",goldLight:"#b5179e",goldDark:"#3a0ca3",dark:"#050510",brown:"#0b0b1a",cream:"#e0e7ff"}}[n]||{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},r=document.documentElement.style;r.setProperty('--gold',p.gold);r.setProperty('--gold-light',p.goldLight);r.setProperty('--gold-dark',p.goldDark);r.setProperty('--dark',p.dark);r.setProperty('--brown',p.brown);r.setProperty('--cream',p.cream);document.querySelector('meta[name="theme-color"]').setAttribute('content',p.gold);}
+function activateHeroVideo(){const u=document.getElementById('heroVideoInput').value;if(!u){showToast(' Link!');return;}db.ref('settings/heroVideoUrl').set(u);showToast(' Attivato!');}
+function deactivateHeroVideo(){db.ref('settings/heroVideoUrl').remove();showToast('️ Fissa!');}
+function uploadVideoFromPhone(input){const f=input.files[0];if(!f)return;if(f.size>15*1024*1024){showToast(' Max 15MB');return;}document.getElementById('videoUploadProgress').style.display='block';const pb=document.getElementById('videoProgressBar'),ts=Date.now(),ref=storage.ref(`hero_videos/video_${ts}.mp4`),task=ref.put(f);task.on('state_changed',s=>{pb.style.width=`${(s.bytesTransferred/s.totalBytes)*100}%`;},e=>{showToast('❌ Errore: '+e.message);document.getElementById('videoUploadProgress').style.display='none';},()=>{task.snapshot.ref.getDownloadURL().then(u=>{db.ref('settings/heroVideoUrl').set(u);showToast('✅ Video caricato!');document.getElementById('videoUploadProgress').style.display='none';pb.style.width='0%';});});}
 </script>
 <script>
 (function(){document.addEventListener('DOMContentLoaded',function(){const ne=document.getElementById('customerName'),te=document.getElementById('customerPhone'),ae=document.getElementById('customerAddress');if(ne)ne.setAttribute('autocomplete','name');if(te)te.setAttribute('autocomplete','tel');if(ae)ae.setAttribute('autocomplete','street-address');if(localStorage.getItem('pg_nome')&&ne)ne.value=localStorage.getItem('pg_nome');if(localStorage.getItem('pg_tel')&&te)te.value=localStorage.getItem('pg_tel');if(localStorage.getItem('pg_addr')&&ae)ae.value=localStorage.getItem('pg_addr');const bo=document.getElementById('checkoutBtn');if(bo){bo.addEventListener('click',function(){const p=document.getElementById('privacyConsent');if(!p||!p.checked)return;if(ne&&ne.value)localStorage.setItem('pg_nome',ne.value.trim());if(te&&te.value)localStorage.setItem('pg_tel',te.value.trim());if(ae&&ae.value)localStorage.setItem('pg_addr',ae.value.trim());},true);}});})();
