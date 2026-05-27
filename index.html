@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -329,9 +329,125 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-review-order { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 .btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: default; }
 .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+
+/* ===== BANNER CONFERMA WHATSAPP ===== */
+#whatsappConfirmBanner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5000;
+    background: linear-gradient(135deg, #2d1f12 0%, #1a1209 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 15px 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    display: none;
+    animation: slideDownBanner 0.4s ease;
+}
+#whatsappConfirmBanner.show { display: block; }
+@keyframes slideDownBanner {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.wa-banner-content {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+}
+.wa-banner-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+}
+.wa-banner-title {
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.wa-banner-subtitle {
+    color: var(--cream);
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+.wa-banner-buttons {
+    display: flex;
+    gap: 8px;
+}
+.wa-banner-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.wa-banner-btn.confirm {
+    background: linear-gradient(180deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    box-shadow: 0 4px 0 #075E54;
+}
+.wa-banner-btn.confirm:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #075E54;
+}
+.wa-banner-btn.cancel {
+    background: rgba(248,113,113,0.2);
+    color: #f87171;
+    border: 1px solid rgba(248,113,113,0.3);
+}
+.wa-banner-btn.retry {
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: var(--dark);
+    box-shadow: 0 4px 0 var(--gold-dark);
+}
+.wa-banner-btn.retry:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--gold-dark);
+}
+.wa-banner-order-info {
+    background: rgba(0,0,0,0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--cream);
+}
+.wa-banner-order-info strong {
+    color: var(--gold);
+}
 </style>
 </head>
 <body>
+
+<!-- ===== BANNER CONFERMA WHATSAPP (in cima, non invasivo) ===== -->
+<div id="whatsappConfirmBanner">
+    <div class="wa-banner-content">
+        <span class="wa-banner-icon">📲</span>
+        <div class="wa-banner-title">Hai inviato l'ordine su WhatsApp?</div>
+        <div class="wa-banner-subtitle">Conferma solo dopo aver premuto "Invia" nella chat</div>
+        <div class="wa-banner-order-info" id="waBannerOrderInfo"></div>
+        <div class="wa-banner-buttons">
+            <button class="wa-banner-btn cancel" onclick="annullaOrdineWhatsApp()">
+                <i class="fas fa-times"></i> Annulla
+            </button>
+            <button class="wa-banner-btn retry" onclick="riapriWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Riapri
+            </button>
+            <button class="wa-banner-btn confirm" onclick="confermaInvioWhatsApp()">
+                <i class="fas fa-check"></i> Inviato!
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="phone-frame">
 <div class="secret-admin-zone" id="secretAdminBtn"></div>
 <header class="header">
@@ -706,7 +822,7 @@ let pendingReviewOrderId = null;
 document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 window.onload=function(){ if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; cleanLocalHistory(); };
-document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); loadReviewsPublic(); renderMyOrders(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} });
+document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); loadReviewsPublic(); renderMyOrders(); checkPendingOrderOnLoad(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} });
 function setupRealtimeListeners(){
 db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val();renderCategories();renderAdminCategories();renderAdminProducts();}});
 db.ref('menu').on('value', s=>{if(s.exists()){appData.menu=s.val();renderCategories();renderAdminProducts();}});
@@ -1074,7 +1190,7 @@ function addToCart(c,i){
     if(ex) ex.qty++;
     else cart.push({...it,cat:c,qty:1,isPromo:false});
     updateCartBadge();
-    showToast(` ${it.name} aggiunta!`);
+    showToast(`✅ ${it.name} aggiunta!`);
     if(currentSearchCat === c) renderProductList(c, document.getElementById('productSearch').value);
 }
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const b=document.getElementById('cartBadge');if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
@@ -1089,25 +1205,29 @@ function closeCart(){document.getElementById('cartModal').classList.remove('acti
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
 
-// === NUOVO SISTEMA ORDINI PULITO ===
+// ======================================================================
+// === SISTEMA ORDINI CORRETTO: Firebase solo DOPO conferma WhatsApp =====
+// ======================================================================
+
+// 1) Click su "Conferma e Ordina" → salva dati LOCALI e apre WhatsApp
 function confirmAndSendOrder(){
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;}
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto tra un ordine e l\'altro');return;}
     const pc=document.getElementById('privacyConsent');
-    if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;}
+    if(!pc||!pc.checked){showToast('⚠️ Accetta la Privacy Policy');return;}
     if(document.getElementById('honeypot').value!=='')return;
     const n=document.getElementById('customerName').value.trim();
     const p=document.getElementById('customerPhone').value.trim();
     const a=document.getElementById('customerAddress').value.trim();
     const nt=document.getElementById('customerNotes').value.trim();
-    if(!n){showToast('❌ Nome');return;}
+    if(!n){showToast('❌ Inserisci il nome');return;}
     const ph=p.replace(/\D/g,'');
-    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;}
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Numero telefono non valido');return;}
     let pt=0; cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
     const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
     const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
     if(orderType==='delivery'){
-        if(a.length<10){showToast('❌ Indirizzo');return;}
-        if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;}
+        if(a.length<10){showToast('❌ Inserisci un indirizzo completo');return;}
+        if(pt+df<minO){showToast(`⚠️ Ordine minimo: €${minO}`);return;}
     }
     if(cart.length===0){showToast('🛒 Carrello vuoto');return;}
 
@@ -1119,48 +1239,116 @@ function confirmAndSendOrder(){
         else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
     });
 
-    const btn = document.getElementById('checkoutBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
-    btn.disabled = true;
-
+    // ✅ SALVA IN SESSION STORAGE (NON su Firebase!)
     const coords = document.getElementById('customerCoords')?.value || null;
-    const r = db.ref('ordini').push();
-    r.set({
+    const pendingOrder = {
         orderId: oid,
-        customerName: sanitizeWA(n),
-        customerPhone: sanitizeWA(ph),
-        address: orderType==='delivery' ? sanitizeWA(a) : '',
-        notes: sanitizeWA(nt),
+        customerName: n,
+        customerPhone: ph,
+        address: a,
+        notes: nt,
         type: orderType,
         scheduledTime: st,
         items: oi,
         productsTotal: pt,
         deliveryFee: df,
         finalTotal: ft,
+        coordinates: coords,
+        createdAt: Date.now()
+    };
+    sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+
+    // ✅ APRI WHATSAPP SUBITO
+    apriWhatsAppConOrdine(pendingOrder);
+
+    // ✅ CHIUDI IL CARRELLO (ma non pulire ancora!)
+    closeCart();
+    
+    // ✅ MOSTRA IL BANNER DI CONFERMA
+    mostraBannerConferma(pendingOrder);
+}
+
+// 2) Apre WhatsApp con il messaggio compilato
+function apriWhatsAppConOrdine(pending) {
+    const telefonoDestinatario = (appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
+    const tipo = pending.type==='delivery' ? '🛵 Consegna' : '🏪 Ritiro';
+    const indirizzo = pending.type==='delivery' ? `\n*Indirizzo:* ${sanitizeWA(pending.address)}` : '';
+    const note = pending.notes ? `\n📝 *Note:* ${sanitizeWA(pending.notes)}` : '';
+    const prodotti = (pending.items||[]).map(i => `• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
+    const messaggio = `🔔 *NUOVO ORDINE*\n*N°:* ${pending.orderId}\n*Cliente:* ${sanitizeWA(pending.customerName)}\n*Tel:* ${sanitizeWA(pending.customerPhone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${pending.finalTotal.toFixed(2)}`;
+    window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
+}
+
+// 3) Mostra il banner di conferma (non invasivo)
+function mostraBannerConferma(pending) {
+    const banner = document.getElementById('whatsappConfirmBanner');
+    const info = document.getElementById('waBannerOrderInfo');
+    info.innerHTML = `Ordine <strong>${pending.orderId}</strong> • €${pending.finalTotal.toFixed(2)}`;
+    banner.classList.add('show');
+    // Scroll in cima per vedere il banner
+    document.querySelector('.phone-frame').scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// 4) Cliente clicca "Inviato!" → SOLO ORA scrive su Firebase
+function confermaInvioWhatsApp() {
+    const pendingStr = sessionStorage.getItem('pendingOrder');
+    if(!pendingStr) {
+        showToast('⚠️ Nessun ordine in sospeso');
+        nascondiBannerConferma();
+        return;
+    }
+    const pending = JSON.parse(pendingStr);
+    
+    // Disabilita il pulsante per evitare doppi click
+    const btn = event.target.closest('.wa-banner-btn.confirm');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+    }
+    
+    showToast('📤 Invio ordine alla cucina...');
+    
+    // ✅ ORA scrive su Firebase - la cucina vede l'ordine!
+    const r = db.ref('ordini').push();
+    r.set({
+        orderId: pending.orderId,
+        customerName: sanitizeWA(pending.customerName),
+        customerPhone: sanitizeWA(pending.customerPhone),
+        address: pending.type==='delivery' ? sanitizeWA(pending.address) : '',
+        notes: sanitizeWA(pending.notes),
+        type: pending.type,
+        scheduledTime: pending.scheduledTime,
+        items: pending.items,
+        productsTotal: pending.productsTotal,
+        deliveryFee: pending.deliveryFee,
+        finalTotal: pending.finalTotal,
         status: 'new',
         timestamp: Date.now(),
         createdAt: new Date().toISOString(),
         stampato: false,
-        coordinates: coords
+        coordinates: pending.coordinates || null
     }).then(() => {
-        const telefonoDestinatario = (appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
-        const tipo = orderType==='delivery' ? '🛵 Consegna' : '🏪 Ritiro';
-        const indirizzo = orderType==='delivery' ? `\n*Indirizzo:* ${sanitizeWA(a)}` : '';
-        const note = nt ? `\n📝 *Note:* ${sanitizeWA(nt)}` : '';
-        const prodotti = oi.map(i => `• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
-        const messaggio = `🔔 *NUOVO ORDINE*\n*N°:* ${oid}\n*Cliente:* ${sanitizeWA(n)}\n*Tel:* ${sanitizeWA(ph)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ft.toFixed(2)}`;
-        
-        window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
-        
+        // ✅ Aggiorna promo uses
         const pi = cart.filter(i => i.isPromo);
-        pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
-        saveOrderToLocal({ orderId: oid, finalTotal: ft, items: oi });
+        pi.forEach(i => { 
+            db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); 
+        });
+        
+        // ✅ Salva nello storico locale
+        saveOrderToLocal({ 
+            orderId: pending.orderId, 
+            finalTotal: pending.finalTotal, 
+            items: pending.items 
+        });
         localStorage.setItem('lastOrderTime', Date.now());
         
+        // ✅ Pulisci tutto
         cart = []; 
-        updateCartBadge(); 
-        closeCart();
+        updateCartBadge();
+        sessionStorage.removeItem('pendingOrder');
+        nascondiBannerConferma();
+        
+        // Reset form
         document.getElementById('customerName').value = '';
         document.getElementById('customerPhone').value = '';
         document.getElementById('customerAddress').value = '';
@@ -1169,15 +1357,58 @@ function confirmAndSendOrder(){
         document.getElementById('privacyConsent').checked = false;
         selectTimeMode('asap');
         
-        btn.innerHTML = originalText;
-        btn.disabled = false;
         showToast('✅ Ordine inviato alla cucina!');
     }).catch(err => {
         console.error(err);
         showToast('❌ Errore di rete: ' + err.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if(btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Inviato!';
+        }
     });
+}
+
+// 5) Cliente clicca "Annulla" → ordine NON inviato alla cucina
+function annullaOrdineWhatsApp() {
+    if(!confirm('Sei sicuro? L\'ordine NON verrà inviato alla cucina.')) return;
+    sessionStorage.removeItem('pendingOrder');
+    nascondiBannerConferma();
+    showToast('❌ Ordine annullato');
+}
+
+// 6) Cliente clicca "Riapri WhatsApp" → riapre la chat
+function riapriWhatsApp() {
+    const pendingStr = sessionStorage.getItem('pendingOrder');
+    if(!pendingStr) {
+        showToast('⚠️ Nessun ordine in sospeso');
+        return;
+    }
+    const pending = JSON.parse(pendingStr);
+    apriWhatsAppConOrdine(pending);
+}
+
+// 7) Nasconde il banner
+function nascondiBannerConferma() {
+    const banner = document.getElementById('whatsappConfirmBanner');
+    banner.classList.remove('show');
+}
+
+// 8) Al caricamento pagina, controlla se c'è un ordine in sospeso
+function checkPendingOrderOnLoad() {
+    const pendingStr = sessionStorage.getItem('pendingOrder');
+    if(pendingStr) {
+        try {
+            const pending = JSON.parse(pendingStr);
+            // Verifica che non sia troppo vecchio (> 15 minuti)
+            if(Date.now() - pending.createdAt > 15 * 60 * 1000) {
+                sessionStorage.removeItem('pendingOrder');
+                return;
+            }
+            mostraBannerConferma(pending);
+        } catch(e) {
+            sessionStorage.removeItem('pendingOrder');
+        }
+    }
 }
 
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast(" Errato");}
