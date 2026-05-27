@@ -15,11 +15,9 @@
 <meta name="msapplication-TileColor" content="#D48806">
 <meta name="msapplication-TileImage" content="/logofattorini192.png">
 
-<!-- ️ ICONE PER iOS & ANDROID -->
 <link rel="apple-touch-icon" href="/logofattorini512.png">
 <link rel="apple-touch-icon" sizes="192x192" href="/logofattorini192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="/logofattorini512.png">
-<!-- FINE MODIFICHE PWA -->
 
 <title>Grasso Delivery - Area Fattorini</title>
 <style>
@@ -60,7 +58,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-sm { padding: 8px 14px; font-size: 0.85rem; width: auto; min-width: 90px; }
 
 .dashboard { display: none; }
-/* ✅ STATS: 3 colonne (rimosso Totale Oggi) */
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
 .stat-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
 .stat-card .number { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
@@ -142,8 +139,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 </div>
 
-<div class="new-order-alert" id="newOrderAlert"> Nuovo Ordine!</div>
-<div class="sound-toggle" id="soundToggle" onclick="toggleSound()"> Suoni: ON</div>
+<div class="new-order-alert" id="newOrderAlert">🔔 Nuovo Ordine!</div>
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Suoni: ON</div>
 
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
@@ -158,7 +155,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <div class="container dashboard" id="dashboard">
-<!-- ✅ STATS: 3 card (Totale Oggi rimosso) -->
 <div class="stats">
 <div class="stat-card"><div class="number" id="pendingCount">0</div><div class="label">In Attesa</div></div>
 <div class="stat-card"><div class="number" id="myCount">0</div><div class="label">Miei Ordini</div></div>
@@ -245,7 +241,7 @@ function playNotificationSound() {
         setTimeout(()=>{const o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.frequency.value=1100;g2.gain.value=0.25;o2.start(c.currentTime);o2.stop(c.currentTime+0.15);},100);
     } catch(e){}
 }
-function toggleSound() { audioEnabled=!audioEnabled; document.getElementById('soundToggle').textContent=` Suoni: ${audioEnabled?'ON':'OFF'}`; document.getElementById('soundToggle').classList.toggle('muted',!audioEnabled); }
+function toggleSound() { audioEnabled=!audioEnabled; document.getElementById('soundToggle').textContent=`🔊 Suoni: ${audioEnabled?'ON':'OFF'}`; document.getElementById('soundToggle').classList.toggle('muted',!audioEnabled); }
 
 // 🔐 Login
 function login() {
@@ -269,7 +265,7 @@ if(localStorage.getItem('grasso_driver_session')) {
     setTimeout(()=>{ if(sp && drivers[sp]===sn) { currentUser=sn; document.getElementById('loginScreen').style.display='none'; document.getElementById('dashboard').style.display='block'; initDashboard(); } else if(driversLoaded) { localStorage.removeItem('grasso_driver_session'); localStorage.removeItem('grasso_driver_pin'); } }, 500);
 }
 
-// 📊 Dashboard
+//  Dashboard
 function initDashboard() {
     db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
         const data = {};
@@ -283,7 +279,7 @@ function checkNewOrders() {
     const pending = Object.values(ordersData).filter(o => o.status === 'new' || o.status === 'pending');
     if(pending.length > lastOrderCount && lastOrderCount > 0) {
         if(audioEnabled) playNotificationSound();
-        sendPushNotification(' Nuovo Ordine!', 'Clicca per vedere i dettagli');
+        sendPushNotification('🔔 Nuovo Ordine!', 'Clicca per vedere i dettagli');
         const alert = document.getElementById('newOrderAlert'); alert.style.display='block';
         setTimeout(()=>alert.style.display='none', 3000);
     }
@@ -322,38 +318,35 @@ function filterOrders(filter) {
     renderOrders();
 }
 
-// 🗺️ GPS - VERSIONE CORRETTA CON CONFERMA
+// ️ GPS - FIX PAGINA BIANCA + CONFERMA
 function navigateToOrder(orderId) {
     const order = ordersData[orderId];
-    if (!order) { showToast('❌ Ordine non trovato'); return; }
+    if (!order) { showToast(' Ordine non trovato'); return; }
     
     let dest = '';
-    
-    // 1. Coordinate GPS
     if(order.coordinates && typeof order.coordinates === 'string') {
         const coords = order.coordinates.trim();
         if(coords.includes(',')) {
             const [lat, lng] = coords.split(',').map(c => parseFloat(c.trim()));
-            if(!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-                dest = `${lat},${lng}`;
-            }
+            if(!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) dest = `${lat},${lng}`;
         }
     }
-    
-    // 2. Fallback indirizzo
     if(!dest && order.address) {
         const addr = order.address.trim();
-        if(addr) {
-            dest = encodeURIComponent(addr.toLowerCase().includes('manfredonia') || addr.toLowerCase().includes('italia') ? addr : addr + ', Manfredonia, FG, Italy');
-        }
+        if(addr) dest = encodeURIComponent(addr.toLowerCase().includes('manfredonia') || addr.toLowerCase().includes('italia') ? addr : addr + ', Manfredonia, FG, Italy');
     }
+    if(!dest) { showToast(' Indirizzo non disponibile'); return; }
     
-    if(!dest) { showToast('❌ Indirizzo non disponibile'); return; }
-    
-    // 3. CONFERMA UTENTE
-    if(confirm('️ Aprire Google Maps per la navigazione?\n\nDestinazione: ' + decodeURIComponent(dest))) {
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`, '_blank');
-        showToast('️ Apertura Maps...');
+    if(confirm('🗺️ Aprire Google Maps?\n\nDestinazione: ' + decodeURIComponent(dest))) {
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`;
+        // ✅ Se è app standalone usa location.href (il tasto indietro riporta all'app)
+        // Se è browser normale usa _blank per non chiudere la pagina
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            window.location.href = mapsUrl;
+        } else {
+            window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+        }
+        showToast('🗺️ Apertura Maps...');
     }
 }
 
@@ -374,7 +367,7 @@ function renderOrders() {
 
     container.innerHTML = orders.map(order => {
         const status = order.status || 'new';
-        const statusText = {new:'⏳ Nuovo',pending:'⏳ In Attesa',accepted:'🛵 In Corso',delivered:'✅ Consegnato'}[status]||status;
+        const statusText = {new:'⏳ Nuovo',pending:' In Attesa',accepted:'🛵 In Corso',delivered:'✅ Consegnato'}[status]||status;
         const statusClass = {new:'pending',pending:'pending',accepted:'accepted',delivered:'delivered'}[status]||'pending';
         const time = order.timestamp ? new Date(order.timestamp).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '--:--';
         const items = (order.items||[]).map(i=>`${i.name}${i.qty?' ×'+i.qty:''}`).join(', ') || 'Nessun prodotto';
@@ -405,12 +398,9 @@ function renderOrders() {
 function getActionButtons(order) {
     const status = order.status || 'new';
     let buttons = '';
-    
     if(order.address) {
-        // ✅ PASSA SOLO L'ID (niente JSON.stringify che rompeva il click)
         buttons += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation(); navigateToOrder('${order.id}')">🗺️ Naviga</button>`;
     }
-    
     if(status==='new'||status==='pending') {
         buttons += `<button class="btn btn-primary btn-sm" onclick="acceptOrder('${order.id}')">🛵 Accetta</button>`;
     } else if(status==='accepted' && order.assignedTo===currentUser) {
@@ -421,7 +411,7 @@ function getActionButtons(order) {
     return buttons;
 }
 
-function acceptOrder(id) { if(!confirm('✅ Accettare?')) return; db.ref('ordini/'+id).update({status:'accepted',assignedTo:currentUser,acceptedAt:Date.now()}).then(()=>{showToast(' Accettato!'); renderOrders();}); }
+function acceptOrder(id) { if(!confirm('✅ Accettare?')) return; db.ref('ordini/'+id).update({status:'accepted',assignedTo:currentUser,acceptedAt:Date.now()}).then(()=>{showToast('🛵 Accettato!'); renderOrders();}); }
 function completeOrder(id) { if(!confirm('✅ Consegnato?')) return; db.ref('ordini/'+id).update({status:'delivered',deliveredAt:Date.now()}).then(()=>{showToast('✅ Consegnato!'); renderOrders();}); }
 function callCustomer(phone) { if(!phone){showToast('📞 Numero non disponibile');return;} if(confirm(`📞 Chiamare ${phone}?`)) window.location.href='tel:'+phone.replace(/\D/g,''); }
 
@@ -436,17 +426,15 @@ function showDetail(orderId) {
     body.innerHTML = `
     <div class="modal-row"><strong>Cliente:</strong> <span>${order.customerName||'N/D'}</span></div>
     <div class="modal-row"><strong>Telefono:</strong> <span><a href="tel:${order.customerPhone||''}" style="color:var(--primary)">${order.customerPhone||'N/D'}</a></span></div>
-    <div class="modal-row"><strong>Tipo:</strong> <span> Consegna</span></div>
+    <div class="modal-row"><strong>Tipo:</strong> <span>🛵 Consegna</span></div>
     <div class="modal-row"><strong>Indirizzo:</strong> <span class="${hasGps?'has-gps':''}">${hasGps?'📍 ':''}${order.address||'N/D'}</span></div>
     <div class="modal-row"><strong>Stato:</strong> <span class="status-badge status-${status}">${statusText}</span></div>
-    ${order.notes?`<div class="modal-notes"> 📝 <strong>Note:</strong><br>${order.notes}</div>`:''}
+    ${order.notes?`<div class="modal-notes">📝 <strong>Note:</strong><br>${order.notes}</div>`:''}
     <div class="modal-items"><strong>Prodotti:</strong>${(order.items||[]).map((item,i)=>`<div>${i+1}. ${item.name} ${item.qty?'×'+item.qty:''} - €${(item.price*(item.qty||1)).toFixed(2)}</div>`).join('')}</div>
     <div class="modal-total">Totale: €${(order.finalTotal||order.total||0).toFixed(2)}</div>
-    
     ${order.address?`<button class="modal-nav-btn" onclick="navigateToOrder('${orderId}'); closeModal()">🗺️ Apri Google Maps</button>`:''}
-    
     <div style="display:flex; gap:10px; margin-top:15px;">
-    ${status==='new'||status==='pending'?`<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()" style="flex:1"> Accetta</button>`:''}
+    ${status==='new'||status==='pending'?`<button class="btn btn-primary" onclick="acceptOrder('${orderId}'); closeModal()" style="flex:1">🛵 Accetta</button>`:''}
     ${status==='accepted'&&order.assignedTo===currentUser?`<button class="btn btn-success" onclick="completeOrder('${orderId}'); closeModal()" style="flex:1">✅ Consegnato</button>`:''}
     </div>`;
     modal.classList.add('active');
@@ -464,6 +452,14 @@ function showToast(msg) {
 document.getElementById('pinInput')?.addEventListener('keypress', e=>{ if(e.key==='Enter') login(); });
 document.addEventListener('touchstart', initAudio, {once:true});
 document.addEventListener('click', initAudio, {once:true});
+
+// ✅ FIX PAGINA BIANCA: rigenera ordini e statistiche quando l'app torna in primo piano
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && ordersData && Object.keys(ordersData).length > 0) {
+        renderOrders();
+        updateStats();
+    }
+});
 </script>
 </body>
 </html>
