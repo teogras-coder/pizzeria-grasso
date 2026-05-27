@@ -194,8 +194,8 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🖼️ LOGO - CON FALLBACK
-const DEFAULT_LOGO = 'logofattorini-512.png'; // ✅ Percorso relativo al file
+// 🖼️ LOGO - PERCORSO RELATIVO PER VERCEL
+const DEFAULT_LOGO = './logofattorini-512.png';
 
 function applyLogo(logoUrl) {
     ['headerLogo','loginLogo'].forEach(id => {
@@ -205,7 +205,6 @@ function applyLogo(logoUrl) {
             el.src = logoUrl;
             el.style.display = 'block';
             el.onerror = function() { 
-                // Se il logo non carica, mostra l'emoji
                 this.style.display='none'; 
                 if(emo) emo.style.display='block'; 
             };
@@ -214,13 +213,13 @@ function applyLogo(logoUrl) {
     });
 }
 
-// Carica da Firebase OPPURE usa il default
+// Carica da Firebase OPPURE usa il default relativo
 db.ref('settings/driverLogo').on('value', snapshot => {
     const logoUrl = snapshot.val();
-    applyLogo(logoUrl || DEFAULT_LOGO); // ✅ Se null, usa il fallback
+    applyLogo(logoUrl || DEFAULT_LOGO);
 });
 
-// ✅ Forza caricamento immediato se Firebase è lento
+// ✅ Forza caricamento immediato
 document.addEventListener('DOMContentLoaded', () => {
     applyLogo(DEFAULT_LOGO);
 });
@@ -311,8 +310,8 @@ function sendPushNotification(title, body) {
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification(title, {
             body: body,
-            icon: 'https://teogra-c8cf5.web.app/icon-192.png',
-            badge: 'https://teogra-c8cf5.web.app/icon-192.png',
+            icon: '/icon-192.png',
+            badge: '/icon-192.png',
             tag: 'new-order',
             requireInteraction: true
         });
