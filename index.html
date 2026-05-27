@@ -1073,6 +1073,8 @@ function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&
 function inviaAvvisoWhatsApp(ordine){ const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,''); const tipo=ordine.type==='delivery'?' Consegna':'🏪 Ritiro'; const indirizzo=ordine.type==='delivery'?`\n *Indirizzo:* ${sanitizeWA(ordine.address)}`:''; const note=ordine.notes?`\n📝 *Note:* ${sanitizeWA(ordine.notes)}`:''; const prodotti=(ordine.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n'); const messaggio=`🚨 *NUOVO ORDINE DA EVADERE* \n *N°:* ${ordine.orderId}\n *Cliente:* ${sanitizeWA(ordine.name)}\n *Telefono:* ${sanitizeWA(ordine.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n *PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ordine.finalTotal.toFixed(2)}`; const linkWA=`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`; const isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent); if(isMobile){window.location.href=linkWA;setTimeout(()=>{closeCart();showToast(' Torna all\'app dopo aver inviato');},1500);}else{const ns=window.open(linkWA,'_blank');closeCart();if(!ns||ns.closed){window.location.href=linkWA;}else{showToast('📩 WhatsApp aperto.');}} }
 
 // ✅ CONFERMA ORDINE + APERTURA WHATSAPP + ATTESA CONFERMA UTENTE
+// ✅ SOSTITUISCI QUESTE 3 FUNZIONI NEL TUO INDEX.HTML
+
 function confirmAndSendOrder(){ 
     if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
@@ -1084,41 +1086,102 @@ function confirmAndSendOrder(){
     const nt=document.getElementById('customerNotes').value.trim(); 
     if(!n){showToast('❌ Nome');return;} 
     const ph=p.replace(/\D/g,''); 
-    if(!/^3[0-9]{9}$/.test(ph)){showToast(' Telefono');return;} 
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} 
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); 
     const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; 
     const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
-    if(orderType==='delivery'){if(a.length<10){showToast('❌ Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} 
+    if(orderType==='delivery'){if(a.length<10){showToast('❌ Indirizzo');return;}if(pt+df<minO){showToast(` Minimo: €${minO}`);return;}} 
     const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oid='ORD-'+Math.floor(Math.random()*9000+1000),oi=[]; 
     cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
     
     const oc={name:n,phone:p,address:a,notes:nt,type:orderType,orderId:oid,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; 
     
-    // 1. Apri WhatsApp
-    inviaAvvisoWhatsApp(oc);
+    // Salva ordine in memoria globale
+    window._pendingOrder = oc;
     
-    // 2. Salva dati in attesa
-    pendingOrderData = oc;
-    
-    // 3. Mostra conferma nell'app
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    checkoutBtn.style.display = 'none';
-    
+    // Mostra modale fissa (non si perde tornando da WhatsApp)
     const confirmBox = document.createElement('div');
     confirmBox.id = 'whatsappConfirmBox';
-    confirmBox.style.cssText = 'margin-top:15px; padding:15px; background:rgba(37,211,102,0.15); border:2px solid #25D366; border-radius:12px; text-align:center;';
+    confirmBox.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;';
     confirmBox.innerHTML = `
-        <p style="color:#25D366; font-weight:700; margin-bottom:10px;">📲 WhatsApp aperto!</p>
-        <p style="color:var(--cream); font-size:0.85rem; margin-bottom:12px;">Invia il messaggio e torna qui.</p>
-        <button class="checkout-btn-3d" style="background:linear-gradient(180deg, #25D366 0%, #128C7E 100%);" onclick="confermaDopoWhatsApp()">
-            ✅ Ho inviato su WhatsApp
-        </button>
+        <div style="background:var(--card-light);padding:25px;border-radius:16px;width:100%;max-width:350px;text-align:center;border:1px solid rgba(212,168,75,0.3);">
+            <div style="font-size:2.5rem;margin-bottom:10px;">📲</div>
+            <h3 style="color:var(--gold);margin-bottom:8px;">Quasi pronto!</h3>
+            <p style="color:var(--cream);font-size:0.9rem;margin-bottom:15px;line-height:1.4;">1️⃣ Apri WhatsApp e invia il messaggio<br>2️⃣ Torna qui e clicca "Ho inviato"</p>
+            <button onclick="aproWhatsApp()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(180deg,#25D366 0%,#128C7E 100%);color:white;font-weight:700;font-size:1rem;margin-bottom:10px;cursor:pointer;box-shadow:0 4px 0 #075E54;"> Apri WhatsApp</button>
+            <button onclick="confermaDopoWhatsApp()" style="width:100%;padding:14px;border-radius:12px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-weight:700;font-size:1rem;cursor:pointer;">✅ Ho inviato su WhatsApp</button>
+        </div>
     `;
-    document.getElementById('customerForm').appendChild(confirmBox);
+    document.body.appendChild(confirmBox);
 }
 
-// ✅ FUNZIONE CHE PARTE SOLO DOPO LA CONFERMA UTENTE
+function aproWhatsApp() {
+    if(!window._pendingOrder) return;
+    const oc = window._pendingOrder;
+    const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,''); 
+    const tipo=oc.type==='delivery'?' Consegna':'🏪 Ritiro'; 
+    const indirizzo=oc.type==='delivery'?`\n *Indirizzo:* ${sanitizeWA(oc.address)}`:''; 
+    const note=oc.notes?`\n📝 *Note:* ${sanitizeWA(oc.notes)}`:''; 
+    const prodotti=(oc.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n'); 
+    const messaggio=`🚨 *NUOVO ORDINE* \n *N°:* ${oc.orderId}\n *Cliente:* ${sanitizeWA(oc.name)}\n *Tel:* ${sanitizeWA(oc.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n *PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${oc.finalTotal.toFixed(2)}`; 
+    const linkWA=`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`;
+    // ✅ Apre in nuova scheda/app senza bloccare il JS della pagina
+    window.open(linkWA, '_blank'); 
+}
+
 function confermaDopoWhatsApp() {
+    if(!window._pendingOrder) { showToast('⚠️ Nessun ordine in sospeso'); return; }
+    const oc = window._pendingOrder;
+    
+    // Rimuovi modale
+    const box = document.getElementById('whatsappConfirmBox');
+    if(box) box.remove();
+    
+    console.log('🚀 Invio ordine a Firebase:', oc.orderId);
+    
+    // Scrivi su Firebase in modo sicuro
+    const r = db.ref('ordini').push();
+    r.set({
+        orderId: oc.orderId,
+        customerName: sanitizeWA(oc.name),
+        customerPhone: sanitizeWA(oc.phone),
+        address: oc.type==='delivery' ? sanitizeWA(oc.address) : '',
+        notes: sanitizeWA(oc.notes),
+        type: oc.type,
+        scheduledTime: oc.scheduledTime || 'Subito',
+        items: oc.items,
+        productsTotal: oc.productsTotal,
+        deliveryFee: oc.deliveryFee,
+        finalTotal: oc.finalTotal,
+        status: 'new',
+        timestamp: Date.now(),
+        createdAt: new Date().toISOString(),
+        stampato: true // Inizialmente true (la stampante lo ignora)
+    }).then(() => {
+        console.log('✅ Firebase scritto! Ora attivo la stampa...');
+        showToast('✅ Ordine registrato in cucina!');
+        // Dopo 3 secondi sblocca la stampante
+        setTimeout(() => {
+            r.update({ stampato: false });
+        }, 3000);
+    }).catch(err => {
+        console.error('❌ Errore Firebase:', err);
+        showToast('❌ Errore rete: ' + err.message);
+    });
+    
+    // Pulisci carrello e form
+    localStorage.setItem('lastOrderTime', Date.now());
+    const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
+    cart=[]; updateCartBadge(); closeCart(); 
+    document.getElementById('customerName').value='';
+    document.getElementById('customerPhone').value='';
+    document.getElementById('customerAddress').value='';
+    document.getElementById('customerNotes').value='';
+    document.getElementById('scheduledTime').value='';
+    document.getElementById('privacyConsent').checked=false; 
+    selectTimeMode('asap');
+    window._pendingOrder = null;
+}
     if(!pendingOrderData) return;
     const oc = pendingOrderData;
     pendingOrderData = null;
