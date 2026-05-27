@@ -99,6 +99,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .product-price { font-size: 1.15rem; font-weight: 700; color: var(--gold); }
 .add-btn-3d { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); flex-shrink: 0; }
 .add-btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
+/* === CONTATORE PRODOTTI === */
 .qty-counter-3d { display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 10px; padding: 4px; border: 1px solid var(--gold-dark); box-shadow: 0 2px 0 var(--shadow); flex-shrink: 0; }
 .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 var(--gold-dark); }
 .qty-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--gold-dark); }
@@ -130,8 +131,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
 .cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
 .cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
-.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
-.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--gold-dark); }
+.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, #25D366 0%, #128C7E 100%); color: white; font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 #075E54; }
+.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 #075E54; }
 .clear-cart-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.3); background: transparent; color: #f87171; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .order-type-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
 .type-option { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
@@ -445,7 +446,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 </div>
 <button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-check-circle"></i> CONFERMA ORDINE</button>
+<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fab fa-whatsapp"></i> Conferma e Ordina</button>
 </div>
 </div>
 <div class="modal-3d" id="reviewModal">
@@ -529,7 +530,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <h3 style="color:var(--gold); margin:0;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h3>
 <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
 </div>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine.</p>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;"> Suono attivo quando arriva un nuovo ordine.</p>
 <div style="display:flex; gap:8px; margin-bottom:15px;">
 <button onclick="clearAllOrders()" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-trash"></i> Azzera Tutto</button>
 <button onclick="clearOldOrdersFromDB()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-broom"></i> Pulisci Vecchi (>60gg)</button>
@@ -680,20 +681,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database(), storage = firebase.storage();
-
-function playNotificationSound() { 
-    try { 
-        const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); 
-        o.connect(g);g.connect(c.destination); 
-        o.frequency.setValueAtTime(880,c.currentTime); 
-        o.frequency.setValueAtTime(1100,c.currentTime+0.1); 
-        o.frequency.setValueAtTime(880,c.currentTime+0.2); 
-        g.gain.setValueAtTime(0.3,c.currentTime); 
-        g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); 
-        o.start(c.currentTime);o.stop(c.currentTime+0.4); 
-    } catch(e){} 
-}
-
+function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
 function acceptCookies(){ localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display='none'; }
 function openPrivacyModal(){ document.getElementById('privacyModal').classList.add('active'); }
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
@@ -733,8 +721,8 @@ const o={};s.forEach(c=>{o[c.key]=c.val();}); renderAdminOrders(o);
 if(!isFirstLoad) {
 Object.keys(o).forEach(id=>{
 if(!knownOrderIds.has(id)){
-    playNotificationSound();
-    showToast('🔔 Nuovo ordine!');
+playNotificationSound();
+showToast(' Nuovo ordine!');
 }
 knownOrderIds.add(id);
 });
@@ -982,7 +970,7 @@ html += gruppi[stato].map(([id,o])=>{
 const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
 let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
 let ah='';
-if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')"> Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')" title="Rifiuta/Elimina"><i class="fas fa-trash"></i> Rifiuta</button>`;
+if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')"> Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')"> Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
@@ -1002,7 +990,7 @@ showToast(` Puliti ${count} ordini vecchi.`);
 });
 }
 function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:' In prep',ready:'✅ Pronto',delivered:' Consegnato'}[st]||'Aggiornato');}
-function deleteOrder(id){if(confirm('Eliminare/Rifiutare questo ordine?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Ordine Rifiutato/Eliminato');}}
+function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Eliminato');}}
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 function renderPromotionsBanner(){
@@ -1029,10 +1017,13 @@ renderProductList(c);
 window.scrollTo(0,0);
 setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
+
+// === FUNZIONI CONTATORE PRODOTTI ===
 function getCartQty(cat, name) {
     const item = cart.find(x => !x.isPromo && x.cat === cat && x.name === name);
     return item ? item.qty : 0;
 }
+
 function changeQty(cat, index, delta) {
     if(!appData.menu || !appData.menu[cat] || !appData.menu[cat][index]) return;
     const it = appData.menu[cat][index];
@@ -1050,6 +1041,7 @@ function changeQty(cat, index, delta) {
     updateCartBadge();
     if(currentSearchCat === cat) renderProductList(cat, document.getElementById('productSearch').value);
 }
+
 function renderProductList(cat, filterTerm) {
     if (!cat || !appData.menu || !appData.menu[cat]) return;
     const term = (filterTerm || '').toLowerCase();
@@ -1078,6 +1070,7 @@ function renderProductList(cat, filterTerm) {
         return `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${actionBtn}</div>`;
     }).join('');
 }
+
 function filterProducts(term){ if(currentSearchCat) renderProductList(currentSearchCat, term || ''); }
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
@@ -1085,16 +1078,7 @@ function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')ret
 function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast(' No ritiro');return;}orderType=t;openCart();}
-function addToCart(c,i){
-    if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}
-    const it=appData.menu[c][i];
-    const ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);
-    if(ex) ex.qty++;
-    else cart.push({...it,cat:c,qty:1,isPromo:false});
-    updateCartBadge();
-    showToast(`✅ ${it.name} aggiunta!`);
-    if(currentSearchCat === c) renderProductList(c, document.getElementById('productSearch').value);
-}
+function addToCart(c,i){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Err.');return;}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex)ex.qty++;else cart.push({...it,cat:c,qty:1,isPromo:false});updateCartBadge();showToast(` ${it.name} aggiunta!`);if(currentSearchCat === c) renderProductList(c, document.getElementById('productSearch').value);}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const b=document.getElementById('cartBadge');if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('️ Svuotato');}}
 function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
@@ -1106,105 +1090,151 @@ function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(
 function closeCart(){document.getElementById('cartModal').classList.remove('active');}
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-
-// ======================================================================
-// === SISTEMA ORDINI DIRETTO (NO WHATSAPP BLOCK) ===
-// ======================================================================
+// --- INIZIO NUOVO SISTEMA ORDINI ---
+// ✅ 1. FUNZIONE INIZIALE: CONVALIDA E APRE MODALE
 function confirmAndSendOrder(){
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto tra un ordine e l\'altro');return;}
-    const pc=document.getElementById('privacyConsent');
-    if(!pc||!pc.checked){showToast('⚠️ Accetta la Privacy Policy');return;}
-    if(document.getElementById('honeypot').value!=='')return;
-    const n=document.getElementById('customerName').value.trim();
-    const p=document.getElementById('customerPhone').value.trim();
-    const a=document.getElementById('customerAddress').value.trim();
-    const nt=document.getElementById('customerNotes').value.trim();
-    if(!n){showToast('❌ Inserisci il nome');return;}
-    const ph=p.replace(/\D/g,'');
-    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Numero telefono non valido');return;}
-    let pt=0; cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
-    const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
-    const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
-    if(orderType==='delivery'){
-        if(a.length<10){showToast('❌ Inserisci un indirizzo completo');return;}
-        if(pt+df<minO){showToast(`⚠️ Ordine minimo: €${minO}`);return;}
-    }
-    if(cart.length===0){showToast('🛒 Carrello vuoto');return;}
-
-    const ft=pt+df, st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito');
-    const oid='ORD-'+Math.floor(Math.random()*9000+1000);
-    const oi=[];
-    cart.forEach(i=>{
-        if(i.isPromo) oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});
-        else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
-    });
-
-    const btn = document.getElementById('checkoutBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
-    btn.disabled = true;
-
-    const coords = document.getElementById('customerCoords')?.value || null;
-    
-    // ✅ 1. SCRIVI IMMEDIATAMENTE SU FIREBASE (Cucina e Fattorini ricevono ORA)
-    const r = db.ref('ordini').push();
-    r.set({
-        orderId: oid,
-        customerName: sanitizeWA(n),
-        customerPhone: sanitizeWA(ph),
-        address: orderType==='delivery' ? sanitizeWA(a) : '',
-        notes: sanitizeWA(nt),
-        type: orderType,
-        scheduledTime: st,
-        items: oi,
-        productsTotal: pt,
-        deliveryFee: df,
-        finalTotal: ft,
-        status: 'new',
-        timestamp: Date.now(),
-        createdAt: new Date().toISOString(),
-        stampato: false,
-        coordinates: coords
-    }).then(() => {
-        // ✅ 2. APRI WHATSAPP IN NUOVA SCHEDA (Solo come ricevuta, non blocca)
-        const telefonoDestinatario = (appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
-        const tipo = orderType==='delivery' ? '🛵 Consegna' : '🏪 Ritiro';
-        const indirizzo = orderType==='delivery' ? `\n*Indirizzo:* ${sanitizeWA(a)}` : '';
-        const note = nt ? `\n📝 *Note:* ${sanitizeWA(nt)}` : '';
-        const prodotti = oi.map(i => `• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
-        const messaggio = `🔔 *NUOVO ORDINE*\n*N°:* ${oid}\n*Cliente:* ${sanitizeWA(n)}\n*Tel:* ${sanitizeWA(ph)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ft.toFixed(2)}`;
-        
-        window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
-        
-        // ✅ 3. AGGIORNA PROMO E STORICO
-        const pi = cart.filter(i => i.isPromo);
-        pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
-        saveOrderToLocal({ orderId: oid, finalTotal: ft, items: oi });
-        localStorage.setItem('lastOrderTime', Date.now());
-        
-        // ✅ 4. PULISCI TUTTO
-        cart = []; 
-        updateCartBadge(); 
-        closeCart();
-        document.getElementById('customerName').value = '';
-        document.getElementById('customerPhone').value = '';
-        document.getElementById('customerAddress').value = '';
-        document.getElementById('customerNotes').value = '';
-        document.getElementById('scheduledTime').value = '';
-        document.getElementById('privacyConsent').checked = false;
-        selectTimeMode('asap');
-        
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        showToast('✅ Ordine Confermato e Inviato!');
-    }).catch(err => {
-        console.error(err);
-        showToast('❌ Errore di rete: ' + err.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
+if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;}
+const pc=document.getElementById('privacyConsent');
+if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;}
+if(document.getElementById('honeypot').value!=='')return;
+const n=document.getElementById('customerName').value.trim();
+const p=document.getElementById('customerPhone').value.trim();
+const a=document.getElementById('customerAddress').value.trim();
+const nt=document.getElementById('customerNotes').value.trim();
+if(!n){showToast('❌ Nome');return;}
+const ph=p.replace(/\D/g,'');
+if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;}
+let pt=0; cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
+const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
+const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
+if(orderType==='delivery'){
+if(a.length<10){showToast('❌ Indirizzo');return;}
+if(pt+df<minO){showToast(`️ Minimo: €${minO}`);return;}
 }
-
+const ft=pt+df, st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito');
+const oid='ORD-'+Math.floor(Math.random()*9000+1000);
+const oi=[];
+cart.forEach(i=>{
+if(i.isPromo) oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});
+else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
+});
+// ✅ SALVA L'ORDINE NELLA MEMORIA DI SESSIONE (Resiste ai ricaricamenti pagina)
+const pendingOrder = {
+name:n, phone:ph, address:a, notes:nt, type:orderType,
+orderId:oid, scheduledTime:st, productsTotal:pt,
+deliveryFee:df, finalTotal:ft, items:oi
+};
+sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+// ✅ MOSTRA LA MODALE DI CONFERMA
+showPendingOrderModal();
+}
+// ✅ 2. FUNZIONE CHE APRE WHATSAPP
+function aproWhatsApp() {
+const pending = JSON.parse(sessionStorage.getItem('pendingOrder'));
+if(!pending) return;
+const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
+const tipo=pending.type==='delivery'?' Consegna':'🏪 Ritiro';
+const indirizzo=pending.type==='delivery'?`\n*Indirizzo:* ${sanitizeWA(pending.address)}`:'';
+const note=pending.notes?`\n📝 *Note:* ${sanitizeWA(pending.notes)}`:'';
+const prodotti=(pending.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
+const messaggio=`🔔 *NUOVO ORDINE*\n*N°:* ${pending.orderId}\n*Cliente:* ${sanitizeWA(pending.name)}\n*Tel:* ${sanitizeWA(pending.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${pending.finalTotal.toFixed(2)}`;
+// ✅ Apre in nuova scheda (più sicuro per non perdere la sessione)
+window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
+}
+// ✅ 3. FUNZIONE CHE FINALMENTE SCRIVE SU FIREBASE (E FA STAMPARE)
+function confermaDopoWhatsApp() {
+const pending = JSON.parse(sessionStorage.getItem('pendingOrder'));
+if(!pending) { showToast('⚠️ Errore: nessun ordine in sospeso'); return; }
+showToast(' Invio alla cucina...');
+// ✅ SCRIVI SU FIREBASE
+const r = db.ref('ordini').push();
+r.set({
+orderId: pending.orderId,
+customerName: sanitizeWA(pending.name),
+customerPhone: sanitizeWA(pending.phone),
+address: pending.type==='delivery' ? sanitizeWA(pending.address) : '',
+notes: sanitizeWA(pending.notes),
+type: pending.type,
+scheduledTime: pending.scheduledTime,
+items: pending.items,
+productsTotal: pending.productsTotal,
+deliveryFee: pending.deliveryFee,
+finalTotal: pending.finalTotal,
+status: 'new',
+timestamp: Date.now(),
+createdAt: new Date().toISOString(),
+stampato: true // ✅ TRUE: il Raspberry lo vede SUBITO e stampa
+}).then(() => {
+showToast('✅ Ordine inviato alla cucina!');
+// Pulizia
+const pi = cart.filter(i => i.isPromo);
+pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
+saveOrderToLocal({ orderId: pending.orderId, finalTotal: pending.finalTotal, items: pending.items });
+localStorage.setItem('lastOrderTime', Date.now());
+cart = []; updateCartBadge(); closeCart();
+document.getElementById('customerName').value = '';
+document.getElementById('customerPhone').value = '';
+document.getElementById('customerAddress').value = '';
+document.getElementById('customerNotes').value = '';
+document.getElementById('scheduledTime').value = '';
+document.getElementById('privacyConsent').checked = false;
+selectTimeMode('asap');
+// Rimuovi memoria temporanea e chiudi modale
+sessionStorage.removeItem('pendingOrder');
+const box = document.getElementById('whatsappConfirmBox');
+if(box) box.remove();
+}).catch(err => {
+console.error(err);
+showToast('❌ Errore di rete: ' + err.message);
+});
+}
+// ✅ HELPER PER MOSTRARE LA MODALE (Usata sia all'inizio che se la pagina si ricarica)
+function showPendingOrderModal() {
+// Rimuovi modale se esiste già
+const oldBox = document.getElementById('whatsappConfirmBox');
+if(oldBox) oldBox.remove();
+const confirmBox = document.createElement('div');
+confirmBox.id = 'whatsappConfirmBox';
+confirmBox.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+confirmBox.innerHTML = `
+<div style="background:var(--card-light);padding:25px;border-radius:16px;width:90%;max-width:350px;text-align:center;border:2px solid var(--gold);">
+<div style="font-size:3rem;margin-bottom:10px;">📲</div>
+<h3 style="color:var(--gold);margin-bottom:8px;">Invia l'ordine</h3>
+<p style="color:var(--cream);font-size:0.9rem;margin-bottom:15px;">Clicca qui sotto, invia il messaggio su WhatsApp, e poi torna qui.</p>
+<button onclick="aproWhatsApp()" style="width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(180deg,#25D366 0%,#128C7E 100%);color:white;font-weight:700;font-size:1rem;margin-bottom:10px;cursor:pointer;"> 1. Apri WhatsApp</button>
+<button onclick="confermaDopoWhatsApp()" style="width:100%;padding:15px;border-radius:12px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-weight:700;font-size:1rem;cursor:pointer;"> 2. Ho inviato su WhatsApp</button>
+<button onclick="annullaOrdine()" style="width:100%;margin-top:15px;background:transparent;border:none;color:#666;font-size:0.8rem;cursor:pointer;">Annulla</button>
+</div>
+`;
+document.body.appendChild(confirmBox);
+}
+function annullaOrdine() {
+sessionStorage.removeItem('pendingOrder');
+const box = document.getElementById('whatsappConfirmBox');
+if(box) box.remove();
+showToast('Ordine annullato');
+}
+// ✅ RECUPERA STATO SE LA PAGINA SI RICARICA TORNANDO DA WHATSAPP
+window.addEventListener('load', function() {
+if(sessionStorage.getItem('pendingOrder')) {
+// Se c'era un ordine in sospeso, mostra di nuovo il pulsante
+showPendingOrderModal();
+}
+});
+// --- FINE NUOVO SISTEMA ORDINI ---
+function sendOrder(d){ // Funzione legacy mantenuta per compatibilità ma non usata nel nuovo flusso
+localStorage.setItem('lastOrderTime',Date.now());
+const r=db.ref('ordini').push();
+const coords=document.getElementById('customerCoords')?.value||null;
+r.set({
+orderId:d.orderId, customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
+address:orderType==='delivery'?sanitizeWA(d.address):'', notes:sanitizeWA(d.notes),
+type:d.type, scheduledTime: d.scheduledTime || 'Subito', items:d.items,
+productsTotal:d.productsTotal, deliveryFee:d.deliveryFee, finalTotal:d.finalTotal,
+status:'new', timestamp:Date.now(), createdAt:new Date().toISOString(), stampato:true, coordinates:coords
+});
+return r;
+}
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast(" Errato");}
 function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
 function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
