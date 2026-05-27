@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E🍕%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="restaurant">
 <meta property="og:title" content="Antica Pizzeria Grasso">
 <meta property="og:description" content="La vera pizza a Manfredonia. Consegna a domicilio e ritiro.">
@@ -1070,11 +1070,8 @@ function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(
 function closeCart(){document.getElementById('cartModal').classList.remove('active');}
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-function inviaAvvisoWhatsApp(ordine){ const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,''); const tipo=ordine.type==='delivery'?' Consegna':'🏪 Ritiro'; const indirizzo=ordine.type==='delivery'?`\n *Indirizzo:* ${sanitizeWA(ordine.address)}`:''; const note=ordine.notes?`\n📝 *Note:* ${sanitizeWA(ordine.notes)}`:''; const prodotti=(ordine.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n'); const messaggio=`🚨 *NUOVO ORDINE DA EVADERE* \n *N°:* ${ordine.orderId}\n *Cliente:* ${sanitizeWA(ordine.name)}\n *Telefono:* ${sanitizeWA(ordine.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n *PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ordine.finalTotal.toFixed(2)}`; const linkWA=`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`; const isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent); if(isMobile){window.location.href=linkWA;setTimeout(()=>{closeCart();showToast(' Torna all\'app dopo aver inviato');},1500);}else{const ns=window.open(linkWA,'_blank');closeCart();if(!ns||ns.closed){window.location.href=linkWA;}else{showToast('📩 WhatsApp aperto.');}} }
 
 // ✅ CONFERMA ORDINE + APERTURA WHATSAPP + ATTESA CONFERMA UTENTE
-// ✅ SOSTITUISCI QUESTE 3 FUNZIONI NEL TUO INDEX.HTML
-
 function confirmAndSendOrder(){ 
     if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
@@ -1181,28 +1178,6 @@ function confermaDopoWhatsApp() {
     document.getElementById('privacyConsent').checked=false; 
     selectTimeMode('asap');
     window._pendingOrder = null;
-}
-    if(!pendingOrderData) return;
-    const oc = pendingOrderData;
-    pendingOrderData = null;
-
-    // Rimuovi box conferma e ripristina pulsante
-    const box = document.getElementById('whatsappConfirmBox');
-    if(box) box.remove();
-    document.getElementById('checkoutBtn').style.display = 'block';
-
-    // Scrivi su Firebase
-    const orderRef = sendOrder(oc);
-
-    // Attiva stampa dopo 3 secondi
-    setTimeout(()=>{
-        if(orderRef) {
-            orderRef.update({ stampato: false }).catch(e=>console.log('Errore update stampa:', e));
-        }
-    }, 3000);
-
-    showToast('✅ Ordine confermato e in stampa!');
-    closeCart();
 }
 
 function sendOrder(d){ 
