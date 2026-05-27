@@ -194,12 +194,35 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🖼️ LOGO
+// 🖼️ LOGO - CON FALLBACK
+const DEFAULT_LOGO = 'logofattorini-512.png'; // ✅ Percorso relativo al file
+
+function applyLogo(logoUrl) {
+    ['headerLogo','loginLogo'].forEach(id => {
+        const el = document.getElementById(id);
+        const emo = document.getElementById(id.replace('Logo','LogoEmoji'));
+        if (el) {
+            el.src = logoUrl;
+            el.style.display = 'block';
+            el.onerror = function() { 
+                // Se il logo non carica, mostra l'emoji
+                this.style.display='none'; 
+                if(emo) emo.style.display='block'; 
+            };
+            if (emo) emo.style.display = 'none';
+        }
+    });
+}
+
+// Carica da Firebase OPPURE usa il default
 db.ref('settings/driverLogo').on('value', snapshot => {
     const logoUrl = snapshot.val();
-    if (logoUrl) {
-        ['headerLogo','loginLogo'].forEach(id=>{const el=document.getElementById(id),emo=document.getElementById(id.replace('Logo','LogoEmoji')); if(el){el.src=logoUrl;el.style.display='block';emo.style.display='none';}});
-    }
+    applyLogo(logoUrl || DEFAULT_LOGO); // ✅ Se null, usa il fallback
+});
+
+// ✅ Forza caricamento immediato se Firebase è lento
+document.addEventListener('DOMContentLoaded', () => {
+    applyLogo(DEFAULT_LOGO);
 });
 
 //  FATTORINI
