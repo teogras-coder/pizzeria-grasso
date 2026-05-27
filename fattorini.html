@@ -194,15 +194,15 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🖼️ LOGO - PERCORSO RELATIVO PER VERCEL
-const DEFAULT_LOGO = './logofattorini-512.png';
+// 🖼️ LOGO - PERCORSO CORRETTO PER VERCEL (senza trattino)
+const DEFAULT_LOGO = '/logofattorini512.png';
 
 function applyLogo(logoUrl) {
     ['headerLogo','loginLogo'].forEach(id => {
         const el = document.getElementById(id);
         const emo = document.getElementById(id.replace('Logo','LogoEmoji'));
         if (el) {
-            el.src = logoUrl;
+            el.src = logoUrl || DEFAULT_LOGO;
             el.style.display = 'block';
             el.onerror = function() { 
                 this.style.display='none'; 
@@ -213,10 +213,10 @@ function applyLogo(logoUrl) {
     });
 }
 
-// Carica da Firebase OPPURE usa il default relativo
+// Carica da Firebase OPPURE usa il default
 db.ref('settings/driverLogo').on('value', snapshot => {
     const logoUrl = snapshot.val();
-    applyLogo(logoUrl || DEFAULT_LOGO);
+    applyLogo(logoUrl);
 });
 
 // ✅ Forza caricamento immediato
