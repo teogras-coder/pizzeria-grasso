@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%F0%9F%8D%95%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="restaurant">
 <meta property="og:title" content="Antica Pizzeria Grasso">
 <meta property="og:description" content="La vera pizza a Manfredonia. Consegna a domicilio e ritiro.">
@@ -86,7 +86,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-delivery { background: linear-gradient(180deg, #d4733a 0%, #8c4218 100%); color: #fff5e6; }
 .btn-pickup { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 6px 0 var(--gold-dark); }
 .btn-pickup:active { box-shadow: 0 2px 0 var(--gold-dark); }
-/* ✅ FIX: Selettore corretto per ID HTML */
 #productsView, #myOrdersView, #reviewsPublicView { display: none; padding: 0 20px 100px; }
 .back-btn-3d { background: var(--card-light); border: none; color: var(--gold); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 20px 0; box-shadow: 0 4px 0 var(--shadow); }
 .category-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 20px; }
@@ -278,8 +277,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .promo-product-row { grid-template-columns: 1fr 70px 50px auto !important; gap: 4px !important; }
 .promo-product-row select, .promo-product-row input, .category-admin-inputs input, .admin-product-inputs input { min-width: 0 !important; width: 100% !important; font-size: 0.72rem !important; padding: 6px 4px !important; }
 .category-admin-inputs { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important; gap: 6px !important; }
-
-/*  RECENSIONI & STORICO ORDINI */
 .review-btn-footer, .review-public-list { display: inline-flex; align-items: center; gap: 6px; }
 .stars-input { display: flex; gap: 4px; margin-bottom: 12px; }
 .stars-input .star { font-size: 2rem; cursor: pointer; color: #555; transition: color 0.2s, transform 0.2s; }
@@ -296,8 +293,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .review-public-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 6px; }
 .review-public-text { color: var(--cream); font-size: 0.85rem; line-height: 1.5; }
 .review-public-order { color: #8a7a5a; font-size: 0.7rem; margin-top: 6px; font-style: italic; }
-
-/*  ADMIN RECENSIONI */
 .admin-review-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(212,168,75,0.2); }
 .admin-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .admin-review-name { color: var(--cream); font-weight: 700; font-size: 0.95rem; }
@@ -317,8 +312,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .review-filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
 .review-filter-tab { padding: 6px 12px; border-radius: 16px; border: none; background: var(--card); color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 500; }
 .review-filter-tab.active { background: var(--gold); color: var(--dark); }
-
-/*  STORICO ORDINI CLIENTE */
 .my-order-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--gold-dark); display: flex; flex-direction: column; gap: 8px; }
 .my-order-header { display: flex; justify-content: space-between; align-items: center; }
 .my-order-id { color: var(--gold); font-weight: 700; }
@@ -360,7 +353,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="action-btn-3d" style="background:linear-gradient(180deg, #f39c12 0%, #d68910 100%); color: var(--dark);" onclick="showReviewsPublic()"><i class="fas fa-star"></i> Leggi le Recensioni</button>
 </div>
 </div>
-<!-- ✅ FIX: ID corretto e stile inline forzato per nascondere all'avvio -->
 <div id="productsView" style="display:none;">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 id="categoryTitle" class="category-title">Categoria</h2>
@@ -371,7 +363,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="productList"></div>
 <button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; margin-bottom:30px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
 </div>
-<!--  STORICO ORDINI CLIENTE -->
 <div id="myOrdersView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title"> I Miei Ordini</h2>
@@ -379,7 +370,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="btn-clear-history" onclick="clearLocalHistory()" style="margin-bottom:15px; width:100%;"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
 <div id="myOrdersList"></div>
 </div>
-<!-- RECENSIONI PUBBLICHE -->
 <div id="reviewsPublicView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title">⭐ Le Nostre Recensioni</h2>
@@ -451,7 +441,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fab fa-whatsapp"></i> Conferma e Ordina</button>
 </div>
 </div>
-<!-- MODAL RECENSIONE -->
 <div class="modal-3d" id="reviewModal">
 <div class="modal-content-3d">
 <div class="modal-header">
@@ -507,7 +496,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 </div>
 </div>
-<!-- ADMIN MODAL -->
 <div class="modal-3d" id="adminModal">
 <div class="modal-content-3d">
 <div class="modal-header">
@@ -541,7 +529,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 <div id="ordersList"></div>
 </div>
-<!--  TAB RECENSIONI ADMIN -->
 <div id="admin-reviews" class="admin-panel-content">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
 <h3 style="color:var(--gold); margin:0;"><i class="fas fa-star"></i> Recensioni Clienti</h3>
@@ -734,7 +721,7 @@ db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s=>{
         Object.keys(o).forEach(id=>{
             if(!knownOrderIds.has(id)){
                 playNotificationSound();
-                showToast('🔔 Nuovo ordine!');
+                showToast(' Nuovo ordine!');
             }
             knownOrderIds.add(id);
         });
@@ -1042,7 +1029,6 @@ if(idx>=0){if(confirm('Aggiungerne un\'altra?'))cart.push(e);else return;}else c
 updateCartBadge();showToast(`🎁 ${p.title} aggiunta!`);openCart();}
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
 function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(i.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');const sel=document.getElementById('categorySelect');if(sel)sel.innerHTML='<option value="">Seleziona...</option>'+Object.keys(appData.categories).map(c=>`<option value="${c}">${appData.categories[c].name}</option>`).join('');}
-// ✅ FIX: Blocco completo se dati mancanti + risveglio input
 function showCategory(c){ 
     if(!c || !appData.menu || !appData.menu[c]){showToast('⚠️ Non disp.');return;} 
     currentSearchCat=c; 
@@ -1054,7 +1040,6 @@ function showCategory(c){
     window.scrollTo(0,0);
     setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
-// ✅ FIX: Sicurezza contro crash se menu non caricato o parametro vuoto
 function renderProductList(cat, filterTerm) {
     if (!cat || !appData.menu || !appData.menu[cat]) return;
     const term = (filterTerm || '').toLowerCase();
@@ -1078,16 +1063,83 @@ function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPric
 function selectOrderType(t){orderType=t;document.getElementById('typeDelivery').classList.toggle('active',t==='delivery');document.getElementById('typePickup').classList.toggle('active',t==='pickup');document.getElementById('timeTypeLabel').textContent=t==='delivery'?'consegna':'ritiro';if(t==='delivery')document.getElementById('addressGroup').style.display='block';else{document.getElementById('addressGroup').style.display='none';document.getElementById('customerAddress').value='';}updateCartTotals();}
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime();}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
-function openCart(){ if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} else { let h=''; cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${i})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${x.products.map(p=>`<div>▸ ${p.name} ×${p.qty} - €${(p.price*p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b;font-weight:700;">Totale</span><span style="color:#ff6b6b;font-weight:700;">€${x.totalPrice.toFixed(2)}</span></div></div>`;}); cart.forEach((x,i)=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;}); it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex'; const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false; document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe); document.getElementById('typeDelivery').onclick=de?()=>selectOrderType('delivery'):()=>showToast(' No'); document.getElementById('typePickup').onclick=pe?()=>selectOrderType('pickup'):()=>showToast('🚫 No'); if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType); selectTimeMode(timeMode);updateCartTotals(); } m.classList.add('active'); }
+function openCart(){ if(!checkIfOpen()){showToast('️ Chiuso');return;} const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} else { let h=''; cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${i})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${x.products.map(p=>`<div>▸ ${p.name} ×${p.qty} - €${(p.price*p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b;font-weight:700;">Totale</span><span style="color:#ff6b6b;font-weight:700;">€${x.totalPrice.toFixed(2)}</span></div></div>`;}); cart.forEach((x,i)=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;}); it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex'; const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false; document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe); document.getElementById('typeDelivery').onclick=de?()=>selectOrderType('delivery'):()=>showToast(' No'); document.getElementById('typePickup').onclick=pe?()=>selectOrderType('pickup'):()=>showToast('🚫 No'); if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType); selectTimeMode(timeMode);updateCartTotals(); } m.classList.add('active'); }
 function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
 function closeCart(){document.getElementById('cartModal').classList.remove('active');}
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
 function inviaAvvisoWhatsApp(ordine){ const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,''); const tipo=ordine.type==='delivery'?'🚚 Consegna':'🏪 Ritiro'; const indirizzo=ordine.type==='delivery'?`\n📍 *Indirizzo:* ${sanitizeWA(ordine.address)}`:''; const note=ordine.notes?`\n📝 *Note:* ${sanitizeWA(ordine.notes)}`:''; const prodotti=(ordine.items||[]).map(i=>`• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n'); const messaggio=`🚨 *NUOVO ORDINE DA EVADERE* \n *N°:* ${ordine.orderId}\n *Cliente:* ${sanitizeWA(ordine.name)}\n *Telefono:* ${sanitizeWA(ordine.phone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n *PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ordine.finalTotal.toFixed(2)}`; const linkWA=`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`; const isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent); if(isMobile){window.location.href=linkWA;setTimeout(()=>{closeCart();showToast(' Torna all\'app dopo aver inviato');},1500);}else{const ns=window.open(linkWA,'_blank');closeCart();if(!ns||ns.closed){window.location.href=linkWA;}else{showToast('📩 WhatsApp aperto.');}} }
-function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast(' Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('❌ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oid='ORD-'+Math.floor(Math.random()*9000+1000),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:` ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,orderId:oid,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; inviaAvvisoWhatsApp(oc); sendOrder(oc); }
-function sendOrder(d){ localStorage.setItem('lastOrderTime',Date.now()); const r=db.ref('ordini').push(); const coords=document.getElementById('customerCoords')?.value||null; const printFormat={width:80,header:"ANTICA PIZZERIA GRASSO\nManfredonia • Tel. 0884 660377\n"+"=".repeat(32),items:(d.items||[]).map(i=>`${i.name.padEnd(25)} x${i.qty||1} €${(i.price*(i.qty||1)).toFixed(2)}`).join('\n'),footer:"-".repeat(32)+`\nTOTALE: €${d.finalTotal.toFixed(2)}\n`+(d.type==='delivery'?`Consegna: ${d.address}\n`:'Ritiro in pizzeria\n')+`Ordine: ${d.orderId} • ${new Date().toLocaleString('it-IT')}\n`+"Grazie per la fiducia! 🍕"}; r.set({orderId:d.orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:orderType==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat:printFormat}); 
-saveOrderToLocal(d);
-const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); cart=[];updateCartBadge();closeCart(); document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false; selectTimeMode('asap');showToast('✅ Ordine inviato!'); }
+
+// ✅ MODIFICA CRITICA: Gestione ordine e stampa ritardata
+function confirmAndSendOrder(){ 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
+    const pc=document.getElementById('privacyConsent'); 
+    if(!pc||!pc.checked){showToast(' Accetta Privacy');return;} 
+    if(document.getElementById('honeypot').value!=='')return; 
+    const n=document.getElementById('customerName').value.trim(); 
+    const p=document.getElementById('customerPhone').value.trim(); 
+    const a=document.getElementById('customerAddress').value.trim(); 
+    const nt=document.getElementById('customerNotes').value.trim(); 
+    if(!n){showToast('❌ Nome');return;} 
+    const ph=p.replace(/\D/g,''); 
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} 
+    let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); 
+    const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; 
+    const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
+    if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} 
+    const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oid='ORD-'+Math.floor(Math.random()*9000+1000),oi=[]; 
+    cart.forEach(i=>{if(i.isPromo)oi.push({name:` ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
+    const oc={name:n,phone:p,address:a,notes:nt,type:orderType,orderId:oid,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; 
+    
+    // 1. Apri WhatsApp SUBITO
+    inviaAvvisoWhatsApp(oc); 
+    
+    // 2. Scrivi su Firebase con stampato: TRUE (la stampante lo ignora all'inizio)
+    const orderRef = sendOrder(oc); 
+    
+    // 3. Dopo 4 secondi, marca come pronto per la stampa (stampato: false)
+    setTimeout(()=>{
+        if(orderRef) {
+            orderRef.update({ stampato: false }).catch(e=>console.log('Errore update stampa:', e));
+        }
+    }, 4000);
+}
+
+function sendOrder(d){ 
+    localStorage.setItem('lastOrderTime',Date.now()); 
+    const r=db.ref('ordini').push(); 
+    const coords=document.getElementById('customerCoords')?.value||null; 
+    const printFormat={width:80,header:"ANTICA PIZZERIA GRASSO\nManfredonia • Tel. 0884 660377\n"+"=".repeat(32),items:(d.items||[]).map(i=>`${i.name.padEnd(25)} x${i.qty||1} €${(i.price*(i.qty||1)).toFixed(2)}`).join('\n'),footer:"-".repeat(32)+`\nTOTALE: €${d.finalTotal.toFixed(2)}\n`+(d.type==='delivery'?`Consegna: ${d.address}\n`:'Ritiro in pizzeria\n')+`Ordine: ${d.orderId} • ${new Date().toLocaleString('it-IT')}\n`+"Grazie per la fiducia! 🍕"}; 
+    
+    // ✅ Scrivi con stampato: true e orario forzato "Subito" se vuoto
+    r.set({
+        orderId:d.orderId,
+        customerName:sanitizeWA(d.name),
+        customerPhone:sanitizeWA(d.phone),
+        address:orderType==='delivery'?sanitizeWA(d.address):'',
+        notes:sanitizeWA(d.notes),
+        type:d.type,
+        scheduledTime: d.scheduledTime || 'Subito', // ✅ Forza Subito
+        items:d.items,
+        productsTotal:d.productsTotal,
+        deliveryFee:d.deliveryFee,
+        finalTotal:d.finalTotal,
+        status:'new',
+        timestamp:Date.now(),
+        createdAt:new Date().toISOString(),
+        stampato:true, // ✅ Inizialmente true, diventa false dopo 4s
+        coordinates:coords,
+        printFormat:printFormat
+    }); 
+    
+    saveOrderToLocal(d);
+    const pi=cart.filter(i=>i.isPromo);pi.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
+    cart=[];updateCartBadge();closeCart(); 
+    document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false; 
+    selectTimeMode('asap');showToast('✅ Ordine inviato!'); 
+    return r; // ✅ Restituisce il riferimento per l'update ritardato
+}
+
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast("🔒 Errato");}
 function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
 function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
@@ -1109,7 +1161,7 @@ function savePromoProducts(pid){const ps=getPromoProductsFromContainer(`promoPro
 function createPromotion(){const t=document.getElementById('newPromoTitle').value.trim(),m=document.getElementById('newPromoMessage').value.trim(),s=document.getElementById('newPromoStart').value,e=document.getElementById('newPromoEnd').value,mx=parseInt(document.getElementById('newPromoMaxUses').value),ps=getPromoProductsFromContainer('newPromoProductsList');if(!t){showToast('❌ Titolo');return;}if(!s||!e){showToast('❌ Date');return;}if(s>e){showToast('❌ Date');return;}if(!mx||mx<1){showToast('❌ Max');return;}if(!ps.length){showToast('❌ Prodotti');return;}const id='promo_'+Date.now();db.ref(`promotions/${id}`).set({title:t,message:m,startDate:s,endDate:e,maxUses:mx,currentUses:0,active:true,products:ps,createdAt:Date.now()});document.getElementById('newPromoTitle').value='';document.getElementById('newPromoMessage').value='';document.getElementById('newPromoStart').value='';document.getElementById('newPromoEnd').value='';document.getElementById('newPromoMaxUses').value='';document.getElementById('newPromoProductsList').innerHTML='';showToast('✅ Creata!');}
 function updatePromo(id,f,v){db.ref(`promotions/${id}/${f}`).set(v);}
 function togglePromo(id){db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active);}
-function resetPromoUses(id){if(confirm("Resettare a 0?")){db.ref(`promotions/${id}/currentUses`).set(0);showToast('🔄 Resettato');}}
+function resetPromoUses(id){if(confirm("Resettare a 0?")){db.ref(`promotions/${id}/currentUses`).set(0);showToast(' Resettato');}}
 function deletePromo(id){if(confirm("Eliminare?")){db.ref(`promotions/${id}`).remove();showToast('️ Eliminata');}}
 function renderAdminCategories(){const l=document.getElementById('categoriesAdminList');l.innerHTML=Object.keys(appData.categories).map(k=>{const c=appData.categories[k];return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name||k}</span><button class="delete-product-btn" onclick="deleteCategory('${k}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name||''}" onchange="updateCategory('${k}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon||''}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona"></div></div>`;}).join('');}
 function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast('❌ Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
