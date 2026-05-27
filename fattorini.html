@@ -3,12 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<!-- ✅ MODIFICHE PWA / MANIFEST AGGIUNTE QUI -->
+
+<!-- ✅ PWA / MANIFEST / ICONE HOME SCREEN -->
 <link rel="manifest" href="/manifest-fattorini.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Fattorini">
 <meta name="mobile-web-app-capable" content="yes">
-<!-- FINE MODIFICHE -->
+<meta name="theme-color" content="#D48806">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<!-- 🖼️ ICONE PER iOS (Apple Touch Icon) -->
+<link rel="apple-touch-icon" href="/logofattorini512.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/logofattorini192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/logofattorini512.png">
+
+<!-- 🖼️ ICONE PER ANDROID -->
+<meta name="application-name" content="Fattorini">
+<meta name="msapplication-TileColor" content="#D48806">
+<meta name="msapplication-TileImage" content="/logofattorini192.png">
+<!-- FINE MODIFICHE PWA -->
+
 <title>Grasso Delivery - Area Fattorini</title>
 <style>
 :root {
@@ -48,7 +62,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-sm { padding: 8px 14px; font-size: 0.85rem; width: auto; min-width: 90px; }
 
 .dashboard { display: none; }
-.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+/* ✅ STATS GRID: 3 colonne invece di 4 (rimosso totale incasso) */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
 .stat-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
 .stat-card .number { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
 .stat-card .label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
@@ -110,6 +125,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 @media (max-width: 480px) {
 .header h1 { font-size: 1.15rem; }
 .header-logo { height: 38px; width: 38px; }
+.stats { grid-template-columns: repeat(2, 1fr); }
 .order-actions .btn { min-width: 75px; padding: 8px 10px; font-size: 0.8rem; }
 }
 </style>
@@ -144,11 +160,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <div class="container dashboard" id="dashboard">
+<!-- ✅ STATS: 3 card invece di 4 (rimosso totale incasso) -->
 <div class="stats">
 <div class="stat-card"><div class="number" id="pendingCount">0</div><div class="label">In Attesa</div></div>
 <div class="stat-card"><div class="number" id="myCount">0</div><div class="label">Miei Ordini</div></div>
 <div class="stat-card"><div class="number" id="deliveredCount">0</div><div class="label">Consegnati Oggi</div></div>
-<div class="stat-card"><div class="number" id="todayTotal">€0</div><div class="label">Totale Oggi</div></div>
+<!-- ✅ RIMOSSO: <div class="stat-card"><div class="number" id="todayTotal">€0</div><div class="label">Totale Oggi</div></div> -->
 </div>
 
 <div class="filter-tabs">
@@ -194,7 +211,7 @@ let audioEnabled = true;
 let audioContext = null;
 let lastOrderCount = 0;
 
-// 🖼️ LOGO - PERCORSO CORRETTO PER VERCEL (senza trattino)
+// 🖼️ LOGO - PERCORSO CORRETTO PER VERCEL
 const DEFAULT_LOGO = '/logofattorini512.png';
 
 function applyLogo(logoUrl) {
@@ -213,13 +230,11 @@ function applyLogo(logoUrl) {
     });
 }
 
-// Carica da Firebase OPPURE usa il default
 db.ref('settings/driverLogo').on('value', snapshot => {
     const logoUrl = snapshot.val();
     applyLogo(logoUrl);
 });
 
-// ✅ Forza caricamento immediato
 document.addEventListener('DOMContentLoaded', () => {
     applyLogo(DEFAULT_LOGO);
 });
@@ -269,7 +284,7 @@ if(localStorage.getItem('grasso_driver_session')) {
     setTimeout(()=>{ if(sp && drivers[sp]===sn) { currentUser=sn; document.getElementById('loginScreen').style.display='none'; document.getElementById('dashboard').style.display='block'; initDashboard(); } else if(driversLoaded) { localStorage.removeItem('grasso_driver_session'); localStorage.removeItem('grasso_driver_pin'); } }, 500);
 }
 
-// 📊 Dashboard - ✅ SOLO DELIVERY
+// 📊 Dashboard
 function initDashboard() {
     db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
         const data = {};
@@ -318,14 +333,17 @@ function sendPushNotification(title, body) {
     }
 }
 
+// ✅ STATS UPDATE - SENZA TOTALE INCASSO
 function updateStats() {
     const all = Object.values(ordersData), today = new Date().toDateString();
     const todayOrders = all.filter(o => new Date(o.timestamp||Date.now()).toDateString() === today);
+    
     document.getElementById('pendingCount').textContent = all.filter(o=>o.status==='new'||o.status==='pending').length;
     document.getElementById('myCount').textContent = all.filter(o=>o.assignedTo===currentUser && o.status==='accepted').length;
     document.getElementById('deliveredCount').textContent = todayOrders.filter(o=>o.status==='delivered').length;
-    const total = todayOrders.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.finalTotal||o.total||0),0);
-    document.getElementById('todayTotal').textContent = '€'+total.toFixed(2);
+    // ✅ RIMOSSO: totale incasso non visibile ai fattorini
+    // const total = todayOrders.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.finalTotal||o.total||0),0);
+    // document.getElementById('todayTotal').textContent = '€'+total.toFixed(2);
 }
 
 function filterOrders(filter) {
@@ -335,17 +353,41 @@ function filterOrders(filter) {
     renderOrders();
 }
 
-// 🗺️ Navigazione Google Maps
+// 🗺️ NAVIGAZIONE GPS - VERSIONE CORRETTA
 function navigateToOrder(order) {
     let dest = '';
-    if(order.coordinates && typeof order.coordinates === 'string' && order.coordinates.includes(',')) {
-        const [lat, lng] = order.coordinates.split(',').map(Number);
-        if(!isNaN(lat) && !isNaN(lng)) dest = `${lat},${lng}`;
+    
+    // 1. Prova con coordinate GPS se disponibili e valide
+    if(order.coordinates && typeof order.coordinates === 'string') {
+        const coords = order.coordinates.trim();
+        if(coords.includes(',')) {
+            const [lat, lng] = coords.split(',').map(c => parseFloat(c.trim()));
+            if(!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                dest = `${lat},${lng}`;
+            }
+        }
     }
+    
+    // 2. Se no coordinate, usa l'indirizzo con fallback per l'Italia
     if(!dest && order.address) {
-        dest = encodeURIComponent(order.address + ', Manfredonia, Italy');
+        const addr = order.address.trim();
+        if(addr) {
+            // Aggiungi Manfredonia, Italy se non è già presente
+            if(!addr.toLowerCase().includes('manfredonia') && !addr.toLowerCase().includes('italia') && !addr.toLowerCase().includes('italy')) {
+                dest = encodeURIComponent(addr + ', Manfredonia, FG, Italy');
+            } else {
+                dest = encodeURIComponent(addr);
+            }
+        }
     }
-    if(!dest) { showToast('❌ Indirizzo non disponibile'); return; }
+    
+    // 3. Se ancora niente, mostra errore
+    if(!dest) { 
+        showToast('❌ Indirizzo non disponibile per la navigazione'); 
+        return; 
+    }
+    
+    // 4. Apri Google Maps
     const url = `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`;
     window.open(url, '_blank');
     showToast('🗺️ Apertura Google Maps...');
