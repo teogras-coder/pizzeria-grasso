@@ -1,4 +1,4 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -130,8 +130,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
 .cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
 .cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
-.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, #25D366 0%, #128C7E 100%); color: white; font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 #075E54; }
-.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 #075E54; }
+.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
+.checkout-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--gold-dark); }
 .clear-cart-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.3); background: transparent; color: #f87171; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .order-type-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
 .type-option { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
@@ -329,125 +329,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-review-order { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 .btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: default; }
 .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-
-/* ===== BANNER CONFERMA WHATSAPP ===== */
-#whatsappConfirmBanner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 5000;
-    background: linear-gradient(135deg, #2d1f12 0%, #1a1209 100%);
-    border-bottom: 3px solid var(--gold);
-    padding: 15px 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-    display: none;
-    animation: slideDownBanner 0.4s ease;
-}
-#whatsappConfirmBanner.show { display: block; }
-@keyframes slideDownBanner {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-.wa-banner-content {
-    max-width: 480px;
-    margin: 0 auto;
-    text-align: center;
-}
-.wa-banner-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    display: block;
-}
-.wa-banner-title {
-    color: var(--gold);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-.wa-banner-subtitle {
-    color: var(--cream);
-    font-size: 0.8rem;
-    margin-bottom: 12px;
-    line-height: 1.4;
-}
-.wa-banner-buttons {
-    display: flex;
-    gap: 8px;
-}
-.wa-banner-btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-.wa-banner-btn.confirm {
-    background: linear-gradient(180deg, #25D366 0%, #128C7E 100%);
-    color: white;
-    box-shadow: 0 4px 0 #075E54;
-}
-.wa-banner-btn.confirm:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #075E54;
-}
-.wa-banner-btn.cancel {
-    background: rgba(248,113,113,0.2);
-    color: #f87171;
-    border: 1px solid rgba(248,113,113,0.3);
-}
-.wa-banner-btn.retry {
-    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
-    color: var(--dark);
-    box-shadow: 0 4px 0 var(--gold-dark);
-}
-.wa-banner-btn.retry:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 var(--gold-dark);
-}
-.wa-banner-order-info {
-    background: rgba(0,0,0,0.3);
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 0.8rem;
-    color: var(--cream);
-}
-.wa-banner-order-info strong {
-    color: var(--gold);
-}
 </style>
 </head>
 <body>
-
-<!-- ===== BANNER CONFERMA WHATSAPP (in cima, non invasivo) ===== -->
-<div id="whatsappConfirmBanner">
-    <div class="wa-banner-content">
-        <span class="wa-banner-icon">📲</span>
-        <div class="wa-banner-title">Hai inviato l'ordine su WhatsApp?</div>
-        <div class="wa-banner-subtitle">Conferma solo dopo aver premuto "Invia" nella chat</div>
-        <div class="wa-banner-order-info" id="waBannerOrderInfo"></div>
-        <div class="wa-banner-buttons">
-            <button class="wa-banner-btn cancel" onclick="annullaOrdineWhatsApp()">
-                <i class="fas fa-times"></i> Annulla
-            </button>
-            <button class="wa-banner-btn retry" onclick="riapriWhatsApp()">
-                <i class="fab fa-whatsapp"></i> Riapri
-            </button>
-            <button class="wa-banner-btn confirm" onclick="confermaInvioWhatsApp()">
-                <i class="fas fa-check"></i> Inviato!
-            </button>
-        </div>
-    </div>
-</div>
-
 <div class="phone-frame">
 <div class="secret-admin-zone" id="secretAdminBtn"></div>
 <header class="header">
@@ -561,7 +445,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 </div>
 <button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fab fa-whatsapp"></i> Conferma e Ordina</button>
+<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-check-circle"></i> CONFERMA ORDINE</button>
 </div>
 </div>
 <div class="modal-3d" id="reviewModal">
@@ -645,7 +529,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <h3 style="color:var(--gold); margin:0;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h3>
 <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
 </div>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;"> Suono attivo quando arriva un nuovo ordine.</p>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">🔔 Suono attivo quando arriva un nuovo ordine.</p>
 <div style="display:flex; gap:8px; margin-bottom:15px;">
 <button onclick="clearAllOrders()" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-trash"></i> Azzera Tutto</button>
 <button onclick="clearOldOrdersFromDB()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-broom"></i> Pulisci Vecchi (>60gg)</button>
@@ -796,7 +680,20 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database(), storage = firebase.storage();
-function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
+
+function playNotificationSound() { 
+    try { 
+        const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); 
+        o.connect(g);g.connect(c.destination); 
+        o.frequency.setValueAtTime(880,c.currentTime); 
+        o.frequency.setValueAtTime(1100,c.currentTime+0.1); 
+        o.frequency.setValueAtTime(880,c.currentTime+0.2); 
+        g.gain.setValueAtTime(0.3,c.currentTime); 
+        g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); 
+        o.start(c.currentTime);o.stop(c.currentTime+0.4); 
+    } catch(e){} 
+}
+
 function acceptCookies(){ localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display='none'; }
 function openPrivacyModal(){ document.getElementById('privacyModal').classList.add('active'); }
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
@@ -822,7 +719,7 @@ let pendingReviewOrderId = null;
 document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 window.onload=function(){ if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; cleanLocalHistory(); };
-document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); loadReviewsPublic(); renderMyOrders(); checkPendingOrderOnLoad(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} });
+document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); loadReviewsPublic(); renderMyOrders(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} });
 function setupRealtimeListeners(){
 db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val();renderCategories();renderAdminCategories();renderAdminProducts();}});
 db.ref('menu').on('value', s=>{if(s.exists()){appData.menu=s.val();renderCategories();renderAdminProducts();}});
@@ -836,8 +733,8 @@ const o={};s.forEach(c=>{o[c.key]=c.val();}); renderAdminOrders(o);
 if(!isFirstLoad) {
 Object.keys(o).forEach(id=>{
 if(!knownOrderIds.has(id)){
-playNotificationSound();
-showToast(' Nuovo ordine!');
+    playNotificationSound();
+    showToast('🔔 Nuovo ordine!');
 }
 knownOrderIds.add(id);
 });
@@ -1085,7 +982,7 @@ html += gruppi[stato].map(([id,o])=>{
 const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
 let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
 let ah='';
-if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')"> Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')"> Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')" title="Rifiuta/Elimina"><i class="fas fa-trash"></i> Rifiuta</button>`;
 else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')"> Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
@@ -1105,7 +1002,7 @@ showToast(` Puliti ${count} ordini vecchi.`);
 });
 }
 function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:' In prep',ready:'✅ Pronto',delivered:' Consegnato'}[st]||'Aggiornato');}
-function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Eliminato');}}
+function deleteOrder(id){if(confirm('Eliminare/Rifiutare questo ordine?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Ordine Rifiutato/Eliminato');}}
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 function renderPromotionsBanner(){
@@ -1140,6 +1037,7 @@ function changeQty(cat, index, delta) {
     if(!appData.menu || !appData.menu[cat] || !appData.menu[cat][index]) return;
     const it = appData.menu[cat][index];
     const ex = cart.find(x => !x.isPromo && x.name === it.name && x.cat === cat);
+    
     if (ex) {
         ex.qty += delta;
         if (ex.qty <= 0) {
@@ -1148,6 +1046,7 @@ function changeQty(cat, index, delta) {
     } else if (delta > 0) {
         cart.push({...it, cat:cat, qty:1, isPromo:false});
     }
+    
     updateCartBadge();
     if(currentSearchCat === cat) renderProductList(cat, document.getElementById('productSearch').value);
 }
@@ -1158,9 +1057,11 @@ function renderProductList(cat, filterTerm) {
     if(!list) return;
     const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
     if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
+    
     list.innerHTML = filtered.map((p, i) => {
         const realIndex = appData.menu[cat].indexOf(p);
         const qty = getCartQty(cat, p.name);
+        
         let actionBtn = '';
         if (qty === 0) {
             actionBtn = `<button class="add-btn-3d" onclick="addToCart('${cat}', ${realIndex})">+ Aggiungi</button>`;
@@ -1173,6 +1074,7 @@ function renderProductList(cat, filterTerm) {
                 </div>
             `;
         }
+        
         return `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${actionBtn}</div>`;
     }).join('');
 }
@@ -1206,10 +1108,8 @@ async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=doc
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
 
 // ======================================================================
-// === SISTEMA ORDINI CORRETTO: Firebase solo DOPO conferma WhatsApp =====
+// === SISTEMA ORDINI DIRETTO (NO WHATSAPP BLOCK) ===
 // ======================================================================
-
-// 1) Click su "Conferma e Ordina" → salva dati LOCALI e apre WhatsApp
 function confirmAndSendOrder(){
     if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto tra un ordine e l\'altro');return;}
     const pc=document.getElementById('privacyConsent');
@@ -1239,116 +1139,53 @@ function confirmAndSendOrder(){
         else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});
     });
 
-    // ✅ SALVA IN SESSION STORAGE (NON su Firebase!)
+    const btn = document.getElementById('checkoutBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+    btn.disabled = true;
+
     const coords = document.getElementById('customerCoords')?.value || null;
-    const pendingOrder = {
+    
+    // ✅ 1. SCRIVI IMMEDIATAMENTE SU FIREBASE (Cucina e Fattorini ricevono ORA)
+    const r = db.ref('ordini').push();
+    r.set({
         orderId: oid,
-        customerName: n,
-        customerPhone: ph,
-        address: a,
-        notes: nt,
+        customerName: sanitizeWA(n),
+        customerPhone: sanitizeWA(ph),
+        address: orderType==='delivery' ? sanitizeWA(a) : '',
+        notes: sanitizeWA(nt),
         type: orderType,
         scheduledTime: st,
         items: oi,
         productsTotal: pt,
         deliveryFee: df,
         finalTotal: ft,
-        coordinates: coords,
-        createdAt: Date.now()
-    };
-    sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
-
-    // ✅ APRI WHATSAPP SUBITO
-    apriWhatsAppConOrdine(pendingOrder);
-
-    // ✅ CHIUDI IL CARRELLO (ma non pulire ancora!)
-    closeCart();
-    
-    // ✅ MOSTRA IL BANNER DI CONFERMA
-    mostraBannerConferma(pendingOrder);
-}
-
-// 2) Apre WhatsApp con il messaggio compilato
-function apriWhatsAppConOrdine(pending) {
-    const telefonoDestinatario = (appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
-    const tipo = pending.type==='delivery' ? '🛵 Consegna' : '🏪 Ritiro';
-    const indirizzo = pending.type==='delivery' ? `\n*Indirizzo:* ${sanitizeWA(pending.address)}` : '';
-    const note = pending.notes ? `\n📝 *Note:* ${sanitizeWA(pending.notes)}` : '';
-    const prodotti = (pending.items||[]).map(i => `• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
-    const messaggio = `🔔 *NUOVO ORDINE*\n*N°:* ${pending.orderId}\n*Cliente:* ${sanitizeWA(pending.customerName)}\n*Tel:* ${sanitizeWA(pending.customerPhone)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${pending.finalTotal.toFixed(2)}`;
-    window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
-}
-
-// 3) Mostra il banner di conferma (non invasivo)
-function mostraBannerConferma(pending) {
-    const banner = document.getElementById('whatsappConfirmBanner');
-    const info = document.getElementById('waBannerOrderInfo');
-    info.innerHTML = `Ordine <strong>${pending.orderId}</strong> • €${pending.finalTotal.toFixed(2)}`;
-    banner.classList.add('show');
-    // Scroll in cima per vedere il banner
-    document.querySelector('.phone-frame').scrollTo({top: 0, behavior: 'smooth'});
-}
-
-// 4) Cliente clicca "Inviato!" → SOLO ORA scrive su Firebase
-function confermaInvioWhatsApp() {
-    const pendingStr = sessionStorage.getItem('pendingOrder');
-    if(!pendingStr) {
-        showToast('⚠️ Nessun ordine in sospeso');
-        nascondiBannerConferma();
-        return;
-    }
-    const pending = JSON.parse(pendingStr);
-    
-    // Disabilita il pulsante per evitare doppi click
-    const btn = event.target.closest('.wa-banner-btn.confirm');
-    if(btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
-    }
-    
-    showToast('📤 Invio ordine alla cucina...');
-    
-    // ✅ ORA scrive su Firebase - la cucina vede l'ordine!
-    const r = db.ref('ordini').push();
-    r.set({
-        orderId: pending.orderId,
-        customerName: sanitizeWA(pending.customerName),
-        customerPhone: sanitizeWA(pending.customerPhone),
-        address: pending.type==='delivery' ? sanitizeWA(pending.address) : '',
-        notes: sanitizeWA(pending.notes),
-        type: pending.type,
-        scheduledTime: pending.scheduledTime,
-        items: pending.items,
-        productsTotal: pending.productsTotal,
-        deliveryFee: pending.deliveryFee,
-        finalTotal: pending.finalTotal,
         status: 'new',
         timestamp: Date.now(),
         createdAt: new Date().toISOString(),
         stampato: false,
-        coordinates: pending.coordinates || null
+        coordinates: coords
     }).then(() => {
-        // ✅ Aggiorna promo uses
-        const pi = cart.filter(i => i.isPromo);
-        pi.forEach(i => { 
-            db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); 
-        });
+        // ✅ 2. APRI WHATSAPP IN NUOVA SCHEDA (Solo come ricevuta, non blocca)
+        const telefonoDestinatario = (appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
+        const tipo = orderType==='delivery' ? '🛵 Consegna' : '🏪 Ritiro';
+        const indirizzo = orderType==='delivery' ? `\n*Indirizzo:* ${sanitizeWA(a)}` : '';
+        const note = nt ? `\n📝 *Note:* ${sanitizeWA(nt)}` : '';
+        const prodotti = oi.map(i => `• ${sanitizeWA(i.name)} ×${i.qty||1}`).join('\n');
+        const messaggio = `🔔 *NUOVO ORDINE*\n*N°:* ${oid}\n*Cliente:* ${sanitizeWA(n)}\n*Tel:* ${sanitizeWA(ph)}\n📦 *Tipo:* ${tipo}${indirizzo}${note}\n\n*PRODOTTI:*\n${prodotti}\n\n💰 *TOTALE:* €${ft.toFixed(2)}`;
         
-        // ✅ Salva nello storico locale
-        saveOrderToLocal({ 
-            orderId: pending.orderId, 
-            finalTotal: pending.finalTotal, 
-            items: pending.items 
-        });
+        window.open(`https://wa.me/${telefonoDestinatario}?text=${encodeURIComponent(messaggio)}`, '_blank');
+        
+        // ✅ 3. AGGIORNA PROMO E STORICO
+        const pi = cart.filter(i => i.isPromo);
+        pi.forEach(i => { db.ref(`promotions/${i.promoId}/currentUses`).transaction(v => (v || 0) + 1); });
+        saveOrderToLocal({ orderId: oid, finalTotal: ft, items: oi });
         localStorage.setItem('lastOrderTime', Date.now());
         
-        // ✅ Pulisci tutto
+        // ✅ 4. PULISCI TUTTO
         cart = []; 
-        updateCartBadge();
-        sessionStorage.removeItem('pendingOrder');
-        nascondiBannerConferma();
-        
-        // Reset form
+        updateCartBadge(); 
+        closeCart();
         document.getElementById('customerName').value = '';
         document.getElementById('customerPhone').value = '';
         document.getElementById('customerAddress').value = '';
@@ -1357,58 +1194,15 @@ function confermaInvioWhatsApp() {
         document.getElementById('privacyConsent').checked = false;
         selectTimeMode('asap');
         
-        showToast('✅ Ordine inviato alla cucina!');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('✅ Ordine Confermato e Inviato!');
     }).catch(err => {
         console.error(err);
         showToast('❌ Errore di rete: ' + err.message);
-        if(btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check"></i> Inviato!';
-        }
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     });
-}
-
-// 5) Cliente clicca "Annulla" → ordine NON inviato alla cucina
-function annullaOrdineWhatsApp() {
-    if(!confirm('Sei sicuro? L\'ordine NON verrà inviato alla cucina.')) return;
-    sessionStorage.removeItem('pendingOrder');
-    nascondiBannerConferma();
-    showToast('❌ Ordine annullato');
-}
-
-// 6) Cliente clicca "Riapri WhatsApp" → riapre la chat
-function riapriWhatsApp() {
-    const pendingStr = sessionStorage.getItem('pendingOrder');
-    if(!pendingStr) {
-        showToast('⚠️ Nessun ordine in sospeso');
-        return;
-    }
-    const pending = JSON.parse(pendingStr);
-    apriWhatsAppConOrdine(pending);
-}
-
-// 7) Nasconde il banner
-function nascondiBannerConferma() {
-    const banner = document.getElementById('whatsappConfirmBanner');
-    banner.classList.remove('show');
-}
-
-// 8) Al caricamento pagina, controlla se c'è un ordine in sospeso
-function checkPendingOrderOnLoad() {
-    const pendingStr = sessionStorage.getItem('pendingOrder');
-    if(pendingStr) {
-        try {
-            const pending = JSON.parse(pendingStr);
-            // Verifica che non sia troppo vecchio (> 15 minuti)
-            if(Date.now() - pending.createdAt > 15 * 60 * 1000) {
-                sessionStorage.removeItem('pendingOrder');
-                return;
-            }
-            mostraBannerConferma(pending);
-        } catch(e) {
-            sessionStorage.removeItem('pendingOrder');
-        }
-    }
 }
 
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast(" Errato");}
