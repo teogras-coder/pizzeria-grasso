@@ -27,14 +27,14 @@
 <meta property="og:url" content="https://teogra-c8cf5.web.app/">
 <script type="application/ld+json">
 {
-"@context": "https://schema.org",
-"@type": "Restaurant",
-"name": "Antica Pizzeria Grasso",
-"telephone": "+390884660377",
-"address": { "@type": "PostalAddress", "addressLocality": "Manfredonia", "addressCountry": "IT" },
-"servesCuisine": "Pizza Italiana",
-"priceRange": "€€",
-"url": "https://teogra-c8cf5.web.app/"
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Antica Pizzeria Grasso",
+  "telephone": "+390884660377",
+  "address": { "@type": "PostalAddress", "addressLocality": "Manfredonia", "addressCountry": "IT" },
+  "servesCuisine": "Pizza Italiana",
+  "priceRange": "€€",
+  "url": "https://teogra-c8cf5.web.app/"
 }
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -522,7 +522,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <h3 style="color:var(--gold); margin:0;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h3>
 <span id="ordersCount" style="background:var(--gold-dark); color:var(--dark); padding:3px 12px; border-radius:10px; font-size:0.8rem; font-weight:700;">0</span>
 </div>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;"> Suono attivo quando arriva un nuovo ordine.</p>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;"> 🔔 Suono attivo solo se sei qui dentro.</p>
 <div style="display:flex; gap:8px; margin-bottom:15px;">
 <button onclick="clearAllOrders()" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-trash"></i> Azzera Tutto</button>
 <button onclick="clearOldOrdersFromDB()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-broom"></i> Pulisci Vecchi (>60gg)</button>
@@ -676,8 +676,8 @@ const db = firebase.database(), storage = firebase.storage();
 
 // ✅ SUONO NOTIFICA: Solo per l'Admin
 function playNotificationSound() { 
-    // Controllo se siamo in admin (il modale è aperto)
     const adminModal = document.getElementById('adminModal');
+    // Suona SOLO se il modale admin è aperto (cioè sei tu)
     if (adminModal && adminModal.classList.contains('active')) {
         try { 
             const c = new(window.AudioContext || window.webkitAudioContext)();
@@ -699,6 +699,7 @@ function openPrivacyModal(){ document.getElementById('privacyModal').classList.a
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
 function sanitizeWA(t){ return String(t).replace(/[*_~`]/g, '\\$&'); }
 const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
+
 let appData = {
 categories: { focacce:{name:" Focacce",icon:"fa-bread-slice"}, pizze:{name:" Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:" Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
 menu: {
@@ -712,10 +713,12 @@ settings:{whatsappNumber:"+390884660377",visiblePhone:"0884660377",manualStatus:
 branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
 images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{focacce:"https://i.ibb.co/PspxmnY8/IMG-0083.jpg",pizze:"https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",frittura:"https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",bibite:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"}}
 };
+
 let cart=[], orderType='delivery', timeMode='asap', openCategories=new Set(), knownOrderIds=new Set(), adminClicks=0, adminClickTimer, currentSearchCat='';
 let selectedStars = 0;
 let currentReviewFilter = 'all';
 let pendingReviewOrderId = null;
+
 document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 window.onload=function(){ if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; cleanLocalHistory(); };
@@ -729,11 +732,16 @@ function setupRealtimeListeners(){
     db.ref('images').on('value', s=>{if(s.exists()){appData.images=s.val();applyImages();}});
     db.ref('branding').on('value', s=>{if(s.exists()){appData.branding={...appData.branding,...s.val()};applyBranding();}});
     db.ref('promotions').on('value', s=>{appData.promotions=s.exists()?s.val():{};renderPromotionsBanner();renderAdminPromotions();});
+    
     let isFirstLoad = true;
     db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s=>{
         const o={}; s.forEach(c=>{o[c.key]=c.val();}); 
         renderAdminOrders(o);
-        // Suono solo se l'admin è attivo
+        
+        // ✅ LOGICA SUONO: Controlla se l'admin è aperto
+        const adminModal = document.getElementById('adminModal');
+        const isAdminOpen = adminModal && adminModal.classList.contains('active');
+
         if(!isFirstLoad) {
             let newOrders = false;
             Object.keys(o).forEach(id=>{
@@ -742,7 +750,8 @@ function setupRealtimeListeners(){
                     knownOrderIds.add(id);
                 }
             });
-            if(newOrders) {
+            // Suona solo se sei nel gestionale
+            if(newOrders && isAdminOpen) {
                 playNotificationSound();
                 showToast('🔔 Nuovo ordine!');
             }
@@ -751,6 +760,7 @@ function setupRealtimeListeners(){
             isFirstLoad = false;
         }
     });
+
     db.ref('settings/colorPalette').on('value', s=>{const p=s.val()||'autunno';applyPalette(p);const e=document.getElementById('currentPaletteName');if(e)e.textContent=p.charAt(0).toUpperCase()+p.slice(1);});
     db.ref('settings/heroVideoUrl').on('value', s=>{
         const u=s.val(),v=document.getElementById('heroVideo'),i=document.getElementById('heroImg');
@@ -768,6 +778,7 @@ function loadFromFirebase(){
     db.ref('promotions').once('value').then(s=>{appData.promotions=s.exists()?s.val():{};});
     db.ref('ordini').once('value').then(s=>{if(s.exists())s.forEach(c=>{knownOrderIds.add(c.key);});});
 }
+
 function openReviewModal(){ document.getElementById('reviewModal').classList.add('active'); }
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
@@ -829,13 +840,16 @@ function saveOrderToLocal(orderData){
             date: Date.now(),
             total: orderData.finalTotal,
             items: orderData.items.map(i=>i.name).join(', '),
-            reviewed: false
+            reviewed: false,
+            status: 'preparing' // Stato iniziale
         });
         if(orders.length > 5) orders = orders.slice(0, 5);
         localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
         renderMyOrders();
     } catch(e){}
 }
+
+// ✅ RENDER STORICO ORDINI CLIENTE (Con stato visibile)
 function renderMyOrders(){
     const list = document.getElementById('myOrdersList');
     if(!list) return;
@@ -846,24 +860,37 @@ function renderMyOrders(){
             return;
         }
         list.innerHTML = orders.map(o=>{
-            const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
+            const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+            
+            // ✅ ICONE DI STATO
+            let statusIcon = '⏳';
+            let statusText = 'In attesa';
+            let statusColor = '#f87171'; // Rosso
+
+            // Leggiamo lo stato dal database se disponibile, altrimenti da locale
+            if(o.status === 'preparing') { statusIcon = '🔥'; statusText = 'In preparazione'; statusColor = '#fbbf24'; }
+            else if(o.status === 'ready') { statusIcon = '✅'; statusText = 'Pronto'; statusColor = '#4ade80'; }
+            else if(o.status === 'delivered') { statusIcon = '🛵'; statusText = 'Consegnato'; statusColor = '#60a5fa'; }
+            
             return `
-            <div class="my-order-card">
+            <div class="my-order-card" style="border-left-color: ${statusColor};">
                 <div class="my-order-header">
-                    <span class="my-order-id">📦 ${o.orderId}</span>
+                    <span class="my-order-id">${statusIcon} ${o.orderId}</span>
                     <span class="my-order-date">${dateStr}</span>
                 </div>
+                <div style="color:${statusColor}; font-size:0.85rem; margin-bottom:6px; font-weight:600;">${statusText}</div>
                 <div class="my-order-items">${o.items}</div>
                 <div class="my-order-total">€${o.total.toFixed(2)}</div>
                 <div class="my-order-actions">
-                    ${o.reviewed
-                    ? '<span class="btn-reviewed">✅ Già recensito</span>'
+                    ${o.reviewed 
+                    ? '<span class="btn-reviewed">✅ Già recensito</span>' 
                     : `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>`}
                 </div>
             </div>`;
         }).join('');
     } catch(e){ list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; }
 }
+
 function openReviewForOrder(orderId){
     pendingReviewOrderId = orderId;
     document.getElementById('reviewOrderId').value = orderId;
@@ -1137,7 +1164,7 @@ function confirmAndSendOrder(){
         document.getElementById('privacyConsent').checked = false;
         selectTimeMode('asap');
 
-        // ✅ APERTURA WHATSAPP DOPO L'INVIO
+        // ✅ APERTURA WHATSAPP DOPO L'INVIO (Solo per notifica admin)
         const telefonoDestinatario=(appData.settings.whatsappNumber||"+390884660377").replace(/\D/g,'');
         const tipo=orderType==='delivery'?'🚚 Consegna':'🏪 Ritiro';
         const indirizzo=orderType==='delivery'?`\n📍 *Indirizzo:* ${sanitizeWA(a)}`:'';
