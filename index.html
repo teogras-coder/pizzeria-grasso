@@ -27,14 +27,14 @@
 <meta property="og:url" content="https://pizzeriagrasso.vercel.app/">
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "Restaurant",
-  "name": "Antica Pizzeria Grasso",
-  "telephone": "+390884660377",
-  "address": { "@type": "PostalAddress", "addressLocality": "Manfredonia", "addressCountry": "IT" },
-  "servesCuisine": "Pizza Italiana",
-  "priceRange": "€€",
-  "url": "https://pizzeriagrasso.vercel.app/"
+"@context": "https://schema.org",
+"@type": "Restaurant",
+"name": "Antica Pizzeria Grasso",
+"telephone": "+390884660377",
+"address": { "@type": "PostalAddress", "addressLocality": "Manfredonia", "addressCountry": "IT" },
+"servesCuisine": "Pizza Italiana",
+"priceRange": "€€",
+"url": "https://pizzeriagrasso.vercel.app/"
 }
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -86,7 +86,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-delivery { background: linear-gradient(180deg, #d4733a 0%, #8c4218 100%); color: #fff5e6; }
 .btn-pickup { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 6px 0 var(--gold-dark); }
 .btn-pickup:active { box-shadow: 0 2px 0 var(--gold-dark); }
-/* ✅ FIX: Selettore corretto per ID HTML */
 #productsView, #myOrdersView, #reviewsPublicView { display: none; padding: 0 20px 100px; }
 .back-btn-3d { background: var(--card-light); border: none; color: var(--gold); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 20px 0; box-shadow: 0 4px 0 var(--shadow); }
 .category-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 20px; }
@@ -286,8 +285,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .promo-product-row { grid-template-columns: 1fr 70px 50px auto !important; gap: 4px !important; }
 .promo-product-row select, .promo-product-row input, .category-admin-inputs input, .admin-product-inputs input { min-width: 0 !important; width: 100% !important; font-size: 0.72rem !important; padding: 6px 4px !important; }
 .category-admin-inputs { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important; gap: 6px !important; }
-
-/*  RECENSIONI & STORICO ORDINI */
 .review-btn-footer, .review-public-list { display: inline-flex; align-items: center; gap: 6px; }
 .stars-input { display: flex; gap: 4px; margin-bottom: 12px; }
 .stars-input .star { font-size: 2rem; cursor: pointer; color: #555; transition: color 0.2s, transform 0.2s; }
@@ -304,8 +301,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .review-public-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 6px; }
 .review-public-text { color: var(--cream); font-size: 0.85rem; line-height: 1.5; }
 .review-public-order { color: #8a7a5a; font-size: 0.7rem; margin-top: 6px; font-style: italic; }
-
-/*  ADMIN RECENSIONI */
 .admin-review-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(212,168,75,0.2); }
 .admin-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .admin-review-name { color: var(--cream); font-weight: 700; font-size: 0.95rem; }
@@ -325,8 +320,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .review-filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
 .review-filter-tab { padding: 6px 12px; border-radius: 16px; border: none; background: var(--card); color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 500; }
 .review-filter-tab.active { background: var(--gold); color: var(--dark); }
-
-/*  STORICO ORDINI CLIENTE */
 .my-order-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--gold-dark); display: flex; flex-direction: column; gap: 8px; }
 .my-order-header { display: flex; justify-content: space-between; align-items: center; }
 .my-order-id { color: var(--gold); font-weight: 700; }
@@ -337,6 +330,26 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-review-order { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 .btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: default; }
 .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+
+/* ✅ NUOVI STILI PER NOTIFICHE ADMIN */
+.order-card.new-order-pulse {
+    animation: pulse-red 2s infinite;
+    border: 3px solid #ff0000 !important;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.7) !important;
+}
+@keyframes pulse-red {
+    0%, 100% { background-color: rgba(255, 0, 0, 0.15); transform: scale(1); }
+    50% { background-color: rgba(255, 0, 0, 0.4); transform: scale(1.02); }
+}
+.admin-notification-badge {
+    position: fixed; top: 20px; right: 20px; background: #ff0000; color: white; padding: 15px 25px;
+    border-radius: 50px; font-weight: 700; font-size: 1.1rem; z-index: 9999; animation: bounce 1s infinite;
+    display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.admin-notification-badge.show { display: block; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.product-card-3d { align-items: center; }
+.product-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; margin-right: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 </style>
 </head>
 <body>
@@ -369,7 +382,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="action-btn-3d" style="background:linear-gradient(180deg, #f39c12 0%, #d68910 100%); color: var(--dark);" onclick="showReviewsPublic()"><i class="fas fa-star"></i> Leggi le Recensioni</button>
 </div>
 </div>
-<!-- ✅ FIX: ID corretto e stile inline forzato per nascondere all'avvio -->
 <div id="productsView" style="display:none;">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 id="categoryTitle" class="category-title">Categoria</h2>
@@ -380,7 +392,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="productList"></div>
 <button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; margin-bottom:30px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
 </div>
-<!--  STORICO ORDINI CLIENTE -->
 <div id="myOrdersView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title"> I Miei Ordini</h2>
@@ -388,7 +399,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="btn-clear-history" onclick="clearLocalHistory()" style="margin-bottom:15px; width:100%;"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
 <div id="myOrdersList"></div>
 </div>
-<!-- RECENSIONI PUBBLICHE -->
 <div id="reviewsPublicView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title">⭐ Le Nostre Recensioni</h2>
@@ -460,7 +470,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
 </div>
 </div>
-<!-- MODAL RECENSIONE -->
 <div class="modal-3d" id="reviewModal">
 <div class="modal-content-3d">
 <div class="modal-header">
@@ -516,13 +525,15 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 </div>
 </div>
-<!-- ADMIN MODAL -->
 <div class="modal-3d" id="adminModal">
 <div class="modal-content-3d">
 <div class="modal-header">
 <h2><i class="fas fa-cog"></i> Pannello Admin</h2>
 <button class="close-btn-3d" onclick="closeAdmin()">×</button>
 </div>
+<!-- Badge Notifica Admin -->
+<div id="adminNotificationBadge" class="admin-notification-badge"> Nuovo Ordine!</div>
+
 <div class="admin-tabs">
 <button class="admin-tab active" onclick="switchAdminTab(event,'orders')"> Ordini</button>
 <button class="admin-tab" onclick="switchAdminTab(event,'contatori')"> Contatori</button>
@@ -559,7 +570,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 <div id="contatoriList"><p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun ordine oggi</p></div>
 </div>
-<!--  TAB RECENSIONI ADMIN -->
 <div id="admin-reviews" class="admin-panel-content">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
 <h3 style="color:var(--gold); margin:0;"><i class="fas fa-star"></i> Recensioni Clienti</h3>
@@ -613,7 +623,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="delivery-fee-card">
 <div class="delivery-fee-card-title"><i class="fas fa-motorcycle"></i> Costo Fattorino</div>
 <div class="delivery-fee-input-row"><span class="currency">€</span><input type="number" id="deliveryFeeInput" step="0.50" min="0" placeholder="2.00"></div>
-<div class="delivery-fee-info">💡 Aggiunto solo agli ordini con consegna.<br>💰 Imposta a <strong>0</strong> per consegna gratuita.</div>
+<div class="delivery-fee-info"> Aggiunto solo agli ordini con consegna.<br> Imposta a <strong>0</strong> per consegna gratuita.</div>
 </div>
 <div class="admin-group"><label>Minimo Ordine Consegna (€)</label><input type="number" id="minDeliveryInput" step="0.50" min="0" placeholder="15"></div>
 <div class="admin-toggle"><div><div style="color:var(--cream); font-weight:600;"><i class="fas fa-motorcycle"></i> Consegna a Domicilio</div></div><div class="toggle-switch on" id="deliveryToggle" onclick="toggleSwitch(this)"></div></div>
@@ -701,20 +711,45 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button onclick="acceptCookies()">Accetta</button>
 </div>
 </div>
-
 <script>
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database(), storage = firebase.storage();
 
-function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
+// ✅ SUONO NOTIFICHE POTENZIATO
+function playNotificationSound() {
+    try {
+        const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
+        audio.volume = 1.0;
+        audio.play().catch(e => console.log('Audio play failed:', e));
+        setTimeout(() => {
+            const newOrders = document.querySelectorAll('.order-card.new-order-pulse');
+            if(newOrders.length > 0) {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }, 2000);
+    } catch(e) {}
+}
+
+// ✅ NOTIFICHE BROWSER
+function showBrowserNotification(orderId) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("🍕 Nuovo Ordine!", {
+            body: `Ordine ${orderId} arrivato in pizzeria!`,
+            icon: "🍕",
+            badge: "",
+            requireInteraction: true,
+            tag: orderId,
+            vibrate: [200, 100, 200]
+        });
+    }
+}
+
 function acceptCookies(){ localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display='none'; }
 function openPrivacyModal(){ document.getElementById('privacyModal').classList.add('active'); }
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
 function sanitizeWA(t){ return String(t).replace(/[*_~`]/g, '\\$&'); }
-
 const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
-
 let appData = {
 categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:" Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍤 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
 menu: {
@@ -726,14 +761,12 @@ bibite:[...DEFAULT_BIBITE]
 promotions:{},
 settings:{whatsappNumber:"+390884660377",visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",specialClosures:"",adminPin:"1234",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15},
 branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
-images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{pizze:"https://i.ibb.co/SwZJCWsh/IMG-0078.jpg",focacce:"https://i.ibb.co/PspxmnY8/IMG-0083.jpg",frittura:"https://i.ibb.co/Ps0qCSdd/IMG-4877.jpg",bibite:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80"}}
+images:{hero:"",categories:{pizze:"",focacce:"",frittura:"",bibite:""}}
 };
-
 let cart=[], orderType='delivery', timeMode='asap', openCategories=new Set(), knownOrderIds=new Set(), adminClicks=0, adminClickTimer, currentSearchCat='';
 let selectedStars = 0;
 let currentReviewFilter = 'all';
 let pendingReviewOrderId = null;
-
 document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 window.onload=function(){ if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; cleanLocalHistory(); }
@@ -746,22 +779,44 @@ db.ref('settings').on('value', s=>{if(s.exists()){appData.settings={...appData.s
 db.ref('images').on('value', s=>{if(s.exists()){appData.images=s.val();applyImages();}});
 db.ref('branding').on('value', s=>{if(s.exists()){appData.branding={...appData.branding,...s.val()};applyBranding();}});
 db.ref('promotions').on('value', s=>{appData.promotions=s.exists()?s.val():{};renderPromotionsBanner();renderAdminPromotions();});
+
 let isFirstLoad = true;
-db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s=>{
-    const o={};s.forEach(c=>{o[c.key]=c.val();}); renderAdminOrders(o);
+db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('child_added', snapshot => {
+    const order = snapshot.val();
+    const orderId = order.orderId || snapshot.key;
+    
     if(!isFirstLoad) {
-        Object.keys(o).forEach(id=>{
-            if(!knownOrderIds.has(id)){
-                playNotificationSound();
-                showToast('🔔 Nuovo ordine!');
+        if(!knownOrderIds.has(orderId)){
+            playNotificationSound();
+            showBrowserNotification(orderId);
+            showToast('🔔 Nuovo ordine!');
+            
+            const badge = document.getElementById('adminNotificationBadge');
+            if(badge) {
+                badge.classList.add('show');
+                setTimeout(() => badge.classList.remove('show'), 10000);
             }
-            knownOrderIds.add(id);
-        });
-    } else {
-        Object.keys(o).forEach(id => knownOrderIds.add(id));
-        isFirstLoad = false;
+            
+            setTimeout(() => {
+                const newOrderCard = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+                if(newOrderCard) {
+                    newOrderCard.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    newOrderCard.classList.add('new-order-pulse');
+                    setTimeout(() => newOrderCard.classList.remove('new-order-pulse'), 10000);
+                }
+            }, 100);
+        }
     }
+    knownOrderIds.add(orderId);
 });
+
+if(isFirstLoad) {
+    db.ref('ordini').once('value', s => {
+        s.forEach(child => knownOrderIds.add(child.key));
+        isFirstLoad = false;
+    });
+}
+
 db.ref('settings/colorPalette').on('value', s=>{const p=s.val()||'autunno';applyPalette(p);const e=document.getElementById('currentPaletteName');if(e)e.textContent=p.charAt(0).toUpperCase()+p.slice(1);});
 db.ref('settings/heroVideoUrl').on('value', s=>{
 const u=s.val(),v=document.getElementById('heroVideo'),i=document.getElementById('heroImg');
@@ -782,49 +837,43 @@ db.ref('branding').once('value').then(s=>{if(s.exists())appData.branding={...app
 db.ref('promotions').once('value').then(s=>{appData.promotions=s.exists()?s.val():{};});
 db.ref('ordini').once('value').then(s=>{if(s.exists())s.forEach(c=>{knownOrderIds.add(c.key);});});
 }
-
 function openReviewModal(){ document.getElementById('reviewModal').classList.add('active'); }
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
 function updateStarsDisplay(){ document.querySelectorAll('#starsInput .star').forEach((s,i)=>{ s.classList.toggle('active', i<selectedStars); }); }
-
 function submitReview(){
 const name = document.getElementById('reviewName').value.trim();
 const text = document.getElementById('reviewText').value.trim();
 const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim();
-
 if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; }
 if(!name){ showToast('❌ Inserisci il nome'); return; }
 if(!text){ showToast('❌ Scrivi un commento'); return; }
-
 if(orderId && orderId !== 'Anonimo') {
-    const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    const existsLocally = localOrders.some(o => o.orderId === orderId);
-    if(!existsLocally) {
-        showToast('❌ Ordine non trovato nello storico.');
-        return;
-    }
+const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+const existsLocally = localOrders.some(o => o.orderId === orderId);
+if(!existsLocally) {
+showToast('❌ Ordine non trovato nello storico.');
+return;
 }
-
+}
 db.ref('recensioni').push({
-    name: sanitizeWA(name),
-    text: sanitizeWA(text),
-    stars: selectedStars,
-    orderId: orderId || 'Anonimo',
-    timestamp: Date.now(),
-    status: 'pending'
+name: sanitizeWA(name),
+text: sanitizeWA(text),
+stars: selectedStars,
+orderId: orderId || 'Anonimo',
+timestamp: Date.now(),
+status: 'pending'
 }).then(()=>{
-    if(pendingReviewOrderId) {
-        let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-        localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o);
-        localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
-        renderMyOrders();
-    }
-    closeReviewModal();
-    showToast('⭐ Grazie per la recensione!');
-}).catch(e=>showToast('❌ Errore: '+e.message));
+if(pendingReviewOrderId) {
+let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o);
+localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
+renderMyOrders();
 }
-
+closeReviewModal();
+showToast('⭐ Grazie per la recensione!');
+}).catch(e=>showToast(' Errore: '+e.message));
+}
 function showMyOrders(){
 document.getElementById('mainMenu').style.display='none';
 document.getElementById('productsView').style.display='none';
@@ -832,68 +881,63 @@ document.getElementById('reviewsPublicView').style.display='none';
 document.getElementById('myOrdersView').style.display='block';
 window.scrollTo(0,0);
 }
-
 function cleanLocalHistory(){
 try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    const now = Date.now();
-    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-    orders = orders.filter(o => (now - o.date) < thirtyDays);
-    localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
+let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+const now = Date.now();
+const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+orders = orders.filter(o => (now - o.date) < thirtyDays);
+localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
 } catch(e){}
 }
-
 function saveOrderToLocal(orderData){
 try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    orders.unshift({
-        orderId: orderData.orderId,
-        date: Date.now(),
-        total: orderData.finalTotal,
-        items: orderData.items.map(i=>i.name).join(', '),
-        reviewed: false
-    });
-    if(orders.length > 5) orders = orders.slice(0, 5);
-    localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
-    renderMyOrders();
+let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+orders.unshift({
+orderId: orderData.orderId,
+date: Date.now(),
+total: orderData.finalTotal,
+items: orderData.items.map(i=>i.name).join(', '),
+reviewed: false
+});
+if(orders.length > 5) orders = orders.slice(0, 5);
+localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
+renderMyOrders();
 } catch(e){}
 }
-
 function renderMyOrders(){
 const list = document.getElementById('myOrdersList');
 if(!list) return;
 try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    if(orders.length === 0){
-        list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>';
-        return;
-    }
-    list.innerHTML = orders.map(o=>{
-        const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
-        return `
-        <div class="my-order-card">
-            <div class="my-order-header">
-                <span class="my-order-id">📦 ${o.orderId}</span>
-                <span class="my-order-date">${dateStr}</span>
-            </div>
-            <div class="my-order-items">${o.items}</div>
-            <div class="my-order-total">€${o.total.toFixed(2)}</div>
-            <div class="my-order-actions">
-                ${o.reviewed 
-                    ? '<span class="btn-reviewed">✅ Già recensito</span>' 
-                    : `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>`}
-            </div>
-        </div>`;
-    }).join('');
+let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+if(orders.length === 0){
+list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>';
+return;
+}
+list.innerHTML = orders.map(o=>{
+const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
+return `
+<div class="my-order-card">
+<div class="my-order-header">
+<span class="my-order-id">📦 ${o.orderId}</span>
+<span class="my-order-date">${dateStr}</span>
+</div>
+<div class="my-order-items">${o.items}</div>
+<div class="my-order-total">€${o.total.toFixed(2)}</div>
+<div class="my-order-actions">
+${o.reviewed
+? '<span class="btn-reviewed">✅ Già recensito</span>'
+: `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>`}
+</div>
+</div>`;
+}).join('');
 } catch(e){ list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; }
 }
-
 function openReviewForOrder(orderId){
 pendingReviewOrderId = orderId;
 document.getElementById('reviewOrderId').value = orderId;
 openReviewModal();
 }
-
 function clearLocalHistory(){
 if(confirm('Cancellare tutto lo storico ordini locale?')){
 localStorage.removeItem('pizzeria_grasso_orders');
@@ -901,7 +945,6 @@ renderMyOrders();
 showToast('️ Storico cancellato');
 }
 }
-
 function showReviewsPublic(){
 document.getElementById('mainMenu').style.display='none';
 document.getElementById('productsView').style.display='none';
@@ -909,7 +952,6 @@ document.getElementById('myOrdersView').style.display='none';
 document.getElementById('reviewsPublicView').style.display='block';
 window.scrollTo(0,0);
 }
-
 function loadReviewsPublic(){
 db.ref('recensioni').orderByChild('timestamp').once('value', s=>{
 const reviews = [];
@@ -941,7 +983,6 @@ ${hasOrder ? `<div class="review-public-order"> Ordine: ${r.orderId}</div>`:''}
 `;}).join('');
 });
 }
-
 function loadAdminReviews(){
 const container = document.getElementById('adminReviewsList');
 if(!container) return;
@@ -954,21 +995,17 @@ const avg = count>0 ? (totalStars/count).toFixed(1) : '0';
 document.getElementById('reviewTotalCount').textContent = count;
 document.getElementById('reviewAvgStars').textContent = avg + '⭐';
 document.getElementById('reviewPendingCount').textContent = pendingCount;
-
 let filtered = reviews;
 if(currentReviewFilter!=='all') filtered = reviews.filter(r=>r.status===currentReviewFilter);
-
 if(filtered.length===0){
 container.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione in questa categoria</div>';
 return;
 }
-
 container.innerHTML = filtered.map(r=>{
 const statusBadge = r.status==='approved'?'✅ Approvata':r.status==='rejected'?'❌ Rifiutata':' In Attesa';
 const dateObj = new Date(r.timestamp);
 const dateStr = dateObj.toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
 const hasOrder = r.orderId && r.orderId !== 'Anonimo';
-
 return `
 <div class="admin-review-card">
 <div class="admin-review-header">
@@ -989,27 +1026,23 @@ ${r.status==='pending'?`<button class="btn-approve-review" onclick="updateReview
 }).join('');
 });
 }
-
 function filterReviews(filter){
 currentReviewFilter = filter;
 document.querySelectorAll('.review-filter-tab').forEach(t=>t.classList.remove('active'));
 event.target.classList.add('active');
 loadAdminReviews();
 }
-
 function updateReviewStatus(id, status){
 db.ref(`recensioni/${id}`).update({status: status}).then(()=>{
 showToast(status==='approved'?'✅ Approvata':'❌ Rifiutata');
 loadAdminReviews();
 });
 }
-
 function deleteReview(id){
 if(confirm('Eliminare questa recensione?')){
 db.ref(`recensioni/${id}`).remove().then(()=>{ showToast('️ Eliminata'); loadAdminReviews(); });
 }
 }
-
 function renderAdminOrders(orders){
 const l=document.getElementById('ordersList'), c=document.getElementById('ordersCount');
 const gruppi = { new:[], preparing:[], ready:[], delivered:[] };
@@ -1018,7 +1051,7 @@ Object.keys(gruppi).forEach(k=>gruppi[k].sort((a,b)=>(b[1].timestamp||0)-(a[1].t
 const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length;
 c.textContent = attivi;
 if (!attivi && !gruppi.delivered.length) { l.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>'; return; }
-const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:'🔵 Consegnati' };
+const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:' Consegnati' };
 let html = '';
 Object.keys(gruppi).forEach(stato=>{
 if (!gruppi[stato].length) return;
@@ -1027,17 +1060,16 @@ html += gruppi[stato].map(([id,o])=>{
 const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
 let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
 let ah='';
-if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')"> Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
 else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
-return `<div class="order-card ${stato}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} •  ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' •  '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
+return `<div class="order-card ${stato}" data-order-id="${id}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span></div><div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} •  ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' •  '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
 }).join('');
 });
 l.innerHTML = html;
 }
-
-function clearAllOrders(){ if(confirm('⚠️ ELIMINARE TUTTI GLI ORDINI DAL DATABASE?')){ db.ref('ordini').remove().then(()=>{ knownOrderIds.clear(); showToast('️ Database svuotato'); }).catch(e=>showToast(' Errore: '+e.message)); } }
+function clearAllOrders(){ if(confirm('️ ELIMINARE TUTTI GLI ORDINI DAL DATABASE?')){ db.ref('ordini').remove().then(()=>{ knownOrderIds.clear(); showToast('️ Database svuotato'); }).catch(e=>showToast(' Errore: '+e.message)); } }
 function clearOldOrdersFromDB(){
 if(!confirm('Cancellare solo gli ordini completati più vecchi di 60 giorni?')) return;
 const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
@@ -1047,8 +1079,8 @@ snap.forEach(c=>{ if(c.val().status==='delivered') { c.ref.remove(); count++; } 
 showToast(` Puliti ${count} ordini vecchi.`);
 });
 }
-function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:'🍕 In prep',ready:'✅ Pronto',delivered:' Consegnato'}[st]||'Aggiornato');}
-function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('🗑️ Eliminato');}}
+function updateOrderStatus(id,st){db.ref(`ordini/${id}/status`).set(st);showToast({preparing:' In prep',ready:'✅ Pronto',delivered:' Consegnato'}[st]||'Aggiornato');}
+function deleteOrder(id){if(confirm('Eliminare?')){db.ref(`ordini/${id}`).remove();showToast('️ Eliminato');}}
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 function renderPromotionsBanner(){
@@ -1057,41 +1089,40 @@ if(a){ b.classList.add('show'); const tp=(a.products||[]).reduce((s,p)=>s+(p.pri
 else { b.classList.remove('show'); b.onclick=null; }
 }
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0],ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0).sort((a,b)=>new Date(a[1].endDate)-new Date(b[1].endDate));return ps.length?{id:ps[0][0],...ps[0][1]}:null;}
-function addPromoToCart(pid){const p=appData.promotions[pid];if(!p){showToast('❌ Non trovata');return;}const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast('⚠️ Scaduta/Esaurita');return;}if(!p.products||!p.products.length){showToast('️ No prodotti');return;}
+function addPromoToCart(pid){const p=appData.promotions[pid];if(!p){showToast(' Non trovata');return;}const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast('⚠️ Scaduta/Esaurita');return;}if(!p.products||!p.products.length){showToast('️ No prodotti');return;}
 let tp=p.products.length===1?(/1x\d+|x1|\b1\b.*\b(?:offerta|promo)/i.test(p.title)&&p.products[0].qty===1?p.products[0].price:p.products[0].price*p.products[0].qty):p.products.reduce((s,x)=>s+(x.price*x.qty),0);
 const e={promoId:pid,promoTitle:p.title,products:p.products.map(x=>({...x})),totalPrice:tp,isPromo:true,cartTimestamp:Date.now()},idx=cart.findIndex(c=>c.isPromo&&c.promoId===pid);
 if(idx>=0){if(confirm('Aggiungerne un\'altra?'))cart.push(e);else return;}else cart.push(e);
 updateCartBadge();showToast(`🎁 ${p.title} aggiunta!`);openCart();}
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
 function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(i.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');const sel=document.getElementById('categorySelect');if(sel)sel.innerHTML='<option value="">Seleziona...</option>'+Object.keys(appData.categories).map(c=>`<option value="${c}">${appData.categories[c].name}</option>`).join('');}
-// ✅ FIX: Blocco completo se dati mancanti + risveglio input
-function showCategory(c){ 
-    if(!c || !appData.menu || !appData.menu[c]){showToast('⚠️ Non disp.');return;} 
-    currentSearchCat=c; 
-    document.getElementById('productSearch').value=''; 
-    document.getElementById('mainMenu').style.display='none'; 
-    document.getElementById('productsView').style.display='block'; 
-    document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c); 
-    renderProductList(c); 
-    window.scrollTo(0,0);
-    setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
+function showCategory(c){
+if(!c || !appData.menu || !appData.menu[c]){showToast('️ Non disp.');return;}
+currentSearchCat=c;
+document.getElementById('productSearch').value='';
+document.getElementById('mainMenu').style.display='none';
+document.getElementById('productsView').style.display='block';
+document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);
+renderProductList(c);
+window.scrollTo(0,0);
+setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
-// ✅ FIX: Sicurezza contro crash se menu non caricato o parametro vuoto
 function renderProductList(cat, filterTerm) {
-    if (!cat || !appData.menu || !appData.menu[cat]) return;
-    const term = (filterTerm || '').toLowerCase();
-    const list = document.getElementById('productList');
-    if(!list) return;
-    const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
-    if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
-    list.innerHTML = filtered.map((p) => {
-        const idx = appData.menu[cat].indexOf(p);
-        const qty = getCartQty(cat, p.name);
-        const qtyUi = qty > 0
-            ? `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${idx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${idx}" data-delta="1">+</button></div>`
-            : `<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${idx}" data-delta="1">+ Aggiungi</button>`;
-        return `<div class="product-card-3d"><div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${qtyUi}</div>`;
-    }).join('');
+if (!cat || !appData.menu || !appData.menu[cat]) return;
+const term = (filterTerm || '').toLowerCase();
+const list = document.getElementById('productList');
+if(!list) return;
+const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
+if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
+list.innerHTML = filtered.map((p) => {
+const idx = appData.menu[cat].indexOf(p);
+const qty = getCartQty(cat, p.name);
+const imgHtml = p.image ? `<img src="${p.image}" class="product-img" alt="${p.name}">` : '';
+const qtyUi = qty > 0
+? `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${idx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${idx}" data-delta="1">+</button></div>`
+: `<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${idx}" data-delta="1">+ Aggiungi</button>`;
+return `<div class="product-card-3d" style="display:flex;align-items:center;">${imgHtml}<div class="product-info" style="flex:1;"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${qtyUi}</div>`;
+}).join('');
 }
 function filterProducts(term){ if(currentSearchCat) renderProductList(currentSearchCat, term || ''); }
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
@@ -1111,19 +1142,69 @@ function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classL
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
 function openCart(){ if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} else { let h=''; cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${i})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${x.products.map(p=>`<div>▸ ${p.name} ×${p.qty} - €${(p.price*p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b;font-weight:700;">Totale</span><span style="color:#ff6b6b;font-weight:700;">€${x.totalPrice.toFixed(2)}</span></div></div>`;}); cart.forEach((x,i)=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;}); it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex'; const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false; document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe); document.getElementById('typeDelivery').onclick=de?()=>selectOrderType('delivery'):()=>showToast(' No'); document.getElementById('typePickup').onclick=pe?()=>selectOrderType('pickup'):()=>showToast('🚫 No'); if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType); selectTimeMode(timeMode);updateCartTotals(); } m.classList.add('active'); }
 function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
-function closeCart(){
-    document.getElementById('cartModal').classList.remove('active');
-    // Forza il ritorno alla Home Page ogni volta che si chiude il carrello
-    showHome();
-}
+function closeCart(){document.getElementById('cartModal').classList.remove('active'); showHome();}
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere la posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast(' Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('❌ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
+async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast(' Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('❌ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`❌ Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:` ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
 function counterKey(name){return String(name).replace(/[.#$\/\[\]]/g,'_');}
 function incrementProductCounters(items){const today=new Date().toISOString().split('T')[0];(items||[]).forEach(item=>{if(item.isPromo)return;const k=counterKey(item.name),q=item.qty||1;db.ref(`contatori/${today}/${k}`).transaction(v=>(v||0)+q);db.ref(`contatori_nomi/${today}/${k}`).set(item.name);});}
 function renderContatoriAdmin(data){const l=document.getElementById('contatoriList');if(!l)return;const today=new Date().toISOString().split('T')[0],day=data&&data[today]?data[today]:{},nomi=(window._contatoriNomi&&window._contatoriNomi[today])||{};const entries=Object.entries(day).map(([k,q])=>({name:nomi[k]||k.replace(/_/g,' '),qty:q})).sort((a,b)=>b.qty-a.qty);if(!entries.length){l.innerHTML='<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun ordine oggi</p>';return;}const tot=entries.reduce((s,e)=>s+e.qty,0);l.innerHTML=`<p style="color:var(--gold);font-weight:700;margin-bottom:12px;">Totale pezzi oggi: ${tot}</p>`+entries.map(e=>`<div class="counter-row"><span class="counter-row-name">${e.name}</span><span class="counter-row-qty">${e.qty}</span></div>`).join('');}
 function resetDailyCounters(){const today=new Date().toISOString().split('T')[0];if(!confirm('Azzerare i contatori di oggi?'))return;db.ref(`contatori/${today}`).remove().then(()=>db.ref(`contatori_nomi/${today}`).remove()).then(()=>showToast('✅ Contatori azzerati'));}
-async function sendOrder(d){ const btn=document.getElementById('checkoutBtn'); const cartBackup=[...cart]; const promos=cart.filter(i=>i.isPromo); if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} try{ const ref=db.ref('ordini').push(); const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); d.orderId=orderId; const coords=document.getElementById('customerCoords')?.value||null; const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO'; const printBody=[`ORDINE ${orderId}`,`${tipoLbl} • ${d.scheduledTime||'Subito'}`,`Cliente: ${d.name}`,`Tel: ${d.phone}`,d.type==='delivery'?`Indirizzo: ${d.address}`:'',d.notes?`Note: ${d.notes}`:'','---',...(d.items||[]).map(i=>`${i.name} x${i.qty||1}  €${(i.price*(i.qty||1)).toFixed(2)}`),'---',`Prodotti: €${d.productsTotal.toFixed(2)}`,d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',`TOTALE: €${d.finalTotal.toFixed(2)}`,`${new Date().toLocaleString('it-IT')}`].filter(Boolean).join('\n'); const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n\n\n"}; await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat}); localStorage.setItem('lastOrderTime',Date.now()); incrementProductCounters(d.items); saveOrderToLocal(d); promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); cart=[];updateCartBadge();closeCart(); document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false; selectTimeMode('asap');showToast('✅ Ordine inviato in pizzeria!'); }catch(e){ console.error(e); cart=cartBackup; updateCartBadge(); showToast('❌ Errore invio. Controlla la connessione e riprova.'); }finally{ if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} } }
+
+async function sendOrder(d){ 
+    const btn=document.getElementById('checkoutBtn'); 
+    const cartBackup=[...cart]; 
+    const promos=cart.filter(i=>i.isPromo); 
+    if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} 
+    try{ 
+        const ref=db.ref('ordini').push(); 
+        const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); 
+        d.orderId=orderId; 
+        const coords=document.getElementById('customerCoords')?.value||null; 
+        const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO'; 
+        const printBody=[`ORDINE ${orderId}`,`${tipoLbl} • ${d.scheduledTime||'Subito'}`,`Cliente: ${d.name}`,`Tel: ${d.phone}`,d.type==='delivery'?`Indirizzo: ${d.address}`:'',d.notes?`Note: ${d.notes}`:'','---',...(d.items||[]).map(i=>`${i.name} x${i.qty||1}  €${(i.price*(i.qty||1)).toFixed(2)}`),'---',`Prodotti: €${d.productsTotal.toFixed(2)}`,d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',`TOTALE: €${d.finalTotal.toFixed(2)}`,`${new Date().toLocaleString('it-IT')}`].filter(Boolean).join('\n'); 
+        const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n"}; 
+        
+        await ref.set({
+            orderId,
+            customerName:sanitizeWA(d.name),
+            customerPhone:sanitizeWA(d.phone),
+            address:d.type==='delivery'?sanitizeWA(d.address):'',
+            notes:sanitizeWA(d.notes),
+            type:d.type,
+            scheduledTime:d.scheduledTime,
+            items:d.items,
+            productsTotal:d.productsTotal,
+            deliveryFee:d.deliveryFee,
+            finalTotal:d.finalTotal,
+            status:'new',
+            timestamp:Date.now(),
+            createdAt:new Date().toISOString(),
+            stampato:false,
+            coordinates:coords,
+            printFormat
+        }); 
+        
+        localStorage.setItem('lastOrderTime',Date.now()); 
+        incrementProductCounters(d.items); 
+        saveOrderToLocal(d); 
+        promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
+        cart=[]; updateCartBadge(); closeCart(); 
+        document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('customerAddress').value='';document.getElementById('customerNotes').value='';document.getElementById('scheduledTime').value='';document.getElementById('privacyConsent').checked=false; 
+        selectTimeMode('asap');
+        showToast('✅ Ordine inviato! Torno alla home...');
+        setTimeout(() => { showHome(); }, 1500);
+
+    } catch(e){ 
+        console.error(e); 
+        cart=cartBackup; 
+        updateCartBadge(); 
+        showToast('❌ Errore invio. Controlla la connessione e riprova.'); 
+    } finally { 
+        if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} 
+    } 
+}
+
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast("🔒 Errato");}
 function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
 function switchAdminTab(e,t){document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel-content').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');document.getElementById(`admin-${t}`).classList.add('active');}
@@ -1148,12 +1229,64 @@ function togglePromo(id){db.ref(`promotions/${id}/active`).set(!appData.promotio
 function resetPromoUses(id){if(confirm("Resettare a 0?")){db.ref(`promotions/${id}/currentUses`).set(0);showToast('🔄 Resettato');}}
 function deletePromo(id){if(confirm("Eliminare?")){db.ref(`promotions/${id}`).remove();showToast('️ Eliminata');}}
 function renderAdminCategories(){const l=document.getElementById('categoriesAdminList');l.innerHTML=Object.keys(appData.categories).map(k=>{const c=appData.categories[k];return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name||k}</span><button class="delete-product-btn" onclick="deleteCategory('${k}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name||''}" onchange="updateCategory('${k}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon||''}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona"></div></div>`;}).join('');}
-function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast('❌ Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
+function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast(' Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
 function updateCategory(k,f,v){appData.categories[k][f]=v;db.ref('categories').set(appData.categories);}
 function deleteCategory(k){if(!confirm(`Eliminare "${appData.categories[k].name}"?`))return;delete appData.categories[k];delete appData.menu[k];if(appData.images.categories)delete appData.images.categories[k];db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);}
+
+// ✅ NUOVA FUNZIONE PER AGGIUNGERE PRODOTTO CON FOTO
+function addProduct(c){
+    const n=prompt("Nome prodotto:");
+    if(!n) return;
+    const p=parseFloat(prompt("Prezzo:","5.00"))||5;
+    const d=prompt("Descrizione:","")||"";
+
+    if(!appData.menu[c]) appData.menu[c]=[];
+    appData.menu[c].push({name:n, price:p, desc:d});
+    db.ref('menu').set(appData.menu);
+    renderAdminProducts();
+    showToast("✅ Prodotto creato!");
+
+    if(confirm("Vuoi caricare una foto per '"+n+"'?\nPremi OK per scegliere dalla galleria.")) {
+        uploadProductImage(c, n);
+    }
+}
+
+// ✅ FUNZIONE UPLOAD FOTO PRODOTTO DAL CELLULARE
+function uploadProductImage(cat, prodName) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        showToast(" Caricamento foto in corso...");
+        const ref = storage.ref(`products/${cat}/${Date.now()}.jpg`);
+        const task = ref.put(file);
+
+        task.on('state_changed', null, 
+            (err) => showToast("❌ Errore upload: " + err.message), 
+            () => {
+                task.snapshot.ref.getDownloadURL().then(url => {
+                    const product = appData.menu[cat].find(p => p.name === prodName);
+                    if(product) {
+                        product.image = url;
+                        db.ref('menu').set(appData.menu);
+                        renderAdminProducts();
+                        showToast("📸 Foto caricata con successo!");
+                    }
+                });
+            }
+        );
+    };
+    input.click();
+}
+
 function renderAdminProducts(){let h='';Object.keys(appData.categories).forEach(c=>{const ci=appData.categories[c],cn=ci.name,ic=ci.icon||'fa-utensils',pr=appData.menu[c]||[],op=openCategories.has(c);h+=`<div class="admin-category-accordion ${op?'open':''}" id="accordion-${c}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${c}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ic}"></i></div><span class="admin-category-header-title">${cn}</span></div><span class="admin-category-header-count">${pr.length}</span></div><div class="admin-category-body">${pr.map((p,i)=>`<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">${p.name}</span><button class="delete-product-btn" onclick="deleteProduct('${c}',${i})"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="${p.name}" onchange="updateProduct('${c}',${i},'name',this.value)" placeholder="Nome"><input type="text" value="${p.desc||''}" onchange="updateProduct('${c}',${i},'desc',this.value)" placeholder="Desc"><input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${c}',${i},'price',parseFloat(this.value))" placeholder="Prezzo"></div></div>`).join('')}<button class="admin-save add-product-btn" style="margin-top:10px;" onclick="addProduct('${c}')"><i class="fas fa-plus"></i> Aggiungi</button></div></div>`;});document.getElementById('adminProducts').innerHTML=h;}
 function toggleCategoryAccordion(c){if(openCategories.has(c))openCategories.delete(c);else openCategories.add(c);const e=document.getElementById(`accordion-${c}`);if(e)e.classList.toggle('open');}
-function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
 function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
 function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
 function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;document.getElementById('minDeliveryInput').value=s.minDeliveryOrder!==undefined?s.minDeliveryOrder:15;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent=" CHIUSO";}else lb.textContent="Auto";const od=s.openDays?s.openDays.split(','):[];document.querySelectorAll('.day-toggle').forEach(el=>{if(od.includes(el.dataset.day))el.classList.add('active');else el.classList.remove('active');});db.ref('settings/driverLogo').once('value').then(s=>{const u=s.val();if(u){const pv=document.getElementById('driverLogoPreview');pv.src=u;pv.style.display='block';}});}
@@ -1164,7 +1297,7 @@ function updateAdminImagePreviews(){const p=document.getElementById('adminHeroPr
 function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast(" Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}const od=Array.from(document.querySelectorAll('.day-toggle.active')).map(el=>el.dataset.day).join(',');db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;const minOv=parseFloat(document.getElementById('minDeliveryInput').value),minO=isNaN(minOv)||minOv<0?0:minOv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,openDays:od,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df,minDeliveryOrder:minO});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='adminModal')closeAdmin();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();}
-function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast(' Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+n.slice(1);}
+function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast(' Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+p.slice(1);}
 function applyPalette(n){const p={autunno:{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},inverno:{gold:"#a8c3d4",goldLight:"#d4e6f0",goldDark:"#5a7b8c",dark:"#0c121a",brown:"#1a2530",cream:"#e6f0f5"},primavera:{gold:"#8cd4a8",goldLight:"#e6f5e6",goldDark:"#4a8c5a",dark:"#0a1a12",brown:"#1a2d1f",cream:"#f5f5e6"},estate:{gold:"#e8a84b",goldLight:"#ffe0a0",goldDark:"#c47a20",dark:"#1a1005",brown:"#3d2510",cream:"#fff5e0"},natale:{gold:"#c41e3a",goldLight:"#ff6b6b",goldDark:"#8a1c2b",dark:"#0f2018",brown:"#1a3325",cream:"#f5f0e6"},san_valentino:{gold:"#ff4d6d",goldLight:"#ffccd5",goldDark:"#c9184a",dark:"#1a0a0f",brown:"#2d1520",cream:"#fff0f3"},notte:{gold:"#7209b7",goldLight:"#b5179e",goldDark:"#3a0ca3",dark:"#050510",brown:"#0b0b1a",cream:"#e0e7ff"}}[n]||{gold:"#d4a84b",goldLight:"#f0d78c",goldDark:"#b8860b",dark:"#1a1209",brown:"#2d1f12",cream:"#f5e6c8"},r=document.documentElement.style;r.setProperty('--gold',p.gold);r.setProperty('--gold-light',p.goldLight);r.setProperty('--gold-dark',p.goldDark);r.setProperty('--dark',p.dark);r.setProperty('--brown',p.brown);r.setProperty('--cream',p.cream);document.querySelector('meta[name="theme-color"]').setAttribute('content',p.gold);}
 function activateHeroVideo(){const u=document.getElementById('heroVideoInput').value;if(!u){showToast('❌ Link!');return;}db.ref('settings/heroVideoUrl').set(u);showToast(' Attivato!');}
 function deactivateHeroVideo(){db.ref('settings/heroVideoUrl').remove();showToast('️ Fissa!');}
