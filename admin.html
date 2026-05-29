@@ -91,7 +91,6 @@ input:checked + .slider:before { transform: translateX(24px); }
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen">
     <div class="login-box">
         <h1>🔐 Area Riservata</h1>
@@ -102,7 +101,6 @@ input:checked + .slider:before { transform: translateX(24px); }
     </div>
 </div>
 
-<!-- ADMIN CONTAINER -->
 <div class="admin-container" id="adminContainer">
     <div class="admin-header">
         <h1>🍕 Pizzeria Grasso - Admin</h1>
@@ -119,7 +117,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         <button class="admin-tab" onclick="showTab('settings')">⚙️ Impostazioni</button>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard" class="admin-section active">
         <div class="stats-grid">
             <div class="stat-card">
@@ -141,7 +138,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- ORDINI -->
     <div id="orders" class="admin-section">
         <div class="card">
             <h3>Gestione Ordini</h3>
@@ -152,7 +148,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- MENU -->
     <div id="menu" class="admin-section">
         <div class="card">
             <h3>Modifica Menu</h3>
@@ -160,7 +155,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- CATEGORIE -->
     <div id="categories" class="admin-section">
         <div class="card">
             <h3>Categorie</h3>
@@ -169,7 +163,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- PROMOZIONI -->
     <div id="promos" class="admin-section">
         <div class="card">
             <h3>Promozioni Attive</h3>
@@ -203,7 +196,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- RECENSIONI -->
     <div id="reviews" class="admin-section">
         <div class="card">
             <h3>Recensioni in Attesa</h3>
@@ -215,7 +207,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         </div>
     </div>
 
-    <!-- IMPOSTAZIONI -->
     <div id="settings" class="admin-section">
         <div class="card">
             <h3>Orari di Apertura</h3>
@@ -291,11 +282,16 @@ const db = firebase.database();
 let currentPin = "";
 let appData = { categories: {}, menu: {}, settings: {}, promotions: {} };
 
+// RECUPERA IL PIN SUBITO (Così è pronto prima del login)
+db.ref('settings/adminPin').once('value').then(s => {
+    currentPin = s.exists() ? s.val() : "1234";
+});
+
 // Check PIN
 function checkPin() {
     const input = document.getElementById('pinInput').value;
     if (!currentPin) {
-        alert("Connessione in corso...");
+        alert("Connessione in corso... Riprova tra un secondo.");
         return;
     }
     if (input === currentPin) {
@@ -319,11 +315,6 @@ function showTab(tabId) {
 }
 
 function initAdmin() {
-    // Load PIN
-    db.ref('settings/adminPin').once('value').then(s => {
-        currentPin = s.exists() ? s.val() : "1234";
-    });
-
     // Load Data
     db.ref('categories').on('value', s => { if(s.exists()) appData.categories = s.val(); renderMenu(); renderCategories(); });
     db.ref('menu').on('value', s => { if(s.exists()) appData.menu = s.val(); renderMenu(); });
@@ -585,6 +576,7 @@ function changePin() {
     if(!np || np.length < 4) { alert('PIN troppo corto'); return; }
     if(np !== cp) { alert('PIN non coincidono'); return; }
     db.ref('settings/adminPin').set(np);
+    currentPin = np; // Aggiorna anche la variabile locale
     alert('PIN cambiato!');
     document.getElementById('newPin').value = '';
     document.getElementById('confirmPin').value = '';
