@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Admin - Antica Pizzeria Grasso</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,6 +12,7 @@
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+input, select, textarea { font-size: 16px !important; }
 body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--cream); padding: 20px; min-height: 100vh; }
 h1, h2, h3, h4 { color: var(--gold); margin-bottom: 10px; }
 button { cursor: pointer; font-family: inherit; }
@@ -49,7 +50,7 @@ input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border
 .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 12px; }
 .accordion.open .accordion-body { max-height: 5000px; padding: 12px; border-top: 1px solid rgba(212,168,75,0.1); }
 .prod-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-.prod-img-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.prod-img-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
 .prod-img-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 2px dashed var(--gold-dark); cursor: pointer; }
 .img-upload-label { font-size: 0.75rem; color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: rgba(212,168,75,0.1); border-radius: 6px; border: 1px solid var(--gold-dark); }
 .img-upload-label input { display: none; }
@@ -122,14 +123,22 @@ input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let appData = { categories: {}, menu: {
-  pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
-  focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
-  frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
-  bibite:[{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}]
-},
 
-document.addEventListener('DOMContentLoaded', ()=>{ loadAll(); setupListeners(); });
+const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
+
+let appData = {
+categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍟 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
+menu: {
+pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
+focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
+frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
+bibite:[...DEFAULT_BIBITE]
+},
+settings: {},
+promotions: {}
+};
+
+document.addEventListener('DOMContentLoaded', ()=>{ loadAll(); setupListeners(); renderMenu(); });
 
 function setupListeners(){
 db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val(); renderMenu();}});
@@ -141,8 +150,8 @@ db.ref('ordini').orderByChild('timestamp').on('value', s=>{renderOrders(s.val())
 }
 
 function loadAll(){
-db.ref('categories').once('value').then(s=>{if(s.exists())appData.categories=s.val();});
-db.ref('menu').once('value').then(s=>{if(s.exists())appData.menu=s.val();});
+db.ref('categories').once('value').then(s=>{if(s.exists())appData.categories=s.val(); renderMenu();});
+db.ref('menu').once('value').then(s=>{if(s.exists())appData.menu=s.val(); renderMenu();});
 db.ref('settings').once('value').then(s=>{if(s.exists()){appData.settings=s.val(); loadSettings();}});
 db.ref('promotions').once('value').then(s=>{appData.promotions=s.val()||{};});
 }
@@ -172,7 +181,6 @@ if(!data){ l.innerHTML=''; return; }
 let html='';
 Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).forEach(o=>{
 const statusClass = o.status || 'new';
-const statusMap = {new:'Nuovi',preparing:'Prep',ready:'Pronti',delivered:'Consegnati'};
 html += `
 <div class="order-card ${statusClass}">
 <div class="order-header">
@@ -192,7 +200,7 @@ ${statusClass==='ready'?'<button class="order-action-btn btn-del" onclick="updat
 });
 l.innerHTML = html;
 }
-function updateStatus(id, st){ db.ref(`ordini`).orderByChild('orderId').equalTo(id).once('value').then(s=>{s.forEach(c=>{c.ref.update({status:st});}); showToast('Stato aggiornato');}); }
+function updateStatus(id, st){ db.ref('ordini').orderByChild('orderId').equalTo(id).once('value').then(s=>{s.forEach(c=>{c.ref.update({status:st});}); showToast('Stato aggiornato');}); }
 function delOrder(id){ if(confirm('Eliminare?')){ db.ref('ordini').orderByChild('orderId').equalTo(id).once('value').then(s=>{s.forEach(c=>c.ref.remove());}); } }
 
 // 🍕 MENU & ACCORDION
@@ -222,7 +230,7 @@ ${items.map((p,i)=>`
 <input type="text" value="${p.desc||''}" placeholder="Descrizione" oninput="updateProd('${c}',${i},'desc',this.value)">
 <input type="number" value="${p.price}" step="0.50" oninput="updateProd('${c}',${i},'price',parseFloat(this.value))">
 <div class="prod-img-wrap">
-${p.img ? `<img src="${p.img}" class="prod-img-preview" onclick="removeImg('${c}',${i})">` : '<div class="prod-img-preview" style="background:#333;"></div>'}
+${p.img ? `<img src="${p.img}" class="prod-img-preview" onclick="removeImg('${c}',${i})">` : '<div class="prod-img-preview" style="background:#333;display:flex;align-items:center;justify-content:center;color:#8a7a5a;font-size:0.6rem;">No foto</div>'}
 <label class="img-upload-label">
 📷 ${p.img?'Cambia':'Foto'}
 <input type="file" accept="image/*" onchange="uploadProdImg('${c}',${i},this)">
@@ -239,13 +247,14 @@ function toggleAccordion(c){
 // Chiude tutti gli altri
 document.querySelectorAll('.accordion').forEach(el=>el.classList.remove('open'));
 // Apre quello cliccato
-document.getElementById('acc-'+c).classList.add('open');
+const el = document.getElementById('acc-'+c);
+if(el) el.classList.toggle('open');
 }
 
 function addCategoryPrompt(){
-const n = prompt('Nome Categoria (es: Pizze)');
+const n = prompt('Nome Categoria (es: Dolci)');
 if(!n) return;
-const k = prompt('Chiave (es: pizze)');
+const k = prompt('Chiave unica (es: dolci)');
 if(!k) return;
 db.ref(`categories/${k}`).set({name:n, icon:'fa-utensils'});
 db.ref(`menu/${k}`).set([]);
@@ -256,6 +265,7 @@ function delCategory(c){
 if(confirm('Eliminare questa categoria e tutti i suoi piatti?')){
 db.ref(`categories/${c}`).remove();
 db.ref(`menu/${c}`).remove();
+renderMenu();
 }
 }
 
@@ -268,7 +278,6 @@ showToast('Piatto aggiunto');
 }
 
 function delProduct(c, i){
-// Get key and remove
 db.ref(`menu/${c}`).once('value').then(s=>{
 let keys = [];
 s.forEach(ch=>keys.push(ch.key));
@@ -322,7 +331,7 @@ h += `
 </div>
 </div>`;
 });
-l.innerHTML = h;
+l.innerHTML = h || '<p style="color:#8a7a5a;">Nessuna promozione attiva</p>';
 }
 
 function addPromo(){
@@ -341,9 +350,9 @@ if(confirm('Eliminare?')) db.ref(`promotions/${id}`).remove();
 // ⭐ RECENSIONI
 function loadReviews(data){
 const l = document.getElementById('reviewsList');
-if(!data) return;
+if(!data) { l.innerHTML=''; return; }
 let h = '';
-Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).forEach(r=>{
+Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp).forEach(([id,r])=>{
 h += `
 <div class="card">
 <div style="display:flex; justify-content:space-between;">
@@ -353,13 +362,13 @@ h += `
 <div>${r.text}</div>
 <div style="margin-top:6px;">
 ${r.status==='pending'?`
-<button class="btn btn-green" onclick="modReview('${r.id}','approved')">✅ Approva</button>
-<button class="btn btn-red" onclick="modReview('${r.id}','rejected')">❌ Rifiuta</button>
+<button class="btn btn-green" onclick="modReview('${id}','approved')">✅ Approva</button>
+<button class="btn btn-red" onclick="modReview('${id}','rejected')">❌ Rifiuta</button>
 `:''}
 </div>
 </div>`;
 });
-l.innerHTML = h;
+l.innerHTML = h || '<p style="color:#8a7a5a;">Nessuna recensione</p>';
 }
 
 function modReview(id, st){ db.ref(`recensioni/${id}`).update({status:st}); }
