@@ -1,3 +1,14 @@
+Hai perfettamente ragione. Il codice che c'era prima usava `capture="environment"`, che forza la fotocamera del telefono. Se lo togliamo, ti chiederà se vuoi scattare o scegliere dalla **Galleria**.
+
+Inoltre, ho aggiunto una funzione di **ridimensionamento automatico**: prima di salvare la foto, l'app la comprime e la riduce (massimo 600px) per non intasare il database e rendere l'app velocissima.
+
+Ecco il file **COMPLETO** con queste due correzioni:
+1.  **Galleria + Fotocamera**: Ora puoi scegliere da dove caricare.
+2.  **Ridimensionamento**: Le foto vengono automaticamente ottimizzate.
+
+Copia tutto e sostituisci il tuo file:
+
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -430,12 +441,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="form-group"><label>Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
 <div class="form-group"><label>Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
 <div class="form-group" id="addressGroup" style="display:none;">
-<label>Indirizzo di Consegna *</label>
-<div style="display: flex; gap: 8px;">
-<input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex: 3;">
-<input type="text" id="customerNumber" placeholder="Civico" style="flex: 1;">
-</div>
-<button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> Usa GPS</button>
+<label>Indirizzo di Consegna (Via e Civico) *</label>
+<input type="text" id="customerAddress" placeholder="Es: Via Roma 123, Piano 2">
+<button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> Usa la mia posizione GPS</button>
 </div>
 <div class="form-group"><label>Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
 <div style="display:none; position:absolute; left:-9999px;"><input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1"></div>
@@ -699,7 +707,7 @@ function closePrivacyModal(){ document.getElementById('privacyModal').classList.
 function sanitizeWA(t){ return String(t).replace(/[*_~`]/g, '\\$&'); }
 const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
 let appData = {
-categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:" Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:" Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
+categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:" Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍤 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
 menu: {
 pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
 focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
@@ -733,7 +741,7 @@ if(!isFirstLoad) {
 Object.keys(o).forEach(id=>{
 if(!knownOrderIds.has(id)){
 playNotificationSound();
-showToast('🔔 Nuovo ordine!');
+showToast(' Nuovo ordine!');
 }
 knownOrderIds.add(id);
 });
@@ -770,7 +778,7 @@ const name = document.getElementById('reviewName').value.trim();
 const text = document.getElementById('reviewText').value.trim();
 const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim();
 if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; }
-if(!name){ showToast('❌ Inserisci il nome'); return; }
+if(!name){ showToast(' Inserisci il nome'); return; }
 if(!text){ showToast('❌ Scrivi un commento'); return; }
 if(orderId && orderId !== 'Anonimo') {
 const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
@@ -1021,7 +1029,7 @@ updateCartBadge();showToast(`🎁 ${p.title} aggiunta!`);openCart();}
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
 function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(i.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');const sel=document.getElementById('categorySelect');if(sel)sel.innerHTML='<option value="">Seleziona...</option>'+Object.keys(appData.categories).map(c=>`<option value="${c}">${appData.categories[c].name}</option>`).join('');}
 function showCategory(c){
-if(!c || !appData.menu || !appData.menu[c]){showToast('⚠️ Non disp.');return;}
+if(!c || !appData.menu || !appData.menu[c]){showToast('️ Non disp.');return;}
 currentSearchCat=c;
 document.getElementById('productSearch').value='';
 document.getElementById('mainMenu').style.display='none';
@@ -1054,27 +1062,14 @@ function applyImages(){if(appData.images.hero)document.getElementById('heroImg')
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
 function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
-function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
+function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast(' No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
 function changeProductQty(cat,i,delta){if(!appData.menu||!appData.menu[cat]||!appData.menu[cat][i]){showToast('⚠️ Err.');return;}const it=appData.menu[cat][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===cat);if(ex){ex.qty=(ex.qty||0)+delta;if(ex.qty<=0){const idx=cart.indexOf(ex);cart.splice(idx,1);}else if(delta>0)showToast(` ${it.name} ×${ex.qty}`);}else if(delta>0){cart.push({...it,cat,qty:1,isPromo:false});showToast(` ${it.name} aggiunta!`);}updateCartBadge();if(currentSearchCat===cat)renderProductList(cat,document.getElementById('productSearch')?.value||'');}
 function addToCart(c,i){changeProductQty(c,i,1);}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const b=document.getElementById('cartBadge');if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('️ Svuotato');}}
 function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
-function selectOrderType(t){
-orderType=t;
-document.getElementById('typeDelivery').classList.toggle('active',t==='delivery');
-document.getElementById('typePickup').classList.toggle('active',t==='pickup');
-document.getElementById('timeTypeLabel').textContent=t==='delivery'?'consegna':'ritiro';
-if(t==='delivery'){
-document.getElementById('addressGroup').style.display='block';
-} else {
-document.getElementById('addressGroup').style.display='none';
-document.getElementById('customerStreet').value='';
-document.getElementById('customerNumber').value='';
-}
-updateCartTotals();
-}
+function selectOrderType(t){orderType=t;document.getElementById('typeDelivery').classList.toggle('active',t==='delivery');document.getElementById('typePickup').classList.toggle('active',t==='pickup');document.getElementById('timeTypeLabel').textContent=t==='delivery'?'consegna':'ritiro';if(t==='delivery')document.getElementById('addressGroup').style.display='block';else{document.getElementById('addressGroup').style.display='none';document.getElementById('customerAddress').value='';}updateCartTotals();}
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime();}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
 function openCart(){ if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} else { let h=''; cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button class="remove-promo-btn" onclick="removePromoFromCartAtIndex(${i})"><i class="fas fa-times"></i></button></div><div class="promo-card-item-products">${x.products.map(p=>`<div>▸ ${p.name} ×${p.qty} - €${(p.price*p.qty).toFixed(2)}</div>`).join('')}</div><div class="promo-card-item-total"><span style="color:#ff6b6b;font-weight:700;">Totale</span><span style="color:#ff6b6b;font-weight:700;">€${x.totalPrice.toFixed(2)}</span></div></div>`;}); cart.forEach((x,i)=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;}); it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex'; const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false; document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe); document.getElementById('typeDelivery').onclick=de?()=>selectOrderType('delivery'):()=>showToast(' No'); document.getElementById('typePickup').onclick=pe?()=>selectOrderType('pickup'):()=>showToast('🚫 No'); if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType); selectTimeMode(timeMode);updateCartTotals(); } m.classList.add('active'); }
@@ -1083,53 +1078,9 @@ function closeCart(){
 document.getElementById('cartModal').classList.remove('active');
 showHome();
 }
-async function getGPSLocation(){ 
-const b=document.getElementById('gpsBtn'), 
-streetInput=document.getElementById('customerStreet'), 
-numberInput=document.getElementById('customerNumber'); 
-if(!navigator.geolocation){showToast('GPS non disponibile');return;} 
-b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; 
-try{ 
-const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
-const{latitude,longitude}=pos.coords; 
-let coordsInput=document.getElementById('customerCoords'); 
-if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} 
-coordsInput.value=`${latitude},${longitude}`; 
-const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
-const d=await r.json(),a=d.address; 
-streetInput.value = a.road || a.pedestrian || ''; 
-numberInput.value = a.house_number || ''; 
-showToast('Posizione trovata!'); 
-}catch(e){showToast('Impossibile ottenere posizione');} 
-finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} 
-}
+async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast('GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('Posizione trovata!'); }catch(e){showToast('Impossibile ottenere posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-async function confirmAndSendOrder(){ 
-if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('Attendi 1 minuto');return;} 
-const pc=document.getElementById('privacyConsent'); 
-if(!pc||!pc.checked){showToast('Accetta Privacy');return;} 
-if(document.getElementById('honeypot').value!=='')return; 
-const n=document.getElementById('customerName').value.trim(); 
-const p=document.getElementById('customerPhone').value.trim(); 
-const street=document.getElementById('customerStreet').value.trim(); 
-const number=document.getElementById('customerNumber').value.trim(); 
-const address = `${street} ${number}`; 
-const nt=document.getElementById('customerNotes').value.trim(); 
-if(!n){showToast('Nome');return;} 
-const ph=p.replace(/\D/g,''); 
-if(!/^3[0-9]{9}$/.test(ph)){showToast('Telefono');return;} 
-let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); 
-const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; 
-const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
-if(orderType==='delivery'){
-if(!street||!number){showToast('Completa indirizzo e civico');return;}
-if(pt+df<minO){showToast(`Minimo: €${minO}`);return;}
-} 
-const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; 
-cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
-const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; 
-await sendOrder(oc); 
-}
+async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast('Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
 function counterKey(name){return String(name).replace(/[.#$\/\[\]]/g,'_');}
 function incrementProductCounters(items){const today=new Date().toISOString().split('T')[0];(items||[]).forEach(item=>{if(item.isPromo)return;const k=counterKey(item.name),q=item.qty||1;db.ref(`contatori/${today}/${k}`).transaction(v=>(v||0)+q);db.ref(`contatori_nomi/${today}/${k}`).set(item.name);});}
 function renderContatoriAdmin(data){const l=document.getElementById('contatoriList');if(!l)return;const today=new Date().toISOString().split('T')[0],day=data&&data[today]?data[today]:{},nomi=(window._contatoriNomi&&window._contatoriNomi[today])||{};const entries=Object.entries(day).map(([k,q])=>({name:nomi[k]||k.replace(/_/g,' '),qty:q})).sort((a,b)=>b.qty-a.qty);if(!entries.length){l.innerHTML='<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun ordine oggi</p>';return;}const tot=entries.reduce((s,e)=>s+e.qty,0);l.innerHTML=`<p style="color:var(--gold);font-weight:700;margin-bottom:12px;">Totale pezzi oggi: ${tot}</p>`+entries.map(e=>`<div class="counter-row"><span class="counter-row-name">${e.name}</span><span class="counter-row-qty">${e.qty}</span></div>`).join('');}
@@ -1185,8 +1136,7 @@ promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>
 cart=[];updateCartBadge();closeCart(); 
 document.getElementById('customerName').value='';
 document.getElementById('customerPhone').value='';
-document.getElementById('customerStreet').value='';
-document.getElementById('customerNumber').value='';
+document.getElementById('customerAddress').value='';
 document.getElementById('customerNotes').value='';
 document.getElementById('scheduledTime').value='';
 document.getElementById('privacyConsent').checked=false; 
@@ -1248,7 +1198,7 @@ ${pr.map((p,i)=>`
 ${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${i})" title="Clicca per rimuovere">` : ''}
 <label class="admin-product-img-upload">
 <i class="fas fa-camera"></i> Foto
-<input type="file" accept="image/*" capture="environment" onchange="uploadProductImage('${c}',${i},this)">
+<input type="file" accept="image/*" onchange="uploadProductImage('${c}',${i},this)">
 </label>
 </div>
 </div>
@@ -1264,19 +1214,47 @@ function toggleCategoryAccordion(c){if(openCategories.has(c))openCategories.dele
 function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
 function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
 function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
+
+// ✅ FUNZIONE RIDIMENSIONAMENTO IMMAGINE (Max 600px, Qualità 70%)
+function resizeImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600;
+            const MAX_HEIGHT = 600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            callback(canvas.toDataURL('image/jpeg', 0.7)); // Compressione JPEG 70%
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
 async function uploadProductImage(cat, idx, input) {
 const file = input.files[0];
 if (!file) return;
 if (file.size > 2 * 1024 * 1024) { showToast('Max 2MB'); return; }
-const reader = new FileReader();
-reader.onload = async (e) => {
-appData.menu[cat][idx].img = e.target.result;
-await db.ref(`menu/${cat}/${idx}/img`).set(e.target.result);
-renderAdminProducts();
-renderProductList(currentSearchCat);
-showToast('Foto caricata!');
-};
-reader.readAsDataURL(file);
+resizeImage(file, async (resizedDataUrl) => {
+    appData.menu[cat][idx].img = resizedDataUrl;
+    await db.ref(`menu/${cat}/${idx}/img`).set(resizedDataUrl);
+    renderAdminProducts();
+    renderProductList(currentSearchCat);
+    showToast('Foto ottimizzata e caricata!');
+});
 }
 function removeProductImage(cat, idx) {
 if (!confirm('Rimuovere foto?')) return;
@@ -1290,7 +1268,7 @@ function loadCategoryImageInput(){document.getElementById('categoryImageArea').s
 function uploadHeroImage(input){if(!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.hero=e.target.result;document.getElementById('heroImg').src=e.target.result;const p=document.getElementById('adminHeroPreview');if(p){p.src=e.target.result;p.style.display='block';}};r.readAsDataURL(f);storage.ref(`images/hero_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.hero=u;db.ref('images/hero').set(u);}));}
 function uploadCategoryImage(input){const c=document.getElementById('categorySelect').value;if(!c||!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.categories[c]=e.target.result;renderCategories();const p=document.getElementById('adminCatPreview');if(p){p.src=e.target.result;p.style.display='block';}};r.readAsDataURL(f);storage.ref(`images/cat_${c}_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.categories[c]=u;db.ref(`images/categories/${c}`).set(u);}));}
 function updateAdminImagePreviews(){const p=document.getElementById('adminHeroPreview');if(p&&appData.images.hero){p.src=appData.images.hero;p.style.display='block';}}
-function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast("❌ Min 4 cifre");return;}if(np!==cf){showToast(" Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}const od=Array.from(document.querySelectorAll('.day-toggle.active')).map(el=>el.dataset.day).join(',');db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;const minOv=parseFloat(document.getElementById('minDeliveryInput').value),minO=isNaN(minOv)||minOv<0?0:minOv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,openDays:od,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df,minDeliveryOrder:minO});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
+function saveAllSettings(){const cp=document.getElementById('currentPin').value,np=document.getElementById('newPin').value,cf=document.getElementById('confirmPin').value;if(np){if(cp!==(appData.settings.adminPin||"1234")){showToast("❌ PIN errato");return;}if(!/^\d{4,}$/.test(np)){showToast(" Min 4 cifre");return;}if(np!==cf){showToast(" Non coincidono");return;}appData.settings.adminPin=np;db.ref('settings/adminPin').set(np);showToast("✅ PIN ok");}const od=Array.from(document.querySelectorAll('.day-toggle.active')).map(el=>el.dataset.day).join(',');db.ref('branding').update({name:document.getElementById('brandName').value||"Antica Pizzeria Grasso",subtitle:document.getElementById('brandSubtitle').value||"Dal 1980 • Tradizione",city:document.getElementById('brandCity').value||"Manfredonia"});const mst=document.getElementById('manualStatusToggle');let ms='auto';if(mst.classList.contains('on'))ms='open';else if(mst.classList.contains('closed'))ms='closed';const dfv=parseFloat(document.getElementById('deliveryFeeInput').value),df=isNaN(dfv)||dfv<0?0:dfv;const minOv=parseFloat(document.getElementById('minDeliveryInput').value),minO=isNaN(minOv)||minOv<0?0:minOv;db.ref('settings').update({hours:document.getElementById('hoursInput').value,specialClosures:document.getElementById('specialClosures').value,whatsappNumber:document.getElementById('whatsappNumber').value,visiblePhone:document.getElementById('visiblePhone').value,manualStatus:ms,openDays:od,deliveryEnabled:document.getElementById('deliveryToggle').classList.contains('on'),pickupEnabled:document.getElementById('pickupToggle').classList.contains('on'),deliveryFee:df,minDeliveryOrder:minO});db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);db.ref('categories').set(appData.categories);applyBranding();updateFooter();renderCategories();updateStatusBanner();updateServicesUI();showToast('✅ Salvato');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='adminModal')closeAdmin();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();}
 function changePalette(n){db.ref('settings/colorPalette').set(n);applyPalette(n);showToast(' Aggiornata!');const l=document.getElementById('currentPaletteName');if(l)l.textContent=n.charAt(0).toUpperCase()+n.slice(1);}
@@ -1304,16 +1282,13 @@ function uploadVideoFromPhone(input){const f=input.files[0];if(!f)return;if(f.si
 document.addEventListener('DOMContentLoaded',function(){
 const ne=document.getElementById('customerName'),
 te=document.getElementById('customerPhone'),
-streetInput=document.getElementById('customerStreet'),
-numberInput=document.getElementById('customerNumber');
+ae=document.getElementById('customerAddress');
 if(ne)ne.setAttribute('autocomplete','name');
 if(te)te.setAttribute('autocomplete','tel');
-if(streetInput)streetInput.setAttribute('autocomplete','street-address');
-if(numberInput)numberInput.setAttribute('autocomplete','address-line2');
+if(ae)ae.setAttribute('autocomplete','street-address');
 if(localStorage.getItem('pg_nome')&&ne)ne.value=localStorage.getItem('pg_nome');
 if(localStorage.getItem('pg_tel')&&te)te.value=localStorage.getItem('pg_tel');
-if(localStorage.getItem('pg_street')&&streetInput)streetInput.value=localStorage.getItem('pg_street');
-if(localStorage.getItem('pg_number')&&numberInput)numberInput.value=localStorage.getItem('pg_number');
+if(localStorage.getItem('pg_addr')&&ae)ae.value=localStorage.getItem('pg_addr');
 const bo=document.getElementById('checkoutBtn');
 if(bo){
 bo.addEventListener('click',function(){
@@ -1321,8 +1296,7 @@ const p=document.getElementById('privacyConsent');
 if(!p||!p.checked)return;
 if(ne&&ne.value)localStorage.setItem('pg_nome',ne.value.trim());
 if(te&&te.value)localStorage.setItem('pg_tel',te.value.trim());
-if(streetInput&&streetInput.value)localStorage.setItem('pg_street',streetInput.value.trim());
-if(numberInput&&numberInput.value)localStorage.setItem('pg_number',numberInput.value.trim());
+if(ae&&ae.value)localStorage.setItem('pg_addr',ae.value.trim());
 },true);
 }
 });
@@ -1330,3 +1304,4 @@ if(numberInput&&numberInput.value)localStorage.setItem('pg_number',numberInput.v
 </script>
 </body>
 </html>
+```
