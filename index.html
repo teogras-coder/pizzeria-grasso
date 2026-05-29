@@ -3,7 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Antica Pizzeria Grasso - Admin & Ordini</title>
+<title>Antica Pizzeria Grasso - Ordina Pizza Online a Manfredonia</title>
+<meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
+<link rel="canonical" href="https://pizzeriagrasso.vercel.app/">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-512.png">
+<meta name="theme-color" content="#d4a84b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pizzeria Grasso">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%235c4033'/%3E%3Cstop offset='50%25' stop-color='%233d2817'/%3E%3Cstop offset='100%25' stop-color='%231a0f0a'/%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f4e5c2'/%3E%3Cstop offset='20%25' stop-color='%23d4af37'/%3E%3Cstop offset='50%25' stop-color='%23b8941f'/%3E%3Cstop offset='80%25' stop-color='%238b6914'/%3E%3Cstop offset='100%25' stop-color='%235a440f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='80' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%F0%9F%8D%95%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='url(%23gold)' letter-spacing='5'%3EGRASSO%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="restaurant">
+<meta property="og:title" content="Antica Pizzeria Grasso">
+<meta property="og:description" content="La vera pizza a Manfredonia. Consegna a domicilio e ritiro.">
+<meta property="og:url" content="https://pizzeriagrasso.vercel.app/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Restaurant","name":"Antica Pizzeria Grasso","telephone":"+390884660377","address":{"@type":"PostalAddress","addressLocality":"Manfredonia","addressCountry":"IT"},"servesCuisine":"Pizza Italiana","priceRange":"€€","url":"https://pizzeriagrasso.vercel.app/"}
+</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -168,15 +192,11 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .img-upload-area i { font-size: 2rem; color: var(--gold); margin-bottom: 8px; }
 .img-upload-area p { color: #8a7a5a; font-size: 0.85rem; }
 .img-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 10px; }
-.category-admin-card { background: var(--card-light); padding: 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); display: flex; flex-direction: column; gap: 10px; }
-.category-admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid rgba(212,168,75,0.1); }
+.category-admin-card { background: var(--card-light); padding: 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
+.category-admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(212,168,75,0.1); }
 .category-admin-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 1.1rem; }
 .category-admin-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .category-admin-inputs input { padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
-.category-img-upload-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-.category-img-upload-box { width: 80px; height: 60px; border-radius: 8px; overflow: hidden; background: var(--dark); border: 1px dashed var(--gold-dark); position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.category-img-upload-box img { width: 100%; height: 100%; object-fit: cover; }
-.category-img-upload-box i { color: var(--text-muted); font-size: 1.5rem; }
 .add-category-btn { background: linear-gradient(180deg, #8e44ad 0%, #7d3c98 100%); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
 .promo-card { background: var(--card-light); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
 .promo-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -257,6 +277,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .driver-row { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
 .driver-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
 .driver-row .delete-product-btn { width: 32px; height: 32px; }
+.admin-category-accordion .category-img { height: 50px; border-radius: 6px; }
 .modal-content-3d { overflow-x: hidden !important; }
 .promo-product-row { grid-template-columns: 1fr 70px 50px auto !important; gap: 4px !important; }
 .promo-product-row select, .promo-product-row input, .category-admin-inputs input, .admin-product-inputs input { min-width: 0 !important; width: 100% !important; font-size: 0.72rem !important; padding: 6px 4px !important; }
@@ -586,14 +607,12 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="admin-toggle"><div><div style="color:var(--cream); font-weight:600;"><i class="fas fa-store"></i> Ritiro in Pizzeria</div></div><div class="toggle-switch on" id="pickupToggle" onclick="toggleSwitch(this)"></div></div>
 </div>
 <div id="admin-categories" class="admin-panel-content">
-<h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-layer-group"></i> Categorie & Foto</h3>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Gestisci le categorie e carica le foto direttamente da qui.</p>
+<h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-layer-group"></i> Categorie</h3>
 <div id="categoriesAdminList"></div>
 <button class="admin-save add-category-btn" onclick="addCategory()"><i class="fas fa-plus"></i> Aggiungi Categoria</button>
 </div>
 <div id="admin-menu" class="admin-panel-content">
 <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-utensils"></i> Prodotti per Categoria</h3>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Tutti i prodotti del menu sono qui. Clicca su una categoria per espanderla.</p>
 <div id="adminProducts"></div>
 </div>
 <div id="admin-images" class="admin-panel-content">
@@ -704,7 +723,7 @@ function setupRealtimeListeners(){
 db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val();renderCategories();renderAdminCategories();renderAdminProducts();}});
 db.ref('menu').on('value', s=>{if(s.exists()){appData.menu=s.val();renderCategories();renderAdminProducts();}});
 db.ref('settings').on('value', s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI();}});
-db.ref('images').on('value', s=>{if(s.exists()){appData.images=s.val();applyImages();renderAdminCategories();}});
+db.ref('images').on('value', s=>{if(s.exists()){appData.images=s.val();applyImages();}});
 db.ref('branding').on('value', s=>{if(s.exists()){appData.branding={...appData.branding,...s.val()};applyBranding();}});
 db.ref('promotions').on('value', s=>{appData.promotions=s.exists()?s.val():{};renderPromotionsBanner();renderAdminPromotions();});
 let isFirstLoad = true;
@@ -1064,80 +1083,83 @@ function closeCart(){
 document.getElementById('cartModal').classList.remove('active');
 showHome();
 }
-async function getGPSLocation(){
-const b=document.getElementById('gpsBtn'),
-streetInput=document.getElementById('customerStreet'),
-numberInput=document.getElementById('customerNumber');
-if(!navigator.geolocation){showToast('GPS non disponibile');return;}
-b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';
-try{
-const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
-const{latitude,longitude}=pos.coords;
-let coordsInput=document.getElementById('customerCoords');
-if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);}
-coordsInput.value=`${latitude},${longitude}`;
-const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
-const d=await r.json(),a=d.address;
-streetInput.value = a.road || a.pedestrian || '';
-numberInput.value = a.house_number || '';
-showToast('Posizione trovata!');
-}catch(e){showToast('Impossibile ottenere posizione');}
-finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';}
+async function getGPSLocation(){ 
+const b=document.getElementById('gpsBtn'), 
+streetInput=document.getElementById('customerStreet'), 
+numberInput=document.getElementById('customerNumber'); 
+if(!navigator.geolocation){showToast('GPS non disponibile');return;} 
+b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; 
+try{ 
+const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
+const{latitude,longitude}=pos.coords; 
+let coordsInput=document.getElementById('customerCoords'); 
+if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} 
+coordsInput.value=`${latitude},${longitude}`; 
+const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
+const d=await r.json(),a=d.address; 
+streetInput.value = a.road || a.pedestrian || ''; 
+numberInput.value = a.house_number || ''; 
+showToast('Posizione trovata!'); 
+}catch(e){showToast('Impossibile ottenere posizione');} 
+finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} 
 }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
-async function confirmAndSendOrder(){
-if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('Attendi 1 minuto');return;}
-const pc=document.getElementById('privacyConsent');
-if(!pc||!pc.checked){showToast('Accetta Privacy');return;}
-if(document.getElementById('honeypot').value!=='')return;
-const n=document.getElementById('customerName').value.trim();
-const p=document.getElementById('customerPhone').value.trim();
-const street=document.getElementById('customerStreet').value.trim();
-const number=document.getElementById('customerNumber').value.trim();
-const address = `${street} ${number}`;
-const nt=document.getElementById('customerNotes').value.trim();
-if(!n){showToast('Nome');return;}
-const ph=p.replace(/\D/g,'');
-if(!/^3[0-9]{9}$/.test(ph)){showToast('Telefono');return;}
-let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
-const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0;
-const minO=parseFloat(appData.settings.minDeliveryOrder)||0;
+async function confirmAndSendOrder(){ 
+if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('Attendi 1 minuto');return;} 
+const pc=document.getElementById('privacyConsent'); 
+if(!pc||!pc.checked){showToast('Accetta Privacy');return;} 
+if(document.getElementById('honeypot').value!=='')return; 
+const n=document.getElementById('customerName').value.trim(); 
+const p=document.getElementById('customerPhone').value.trim(); 
+const street=document.getElementById('customerStreet').value.trim(); 
+const number=document.getElementById('customerNumber').value.trim(); 
+const address = `${street} ${number}`; 
+const nt=document.getElementById('customerNotes').value.trim(); 
+if(!n){showToast('Nome');return;} 
+const ph=p.replace(/\D/g,''); 
+if(!/^3[0-9]{9}$/.test(ph)){showToast('Telefono');return;} 
+let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); 
+const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; 
+const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
 if(orderType==='delivery'){
 if(!street||!number){showToast('Completa indirizzo e civico');return;}
 if(pt+df<minO){showToast(`Minimo: €${minO}`);return;}
-}
-const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[];
-cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});});
-const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi};
-await sendOrder(oc);
+} 
+const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; 
+cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
+const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; 
+await sendOrder(oc); 
 }
 function counterKey(name){return String(name).replace(/[.#$\/\[\]]/g,'_');}
 function incrementProductCounters(items){const today=new Date().toISOString().split('T')[0];(items||[]).forEach(item=>{if(item.isPromo)return;const k=counterKey(item.name),q=item.qty||1;db.ref(`contatori/${today}/${k}`).transaction(v=>(v||0)+q);db.ref(`contatori_nomi/${today}/${k}`).set(item.name);});}
 function renderContatoriAdmin(data){const l=document.getElementById('contatoriList');if(!l)return;const today=new Date().toISOString().split('T')[0],day=data&&data[today]?data[today]:{},nomi=(window._contatoriNomi&&window._contatoriNomi[today])||{};const entries=Object.entries(day).map(([k,q])=>({name:nomi[k]||k.replace(/_/g,' '),qty:q})).sort((a,b)=>b.qty-a.qty);if(!entries.length){l.innerHTML='<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun ordine oggi</p>';return;}const tot=entries.reduce((s,e)=>s+e.qty,0);l.innerHTML=`<p style="color:var(--gold);font-weight:700;margin-bottom:12px;">Totale pezzi oggi: ${tot}</p>`+entries.map(e=>`<div class="counter-row"><span class="counter-row-name">${e.name}</span><span class="counter-row-qty">${e.qty}</span></div>`).join('');}
 function resetDailyCounters(){const today=new Date().toISOString().split('T')[0];if(!confirm('Azzerare i contatori di oggi?'))return;db.ref(`contatori/${today}`).remove().then(()=>db.ref(`contatori_nomi/${today}`).remove()).then(()=>showToast('✅ Contatori azzerati'));}
-async function sendOrder(d){
-const btn=document.getElementById('checkoutBtn');
-const cartBackup=[...cart];
-const promos=cart.filter(i=>i.isPromo);
-if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';}
-try{
-const ref=db.ref('ordini').push();
-const orderId='ORD-'+ref.key.slice(-6).toUpperCase();
-d.orderId=orderId;
-const coords=document.getElementById('customerCoords')?.value||null;
-const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO';
+async function sendOrder(d){ 
+const btn=document.getElementById('checkoutBtn'); 
+const cartBackup=[...cart]; 
+const promos=cart.filter(i=>i.isPromo); 
+if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} 
+try{ 
+const ref=db.ref('ordini').push(); 
+const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); 
+d.orderId=orderId; 
+const coords=document.getElementById('customerCoords')?.value||null; 
+const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO'; 
+
+// 🔧 RAGGRUPPAMENTO PRODOTTI PER CATEGORIA
 let catMap = {};
 (d.items||[]).forEach(item=>{
-let cat = item.cat || 'VARIE';
-let catName = (appData.categories[cat] && appData.categories[cat].name) ? appData.categories[cat].name : cat.toUpperCase();
-if(!catMap[cat]) catMap[cat] = {name: catName, items: []};
-catMap[cat].items.push(`${item.name} x${item.qty||1}  €${(item.price*(item.qty||1)).toFixed(2)}`);
+  let cat = item.cat || 'VARIE';
+  let catName = (appData.categories[cat] && appData.categories[cat].name) ? appData.categories[cat].name : cat.toUpperCase();
+  if(!catMap[cat]) catMap[cat] = {name: catName, items: []};
+  catMap[cat].items.push(`${item.name} x${item.qty||1}  €${(item.price*(item.qty||1)).toFixed(2)}`);
 });
 let itemsList = [];
 Object.keys(catMap).forEach(cat=>{
-itemsList.push(`--- ${catMap[cat].name} ---`);
-catMap[cat].items.forEach(line => itemsList.push(line));
+  itemsList.push(`--- ${catMap[cat].name} ---`);
+  catMap[cat].items.forEach(line => itemsList.push(line));
 });
+
 const printBody=[
 `ORDINE ${orderId}`,
 `${tipoLbl} • ${d.scheduledTime||'Subito'}`,
@@ -1152,30 +1174,31 @@ d.notes?`Note: ${d.notes}`:'',
 d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',
 `TOTALE: €${d.finalTotal.toFixed(2)}`,
 `${new Date().toLocaleString('it-IT')}`
-].filter(Boolean).join('\n');
-const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n"};
-await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat});
-localStorage.setItem('lastOrderTime',Date.now());
-incrementProductCounters(d.items);
-saveOrderToLocal(d);
-promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);});
-cart=[];updateCartBadge();closeCart();
+].filter(Boolean).join('\n'); 
+
+const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n"}; 
+await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat}); 
+localStorage.setItem('lastOrderTime',Date.now()); 
+incrementProductCounters(d.items); 
+saveOrderToLocal(d); 
+promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
+cart=[];updateCartBadge();closeCart(); 
 document.getElementById('customerName').value='';
 document.getElementById('customerPhone').value='';
 document.getElementById('customerStreet').value='';
 document.getElementById('customerNumber').value='';
 document.getElementById('customerNotes').value='';
 document.getElementById('scheduledTime').value='';
-document.getElementById('privacyConsent').checked=false;
-selectTimeMode('asap');showToast('✅ Ordine inviato in pizzeria!');
-}catch(e){
-console.error(e);
-cart=cartBackup;
-updateCartBadge();
-showToast('❌ Errore invio. Controlla la connessione e riprova.');
-}finally{
-if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';}
-}
+document.getElementById('privacyConsent').checked=false; 
+selectTimeMode('asap');showToast('✅ Ordine inviato in pizzeria!'); 
+}catch(e){ 
+console.error(e); 
+cart=cartBackup; 
+updateCartBadge(); 
+showToast('❌ Errore invio. Controlla la connessione e riprova.'); 
+}finally{ 
+if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} 
+} 
 }
 function openAdmin(){const p=prompt(" PIN:");if(p===(appData.settings.adminPin||"1234")){document.getElementById('adminModal').classList.add('active');renderAdminProducts();renderAdminCategories();renderAdminPromotions();loadAdminSettings();loadDriversAdmin();updateAdminImagePreviews();loadAdminReviews();}else if(p!==null)showToast("🔒 Errato");}
 function closeAdmin(){document.getElementById('adminModal').classList.remove('active');}
@@ -1200,155 +1223,67 @@ function updatePromo(id,f,v){db.ref(`promotions/${id}/${f}`).set(v);}
 function togglePromo(id){db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active);}
 function resetPromoUses(id){if(confirm("Resettare a 0?")){db.ref(`promotions/${id}/currentUses`).set(0);showToast('🔄 Resettato');}}
 function deletePromo(id){if(confirm("Eliminare?")){db.ref(`promotions/${id}`).remove();showToast('️ Eliminata');}}
-
-// *** NUOVA FUNZIONE RENDER ADMIN CATEGORIE CON UPLOAD IMMAGINI ***
-function renderAdminCategories(){
-    const l=document.getElementById('categoriesAdminList');
-    l.innerHTML=Object.keys(appData.categories).map(k=>{
-        const c=appData.categories[k];
-        const currentImg = (appData.images && appData.images.categories && appData.images.categories[k]) ? appData.images.categories[k] : '';
-        return `
-        <div class="category-admin-card">
-            <div class="category-admin-header">
-                <span class="category-admin-title">${c.name||k}</span>
-                <button class="delete-product-btn" onclick="deleteCategory('${k}')"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="display:flex; gap:15px; align-items:flex-start;">
-                <div style="flex:1;">
-                    <div style="margin-bottom:6px;">
-                        <label style="font-size:0.7rem; color:var(--gold);">Nome</label>
-                        <input type="text" value="${c.name||''}" onchange="updateCategory('${k}','name',this.value)" placeholder="Nome" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);">
-                    </div>
-                    <div>
-                        <label style="font-size:0.7rem; color:var(--gold);">Icona</label>
-                        <input type="text" value="${c.icon||''}" onchange="updateCategory('${k}','icon',this.value)" placeholder="fa-utensils" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);">
-                    </div>
-                </div>
-                <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
-                    <div class="category-img-upload-box">
-                        ${currentImg ? `<img src="${currentImg}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-image"></i>'}
-                    </div>
-                    <label style="cursor:pointer; background:var(--gold-dark); color:white; padding:6px 10px; border-radius:6px; font-size:0.7rem; text-align:center; display:flex; align-items:center; gap:4px;">
-                        📷 Cambia
-                        <input type="file" accept="image/*" style="display:none;" onchange="uploadCatImgInline('${k}', this)">
-                    </label>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
-// *** FUNZIONE UPLOAD IMMAGINE INLINE CON RIDIMENSIONAMENTO ***
-async function uploadCatImgInline(catKey, input){
-    if(!input.files[0]) return;
-    const f = input.files[0];
-    const toast = document.getElementById('toast');
-    toast.textContent = '⏳ Ottimizzazione...'; 
-    toast.classList.add('show');
-
-    try {
-        // 1. Ridimensionamento Canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        await new Promise((resolve) => {
-            img.onload = () => {
-                // Max 800px per lato, mantiene aspect ratio
-                const MAX = 800;
-                let w = img.width, h = img.height;
-                if (w > h) { if(w>MAX){h*=MAX/w; w=MAX;} }
-                else { if(h>MAX){w*=MAX/h; h=MAX;} }
-                canvas.width = w; canvas.height = h;
-                ctx.drawImage(img, 0, 0, w, h);
-                resolve();
-            };
-            img.src = URL.createObjectURL(f);
-        });
-
-        // 2. Converti in Blob JPEG
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-        
-        // 3. Upload a Firebase
-        const path = `images/categories/${catKey}`;
-        const snap = await storage.ref(path).put(blob, { contentType: 'image/jpeg' });
-        const url = await snap.ref.getDownloadURL();
-
-        // 4. Aggiorna App
-        if (!appData.images.categories) appData.images.categories = {};
-        appData.images.categories[catKey] = url;
-        db.ref(`images/categories/${catKey}`).set(url);
-
-        renderCategories();
-        renderAdminCategories();
-        toast.textContent = '✅ Foto caricata!';
-    } catch (e) {
-        console.error(e);
-        toast.textContent = '❌ Errore: ' + e.message;
-    } finally {
-        setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-}
-
+function renderAdminCategories(){const l=document.getElementById('categoriesAdminList');l.innerHTML=Object.keys(appData.categories).map(k=>{const c=appData.categories[k];return `<div class="category-admin-card"><div class="category-admin-header"><span class="category-admin-title">${c.name||k}</span><button class="delete-product-btn" onclick="deleteCategory('${k}')"><i class="fas fa-times"></i></button></div><div class="category-admin-inputs"><input type="text" value="${c.name||''}" onchange="updateCategory('${k}','name',this.value)" placeholder="Nome"><input type="text" value="${c.icon||''}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona"></div></div>`;}).join('');}
 function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast('❌ Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
 function updateCategory(k,f,v){appData.categories[k][f]=v;db.ref('categories').set(appData.categories);}
 function deleteCategory(k){if(!confirm(`Eliminare "${appData.categories[k].name}"?`))return;delete appData.categories[k];delete appData.menu[k];if(appData.images.categories)delete appData.images.categories[k];db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);}
 function renderAdminProducts(){
-    let h='';
-    Object.keys(appData.categories).forEach(c=>{
-        const ci=appData.categories[c],cn=ci.name,ic=ci.icon||'fa-utensils',pr=appData.menu[c]||[],op=openCategories.has(c);
-        h+=`<div class="admin-category-accordion ${op?'open':''}" id="accordion-${c}">
-        <div class="admin-category-header" onclick="toggleCategoryAccordion('${c}')">
-        <div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ic}"></i></div><span class="admin-category-header-title">${cn}</span></div>
-        <span class="admin-category-header-count">${pr.length}</span>
-        </div>
-        <div class="admin-category-body">
-        ${pr.map((p,i)=>`
-        <div class="admin-product-item">
-        <div class="admin-product-header"><span class="admin-product-name">${p.name}</span><button class="delete-product-btn" onclick="deleteProduct('${c}',${i})"><i class="fas fa-times"></i></button></div>
-        <div class="admin-product-inputs">
-        <input type="text" value="${p.name}" onchange="updateProduct('${c}',${i},'name',this.value)" placeholder="Nome">
-        <input type="text" value="${p.desc||''}" onchange="updateProduct('${c}',${i},'desc',this.value)" placeholder="Desc">
-        <input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${c}',${i},'price',parseFloat(this.value))" placeholder="Prezzo">
-        <div class="admin-product-img-wrapper">
-        ${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${i})" title="Clicca per rimuovere">` : ''}
-        <label class="admin-product-img-upload">
-        <i class="fas fa-camera"></i> Foto
-        <input type="file" accept="image/*" capture="environment" onchange="uploadProductImage('${c}',${i},this)">
-        </label>
-        </div>
-        </div>
-        </div>
-        `).join('')}
-        <button class="admin-save add-product-btn" style="margin-top:10px;" onclick="addProduct('${c}')"><i class="fas fa-plus"></i> Aggiungi</button>
-        </div>
-        </div>`;
-    });
-    document.getElementById('adminProducts').innerHTML=h;
+let h='';
+Object.keys(appData.categories).forEach(c=>{
+const ci=appData.categories[c],cn=ci.name,ic=ci.icon||'fa-utensils',pr=appData.menu[c]||[],op=openCategories.has(c);
+h+=`<div class="admin-category-accordion ${op?'open':''}" id="accordion-${c}">
+<div class="admin-category-header" onclick="toggleCategoryAccordion('${c}')">
+<div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ic}"></i></div><span class="admin-category-header-title">${cn}</span></div>
+<span class="admin-category-header-count">${pr.length}</span>
+</div>
+<div class="admin-category-body">
+${pr.map((p,i)=>`
+<div class="admin-product-item">
+<div class="admin-product-header"><span class="admin-product-name">${p.name}</span><button class="delete-product-btn" onclick="deleteProduct('${c}',${i})"><i class="fas fa-times"></i></button></div>
+<div class="admin-product-inputs">
+<input type="text" value="${p.name}" onchange="updateProduct('${c}',${i},'name',this.value)" placeholder="Nome">
+<input type="text" value="${p.desc||''}" onchange="updateProduct('${c}',${i},'desc',this.value)" placeholder="Desc">
+<input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${c}',${i},'price',parseFloat(this.value))" placeholder="Prezzo">
+<div class="admin-product-img-wrapper">
+${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${i})" title="Clicca per rimuovere">` : ''}
+<label class="admin-product-img-upload">
+<i class="fas fa-camera"></i> Foto
+<input type="file" accept="image/*" capture="environment" onchange="uploadProductImage('${c}',${i},this)">
+</label>
+</div>
+</div>
+</div>
+`).join('')}
+<button class="admin-save add-product-btn" style="margin-top:10px;" onclick="addProduct('${c}')"><i class="fas fa-plus"></i> Aggiungi</button>
+</div>
+</div>`;
+});
+document.getElementById('adminProducts').innerHTML=h;
 }
 function toggleCategoryAccordion(c){if(openCategories.has(c))openCategories.delete(c);else openCategories.add(c);const e=document.getElementById(`accordion-${c}`);if(e)e.classList.toggle('open');}
 function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
 function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
 function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
 async function uploadProductImage(cat, idx, input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { showToast('Max 2MB'); return; }
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        appData.menu[cat][idx].img = e.target.result;
-        await db.ref(`menu/${cat}/${idx}/img`).set(e.target.result);
-        renderAdminProducts();
-        renderProductList(currentSearchCat);
-        showToast('Foto caricata!');
-    };
-    reader.readAsDataURL(file);
+const file = input.files[0];
+if (!file) return;
+if (file.size > 2 * 1024 * 1024) { showToast('Max 2MB'); return; }
+const reader = new FileReader();
+reader.onload = async (e) => {
+appData.menu[cat][idx].img = e.target.result;
+await db.ref(`menu/${cat}/${idx}/img`).set(e.target.result);
+renderAdminProducts();
+renderProductList(currentSearchCat);
+showToast('Foto caricata!');
+};
+reader.readAsDataURL(file);
 }
 function removeProductImage(cat, idx) {
-    if (!confirm('Rimuovere foto?')) return;
-    delete appData.menu[cat][idx].img;
-    db.ref(`menu/${cat}/${idx}/img`).remove();
-    renderAdminProducts();
-    renderProductList(currentSearchCat);
+if (!confirm('Rimuovere foto?')) return;
+delete appData.menu[cat][idx].img;
+db.ref(`menu/${cat}/${idx}/img`).remove();
+renderAdminProducts();
+renderProductList(currentSearchCat);
 }
 function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;document.getElementById('minDeliveryInput').value=s.minDeliveryOrder!==undefined?s.minDeliveryOrder:15;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent=" CHIUSO";}else lb.textContent="Auto";const od=s.openDays?s.openDays.split(','):[];document.querySelectorAll('.day-toggle').forEach(el=>{if(od.includes(el.dataset.day))el.classList.add('active');else el.classList.remove('active');});db.ref('settings/driverLogo').once('value').then(s=>{const u=s.val();if(u){const pv=document.getElementById('driverLogoPreview');pv.src=u;pv.style.display='block';}});}
 function loadCategoryImageInput(){document.getElementById('categoryImageArea').style.display=document.getElementById('categorySelect').value?'block':'none';}
