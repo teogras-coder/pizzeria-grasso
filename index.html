@@ -913,6 +913,19 @@ const bo=document.getElementById('checkoutBtn');
 if(bo){bo.addEventListener('click',function(){const p=document.getElementById('privacyConsent');if(!p||!p.checked)return;if(ne&&ne.value)localStorage.setItem('pg_nome',ne.value.trim());if(te&&te.value)localStorage.setItem('pg_tel',te.value.trim());if(si&&si.value)localStorage.setItem('pg_street',si.value.trim());if(ni&&ni.value)localStorage.setItem('pg_number',ni.value.trim());},true);}
 });
 })();
+<script>
+// 🔄 REGISTRAZIONE SERVICE WORKER PER PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('✅ Service Worker registrato:', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('❌ Errore Service Worker:', error);
+      });
+  });
+}
 </script>
 </body>
 </html>
