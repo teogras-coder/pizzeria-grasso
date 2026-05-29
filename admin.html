@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Antica Pizzeria Grasso</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<style>
+:root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--cream); padding: 20px; min-height: 100vh; }
+h1, h2, h3, h4 { color: var(--gold); margin-bottom: 10px; }
+button { cursor: pointer; font-family: inherit; }
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; }
+.tab { background: var(--card); border: none; color: #8a7a5a; padding: 10px 15px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+.tab.active { background: var(--gold); color: var(--dark); }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: var(--card-light); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
+input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; }
+.btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; }
+.btn-gold { background: var(--gold); color: var(--dark); }
+.btn-red { background: #e74c3c; color: white; }
+.btn-green { background: #27ae60; color: white; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; z-index: 9999; opacity: 0; transition: all 0.3s ease; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.orders-group-title { padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; margin: 15px 0 8px; display: flex; align-items: center; gap: 8px; }
+.orders-group-title.new { background: #f87171; color: white; }
+.orders-group-title.preparing { background: #fbbf24; color: var(--dark); }
+.orders-group-title.ready { background: #4ade80; color: var(--dark); }
+.orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
+.order-card { background: var(--card-light); border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
+.order-card.new-order { border-left: 4px solid #f87171; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 50%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
+.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.order-id { color: var(--gold); font-weight: 700; }
+.order-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.order-action-btn { flex: 1; min-width: 80px; padding: 8px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
+.btn-prep { background: #fbbf24; color: var(--dark); }
+.btn-ready { background: #4ade80; color: var(--dark); }
+.btn-del { background: #60a5fa; color: white; }
+.btn-trash { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+.accordion { background: var(--card-light); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); overflow: hidden; }
+.accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 12px; }
+.accordion.open .accordion-body { max-height: 5000px; padding: 12px; border-top: 1px solid rgba(212,168,75,0.1); }
+.prod-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+.prod-img-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.prod-img-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 2px dashed var(--gold-dark); cursor: pointer; }
+.img-upload-label { font-size: 0.75rem; color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: rgba(212,168,75,0.1); border-radius: 6px; border: 1px solid var(--gold-dark); }
+.img-upload-label input { display: none; }
+</style>
+</head>
+<body>
+<h1>🔧 Pannello Admin</h1>
+<div class="tabs">
+<button class="tab active" onclick="showTab('orders', this)">Ordini</button>
+<button class="tab" onclick="showTab('menu', this)">Menu</button>
+<button class="tab" onclick="showTab('settings', this)">Impostazioni</button>
+<button class="tab" onclick="showTab('promo', this)">Promo</button>
+<button class="tab" onclick="showTab('reviews', this)">Recensioni</button>
+<button class="tab" onclick="showTab('export', this)">Export/Import</button>
+</div>
+
+<div id="orders" class="panel active">
+<h2><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h2>
+<div id="ordersList"></div>
+</div>
+
+<div id="menu" class="panel">
+<h2><i class="fas fa-utensils"></i> Gestione Menu</h2>
+<p style="color:#8a7a5a; margin-bottom:10px; font-size:0.8rem;">Clicca su una categoria per espanderla. Le altre si chiuderanno.</p>
+<div id="menuList"></div>
+<button class="btn btn-gold" onclick="addCategoryPrompt()"><i class="fas fa-plus"></i> Nuova Categoria</button>
+</div>
+
+<div id="settings" class="panel">
+<h2><i class="fas fa-cog"></i> Impostazioni Generali</h2>
+<div class="card">
+<label>Nome Pizzeria</label>
+<input type="text" id="setBrandName">
+<label>Telefono</label>
+<input type="text" id="setPhone">
+<label>Città</label>
+<input type="text" id="setCity">
+<label>Orari</label>
+<input type="text" id="setHours">
+<button class="btn btn-gold" onclick="saveSettings()">Salva Impostazioni</button>
+</div>
+</div>
+
+<div id="promo" class="panel">
+<h2><i class="fas fa-gift"></i> Promozioni</h2>
+<div id="promoList"></div>
+<button class="btn btn-green" onclick="addPromo()"><i class="fas fa-plus"></i> Nuova Promo</button>
+</div>
+
+<div id="reviews" class="panel">
+<h2><i class="fas fa-star"></i> Recensioni</h2>
+<div id="reviewsList"></div>
+</div>
+
+<div id="export" class="panel">
+<h2><i class="fas fa-file-export"></i> Backup Menu</h2>
+<div class="card">
+<p>Esporta il menu per fare un backup o importalo per ripristinarlo rapidamente.</p>
+<br>
+<button class="btn btn-gold" onclick="exportMenu()"><i class="fas fa-download"></i> Esporta JSON</button>
+<br><br>
+<input type="file" id="importFile" accept=".json" style="margin-bottom:10px;">
+<button class="btn btn-green" onclick="importMenu()"><i class="fas fa-upload"></i> Importa JSON</button>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+let appData = { categories: {}, menu: {
+  pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
+  focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
+  frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
+  bibite:[{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}]
+},
+
+document.addEventListener('DOMContentLoaded', ()=>{ loadAll(); setupListeners(); });
+
+function setupListeners(){
+db.ref('categories').on('value', s=>{if(s.exists()){appData.categories=s.val(); renderMenu();}});
+db.ref('menu').on('value', s=>{if(s.exists()){appData.menu=s.val(); renderMenu();}});
+db.ref('settings').on('value', s=>{if(s.exists()){appData.settings=s.val(); loadSettings();}});
+db.ref('promotions').on('value', s=>{appData.promotions=s.val()||{}; renderPromos();});
+db.ref('recensioni').on('value', s=>{loadReviews(s.val());});
+db.ref('ordini').orderByChild('timestamp').on('value', s=>{renderOrders(s.val());});
+}
+
+function loadAll(){
+db.ref('categories').once('value').then(s=>{if(s.exists())appData.categories=s.val();});
+db.ref('menu').once('value').then(s=>{if(s.exists())appData.menu=s.val();});
+db.ref('settings').once('value').then(s=>{if(s.exists()){appData.settings=s.val(); loadSettings();}});
+db.ref('promotions').once('value').then(s=>{appData.promotions=s.val()||{};});
+}
+
+function loadSettings(){
+document.getElementById('setBrandName').value = appData.settings.brandName || appData.settings.name || '';
+document.getElementById('setPhone').value = appData.settings.visiblePhone || appData.settings.whatsappNumber || '';
+document.getElementById('setCity').value = appData.settings.city || '';
+document.getElementById('setHours').value = appData.settings.hours || '';
+}
+
+function saveSettings(){
+db.ref('settings').update({
+name: document.getElementById('setBrandName').value,
+brandName: document.getElementById('setBrandName').value,
+visiblePhone: document.getElementById('setPhone').value,
+whatsappNumber: document.getElementById('setPhone').value,
+city: document.getElementById('setCity').value,
+hours: document.getElementById('setHours').value
+}).then(()=>showToast('✅ Salvato'));
+}
+
+// 📋 ORDINI
+function renderOrders(data){
+const l = document.getElementById('ordersList');
+if(!data){ l.innerHTML=''; return; }
+let html='';
+Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).forEach(o=>{
+const statusClass = o.status || 'new';
+const statusMap = {new:'Nuovi',preparing:'Prep',ready:'Pronti',delivered:'Consegnati'};
+html += `
+<div class="order-card ${statusClass}">
+<div class="order-header">
+<span class="order-id">#${o.orderId} - ${o.customerName}</span>
+<span>${new Date(o.timestamp).toLocaleTimeString()}</span>
+</div>
+<div>📞 ${o.customerPhone} | ${o.type==='delivery'?'🛵 Consegna':'🏪 Ritiro'}</div>
+<div style="margin-top:6px; font-size:0.85rem;">${o.items.map(i=>`${i.qty}x ${i.name}`).join(', ')}</div>
+<div style="color:var(--gold); font-weight:700; margin-top:4px;">Totale: €${(o.finalTotal||0).toFixed(2)}</div>
+<div class="order-actions">
+${statusClass==='new'?'<button class="order-action-btn btn-prep" onclick="updateStatus(\''+o.orderId+'\',\'preparing\')">🍕 Prep</button>':''}
+${statusClass==='preparing'?'<button class="order-action-btn btn-ready" onclick="updateStatus(\''+o.orderId+'\',\'ready\')">✅ Pronto</button>':''}
+${statusClass==='ready'?'<button class="order-action-btn btn-del" onclick="updateStatus(\''+o.orderId+'\',\'delivered\')">🛵 Cons.</button>':''}
+<button class="order-action-btn btn-trash" onclick="delOrder('${o.orderId}')">🗑️</button>
+</div>
+</div>`;
+});
+l.innerHTML = html;
+}
+function updateStatus(id, st){ db.ref(`ordini`).orderByChild('orderId').equalTo(id).once('value').then(s=>{s.forEach(c=>{c.ref.update({status:st});}); showToast('Stato aggiornato');}); }
+function delOrder(id){ if(confirm('Eliminare?')){ db.ref('ordini').orderByChild('orderId').equalTo(id).once('value').then(s=>{s.forEach(c=>c.ref.remove());}); } }
+
+// 🍕 MENU & ACCORDION
+function renderMenu(){
+const l = document.getElementById('menuList');
+if(!l) return;
+let h = '';
+Object.keys(appData.categories).forEach(c=>{
+const catInfo = appData.categories[c];
+const items = appData.menu[c] || [];
+h += `
+<div class="accordion" id="acc-${c}">
+<div class="accordion-header" onclick="toggleAccordion('${c}')">
+<strong>${catInfo.name} (${items.length})</strong>
+<div>
+<button class="btn btn-green" style="padding:4px 8px; font-size:0.7rem;" onclick="event.stopPropagation(); addProduct('${c}')">+ Piatto</button>
+<button class="btn btn-red" style="padding:4px 8px; font-size:0.7rem;" onclick="event.stopPropagation(); delCategory('${c}')">🗑️</button>
+</div>
+</div>
+<div class="accordion-body">
+${items.map((p,i)=>`
+<div class="prod-item">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<strong>${p.name}</strong>
+<button class="btn btn-red" style="padding:2px 6px; font-size:0.7rem;" onclick="delProduct('${c}',${i})">x</button>
+</div>
+<input type="text" value="${p.desc||''}" placeholder="Descrizione" oninput="updateProd('${c}',${i},'desc',this.value)">
+<input type="number" value="${p.price}" step="0.50" oninput="updateProd('${c}',${i},'price',parseFloat(this.value))">
+<div class="prod-img-wrap">
+${p.img ? `<img src="${p.img}" class="prod-img-preview" onclick="removeImg('${c}',${i})">` : '<div class="prod-img-preview" style="background:#333;"></div>'}
+<label class="img-upload-label">
+📷 ${p.img?'Cambia':'Foto'}
+<input type="file" accept="image/*" onchange="uploadProdImg('${c}',${i},this)">
+</label>
+</div>
+</div>`).join('')}
+</div>
+</div>`;
+});
+l.innerHTML = h;
+}
+
+function toggleAccordion(c){
+// Chiude tutti gli altri
+document.querySelectorAll('.accordion').forEach(el=>el.classList.remove('open'));
+// Apre quello cliccato
+document.getElementById('acc-'+c).classList.add('open');
+}
+
+function addCategoryPrompt(){
+const n = prompt('Nome Categoria (es: Pizze)');
+if(!n) return;
+const k = prompt('Chiave (es: pizze)');
+if(!k) return;
+db.ref(`categories/${k}`).set({name:n, icon:'fa-utensils'});
+db.ref(`menu/${k}`).set([]);
+showToast('Categoria aggiunta');
+}
+
+function delCategory(c){
+if(confirm('Eliminare questa categoria e tutti i suoi piatti?')){
+db.ref(`categories/${c}`).remove();
+db.ref(`menu/${c}`).remove();
+}
+}
+
+function addProduct(cat){
+const n = prompt('Nome Piatto');
+if(!n) return;
+const p = parseFloat(prompt('Prezzo', '5.00')) || 5;
+db.ref(`menu/${cat}`).push({name:n, price:p, desc:''});
+showToast('Piatto aggiunto');
+}
+
+function delProduct(c, i){
+// Get key and remove
+db.ref(`menu/${c}`).once('value').then(s=>{
+let keys = [];
+s.forEach(ch=>keys.push(ch.key));
+if(keys[i]) db.ref(`menu/${c}/${keys[i]}`).remove();
+});
+}
+
+function updateProd(c, i, f, v){
+db.ref(`menu/${c}`).once('value').then(s=>{
+let keys = [];
+s.forEach(ch=>keys.push(ch.key));
+if(keys[i]) db.ref(`menu/${c}/${keys[i]}/${f}`).set(v);
+});
+}
+
+async function uploadProdImg(c, i, input){
+const file = input.files[0];
+if(!file) return;
+const path = `menu/${c}/${i}/${Date.now()}.jpg`;
+const ref = firebase.storage().ref(path);
+await ref.put(file);
+const url = await ref.getDownloadURL();
+db.ref(`menu/${c}`).once('value').then(s=>{
+let keys = []; s.forEach(ch=>keys.push(ch.key));
+if(keys[i]) db.ref(`menu/${c}/${keys[i]}/img`).set(url);
+});
+showToast('Foto caricata');
+}
+
+function removeImg(c, i){
+if(confirm('Rimuovere foto?')){
+db.ref(`menu/${c}`).once('value').then(s=>{
+let keys = []; s.forEach(ch=>keys.push(ch.key));
+if(keys[i]) db.ref(`menu/${c}/${keys[i]}/img`).remove();
+});
+}
+}
+
+// 🎁 PROMO
+function renderPromos(){
+const l = document.getElementById('promoList');
+let h = '';
+Object.keys(appData.promotions).forEach(id=>{
+const p = appData.promotions[id];
+h += `
+<div class="card">
+<strong>${p.title}</strong>
+<div style="font-size:0.8rem; color:#8a7a5a;">Scade: ${p.endDate}</div>
+<div style="margin-top:6px;">
+<button class="btn btn-red" onclick="delPromo('${id}')">Elimina</button>
+</div>
+</div>`;
+});
+l.innerHTML = h;
+}
+
+function addPromo(){
+const t = prompt('Titolo Promo');
+if(!t) return;
+const d = prompt('Data fine (YYYY-MM-DD)');
+if(!d) return;
+db.ref('promotions').push({title:t, endDate:d, active:true, products:[], maxUses:50, currentUses:0});
+showToast('Promo creata');
+}
+
+function delPromo(id){
+if(confirm('Eliminare?')) db.ref(`promotions/${id}`).remove();
+}
+
+// ⭐ RECENSIONI
+function loadReviews(data){
+const l = document.getElementById('reviewsList');
+if(!data) return;
+let h = '';
+Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).forEach(r=>{
+h += `
+<div class="card">
+<div style="display:flex; justify-content:space-between;">
+<strong>${r.name}</strong>
+<span>${'⭐'.repeat(r.stars)}</span>
+</div>
+<div>${r.text}</div>
+<div style="margin-top:6px;">
+${r.status==='pending'?`
+<button class="btn btn-green" onclick="modReview('${r.id}','approved')">✅ Approva</button>
+<button class="btn btn-red" onclick="modReview('${r.id}','rejected')">❌ Rifiuta</button>
+`:''}
+</div>
+</div>`;
+});
+l.innerHTML = h;
+}
+
+function modReview(id, st){ db.ref(`recensioni/${id}`).update({status:st}); }
+
+// 💾 EXPORT / IMPORT
+function exportMenu(){
+const data = {
+categories: appData.categories,
+menu: appData.menu
+};
+const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `menu_backup_${new Date().toISOString().split('T')[0]}.json`;
+a.click();
+showToast('Menu esportato!');
+}
+
+function importMenu(){
+const file = document.getElementById('importFile').files[0];
+if(!file){ showToast('Seleziona un file JSON'); return; }
+const r = new FileReader();
+r.onload = e => {
+try {
+const data = JSON.parse(e.target.result);
+if(data.categories && data.menu){
+if(confirm('Questo sovrascriverà il menu attuale. Continuare?')){
+db.ref('categories').set(data.categories);
+db.ref('menu').set(data.menu);
+showToast('Menu importato con successo!');
+}
+} else { showToast('Formato non valido'); }
+} catch(err){ showToast('Errore file JSON'); }
+};
+r.readAsText(file);
+}
+
+// 🛠️ UTILS
+function showTab(id, btn){
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+btn.classList.add('active');
+}
+
+function showToast(msg){
+const t = document.getElementById('toast');
+t.textContent = msg;
+t.classList.add('show');
+setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
