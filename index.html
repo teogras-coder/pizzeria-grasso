@@ -1134,7 +1134,23 @@ const orderId='ORD-'+ref.key.slice(-6).toUpperCase();
 d.orderId=orderId; 
 const coords=document.getElementById('customerCoords')?.value||null; 
 const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO'; 
-const printBody=[`ORDINE ${orderId}`,`${tipoLbl} • ${d.scheduledTime||'Subito'}`,`Cliente: ${d.name}`,`Tel: ${d.phone}`,d.type==='delivery'?`Indirizzo: ${d.address}`:'',d.notes?`Note: ${d.notes}`:'','---',...(d.items||[]).map(i=>`${i.name} x${i.qty||1}  €${(i.price*(i.qty||1)).toFixed(2)}`),'---',`Prodotti: €${d.productsTotal.toFixed(2)}`,d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',`TOTALE: €${d.finalTotal.toFixed(2)}`,`${new Date().toLocaleString('it-IT')}`].filter(Boolean).join('\n'); 
+// Raggruppa prodotti per categoria
+let catMap = {};
+(d.items||[]).forEach(item=>{
+  let cat = item.cat || 'VARIE';
+  let catName = (appData.categories[cat] && appData.categories[cat].name) ? appData.categories[cat].name : cat.toUpperCase();
+  if(!catMap[cat]) catMap[cat] = {name: catName, items: []};
+  catMap[cat].items.push(`${item.name} x${item.qty||1}  €${(item.price*(item.qty||1)).toFixed(2)}`);
+});
+
+// Crea lista prodotti raggruppata
+let itemsList = [];
+Object.keys(catMap).forEach(cat=>{
+  itemsList.push(`--- ${catMap[cat].name} ---`);
+  catMap[cat].items.forEach(line => itemsList.push(line));
+});
+
+const printBody=[`ORDINE ${orderId}`,`${tipoLbl} • ${d.scheduledTime||'Subito'}`,`Cliente: ${d.name}`,`Tel: ${d.phone}`,d.type==='delivery'?`Indirizzo: ${d.address}`:'',d.notes?`Note: ${d.notes}`:'','---',...itemsList,'---',`Prodotti: €${d.productsTotal.toFixed(2)}`,d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',`TOTALE: €${d.finalTotal.toFixed(2)}`,`${new Date().toLocaleString('it-IT')}`].filter(Boolean).join('\n');
 const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n"}; 
 await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat}); 
 localStorage.setItem('lastOrderTime',Date.now()); 
