@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Antica Pizzeria Grasso</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<style>
+:root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--cream); height: 100vh; overflow: hidden; display: flex; }
+
+/* Sidebar */
+.sidebar { width: 260px; background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); border-right: 1px solid var(--gold-dark); display: flex; flex-direction: column; padding: 20px 0; overflow-y: auto; }
+.sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(212,168,75,0.2); margin-bottom: 10px; }
+.sidebar-header h2 { color: var(--gold); font-size: 1.2rem; font-weight: 700; }
+.sidebar-header p { color: #8a7a5a; font-size: 0.8rem; }
+.nav-btn { background: transparent; border: none; color: #a08b6d; padding: 12px 20px; text-align: left; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+.nav-btn:hover, .nav-btn.active { background: rgba(212,168,75,0.1); color: var(--gold); border-left: 3px solid var(--gold); }
+.nav-btn i { width: 20px; text-align: center; }
+
+/* Main Content */
+.main-content { flex: 1; overflow-y: auto; padding: 30px; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 100%); }
+.section { display: none; animation: fadeIn 0.3s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-title { font-size: 1.5rem; color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--gold-dark); padding-bottom: 10px; }
+.card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(212,168,75,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.card h3 { color: var(--gold-light); margin-bottom: 15px; font-size: 1.1rem; }
+
+/* Forms & Inputs */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gold-dark); background: var(--card-light); color: var(--cream); font-size: 0.9rem; }
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--gold-light); }
+.btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.1s; }
+.btn:active { transform: scale(0.98); }
+.btn-gold { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
+.btn-red { background: #e74c3c; color: white; }
+.btn-green { background: #4ade80; color: var(--dark); }
+.btn-blue { background: #60a5fa; color: white; }
+.btn-gray { background: var(--card-light); color: var(--cream); border: 1px solid var(--gold-dark); }
+
+/* Orders Grid */
+.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.order-card { background: var(--card-light); border-radius: 12px; padding: 15px; border-left: 4px solid var(--gold); position: relative; }
+.order-card.new { border-left-color: #f87171; }
+.order-card.preparing { border-left-color: #fbbf24; }
+.order-card.ready { border-left-color: #4ade80; }
+.order-card.delivered { border-left-color: #60a5fa; opacity: 0.7; }
+.order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.order-id { font-weight: 700; color: var(--gold); }
+.order-time { font-size: 0.8rem; color: #8a7a5a; }
+.order-info { font-size: 0.9rem; margin-bottom: 10px; }
+.order-items { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85rem; }
+.order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.order-actions button { flex: 1; padding: 6px; font-size: 0.8rem; }
+
+/* Menu Accordion */
+.accordion { background: var(--card-light); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.accordion-header { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); font-weight: 600; }
+.accordion-header:hover { background: rgba(212,168,75,0.1); }
+.accordion-body { padding: 15px; display: none; }
+.accordion.open .accordion-body { display: block; }
+.product-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.product-row input { flex: 1; padding: 6px; border-radius: 4px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); }
+.product-img-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px dashed var(--gold-dark); }
+
+/* Toggles */
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--gold); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  body { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 10px; border-right: none; border-bottom: 1px solid var(--gold-dark); }
+  .sidebar-header { display: none; }
+  .nav-btn { padding: 8px 12px; font-size: 0.8rem; white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+  .nav-btn.active { border-bottom-color: var(--gold); border-left: none; }
+  .main-content { padding: 15px; }
+  .orders-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2> Pizzeria Grasso</h2>
+    <p>Pannello di Gestione</p>
+  </div>
+  <button class="nav-btn active" onclick="showSection('orders')"><i class="fas fa-receipt"></i> Ordini</button>
+  <button class="nav-btn" onclick="showSection('menu')"><i class="fas fa-utensils"></i> Menu & Prodotti</button>
+  <button class="nav-btn" onclick="showSection('categories')"><i class="fas fa-layer-group"></i> Categorie</button>
+  <button class="nav-btn" onclick="showSection('services')"><i class="fas fa-concierge-bell"></i> Servizi & Delivery</button>
+  <button class="nav-btn" onclick="showSection('hours')"><i class="fas fa-clock"></i> Orari & Stato</button>
+  <button class="nav-btn" onclick="showSection('promos')"><i class="fas fa-gift"></i> Promozioni</button>
+  <button class="nav-btn" onclick="showSection('reviews')"><i class="fas fa-star"></i> Recensioni</button>
+  <button class="nav-btn" onclick="showSection('branding')"><i class="fas fa-paint-brush"></i> Branding & Foto</button>
+  <button class="nav-btn" onclick="showSection('settings')"><i class="fas fa-cog"></i> Impostazioni</button>
+</div>
+
+<div class="main-content">
+
+  <!-- ORDINI -->
+  <div id="orders" class="section active">
+    <div class="section-title"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</div>
+    <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+      <button class="btn btn-red" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Azzera Tutto</button>
+      <button class="btn btn-gray" onclick="clearOldOrdersFromDB()"><i class="fas fa-broom"></i> Pulisci Vecchi (>60gg)</button>
+    </div>
+    <div id="ordersList" class="orders-grid">
+      <div class="card" style="text-align:center; color:#8a7a5a;">Caricamento ordini...</div>
+    </div>
+  </div>
+
+  <!-- MENU & PRODOTTI -->
+  <div id="menu" class="section">
+    <div class="section-title"><i class="fas fa-utensils"></i> Gestione Menu</div>
+    <div id="adminProducts"></div>
+  </div>
+
+  <!-- CATEGORIE -->
+  <div id="categories" class="section">
+    <div class="section-title"><i class="fas fa-layer-group"></i> Categorie</div>
+    <div id="categoriesAdminList"></div>
+    <button class="btn btn-gold" onclick="addCategory()" style="margin-top:15px;"><i class="fas fa-plus"></i> Nuova Categoria</button>
+  </div>
+
+  <!-- SERVIZI -->
+  <div id="services" class="section">
+    <div class="section-title"><i class="fas fa-concierge-bell"></i> Servizi & Delivery</div>
+    <div class="card">
+      <h3>🛵 Consegna a Domicilio</h3>
+      <div class="toggle-row">
+        <span>Abilita Consegna</span>
+        <label class="switch"><input type="checkbox" id="deliveryToggle" onchange="toggleService('deliveryEnabled', this.checked)"><span class="slider"></span></label>
+      </div>
+      <div class="form-group" style="margin-top:15px;">
+        <label>Costo Consegna (€)</label>
+        <input type="number" id="deliveryFeeInput" step="0.50" onchange="updateSetting('deliveryFee', parseFloat(this.value))">
+      </div>
+      <div class="form-group">
+        <label>Minimo Ordine Consegna (€)</label>
+        <input type="number" id="minDeliveryInput" step="0.50" onchange="updateSetting('minDeliveryOrder', parseFloat(this.value))">
+      </div>
+    </div>
+    <div class="card">
+      <h3>🏪 Ritiro in Pizzeria</h3>
+      <div class="toggle-row">
+        <span>Abilita Ritiro</span>
+        <label class="switch"><input type="checkbox" id="pickupToggle" onchange="toggleService('pickupEnabled', this.checked)"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORARI -->
+  <div id="hours" class="section">
+    <div class="section-title"><i class="fas fa-clock"></i> Orari & Stato</div>
+    <div class="card">
+      <h3>Stato Manuale</h3>
+      <div class="toggle-row">
+        <span>Forza Apertura/Chiusura</span>
+        <select id="manualStatus" onchange="updateSetting('manualStatus', this.value)" style="width:120px;">
+          <option value="auto">Automatico</option>
+          <option value="open">Aperto Forzato</option>
+          <option value="closed">Chiuso Forzato</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Giorni di Apertura</h3>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <label class="day-toggle"><input type="checkbox" value="lun" onchange="updateDays()"> Lun</label>
+        <label class="day-toggle"><input type="checkbox" value="mar" onchange="updateDays()"> Mar</label>
+        <label class="day-toggle"><input type="checkbox" value="mer" onchange="updateDays()"> Mer</label>
+        <label class="day-toggle"><input type="checkbox" value="gio" onchange="updateDays()"> Gio</label>
+        <label class="day-toggle"><input type="checkbox" value="ven" onchange="updateDays()"> Ven</label>
+        <label class="day-toggle"><input type="checkbox" value="sab" onchange="updateDays()"> Sab</label>
+        <label class="day-toggle"><input type="checkbox" value="dom" onchange="updateDays()"> Dom</label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Fasce Orarie (HH:MM-HH:MM)</h3>
+      <textarea id="hoursInput" rows="2" onchange="updateSetting('hours', this.value)" placeholder="11:00-15:00,18:00-23:00"></textarea>
+    </div>
+  </div>
+
+  <!-- PROMOZIONI -->
+  <div id="promos" class="section">
+    <div class="section-title"><i class="fas fa-gift"></i> Promozioni</div>
+    <div id="promotionsAdminList"></div>
+    <div class="card" style="border:1px dashed var(--gold);">
+      <h3>+ Nuova Promozione</h3>
+      <div class="form-group"><label>Titolo</label><input type="text" id="newPromoTitle"></div>
+      <div class="form-group"><label>Messaggio</label><textarea id="newPromoMessage" rows="2"></textarea></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-group"><label>Data Inizio</label><input type="date" id="newPromoStart"></div>
+        <div class="form-group"><label>Data Fine</label><input type="date" id="newPromoEnd"></div>
+      </div>
+      <div class="form-group"><label>Max Utilizzi</label><input type="number" id="newPromoMaxUses" value="50"></div>
+      <div class="form-group"><label>Prodotti (seleziona dal menu)</label><div id="newPromoProductsList"></div><button class="btn btn-gray" onclick="addPromoProductRow('newPromoProductsList')" style="margin-top:5px;"><i class="fas fa-plus"></i> Aggiungi Prodotto</button></div>
+      <button class="btn btn-gold" onclick="createPromotion()"><i class="fas fa-save"></i> Crea Promozione</button>
+    </div>
+  </div>
+
+  <!-- RECENSIONI -->
+  <div id="reviews" class="section">
+    <div class="section-title"><i class="fas fa-star"></i> Recensioni Clienti</div>
+    <div id="adminReviewsList"></div>
+  </div>
+
+  <!-- BRANDING -->
+  <div id="branding" class="section">
+    <div class="section-title"><i class="fas fa-paint-brush"></i> Branding & Foto</div>
+    <div class="card">
+      <h3>Info Pizzeria</h3>
+      <div class="form-group"><label>Nome</label><input type="text" id="brandName" onchange="updateBranding('name', this.value)"></div>
+      <div class="form-group"><label>Sottotitolo</label><input type="text" id="brandSubtitle" onchange="updateBranding('subtitle', this.value)"></div>
+      <div class="form-group"><label>Città</label><input type="text" id="brandCity" onchange="updateBranding('city', this.value)"></div>
+    </div>
+    <div class="card">
+      <h3>Immagini</h3>
+      <div class="form-group">
+        <label>Hero Image (Principale)</label>
+        <input type="file" accept="image/*" onchange="uploadHeroImage(this)">
+      </div>
+      <div class="form-group">
+        <label>Foto Categorie</label>
+        <select id="categorySelect" onchange="loadCategoryImageInput()">
+          <option value="">Seleziona...</option>
+        </select>
+        <input type="file" accept="image/*" id="categoryImageInput" style="display:none;" onchange="uploadCategoryImage(this)">
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPOSTAZIONI -->
+  <div id="settings" class="section">
+    <div class="section-title"><i class="fas fa-cog"></i> Impostazioni Avanzate</div>
+    <div class="card">
+      <h3>Contatti</h3>
+      <div class="form-group"><label>Telefono Visibile</label><input type="tel" id="visiblePhone" onchange="updateSetting('visiblePhone', this.value)"></div>
+      <div class="form-group"><label>WhatsApp (opzionale)</label><input type="tel" id="whatsappNumber" onchange="updateSetting('whatsappNumber', this.value)"></div>
+    </div>
+    <div class="card">
+      <h3>Sicurezza</h3>
+      <div class="form-group"><label>Nuovo PIN Admin</label><input type="password" id="newPin"></div>
+      <div class="form-group"><label>Conferma PIN</label><input type="password" id="confirmPin"></div>
+      <button class="btn btn-gold" onclick="changePin()"><i class="fas fa-lock"></i> Cambia PIN</button>
+    </div>
+    <div class="card">
+      <h3>Palette Colori</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px;">
+        <button class="btn btn-gray" onclick="changePalette('autunno')">🍂 Autunno</button>
+        <button class="btn btn-gray" onclick="changePalette('inverno')">️ Inverno</button>
+        <button class="btn btn-gray" onclick="changePalette('primavera')">🌱 Primavera</button>
+        <button class="btn btn-gray" onclick="changePalette('estate')">☀️ Estate</button>
+        <button class="btn btn-gray" onclick="changePalette('natale')">🎄 Natale</button>
+        <button class="btn btn-gray" onclick="changePalette('notte')">🌙 Notte</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database(), storage = firebase.storage();
+
+let appData = { categories: {}, menu: {}, settings: {}, branding: {}, images: {}, promotions: {} };
+let openCategories = new Set();
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--gold); color:var(--dark); padding:10px 20px; border-radius:8px; font-weight:700; z-index:9999;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+// --- LOAD DATA ---
+function loadAll() {
+  db.ref('categories').on('value', s => { if(s.exists()) { appData.categories = s.val(); renderCategories(); renderAdminProducts(); updateCategorySelect(); } });
+  db.ref('menu').on('value', s => { if(s.exists()) { appData.menu = s.val(); renderCategories(); renderAdminProducts(); } });
+  db.ref('settings').on('value', s => { 
+    if(s.exists()) {
+      appData.settings = { ...appData.settings, ...s.val() };
+      loadSettingsUI();
+    }
+  });
+  db.ref('branding').on('value', s => { if(s.exists()) { appData.branding = { ...appData.branding, ...s.val() }; loadBrandingUI(); } });
+  db.ref('images').on('value', s => { if(s.exists()) appData.images = s.val(); });
+  db.ref('promotions').on('value', s => { appData.promotions = s.exists() ? s.val() : {}; renderPromotions(); });
+  db.ref('recensioni').on('value', s => { renderAdminReviews(s.val()); });
+  
+  let isFirstLoad = true;
+  db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => {
+    const o = {}; s.forEach(c => o[c.key] = c.val());
+    renderAdminOrders(o);
+    if(isFirstLoad) { Object.keys(o).forEach(k => knownOrderIds.add(k)); isFirstLoad = false; }
+    else {
+      Object.keys(o).forEach(id => {
+        if(!knownOrderIds.has(id)) {
+          const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+          audio.play().catch(()=>{});
+          showToast(' Nuovo Ordine!');
+        }
+        knownOrderIds.add(id);
+      });
+    }
+  });
+}
+
+let knownOrderIds = new Set();
+
+// --- RENDER ORDERS ---
+function renderAdminOrders(orders) {
+  const l = document.getElementById('ordersList');
+  if(!orders || Object.keys(orders).length === 0) {
+    l.innerHTML = '<div class="card" style="text-align:center; grid-column:1/-1;">Nessun ordine recente</div>';
+    return;
+  }
+  const sorted = Object.entries(orders).sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
+  l.innerHTML = sorted.map(([id, o]) => {
+    const dt = new Date(o.timestamp||0);
+    const statusClass = o.status || 'new';
+    const itemsHtml = (o.items||[]).map(i => `<div>▸ ${i.name} x${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('');
+    let actions = '';
+    if(statusClass === 'new') actions = `<button class="btn btn-green" onclick="updateOrderStatus('${id}','preparing')"> Prepara</button><button class="btn btn-red" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+    else if(statusClass === 'preparing') actions = `<button class="btn btn-blue" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="btn btn-red" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+    else if(statusClass === 'ready') actions = `<button class="btn btn-gold" onclick="updateOrderStatus('${id}','delivered')">🛵 Consegnato</button><button class="btn btn-red" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+    else actions = `<button class="btn btn-red" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+    
+    return `<div class="order-card ${statusClass}">
+      <div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${dt.toLocaleDateString()} ${dt.toLocaleTimeString()}</span></div>
+      <div class="order-info"><strong>${o.customerName||'N/A'}</strong> • ${o.customerPhone||'N/A'}<br>${o.type==='delivery'?'🛵 Consegna':' Ritiro'} ${o.scheduledTime?'• '+o.scheduledTime:''}<br>${o.type==='delivery'&&o.address?'📍 '+o.address:''}</div>
+      <div class="order-items">${itemsHtml}</div>
+      <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:10px;"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div>
+      <div class="order-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+
+function updateOrderStatus(id, st) { db.ref(`ordini/${id}/status`).set(st); showToast('Aggiornato'); }
+function deleteOrder(id) { if(confirm('Eliminare?')) db.ref(`ordini/${id}`).remove(); }
+function clearAllOrders() { if(confirm('ELIMINARE TUTTI GLI ORDINI?')) db.ref('ordini').remove(); }
+function clearOldOrdersFromDB() {
+  if(!confirm('Pulire ordini >60gg?')) return;
+  const cutoff = Date.now() - (60*24*60*60*1000);
+  db.ref('ordini').orderByChild('timestamp').endAt(cutoff).once('value', snap => {
+    let count=0; snap.forEach(c => { if(c.val().status==='delivered'){c.ref.remove(); count++;} });
+    showToast(`Puliti ${count} ordini`);
+  });
+}
+
+// --- RENDER MENU & CATEGORIES ---
+function renderAdminProducts() {
+  const container = document.getElementById('adminProducts');
+  if(!appData.categories || !appData.menu) return;
+  container.innerHTML = Object.keys(appData.categories).map(cat => {
+    const info = appData.categories[cat];
+    const products = appData.menu[cat] || [];
+    const isOpen = openCategories.has(cat);
+    return `<div class="accordion ${isOpen?'open':''}">
+      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <span>${info.name} (${products.length})</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="accordion-body">
+        ${products.map((p, i) => `
+          <div class="product-row">
+            <img src="${p.img||''}" class="product-img-thumb" onclick="document.getElementById('img-${cat}-${i}').click()">
+            <input type="file" id="img-${cat}-${i}" style="display:none" accept="image/*" onchange="uploadProductImage('${cat}', ${i}, this)">
+            <input type="text" value="${p.name}" onchange="updateProduct('${cat}',${i},'name',this.value)">
+            <input type="number" step="0.50" value="${p.price}" style="width:80px;" onchange="updateProduct('${cat}',${i},'price',parseFloat(this.value))">
+            <button class="btn btn-red" onclick="deleteProduct('${cat}',${i})" style="padding:6px 10px;"><i class="fas fa-trash"></i></button>
+          </div>
+        `).join('')}
+        <button class="btn btn-gold" onclick="addProduct('${cat}')" style="margin-top:10px;"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addProduct(cat) {
+  const name = prompt("Nome prodotto:");
+  if(!name) return;
+  const price = parseFloat(prompt("Prezzo:", "5.00")) || 5;
+  if(!appData.menu[cat]) appData.menu[cat] = [];
+  appData.menu[cat].push({ name, price, desc: "" });
+  db.ref('menu').set(appData.menu);
+}
+function deleteProduct(cat, i) {
+  if(confirm("Eliminare prodotto?")) {
+    appData.menu[cat].splice(i, 1);
+    db.ref('menu').set(appData.menu);
+  }
+}
+function updateProduct(cat, i, field, val) {
+  appData.menu[cat][i][field] = val;
+  db.ref('menu').set(appData.menu);
+}
+async function uploadProductImage(cat, idx, input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    appData.menu[cat][idx].img = e.target.result;
+    await db.ref(`menu/${cat}/${idx}/img`).set(e.target.result);
+    showToast("Foto caricata");
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderCategories() {
+  const l = document.getElementById('categoriesAdminList');
+  if(!appData.categories) return;
+  l.innerHTML = Object.keys(appData.categories).map(k => {
+    const c = appData.categories[k];
+    return `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <input type="text" value="${c.name}" style="background:transparent; border:none; color:var(--gold); font-size:1.1rem; font-weight:700; width:200px;" onchange="updateCategory('${k}','name',this.value)">
+        <input type="text" value="${c.icon||''}" style="background:transparent; border:none; color:#8a7a5a; font-size:0.9rem; width:150px;" onchange="updateCategory('${k}','icon',this.value)">
+      </div>
+      <button class="btn btn-red" onclick="deleteCategory('${k}')"><i class="fas fa-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+function addCategory() {
+  const name = prompt("Nome categoria:");
+  if(!name) return;
+  const icon = prompt("Icona (es: fa-pizza-slice):", "fa-utensils") || "fa-utensils";
+  const key = prompt("Chiave (minuscole, es: pizze):");
+  if(!key) return;
+  appData.categories[key] = { name, icon };
+  if(!appData.menu[key]) appData.menu[key] = [];
+  db.ref('categories').set(appData.categories);
+  db.ref('menu').set(appData.menu);
+}
+function deleteCategory(k) {
+  if(confirm("Eliminare categoria e prodotti?")) {
+    delete appData.categories[k];
+    delete appData.menu[k];
+    db.ref('categories').set(appData.categories);
+    db.ref('menu').set(appData.menu);
+  }
+}
+function updateCategory(k, f, v) {
+  appData.categories[k][f] = v;
+  db.ref('categories').set(appData.categories);
+}
+function updateCategorySelect() {
+  const sel = document.getElementById('categorySelect');
+  sel.innerHTML = '<option value="">Seleziona...</option>' + Object.keys(appData.categories).map(k => `<option value="${k}">${appData.categories[k].name}</option>`).join('');
+}
+
+// --- SETTINGS & SERVICES ---
+function loadSettingsUI() {
+  const s = appData.settings;
+  document.getElementById('deliveryToggle').checked = s.deliveryEnabled !== false;
+  document.getElementById('pickupToggle').checked = s.pickupEnabled !== false;
+  document.getElementById('deliveryFeeInput').value = s.deliveryFee || 0;
+  document.getElementById('minDeliveryInput').value = s.minDeliveryOrder || 0;
+  document.getElementById('manualStatus').value = s.manualStatus || 'auto';
+  document.getElementById('hoursInput').value = s.hours || '';
+  document.getElementById('visiblePhone').value = s.visiblePhone || '';
+  document.getElementById('whatsappNumber').value = s.whatsappNumber || '';
+  
+  // Days
+  const days = (s.openDays || '').split(',');
+  document.querySelectorAll('#hours .day-toggle input').forEach(cb => {
+    cb.checked = days.includes(cb.value);
+  });
+}
+function toggleService(key, val) { appData.settings[key] = val; db.ref(`settings/${key}`).set(val); }
+function updateSetting(key, val) { appData.settings[key] = val; db.ref(`settings/${key}`).set(val); }
+function updateDays() {
+  const days = Array.from(document.querySelectorAll('#hours .day-toggle input:checked')).map(cb => cb.value);
+  appData.settings.openDays = days.join(',');
+  db.ref('settings/openDays').set(appData.settings.openDays);
+}
+function changePin() {
+  const np = document.getElementById('newPin').value;
+  const cp = document.getElementById('confirmPin').value;
+  if(!np || np.length < 4) { showToast("PIN troppo corto"); return; }
+  if(np !== cp) { showToast("PIN non coincidono"); return; }
+  db.ref('settings/adminPin').set(np);
+  showToast("PIN Cambiato");
+  document.getElementById('newPin').value = '';
+  document.getElementById('confirmPin').value = '';
+}
+function changePalette(n) {
+  db.ref('settings/colorPalette').set(n);
+  showToast("Tema aggiornato");
+}
+
+// --- BRANDING ---
+function loadBrandingUI() {
+  document.getElementById('brandName').value = appData.branding.name || '';
+  document.getElementById('brandSubtitle').value = appData.branding.subtitle || '';
+  document.getElementById('brandCity').value = appData.branding.city || '';
+}
+function updateBranding(f, v) {
+  appData.branding[f] = v;
+  db.ref(`branding/${f}`).set(v);
+}
+function uploadHeroImage(input) {
+  const f = input.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    appData.images.hero = e.target.result;
+    db.ref('images/hero').set(e.target.result);
+    showToast("Hero Image caricata");
+  };
+  r.readAsDataURL(f);
+}
+function loadCategoryImageInput() {
+  const val = document.getElementById('categorySelect').value;
+  document.getElementById('categoryImageInput').style.display = val ? 'block' : 'none';
+}
+function uploadCategoryImage(input) {
+  const cat = document.getElementById('categorySelect').value;
+  const f = input.files[0];
+  if(!cat || !f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    appData.images.categories[cat] = e.target.result;
+    db.ref(`images/categories/${cat}`).set(e.target.result);
+    showToast("Foto categoria caricata");
+  };
+  r.readAsDataURL(f);
+}
+
+// --- PROMOTIONS ---
+function renderPromotions() {
+  const l = document.getElementById('promotionsAdminList');
+  const ps = Object.entries(appData.promotions || {});
+  if(!ps.length) { l.innerHTML = '<div class="card">Nessuna promozione attiva</div>'; return; }
+  l.innerHTML = ps.map(([id, p]) => {
+    const isActive = p.active && new Date() >= new Date(p.startDate) && new Date() <= new Date(p.endDate);
+    return `<div class="card" style="border-left:4px solid ${isActive?'#4ade80':'#f87171'}">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <h3>${p.title} ${isActive?'<span style="font-size:0.8rem; background:#4ade80; color:var(--dark); padding:2px 6px; border-radius:4px;">ATTIVA</span>':''}</h3>
+          <p style="color:#8a7a5a; font-size:0.9rem;">${p.message||''}</p>
+          <p style="font-size:0.8rem;">📅 ${p.startDate} → ${p.endDate} | Utilizzi: ${p.currentUses||0}/${p.maxUses}</p>
+        </div>
+        <div style="display:flex; gap:5px;">
+          <button class="btn ${p.active?'btn-red':'btn-green'}" onclick="togglePromo('${id}')">${p.active?'Disattiva':'Attiva'}</button>
+          <button class="btn btn-red" onclick="deletePromo('${id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:0.85rem; color:var(--cream);">
+        ${(p.products||[]).map(pr => `<span style="display:inline-block; background:rgba(0,0,0,0.3); padding:2px 8px; border-radius:4px; margin:2px;">${pr.name} (€${pr.price})</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function addPromoProductRow(cid) {
+  const c = document.getElementById(cid);
+  const row = document.createElement('div');
+  row.style.cssText = "display:flex; gap:5px; margin-bottom:5px;";
+  let opts = '<option value="">Seleziona...</option>';
+  Object.keys(appData.categories).forEach(cat => {
+    opts += `<optgroup label="${appData.categories[cat].name}">`;
+    (appData.menu[cat]||[]).forEach(p => {
+      opts += `<option value="${p.name}|||${p.price}">${p.name} - €${p.price}</option>`;
+    });
+    opts += `</optgroup>`;
+  });
+  row.innerHTML = `<select style="flex:1; padding:5px; background:var(--card); color:var(--cream); border:1px solid var(--gold-dark);">${opts}</select>
+    <input type="number" step="0.50" placeholder="Prezzo" style="width:80px; padding:5px; background:var(--card); color:var(--cream); border:1px solid var(--gold-dark);">
+    <button class="btn btn-red" onclick="this.parentElement.remove()" style="padding:5px;"><i class="fas fa-times"></i></button>`;
+  c.appendChild(row);
+}
+function createPromotion() {
+  const t = document.getElementById('newPromoTitle').value.trim();
+  const m = document.getElementById('newPromoMessage').value.trim();
+  const s = document.getElementById('newPromoStart').value;
+  const e = document.getElementById('newPromoEnd').value;
+  const mx = parseInt(document.getElementById('newPromoMaxUses').value) || 50;
+  const rows = document.querySelectorAll('#newPromoProductsList > div');
+  const products = [];
+  rows.forEach(r => {
+    const sel = r.querySelector('select').value;
+    const price = parseFloat(r.querySelector('input').value);
+    if(sel && !isNaN(price)) {
+      const [name, p] = sel.split('|||');
+      products.push({ name, price });
+    }
+  });
+  if(!t || !s || !e || !products.length) { showToast("Compila tutti i campi"); return; }
+  const id = 'promo_' + Date.now();
+  db.ref(`promotions/${id}`).set({ title:t, message:m, startDate:s, endDate:e, maxUses:mx, currentUses:0, active:true, products });
+  showToast("Promozione creata");
+  document.getElementById('newPromoTitle').value = '';
+  document.getElementById('newPromoMessage').value = '';
+  document.getElementById('newPromoProductsList').innerHTML = '';
+}
+function togglePromo(id) {
+  const current = appData.promotions[id];
+  db.ref(`promotions/${id}/active`).set(!current.active);
+}
+function deletePromo(id) {
+  if(confirm("Eliminare?")) db.ref(`promotions/${id}`).remove();
+}
+
+// --- REVIEWS ---
+function renderAdminReviews(data) {
+  const container = document.getElementById('adminReviewsList');
+  if(!data) { container.innerHTML = ''; return; }
+  const reviews = Object.entries(data).sort((a,b) => b[1].timestamp - a[1].timestamp);
+  container.innerHTML = reviews.map(([id, r]) => `
+    <div class="card" style="border-left:4px solid ${r.status==='approved'?'#4ade80':r.status==='rejected'?'#f87171':'#fbbf24'}">
+      <div style="display:flex; justify-content:space-between;">
+        <div>
+          <strong>${r.name}</strong> <span style="color:var(--gold);">⭐${r.stars}</span> <span style="font-size:0.8rem; color:#8a7a5a;">${new Date(r.timestamp).toLocaleDateString()}</span>
+          ${r.orderId && r.orderId!=='Anonimo' ? `<span style="font-size:0.7rem; background:rgba(74,222,128,0.2); color:#4ade80; padding:1px 5px; border-radius:3px; margin-left:5px;">Verificato</span>` : ''}
+        </div>
+        <div style="display:flex; gap:5px;">
+          ${r.status==='pending' ? `<button class="btn btn-green" onclick="updateReviewStatus('${id}','approved')">✅</button><button class="btn btn-red" onclick="updateReviewStatus('${id}','rejected')">❌</button>` : ''}
+          <button class="btn btn-gray" onclick="deleteReview('${id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <p style="margin-top:8px; font-size:0.9rem;">${r.text}</p>
+    </div>
+  `).join('');
+}
+function updateReviewStatus(id, status) {
+  db.ref(`recensioni/${id}/status`).set(status);
+  showToast("Aggiornata");
+}
+function deleteReview(id) {
+  if(confirm("Eliminare recensione?")) db.ref(`recensioni/${id}`).remove();
+}
+
+// Init
+window.onload = loadAll;
+</script>
+</body>
+</html>
