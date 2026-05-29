@@ -1,14 +1,3 @@
-Hai perfettamente ragione. Il codice che c'era prima usava `capture="environment"`, che forza la fotocamera del telefono. Se lo togliamo, ti chiederà se vuoi scattare o scegliere dalla **Galleria**.
-
-Inoltre, ho aggiunto una funzione di **ridimensionamento automatico**: prima di salvare la foto, l'app la comprime e la riduce (massimo 600px) per non intasare il database e rendere l'app velocissima.
-
-Ecco il file **COMPLETO** con queste due correzioni:
-1.  **Galleria + Fotocamera**: Ora puoi scegliere da dove caricare.
-2.  **Ridimensionamento**: Le foto vengono automaticamente ottimizzate.
-
-Copia tutto e sostituisci il tuo file:
-
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -95,6 +84,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .search-bar-3d input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 14px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 1rem; outline: none; box-shadow: 0 4px 0 var(--shadow); }
 .search-bar-3d i { position: absolute; left: 15px; top: 14px; color: var(--gold); z-index: 2; }
 .product-card-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--brown) 100%); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 0 var(--shadow); border: 1px solid rgba(212,168,75,0.1); }
+/* ✅ STILI IMMAGINI PRODOTTI */
 .product-img-square { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 12px; border: 1px solid rgba(212,168,75,0.3); flex-shrink: 0; background: var(--card); }
 .product-info { flex: 1; }
 .product-info h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream); margin-bottom: 4px; }
@@ -192,6 +182,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .delete-product-btn { background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; }
 .admin-product-inputs { display: flex; flex-direction: column; gap: 8px; }
 .admin-product-inputs input { padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
+/* ✅ STILI ADMIN IMMAGINI */
 .admin-product-img-wrapper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .admin-product-img-preview { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px dashed var(--gold-dark); cursor: pointer; }
 .admin-product-img-upload { font-size: 0.75rem; color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -1039,6 +1030,7 @@ renderProductList(c);
 window.scrollTo(0,0);
 setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
+// ✅ FIX: Render prodotti con immagine
 function renderProductList(cat, filterTerm) {
 if (!cat || !appData.menu || !appData.menu[cat]) return;
 const term = (filterTerm || '').toLowerCase();
@@ -1049,6 +1041,7 @@ if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#
 list.innerHTML = filtered.map((p) => {
 const idx = appData.menu[cat].indexOf(p);
 const qty = getCartQty(cat, p.name);
+// Mostra immagine se presente
 const imgHtml = p.img ? `<img src="${p.img}" class="product-img-square" alt="${p.name}" onerror="this.style.display='none'">` : '';
 const qtyUi = qty > 0
 ? `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${idx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${idx}" data-delta="1">+</button></div>`
@@ -1078,13 +1071,66 @@ function closeCart(){
 document.getElementById('cartModal').classList.remove('active');
 showHome();
 }
-async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast('GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('Posizione trovata!'); }catch(e){showToast('Impossibile ottenere posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
+async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),i=document.getElementById('customerAddress'); if(!navigator.geolocation){showToast(' GPS non disponibile');return;} b.classList.add('loading');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; let coordsInput=document.getElementById('customerCoords'); if(!coordsInput){coordsInput=document.createElement('input');coordsInput.type='hidden';coordsInput.id='customerCoords';coordsInput.name='coords';document.getElementById('customerForm').appendChild(coordsInput);} coordsInput.value=`${latitude},${longitude}`; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; // Compila Via, Numero e Città in un unico campo i.value=[a.road,a.house_number,a.city||a.town].filter(Boolean).join(', ')||`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`; showToast('Posizione trovata!'); }catch(e){showToast('Impossibile ottenere posizione');} finally{b.classList.remove('loading');b.disabled=false;b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
 function validatePhoneNumber(p){const c=p.replace(/\D/g,'');return c.length>=9&&c.length<=15;}
 async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast('Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const a=document.getElementById('customerAddress').value.trim(); const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){if(a.length<10){showToast(' Indirizzo');return;}if(pt+df<minO){showToast(`Minimo: €${minO}`);return;}} const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:a,notes:nt,type:orderType,scheduledTime:st,orderTimeStr:new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
 function counterKey(name){return String(name).replace(/[.#$\/\[\]]/g,'_');}
 function incrementProductCounters(items){const today=new Date().toISOString().split('T')[0];(items||[]).forEach(item=>{if(item.isPromo)return;const k=counterKey(item.name),q=item.qty||1;db.ref(`contatori/${today}/${k}`).transaction(v=>(v||0)+q);db.ref(`contatori_nomi/${today}/${k}`).set(item.name);});}
 function renderContatoriAdmin(data){const l=document.getElementById('contatoriList');if(!l)return;const today=new Date().toISOString().split('T')[0],day=data&&data[today]?data[today]:{},nomi=(window._contatoriNomi&&window._contatoriNomi[today])||{};const entries=Object.entries(day).map(([k,q])=>({name:nomi[k]||k.replace(/_/g,' '),qty:q})).sort((a,b)=>b.qty-a.qty);if(!entries.length){l.innerHTML='<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun ordine oggi</p>';return;}const tot=entries.reduce((s,e)=>s+e.qty,0);l.innerHTML=`<p style="color:var(--gold);font-weight:700;margin-bottom:12px;">Totale pezzi oggi: ${tot}</p>`+entries.map(e=>`<div class="counter-row"><span class="counter-row-name">${e.name}</span><span class="counter-row-qty">${e.qty}</span></div>`).join('');}
 function resetDailyCounters(){const today=new Date().toISOString().split('T')[0];if(!confirm('Azzerare i contatori di oggi?'))return;db.ref(`contatori/${today}`).remove().then(()=>db.ref(`contatori_nomi/${today}`).remove()).then(()=>showToast('✅ Contatori azzerati'));}
+
+// ✅ FUNZIONE RIDIMENSIONAMENTO IMMAGINE (Max 600px, Qualità 70%)
+function resizeImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600;
+            const MAX_HEIGHT = 600;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            callback(canvas.toDataURL('image/jpeg', 0.7)); // Compressione JPEG 70%
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ✅ UPLOAD IMMAGINE PRODOTTO CON RIDIMENSIONAMENTO
+async function uploadProductImage(cat, idx, input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('Max 2MB'); return; }
+    
+    // Ridimensiona prima di salvare
+    resizeImage(file, async (resizedDataUrl) => {
+        appData.menu[cat][idx].img = resizedDataUrl;
+        await db.ref(`menu/${cat}/${idx}/img`).set(resizedDataUrl);
+        renderAdminProducts();
+        renderProductList(currentSearchCat);
+        showToast('Foto ottimizzata e caricata!');
+    });
+}
+
+function removeProductImage(cat, idx) {
+    if (!confirm('Rimuovere foto?')) return;
+    delete appData.menu[cat][idx].img;
+    db.ref(`menu/${cat}/${idx}/img`).remove();
+    renderAdminProducts();
+    renderProductList(currentSearchCat);
+}
+
+// ✅ SEND ORDER CON RAGGRUPPAMENTO PER CATEGORIA
 async function sendOrder(d){ 
 const btn=document.getElementById('checkoutBtn'); 
 const cartBackup=[...cart]; 
@@ -1177,6 +1223,8 @@ function renderAdminCategories(){const l=document.getElementById('categoriesAdmi
 function addCategory(){const n=prompt("Nome:");if(!n)return;const i=prompt("Icona:","fa-utensils")||"fa-utensils",k=prompt("Chiave (minuscole):");if(!k||!/^[a-z][a-z0-9_]*$/.test(k)||appData.categories[k]){showToast('❌ Chiave');return;}appData.categories[k]={name:n,icon:i};if(!appData.menu[k])appData.menu[k]=[];if(!appData.images.categories[k])appData.images.categories[k]='';db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);showToast('✅ Aggiunta');}
 function updateCategory(k,f,v){appData.categories[k][f]=v;db.ref('categories').set(appData.categories);}
 function deleteCategory(k){if(!confirm(`Eliminare "${appData.categories[k].name}"?`))return;delete appData.categories[k];delete appData.menu[k];if(appData.images.categories)delete appData.images.categories[k];db.ref('categories').set(appData.categories);db.ref('menu').set(appData.menu);db.ref('images').set(appData.images);}
+
+// ✅ RENDER ADMIN PRODOTTI CON UPLOAD FOTO
 function renderAdminProducts(){
 let h='';
 Object.keys(appData.categories).forEach(c=>{
@@ -1194,6 +1242,7 @@ ${pr.map((p,i)=>`
 <input type="text" value="${p.name}" onchange="updateProduct('${c}',${i},'name',this.value)" placeholder="Nome">
 <input type="text" value="${p.desc||''}" onchange="updateProduct('${c}',${i},'desc',this.value)" placeholder="Desc">
 <input type="number" step="0.50" value="${p.price}" onchange="updateProduct('${c}',${i},'price',parseFloat(this.value))" placeholder="Prezzo">
+<!-- ✅ AREA UPLOAD FOTO -->
 <div class="admin-product-img-wrapper">
 ${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${i})" title="Clicca per rimuovere">` : ''}
 <label class="admin-product-img-upload">
@@ -1214,55 +1263,6 @@ function toggleCategoryAccordion(c){if(openCategories.has(c))openCategories.dele
 function addProduct(c){const n=prompt("Nome:");if(!n)return;const p=parseFloat(prompt("Prezzo:","5.00"))||5,d=prompt("Desc:","")||"";if(!appData.menu[c])appData.menu[c]=[];appData.menu[c].push({name:n,price:p,desc:d});db.ref('menu').set(appData.menu);renderAdminProducts();showToast('✅ Aggiunto');}
 function deleteProduct(c,i){if(confirm("Eliminare?")){appData.menu[c].splice(i,1);db.ref('menu').set(appData.menu);renderAdminProducts();}}
 function updateProduct(c,i,f,v){appData.menu[c][i][f]=v;db.ref('menu').set(appData.menu);}
-
-// ✅ FUNZIONE RIDIMENSIONAMENTO IMMAGINE (Max 600px, Qualità 70%)
-function resizeImage(file, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 600;
-            const MAX_HEIGHT = 600;
-            let width = img.width;
-            let height = img.height;
-
-            if (width > height) {
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-            } else {
-                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            callback(canvas.toDataURL('image/jpeg', 0.7)); // Compressione JPEG 70%
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-async function uploadProductImage(cat, idx, input) {
-const file = input.files[0];
-if (!file) return;
-if (file.size > 2 * 1024 * 1024) { showToast('Max 2MB'); return; }
-resizeImage(file, async (resizedDataUrl) => {
-    appData.menu[cat][idx].img = resizedDataUrl;
-    await db.ref(`menu/${cat}/${idx}/img`).set(resizedDataUrl);
-    renderAdminProducts();
-    renderProductList(currentSearchCat);
-    showToast('Foto ottimizzata e caricata!');
-});
-}
-function removeProductImage(cat, idx) {
-if (!confirm('Rimuovere foto?')) return;
-delete appData.menu[cat][idx].img;
-db.ref(`menu/${cat}/${idx}/img`).remove();
-renderAdminProducts();
-renderProductList(currentSearchCat);
-}
 function loadAdminSettings(){const s=appData.settings,b=appData.branding;document.getElementById('brandName').value=b.name||'';document.getElementById('brandSubtitle').value=b.subtitle||'';document.getElementById('brandCity').value=b.city||'';document.getElementById('hoursInput').value=s.hours;document.getElementById('specialClosures').value=s.specialClosures;document.getElementById('whatsappNumber').value=s.whatsappNumber;document.getElementById('visiblePhone').value=s.visiblePhone;document.getElementById('deliveryToggle').classList.toggle('on',s.deliveryEnabled!==false);document.getElementById('pickupToggle').classList.toggle('on',s.pickupEnabled!==false);document.getElementById('deliveryFeeInput').value=s.deliveryFee!==undefined?s.deliveryFee:2.00;document.getElementById('minDeliveryInput').value=s.minDeliveryOrder!==undefined?s.minDeliveryOrder:15;const mst=document.getElementById('manualStatusToggle'),lb=document.getElementById('manualStatusLabel');mst.classList.remove('on','closed');if(s.manualStatus==='open'){mst.classList.add('on');lb.textContent="✅ APERTO";}else if(s.manualStatus==='closed'){mst.classList.add('closed');lb.textContent=" CHIUSO";}else lb.textContent="Auto";const od=s.openDays?s.openDays.split(','):[];document.querySelectorAll('.day-toggle').forEach(el=>{if(od.includes(el.dataset.day))el.classList.add('active');else el.classList.remove('active');});db.ref('settings/driverLogo').once('value').then(s=>{const u=s.val();if(u){const pv=document.getElementById('driverLogoPreview');pv.src=u;pv.style.display='block';}});}
 function loadCategoryImageInput(){document.getElementById('categoryImageArea').style.display=document.getElementById('categorySelect').value?'block':'none';}
 function uploadHeroImage(input){if(!input.files[0])return;const f=input.files[0],r=new FileReader();r.onload=e=>{appData.images.hero=e.target.result;document.getElementById('heroImg').src=e.target.result;const p=document.getElementById('adminHeroPreview');if(p){p.src=e.target.result;p.style.display='block';}};r.readAsDataURL(f);storage.ref(`images/hero_${Date.now()}`).put(f).then(r=>r.ref.getDownloadURL().then(u=>{appData.images.hero=u;db.ref('images/hero').set(u);}));}
@@ -1304,4 +1304,3 @@ if(ae&&ae.value)localStorage.setItem('pg_addr',ae.value.trim());
 </script>
 </body>
 </html>
-```
