@@ -725,6 +725,12 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database(), storage = firebase.storage();
+// 🔒 BLOCCO ANTI-CONGELAMENTO
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('🚨 Errore bloccante:', msg, 'Riga:', lineNo);
+    showToast('⚠️ Errore: ' + msg);
+    return false;
+};
 function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
 function acceptCookies(){ localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display='none'; }
 function openPrivacyModal(){ document.getElementById('privacyModal').classList.add('active'); }
@@ -1078,13 +1084,46 @@ window.scrollTo(0,0);
 setTimeout(()=>{ const inp=document.getElementById('productSearch'); if(inp){inp.focus();inp.blur();} }, 150);
 }
 function renderProductList(cat, filterTerm) {
-if (!cat || !appData.menu || !appData.menu[cat]) return;
-const term = (filterTerm || '').toLowerCase();
-const list = document.getElementById('productList');
-if(!list) return;
-const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
-if(filtered.length === 0){ list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
-list.innerHTML = filtered.map((p, index) => {
+    if (!cat || !appData.menu || !appData.menu[cat]) {
+        document.getElementById('productList').innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:30px;">Menu in caricamento...</p>';
+        return;
+    }
+    
+    const term = (filterTerm || '').toLowerCase();
+    const list = document.getElementById('productList');
+    if (!list) return;
+    
+    const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
+    
+    if (filtered.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato </p>';
+        return;
+    }
+    
+    list.innerHTML = filtered.map((p) => {
+        const idx = appData.menu[cat].indexOf(p);
+        const qty = getCartQty(cat, p.name);
+        const isAvailable = p.available !== false;
+        const imgHtml = p.img ? `<img src="${p.img}" class="product-img-square" alt="${p.name}" onerror="this.style.display='none'">` : '';
+        
+        const qtyUi = qty > 0
+            ? `<div class="qty-counter"><button class="qty-btn minus" data-cat="${cat}" data-idx="${idx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button class="qty-btn" data-cat="${cat}" data-idx="${idx}" data-delta="1">+</button></div>`
+            : `<button class="add-btn-3d" data-cat="${cat}" data-idx="${idx}" data-delta="1" ${!isAvailable ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${isAvailable ? '+ Aggiungi' : 'Esaurito'}</button>`;
+
+        return `<div class="product-card-3d ${!isAvailable ? 'sold-out' : ''}">
+            ${imgHtml}
+            <div class="product-info" style="flex:1;">
+                <h4>${p.name}</h4>
+                <p>${p.desc || ''}</p>
+                <div class="product-price">€${p.price.toFixed(2)}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                ${qtyUi}
+                ${isAvailable ? `<button class="customize-btn" onclick="openIngredientsModal('${cat}', ${idx})" title="Personalizza"><i class="fas fa-cog"></i></button>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
 // Trova l'indice reale nel menu originale
 const realIndex = appData.menu[cat].indexOf(p);
 const isAvailable = p.available !== false;
@@ -1145,7 +1184,8 @@ let currentMods = {};
 
 function openIngredientsModal(cat, idx) {
     const prod = appData.menu[cat][idx];
-    currentIngProduct = { ...prod, cat, idx, mods: {} }; // Copia con mods vuoti
+    if (!prod) return;
+    currentIngProduct = { ...prod, cat, idx };
     currentMods = {};
     document.getElementById('ingModalTitle').textContent = prod.name;
     renderIngredientsList();
@@ -1153,7 +1193,11 @@ function openIngredientsModal(cat, idx) {
 }
 
 function closeIngredientsModal() {
-    document.getElementById('ingredientsModal').classList.remove('active');
+    const modal = document.getElementById('ingredientsModal');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = ''; // Forza reset display
+    }
     currentIngProduct = null;
 }
 
