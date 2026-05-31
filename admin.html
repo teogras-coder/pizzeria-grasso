@@ -396,7 +396,7 @@ let currentOrderFilter = 'all';
 
 // === PIN AUTH ===
 function enterPin(n) {
-if(pinCode.length < 4) {
+if(pinCode.length < 6) {
 pinCode += n;
 updatePinDots();
 if(pinCode.length === 4) setTimeout(checkPin, 200);
