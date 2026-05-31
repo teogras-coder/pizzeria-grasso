@@ -408,19 +408,20 @@ function updatePinDots() {
 document.querySelectorAll('.pin-dot').forEach((d,i) => d.classList.toggle('filled', i < pinCode.length));
 }
 function checkPin() {
-db.ref('settings/adminPin').once('value').then(s => {
-const savedPin = s.val() || '1234';
-if(pinCode === savedPin) {
-adminPin = savedPin;
-document.getElementById('pinLogin').classList.add('hidden');
-document.getElementById('appMain').classList.add('active');
-initApp();
-} else {
-showToast('❌ PIN Errato','error');
-pinCode = '';
-updatePinDots();
-}
-});
+    db.ref('settings/adminPin').once('value').then(s => {
+        // Fix: Convertiamo tutto a Stringa per evitare errori con i numeri
+        const savedPin = String(s.val() || '1234');
+        if(String(pinCode) === savedPin) {
+            adminPin = savedPin;
+            document.getElementById('pinLogin').classList.add('hidden');
+            document.getElementById('appMain').classList.add('active');
+            initApp();
+        } else {
+            showToast('❌ PIN Errato','error');
+            pinCode = '';
+            updatePinDots();
+        }
+    });
 }
 function logout() {
 document.getElementById('appMain').classList.remove('active');
