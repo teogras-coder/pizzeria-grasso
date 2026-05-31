@@ -3,68 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestionale Pizzeria Grasso - Admin Completo</title>
+<title>Gestionale Pizzeria Grasso - Admin PC/Tablet</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-
 <style>
-:root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --card: #2a1e13; --cream: #f5e6c8; --danger: #ef4444; --success: #4ade80; --warning: #fbbf24; --info: #60a5fa; }
+:root {
+    --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b;
+    --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728;
+    --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8;
+    --shadow: #0a0704; --danger: #ef4444; --success: #4ade80; --warning: #fbbf24; --info: #60a5fa;
+}
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat',sans-serif; }
-body { background:var(--dark); color:var(--cream); height:100vh; overflow:hidden; }
+body { background:var(--dark); color:var(--cream); height:100vh; overflow:hidden; display:flex; }
 
 /* LOGIN */
 #loginScreen { position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center; }
-.login-box { background:var(--card); padding:40px; border-radius:20px; text-align:center; border:2px solid var(--gold); width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.8); }
-.login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); margin-bottom:20px; font-size:2rem; }
+.login-box { background:var(--card); padding:50px; border-radius:20px; text-align:center; border:2px solid var(--gold); width:400px; box-shadow:0 20px 50px rgba(0,0,0,0.8); }
+.login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); font-size:2rem; margin-bottom:10px; }
+.login-box p { color:#8a7a5a; margin-bottom:25px; }
 .login-box input { width:100%; padding:15px; border-radius:10px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--gold); font-size:1.5rem; text-align:center; margin-bottom:20px; }
-.login-box button { width:100%; padding:15px; background:var(--gold); color:var(--dark); font-weight:700; border:none; border-radius:10px; font-size:1.1rem; cursor:pointer; }
+.login-box button { width:100%; padding:15px; background:var(--gold); color:var(--dark); font-weight:700; border:none; border-radius:10px; font-size:1.1rem; cursor:pointer; transition:0.2s; }
+.login-box button:hover { background:var(--gold-light); }
 
 /* LAYOUT */
-#appMain { display:none; height:100vh; }
-.sidebar { width:240px; background:var(--brown); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; overflow-y:auto; }
-.sidebar-header { padding:20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar { width:260px; background:var(--brown); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; overflow-y:auto; }
+.sidebar-header { padding:25px 20px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:center; }
 .sidebar-header h2 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.4rem; }
-.nav-item { padding:14px 20px; cursor:pointer; color:var(--cream); display:flex; align-items:center; gap:10px; transition:0.2s; font-size:0.9rem; font-weight:600; }
+.nav-item { padding:14px 20px; cursor:pointer; color:var(--cream); display:flex; align-items:center; gap:12px; transition:0.2s; font-weight:500; }
 .nav-item:hover, .nav-item.active { background:var(--gold); color:var(--dark); }
 .nav-item i { width:20px; text-align:center; }
 
-.main { flex:1; padding:30px; overflow-y:auto; }
+.main { flex:1; overflow-y:auto; padding:30px; }
 .section { display:none; }
-.section.active { display:block; animation: fadeIn 0.3s; }
+.section.active { display:block; animation:fadeIn 0.3s; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-h2 { font-family:'Playfair Display',serif; color:var(--gold); border-bottom:1px solid var(--gold-dark); padding-bottom:10px; margin-bottom:20px; font-size:1.8rem; }
+h2 { font-family:'Playfair Display',serif; color:var(--gold); border-bottom:1px solid var(--gold-dark); padding-bottom:12px; margin-bottom:25px; font-size:1.8rem; }
 h3 { color:var(--gold); margin-bottom:15px; font-size:1.1rem; }
 
 /* COMPONENTS */
 .card { background:var(--card); padding:20px; border-radius:15px; border:1px solid rgba(212,168,75,0.2); margin-bottom:20px; }
 .form-group { margin-bottom:15px; }
-.form-group label { display:block; color:var(--gold); margin-bottom:5px; font-weight:600; font-size:0.9rem; }
-.form-control { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--cream); }
-.btn { padding:10px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:0.9rem; }
+.form-group label { display:block; color:var(--cream); font-size:0.85rem; margin-bottom:6px; font-weight:600; }
+.form-control { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--cream); font-size:0.9rem; }
+.form-control:focus { outline:none; border-color:var(--gold-light); }
+.btn { padding:10px 18px; border-radius:8px; border:none; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:0.9rem; transition:0.2s; }
 .btn-gold { background:var(--gold); color:var(--dark); }
+.btn-gold:hover { background:var(--gold-light); }
 .btn-danger { background:var(--danger); color:white; }
 .btn-success { background:var(--success); color:var(--dark); }
-.btn-warning { background:var(--warning); color:var(--dark); }
 .btn-sm { padding:6px 12px; font-size:0.8rem; }
 
-/* TABLES & LISTS */
+/* TABLES */
 table { width:100%; border-collapse:collapse; }
-th { text-align:left; padding:12px; color:var(--gold); border-bottom:2px solid var(--gold-dark); font-size:0.85rem; }
+th { text-align:left; padding:12px; color:var(--gold); border-bottom:2px solid var(--gold-dark); font-size:0.85rem; text-transform:uppercase; }
 td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-align:middle; font-size:0.9rem; }
-.img-thumb { width:45px; height:45px; border-radius:6px; object-fit:cover; }
+.img-thumb { width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold-dark); }
 
-/* TOGGLE & SWITCHES */
+/* TOGGLE */
 .toggle { width:50px; height:26px; background:#555; border-radius:13px; position:relative; cursor:pointer; }
 .toggle.on { background:var(--success); }
 .toggle::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; background:white; border-radius:50%; transition:0.3s; }
 .toggle.on::after { left:27px; }
-.day-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px; }
-.day-btn { padding:10px; border-radius:8px; background:var(--card); border:1px solid var(--gold-dark); color:#8a7a5a; text-align:center; cursor:pointer; font-size:0.85rem; }
-.day-btn.active { background:var(--gold-dark); color:var(--dark); border-color:var(--gold); font-weight:700; }
 
 /* UPLOAD */
 .upload-box { border:2px dashed var(--gold-dark); padding:25px; text-align:center; cursor:pointer; border-radius:12px; transition:0.2s; }
@@ -72,37 +75,26 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 .hidden-input { display:none; }
 
 /* ORDERS */
-.order-card { background:var(--card-light); border-radius:12px; padding:14px; margin-bottom:12px; border-left:4px solid var(--gold-dark); }
+.order-card { background:var(--card-light); border-radius:12px; padding:15px; margin-bottom:12px; border-left:4px solid var(--gold-dark); }
 .order-card.new { border-left-color:var(--danger); }
 .order-card.prep { border-left-color:var(--warning); }
-.order-header { display:flex; justify-content:space-between; margin-bottom:8px; }
 .badge { padding:4px 10px; border-radius:10px; font-size:0.75rem; font-weight:700; }
 .badge-new { background:rgba(239,68,68,0.2); color:#ef4444; }
 .badge-prep { background:rgba(251,191,36,0.2); color:#fbbf24; }
 .badge-ready { background:rgba(74,222,128,0.2); color:#4ade80; }
-.badge-delivered { background:rgba(96,165,250,0.2); color:#60a5fa; }
-
-/* ACCORDION */
-.accordion { background:var(--card); border-radius:10px; margin-bottom:10px; border:1px solid rgba(212,168,75,0.15); overflow:hidden; }
-.accordion-header { padding:12px 15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
-.accordion-body { max-height:0; overflow:hidden; transition:max-height 0.3s ease; padding:0 15px; }
-.accordion.open .accordion-body { max-height:2000px; padding:15px; border-top:1px solid rgba(212,168,75,0.1); }
-.prod-row { background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin-bottom:8px; }
-.prod-row-header { display:flex; justify-content:space-between; margin-bottom:6px; }
 
 /* PALETTE */
-.palette-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; }
-.palette-btn { padding:16px; border-radius:12px; cursor:pointer; text-align:center; font-weight:700; color:white; transition:0.2s; }
+.palette-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px; }
+.palette-btn { padding:18px; border-radius:12px; cursor:pointer; text-align:center; font-weight:700; color:white; transition:0.2s; border:2px solid transparent; }
 .palette-btn:hover { transform:translateY(-2px); }
-.palette-btn.active { border:3px solid var(--gold); }
+.palette-btn.active { border-color:var(--gold); }
 
 /* RESPONSIVE */
 @media(max-width:1024px) {
-  .sidebar { width:65px; }
+  .sidebar { width:70px; }
   .sidebar-header h2, .nav-item span { display:none; }
   .nav-item { justify-content:center; }
   .main { padding:20px; }
-  .day-grid { grid-template-columns:repeat(4,1fr); }
 }
 </style>
 </head>
@@ -112,18 +104,21 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 <div id="loginScreen">
   <div class="login-box">
     <h1>🔐 Admin Grasso</h1>
-    <input type="password" id="pinInput" placeholder="PIN (4 o 6 cifre)" maxlength="6">
+    <p>Gestionale PC & Tablet</p>
+    <input type="password" id="pinInput" placeholder="Inserisci il PIN" maxlength="6">
     <button onclick="checkLogin()">Accedi</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="appMain">
+<div id="appMain" style="display:none; width:100%; height:100vh;">
   <aside class="sidebar">
-    <div class="sidebar-header"><h2>🍕 Grasso</h2></div>
+    <div class="sidebar-header">
+      <h2>🍕 Grasso</h2>
+    </div>
     <div class="nav-item active" onclick="showSec('dashboard',this)"><i class="fas fa-chart-line"></i> <span>Dashboard</span></div>
     <div class="nav-item" onclick="showSec('orders',this)"><i class="fas fa-receipt"></i> <span>Ordini</span></div>
-    <div class="nav-item" onclick="showSec('counters',this)"><i class="fas fa-barcode"></i> <span>Contatori</span></div>
+    <div class="nav-item" onclick="showSec('contatori',this)"><i class="fas fa-barcode"></i> <span>Contatori</span></div>
     <div class="nav-item" onclick="showSec('reviews',this)"><i class="fas fa-star"></i> <span>Recensioni</span></div>
     <div class="nav-item" onclick="showSec('branding',this)"><i class="fas fa-paint-brush"></i> <span>Branding</span></div>
     <div class="nav-item" onclick="showSec('promos',this)"><i class="fas fa-gift"></i> <span>Promo</span></div>
@@ -164,7 +159,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
     </section>
 
     <!-- CONTATORI -->
-    <section id="sec-counters" class="section">
+    <section id="sec-contatori" class="section">
       <h2>📈 Contatori Prodotti Oggi</h2>
       <button class="btn btn-danger btn-sm" style="margin-bottom:15px;" onclick="resetCounters()"><i class="fas fa-undo"></i> Azzera Oggi</button>
       <div id="countersList" class="card"><p style="text-align:center; color:#8a7a5a;">Nessun ordine oggi</p></div>
@@ -183,7 +178,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- BRANDING -->
     <section id="sec-branding" class="section">
-      <h2>🎨 Branding</h2>
+      <h2> Branding</h2>
       <div class="card">
         <div class="form-group"><label>Nome Pizzeria</label><input type="text" class="form-control" id="brandName"></div>
         <div class="form-group"><label>Sottotitolo</label><input type="text" class="form-control" id="brandSubtitle"></div>
@@ -198,7 +193,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- PROMOZIONI -->
     <section id="sec-promos" class="section">
-      <h2>🎁 Promozioni</h2>
+      <h2> Promozioni</h2>
       <div id="promosList"></div>
       <div class="card" style="margin-top:20px;">
         <h3>Nuova Promozione</h3>
@@ -244,7 +239,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- IMMAGINI -->
     <section id="sec-images" class="section">
-      <h2>🖼️ Immagini</h2>
+      <h2>️ Immagini</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
         <div class="card">
           <h3>Copertina (Hero)</h3>
@@ -275,7 +270,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
         </div>
         <div class="form-group">
           <label>Giorni di Apertura</label>
-          <div class="day-grid" id="daysGrid">
+          <div class="day-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px;">
             <div class="day-btn" data-day="lun">Lun</div><div class="day-btn" data-day="mar">Mar</div><div class="day-btn" data-day="mer">Mer</div><div class="day-btn" data-day="gio">Gio</div><div class="day-btn" data-day="ven">Ven</div><div class="day-btn" data-day="sab">Sab</div><div class="day-btn" data-day="dom">Dom</div>
           </div>
         </div>
@@ -286,14 +281,14 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- FATTORINI -->
     <section id="sec-drivers" class="section">
-      <h2> Fattorini</h2>
+      <h2>🛵 Fattorini</h2>
       <div class="card" id="driversList"></div>
       <button class="btn btn-gold" style="margin-top:15px;" onclick="addDriver()"><i class="fas fa-plus"></i> Aggiungi Fattorino</button>
     </section>
 
     <!-- SICUREZZA -->
     <section id="sec-security" class="section">
-      <h2>🔒 Sicurezza</h2>
+      <h2> Sicurezza</h2>
       <div class="card">
         <div class="form-group"><label>PIN Attuale</label><input type="password" class="form-control" id="currPin"></div>
         <div class="form-group"><label>Nuovo PIN (min 4 cifre)</label><input type="password" class="form-control" id="newPin"></div>
@@ -304,14 +299,14 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- COLORI & VIDEO -->
     <section id="sec-palette" class="section">
-      <h2>🎨 Colori & Video Ricorrenza</h2>
+      <h2> Colori & Video Ricorrenza</h2>
       <div class="card">
         <h3>Palette Temi</h3>
         <div class="palette-grid">
           <div class="palette-btn" style="background:linear-gradient(135deg,#d4a84b,#2d1f12);" onclick="changePalette('autunno')">🍂 Autunno</div>
-          <div class="palette-btn" style="background:linear-gradient(135deg,#a8c3d4,#1a2530);" onclick="changePalette('inverno')">️ Inverno</div>
-          <div class="palette-btn" style="background:linear-gradient(135deg,#8cd4a8,#1a2d1f);" onclick="changePalette('primavera')">🌱 Primavera</div>
-          <div class="palette-btn" style="background:linear-gradient(135deg,#e8a84b,#3d2510);" onclick="changePalette('estate')">☀️ Estate</div>
+          <div class="palette-btn" style="background:linear-gradient(135deg,#a8c3d4,#1a2530);" onclick="changePalette('inverno')">❄️ Inverno</div>
+          <div class="palette-btn" style="background:linear-gradient(135deg,#8cd4a8,#1a2d1f);" onclick="changePalette('primavera')"> Primavera</div>
+          <div class="palette-btn" style="background:linear-gradient(135deg,#e8a84b,#3d2510);" onclick="changePalette('estate')">️ Estate</div>
           <div class="palette-btn" style="background:linear-gradient(135deg,#c41e3a,#0f2018);" onclick="changePalette('natale')">🎄 Natale</div>
           <div class="palette-btn" style="background:linear-gradient(135deg,#ff4d6d,#1a0a0f);" onclick="changePalette('san_valentino')">❤️ San Valentino</div>
           <div class="palette-btn" style="background:linear-gradient(135deg,#7209b7,#050510);" onclick="changePalette('notte')">🌙 Notte</div>
@@ -319,7 +314,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
         <div style="margin-top:15px; padding:10px; background:rgba(212,168,75,0.1); border-radius:8px;"><strong>Tema Attuale:</strong> <span id="currPalette">autunno</span></div>
       </div>
       <div class="card" style="margin-top:20px;">
-        <h3>🎥 Video Hero</h3>
+        <h3> Video Hero</h3>
         <div class="form-group"><label>URL Video (MP4)</label><input type="text" class="form-control" id="videoUrlInput" placeholder="https://..."></div>
         <div class="upload-box" onclick="uploadVideo()"><i class="fas fa-video" style="font-size:2rem; color:var(--gold);"></i><p>Carica Video dal Dispositivo</p></div>
         <div style="display:flex; gap:10px; margin-top:15px;">
@@ -337,14 +332,32 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 <input type="file" id="videoFileInput" class="hidden-input" accept="video/*" onchange="handleVideo(this)">
 
 <script>
-// === CONFIG ===
-const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
+// === CONFIG FIREBASE ===
+const firebaseConfig = { 
+  apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", 
+  authDomain: "teogra-c8cf5.firebaseapp.com", 
+  databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", 
+  projectId: "teogra-c8cf5", 
+  storageBucket: "teogra-c8cf5.firebasestorage.app", 
+  messagingSenderId: "686300112893", 
+  appId: "1:686300112893:web:e147b82f91374f12db1b94" 
+};
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database(), storage = firebase.storage();
 
-// === DATA ===
-const DEFAULT_MENU = { pizze:[{name:"Margherita",price:5.00},{name:"Diavola",price:7.00},{name:"Marinara",price:4.00}], focacce:[{name:"Rosso",price:6.00},{name:"Bianca",price:6.00}], bibite:[{name:"Coca Cola",price:2.00},{name:"Acqua",price:1.00}] };
-const DEFAULT_CATS = { pizze:{name:"🍕 Pizze",icon:"fa-pizza-slice"}, focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} };
+// === DATA COMPLETO (Pizze, Focacce, Frittura, Bibite) ===
+const DEFAULT_CATS = { 
+  pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, 
+  focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, 
+  frittura:{name:"🍟 Frittura",icon:"fa-drumstick-bite"}, 
+  bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} 
+};
+const DEFAULT_MENU = { 
+  pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
+  focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
+  frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
+  bibite:[{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}]
+};
 
 let appData = { categories:{}, menu:{}, settings:{}, branding:{}, promotions:{}, drivers:{}, images:{} };
 let uploadTarget = null, promoTarget = null;
@@ -354,21 +367,26 @@ function checkLogin() {
   const p = document.getElementById('pinInput').value;
   if(!p) return;
   db.ref('settings/adminPin').once('value').then(s => {
-    if(String(p) === String(s.val() || '1234')) {
+    const saved = String(s.val() || '1234');
+    if(String(p) === saved) {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('appMain').style.display = 'flex';
       init();
-    } else alert('❌ PIN Errato');
+    } else {
+      alert('❌ PIN Errato! (Il sistema legge: ' + saved + ')');
+    }
+  }).catch(e => {
+    console.error(e);
+    alert('Errore connessione database.');
   });
 }
 function logout() { location.reload(); }
 
 // === INIT ===
 function init() {
-  // Init DB if empty
+  // Se il DB è vuoto, carica il menu completo
   db.ref('categories').once('value').then(s => { if(!s.exists()) { db.ref('categories').set(DEFAULT_CATS); db.ref('menu').set(DEFAULT_MENU); }});
   
-  // Listeners
   db.ref('categories').on('value', s => { appData.categories = s.val()||{}; renderCatSel(); renderCatTable(); renderMenu(); });
   db.ref('menu').on('value', s => { appData.menu = s.val()||{}; renderMenu(); });
   db.ref('settings').on('value', s => { if(s.exists()) { appData.settings = {...appData.settings, ...s.val()}; loadSettingsUI(); }});
@@ -396,7 +414,11 @@ function showSec(id, el) {
 function updateStats(o) {
   let today=0, pend=0, rev=0; const d=new Date().toISOString().split('T')[0];
   Object.values(o).forEach(v => {
-    if(new Date(v.timestamp).toISOString().split('T')[0]===d) { today++; if(v.status==='new'||v.status==='preparing') pend++; if(v.status==='delivered') rev+=(v.finalTotal||0); }
+    if(new Date(v.timestamp).toISOString().split('T')[0]===d) { 
+      today++; 
+      if(v.status==='new'||v.status==='preparing') pend++; 
+      if(v.status==='delivered') rev+=(v.finalTotal||0); 
+    }
   });
   document.getElementById('statOrders').innerText=today;
   document.getElementById('statPending').innerText=pend;
@@ -408,7 +430,7 @@ function renderOrders(o) {
   Object.entries(o).reverse().forEach(([id,v]) => {
     const cls = v.status==='new'?'new':v.status==='preparing'?'prep':'';
     h+=`<div class="order-card ${cls}">
-      <div class="order-header"><strong style="color:var(--gold)">${v.orderId||id}</strong><span class="badge badge-${v.status}">${v.status}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong style="color:var(--gold)">${v.orderId||id}</strong><span class="badge badge-${v.status}">${v.status}</span></div>
       <div>${v.customerName} • ${v.customerPhone}</div>
       <div style="font-size:0.8rem; color:#8a7a5a; margin:4px 0;">${(v.items||[]).map(i=>i.name).join(', ')}</div>
       <div style="font-weight:700; color:var(--gold);">Totale: €${(v.finalTotal||0).toFixed(2)}</div>
@@ -473,21 +495,19 @@ function renderMenu() {
   let h='';
   Object.entries(appData.categories).forEach(([ck,cv]) => {
     const prods = appData.menu[ck]||[];
-    h+=`<div class="accordion open" id="acc-${ck}">
-      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')"><span style="color:var(--gold); font-weight:700;">${cv.name}</span><span style="background:var(--gold-dark); color:var(--dark); padding:2px 8px; border-radius:10px; font-size:0.8rem;">${prods.length}</span></div>
-      <div class="accordion-body">
-        ${prods.map((p,i)=>`<div class="prod-row">
-          <div class="prod-row-header"><span style="font-weight:600;">${p.name}</span><button class="btn btn-sm btn-danger" onclick="delProd('${ck}',${i})"><i class="fas fa-times"></i></button></div>
-          <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; align-items:center;">
-            <input class="form-control" value="${p.name}" onchange="updProd('${ck}',${i},'name',this.value)" placeholder="Nome">
-            <input class="form-control" value="${p.price}" type="number" step="0.50" onchange="updProd('${ck}',${i},'price',parseFloat(this.value))" placeholder="€">
-            <div class="toggle ${p.available!==false?'on':''}" onclick="this.classList.toggle('on'); appData.menu['${ck}'][${i}].available=!appData.menu['${ck}'][${i}].available; db.ref('menu/${ck}/${i}').update({available:appData.menu['${ck}'][${i}].available})"></div>
-            <div class="upload-box" style="padding:8px; font-size:0.8rem;" onclick="uploadProdImg('${ck}',${i})"><i class="fas fa-camera"></i></div>
-          </div>
-          ${p.img?`<img src="${p.img}" style="height:30px; border-radius:4px; margin-top:5px; cursor:pointer;" onclick="delProdImg('${ck}',${i})" title="Clicca per rimuovere">`:''}
-        </div>`).join('')}
-        <button class="btn btn-sm btn-gold" style="margin-top:10px;" onclick="addProd('${ck}')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>
-      </div>
+    h+=`<div class="card" style="margin-bottom:15px;">
+      <h3 style="display:flex; justify-content:space-between; align-items:center;">${cv.name} <span style="background:var(--gold-dark); color:var(--dark); padding:2px 8px; border-radius:10px; font-size:0.8rem;">${prods.length}</span></h3>
+      ${prods.map((p,i)=>`<div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:600;">${p.name}</span><button class="btn btn-sm btn-danger" onclick="delProd('${ck}',${i})"><i class="fas fa-times"></i></button></div>
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; align-items:center;">
+          <input class="form-control" value="${p.name}" onchange="updProd('${ck}',${i},'name',this.value)" placeholder="Nome">
+          <input class="form-control" value="${p.price}" type="number" step="0.50" onchange="updProd('${ck}',${i},'price',parseFloat(this.value))" placeholder="€">
+          <div class="toggle ${p.available!==false?'on':''}" onclick="this.classList.toggle('on'); appData.menu['${ck}'][${i}].available=!appData.menu['${ck}'][${i}].available; db.ref('menu/${ck}/${i}').update({available:appData.menu['${ck}'][${i}].available})"></div>
+          <div class="upload-box" style="padding:8px; font-size:0.8rem;" onclick="uploadProdImg('${ck}',${i})"><i class="fas fa-camera"></i></div>
+        </div>
+        ${p.img?`<img src="${p.img}" style="height:30px; border-radius:4px; margin-top:5px; cursor:pointer;" onclick="delProdImg('${ck}',${i})" title="Clicca per rimuovere">`:''}
+      </div>`).join('')}
+      <button class="btn btn-sm btn-gold" style="margin-top:10px;" onclick="addProd('${ck}')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>
     </div>`;
   });
   document.getElementById('menuList').innerHTML = h;
@@ -498,7 +518,7 @@ function renderPromos() {
   Object.entries(appData.promotions).forEach(([id,p]) => {
     const u=p.currentUses||0, max=p.maxUses||0, rem=max-u;
     const status = !p.active?'Off':u>=max?'Esaurita':'Attiva';
-    const cls = !p.active?'badge-delivered':u>=max?'badge-prep':'badge-ready';
+    const cls = !p.active?'badge-new':u>=max?'badge-prep':'badge-ready';
     h+=`<div class="card" style="border-left:4px solid var(--gold-dark);">
       <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:10px;">
         <div><strong style="color:var(--gold);">${p.title}</strong><br><span style="font-size:0.8rem; color:#8a7a5a;">${p.message||''}</span></div>
@@ -670,7 +690,6 @@ function saveAll() {
   b.subtitle=document.getElementById('brandSubtitle').value.trim()||"Tradizione";
   b.city=document.getElementById('brandCity').value.trim()||"Manfredonia";
   
-  // Drivers
   const dr={}; document.querySelectorAll('#driversList > div').forEach(r=>{ const n=r.querySelector('input[data-type="name"]').value.trim(), p=r.querySelector('input[data-type="pin"]').value.trim(); if(n&&p) dr[p]=n; });
   
   db.ref('settings').update(s);
