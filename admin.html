@@ -396,11 +396,13 @@ let currentOrderFilter = 'all';
 
 // === PIN AUTH ===
 function enterPin(n) {
-if(pinCode.length < 6) {
-pinCode += n;
-updatePinDots();
-if(pinCode.length === 4) setTimeout(checkPin, 200);
-}
+    // Cambia da 4 a 6 qui sotto
+    if(pinCode.length < 6) { 
+        pinCode += n;
+        updatePinDots();
+        // Cambia da 4 a 6 qui sotto
+        if(pinCode.length === 6) setTimeout(checkPin, 200); 
+    }
 }
 function deletePin() { pinCode = pinCode.slice(0,-1); updatePinDots(); }
 function clearPin() { pinCode = ''; updatePinDots(); }
