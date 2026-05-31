@@ -715,7 +715,28 @@ let cart=[], orderType='delivery', timeMode='asap', openCategories=new Set(), kn
 let selectedStars = 0;
 let currentReviewFilter = 'all';
 let pendingReviewOrderId = null;
-document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;openAdmin();} });
+document.getElementById('secretAdminBtn').addEventListener('click', ()=>{ adminClicks++; clearTimeout(adminClickTimer); adminClickTimer=setTimeout(()=>{adminClicks=0;},1500); if(adminClicks===4){adminClicks=0;
+    function openAdmin(){
+    const p = prompt(" PIN:");
+    if (p === null) return; // Se premi Annulla, non fare nulla
+    
+    // 🔑 FIX IMPORTANTE: String() assicura che 1234 (numero) e "1234" (testo) siano letti uguali.
+    // Se non trova il PIN nel database, usa "1234" di default.
+    const savedPin = String(appData.settings.adminPin || "1234");
+    
+    if (String(p) === savedPin) {
+        document.getElementById('adminModal').classList.add('active');
+        renderAdminProducts();
+        renderAdminCategories();
+        renderAdminPromotions();
+        loadAdminSettings();
+        loadDriversAdmin();
+        updateAdminImagePreviews();
+        loadAdminReviews();
+    } else {
+        showToast("🔒 PIN Errato");
+    }
+}
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
 window.onload=function(){ if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; cleanLocalHistory(); }
 document.addEventListener('DOMContentLoaded', ()=>{ loadFromFirebase(); setupRealtimeListeners(); loadReviewsPublic(); renderMyOrders(); try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} const pl=document.getElementById('productList'); if(pl){pl.addEventListener('click',e=>{const btn=e.target.closest('[data-cat][data-idx][data-delta]'); if(!btn)return; e.preventDefault(); e.stopPropagation(); changeProductQty(btn.dataset.cat,parseInt(btn.dataset.idx,10),parseInt(btn.dataset.delta,10));});} });
