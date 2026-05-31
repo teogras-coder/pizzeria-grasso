@@ -3,38 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestionale PC - Pizzeria Grasso</title>
+<title>Gestionale Pizzeria Grasso</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
 <style>
 :root {
-    --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b;
-    --dark: #1a1209; --brown: #2d1f12; --card: #2a1e13; --cream: #f5e6c8;
-    --danger: #ef4444; --success: #4ade80; --warning: #fbbf24;
+    --gold: #d4a84b; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; 
+    --card: #2a1e13; --cream: #f5e6c8; --danger: #ef4444; --success: #4ade80;
 }
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat',sans-serif; }
-body { background:var(--dark); color:var(--cream); height:100vh; display:flex; overflow:hidden; }
+body { background:var(--dark); color:var(--cream); height:100vh; overflow:hidden; }
 
-/* LOGIN SCREEN */
-#loginScreen { position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center; }
-.login-box { background:var(--card); padding:40px; border-radius:20px; text-align:center; border:2px solid var(--gold); width:400px; box-shadow:0 20px 50px rgba(0,0,0,0.8); }
+/* === LOGIN SCREEN === */
+#loginScreen {
+    position:fixed; inset:0; background:var(--dark); z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+}
+.login-box {
+    background:var(--card); padding:40px; border-radius:20px; text-align:center;
+    border:2px solid var(--gold); width:350px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.8);
+}
 .login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); margin-bottom:20px; font-size:2rem; }
-.login-box input { width:100%; padding:15px; border-radius:10px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--gold); font-size:1.5rem; text-align:center; margin-bottom:20px; }
-.login-box button { width:100%; padding:15px; background:var(--gold); color:var(--dark); font-weight:700; border:none; border-radius:10px; font-size:1.1rem; cursor:pointer; }
+.login-box input {
+    width:100%; padding:15px; border-radius:10px; border:1px solid var(--gold-dark);
+    background:var(--brown); color:var(--gold); font-size:1.5rem; text-align:center;
+    margin-bottom:20px; outline:none;
+}
+.login-box button {
+    width:100%; padding:15px; background:var(--gold); color:var(--dark);
+    font-weight:700; border:none; border-radius:10px; font-size:1.1rem; cursor:pointer;
+}
+.login-box button:hover { background:var(--gold-dark); color:white; }
 
-/* SIDEBAR */
-.sidebar { width:250px; background:var(--brown); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; }
+/* === LAYOUT === */
+#appMain { display:none; height:100vh; }
+.sidebar {
+    width:250px; background:var(--brown); border-right:1px solid rgba(255,255,255,0.1);
+    display:flex; flex-direction:column;
+}
 .sidebar-header { padding:20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); }
 .sidebar-header h2 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.5rem; }
-.nav-item { padding:15px 20px; cursor:pointer; color:var(--cream); display:flex; align-items:center; gap:10px; transition:0.2s; font-weight:600; }
+.nav-item {
+    padding:15px 20px; cursor:pointer; color:var(--cream); display:flex;
+    align-items:center; gap:10px; transition:0.2s; font-weight:600;
+}
 .nav-item:hover, .nav-item.active { background:var(--gold); color:var(--dark); }
 .nav-item i { width:20px; text-align:center; }
 
-/* MAIN CONTENT */
 .main { flex:1; padding:30px; overflow-y:auto; }
 .section { display:none; }
 .section.active { display:block; animation: fadeIn 0.3s; }
@@ -42,7 +62,7 @@ body { background:var(--dark); color:var(--cream); height:100vh; display:flex; o
 
 h2 { font-family:'Playfair Display',serif; color:var(--gold); border-bottom:1px solid var(--gold-dark); padding-bottom:10px; margin-bottom:20px; font-size:1.8rem; }
 
-/* CARDS & FORMS */
+/* === COMPONENTS === */
 .card { background:var(--card); padding:20px; border-radius:15px; border:1px solid rgba(212,168,75,0.2); margin-bottom:20px; }
 .form-group { margin-bottom:15px; }
 .form-group label { display:block; color:var(--gold); margin-bottom:5px; font-weight:600; }
@@ -69,11 +89,6 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 .upload-box:hover { border-color:var(--gold); }
 .hidden-input { display:none; }
 
-/* ORDERS */
-.order-card { background:var(--card); padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--gold); }
-.order-card.new { border-left-color:var(--danger); }
-.order-card.prep { border-left-color:var(--warning); }
-
 /* RESPONSIVE */
 @media(max-width:1024px) {
     .sidebar { width:70px; }
@@ -84,156 +99,158 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- === LOGIN === -->
 <div id="loginScreen">
     <div class="login-box">
-        <h1> Admin Grasso</h1>
+        <h1>🔐 Admin Grasso</h1>
         <input type="password" id="pinInput" placeholder="PIN (4 o 6 cifre)" maxlength="6">
         <button onclick="checkLogin()">Accedi</button>
+        <p style="margin-top:15px; font-size:0.8rem; color:#8a7a5a;">Il PIN di default è 1234</p>
     </div>
 </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2>🍕 Grasso</h2>
-    </div>
-    <div class="nav-item active" onclick="showSec('dashboard',this)"><i class="fas fa-chart-line"></i> <span>Dashboard</span></div>
-    <div class="nav-item" onclick="showSec('orders',this)"><i class="fas fa-receipt"></i> <span>Ordini</span></div>
-    <div class="nav-item" onclick="showSec('menu',this)"><i class="fas fa-utensils"></i> <span>Menu</span></div>
-    <div class="nav-item" onclick="showSec('categories',this)"><i class="fas fa-layer-group"></i> <span>Categorie</span></div>
-    <div class="nav-item" onclick="showSec('images',this)"><i class="fas fa-images"></i> <span>Immagini</span></div>
-    <div class="nav-item" onclick="showSec('settings',this)"><i class="fas fa-cog"></i> <span>Impostazioni</span></div>
-    <div class="nav-item" onclick="logout()" style="margin-top:auto; color:var(--danger)"><i class="fas fa-sign-out-alt"></i> <span>Esci</span></div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="main">
-
-    <!-- DASHBOARD -->
-    <div id="sec-dashboard" class="section active">
-        <h2>📊 Panoramica</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:30px;">
-            <div class="card" style="text-align:center; padding:30px;">
-                <div style="color:#8a7a5a; font-size:1rem; margin-bottom:10px;">Ordini Oggi</div>
-                <div style="font-size:3rem; font-weight:700; color:var(--gold)" id="statOrders">0</div>
-            </div>
-            <div class="card" style="text-align:center; padding:30px;">
-                <div style="color:#8a7a5a; font-size:1rem; margin-bottom:10px;">Fatturato</div>
-                <div style="font-size:3rem; font-weight:700; color:var(--success)" id="statRevenue">€0</div>
-            </div>
-            <div class="card" style="text-align:center; padding:30px;">
-                <div style="color:#8a7a5a; font-size:1rem; margin-bottom:10px;">In Attesa</div>
-                <div style="font-size:3rem; font-weight:700; color:var(--danger)" id="statPending">0</div>
-            </div>
-        </div>
-        <div class="card">
-            <h3>🔔 Ultimi Ordini</h3>
-            <div id="recentOrders">Caricamento...</div>
-        </div>
+<!-- === APP MAIN === -->
+<div id="appMain">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header"><h2>🍕 Grasso</h2></div>
+        <div class="nav-item active" onclick="showSec('dashboard',this)"><i class="fas fa-chart-line"></i> <span>Dashboard</span></div>
+        <div class="nav-item" onclick="showSec('orders',this)"><i class="fas fa-receipt"></i> <span>Ordini</span></div>
+        <div class="nav-item" onclick="showSec('menu',this)"><i class="fas fa-utensils"></i> <span>Menu</span></div>
+        <div class="nav-item" onclick="showSec('categories',this)"><i class="fas fa-layer-group"></i> <span>Categorie</span></div>
+        <div class="nav-item" onclick="showSec('images',this)"><i class="fas fa-images"></i> <span>Immagini</span></div>
+        <div class="nav-item" onclick="showSec('settings',this)"><i class="fas fa-cog"></i> <span>Impostazioni</span></div>
+        <div class="nav-item" onclick="logout()" style="margin-top:auto; color:var(--danger)"><i class="fas fa-sign-out-alt"></i> <span>Esci</span></div>
     </div>
 
-    <!-- ORDINI -->
-    <div id="sec-orders" class="section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; border:none;">📋 Gestione Ordini</h2>
-            <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Svuota Tutto</button>
-        </div>
-        <div id="ordersList">Caricamento ordini...</div>
-    </div>
+    <!-- CONTENT -->
+    <div class="main">
 
-    <!-- MENU -->
-    <div id="sec-menu" class="section">
-        <h2>🍕 Menu Prodotti</h2>
-        <div class="form-group">
-            <label>Seleziona Categoria:</label>
-            <select id="catSelect" class="form-control" onchange="renderProducts()"></select>
-        </div>
-        <div class="card">
-            <table>
-                <thead><tr><th>Foto</th><th>Nome</th><th>Prezzo</th><th>Disp.</th><th>Azioni</th></tr></thead>
-                <tbody id="prodTable"></tbody>
-            </table>
-            <div style="margin-top:20px; display:flex; gap:10px; align-items:center;">
-                <input id="newProdName" class="form-control" placeholder="Nome Prodotto" style="flex:2">
-                <input id="newProdPrice" class="form-control" placeholder="€" style="width:100px">
-                <button class="btn btn-gold" onclick="addProduct()"><i class="fas fa-plus"></i> Aggiungi</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CATEGORIE -->
-    <div id="sec-categories" class="section">
-        <h2>📂 Categorie</h2>
-        <div class="card">
-            <table>
-                <thead><tr><th>Nome</th><th>Icona</th><th>Azioni</th></tr></thead>
-                <tbody id="catTable"></tbody>
-            </table>
-            <button class="btn btn-gold" style="margin-top:15px" onclick="addCategory()"><i class="fas fa-plus"></i> Nuova Categoria</button>
-        </div>
-    </div>
-
-    <!-- IMMAGINI -->
-    <div id="sec-images" class="section">
-        <h2>🖼️ Gestione Immagini</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-            <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">Copertina (Hero)</h3>
-                <div class="upload-box" onclick="uploadImage('hero')">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
-                    <p>Clicca per caricare immagine</p>
+        <!-- DASHBOARD -->
+        <div id="sec-dashboard" class="section active">
+            <h2> Panoramica</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:30px;">
+                <div class="card" style="text-align:center; padding:30px;">
+                    <div style="color:#8a7a5a; margin-bottom:10px;">Ordini Oggi</div>
+                    <div style="font-size:3rem; font-weight:700; color:var(--gold)" id="statOrders">0</div>
+                </div>
+                <div class="card" style="text-align:center; padding:30px;">
+                    <div style="color:#8a7a5a; margin-bottom:10px;">Fatturato</div>
+                    <div style="font-size:3rem; font-weight:700; color:var(--success)" id="statRevenue">€0</div>
+                </div>
+                <div class="card" style="text-align:center; padding:30px;">
+                    <div style="color:#8a7a5a; margin-bottom:10px;">In Attesa</div>
+                    <div style="font-size:3rem; font-weight:700; color:var(--danger)" id="statPending">0</div>
                 </div>
             </div>
             <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">Logo Fattorini</h3>
-                <div class="upload-box" onclick="uploadImage('driverLogo')">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
-                    <p>Clicca per caricare logo</p>
-                </div>
+                <h3>🔔 Ultimi Ordini</h3>
+                <div id="recentOrders">Caricamento...</div>
             </div>
         </div>
-        <div class="card" style="margin-top:20px;">
-            <h3 style="color:var(--gold); margin-bottom:15px;">Foto Categorie</h3>
+
+        <!-- ORDINI -->
+        <div id="sec-orders" class="section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; border:none;">📋 Gestione Ordini</h2>
+                <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Svuota Tutto</button>
+            </div>
+            <div id="ordersList">Caricamento ordini...</div>
+        </div>
+
+        <!-- MENU -->
+        <div id="sec-menu" class="section">
+            <h2>🍕 Menu Prodotti</h2>
             <div class="form-group">
                 <label>Seleziona Categoria:</label>
-                <select id="imgCatSelect" class="form-control" onchange="renderCatImageSection()"></select>
+                <select id="catSelect" class="form-control" onchange="renderProducts()"></select>
             </div>
-            <div id="catImageArea" style="display:none;">
-                <div class="upload-box" onclick="uploadImage('category')">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
-                    <p>Clicca per caricare foto categoria</p>
+            <div class="card">
+                <table>
+                    <thead><tr><th>Foto</th><th>Nome</th><th>Prezzo</th><th>Disp.</th><th>Azioni</th></tr></thead>
+                    <tbody id="prodTable"></tbody>
+                </table>
+                <div style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+                    <input id="newProdName" class="form-control" placeholder="Nome Prodotto" style="flex:2">
+                    <input id="newProdPrice" class="form-control" placeholder="€" style="width:100px">
+                    <button class="btn btn-gold" onclick="addProduct()"><i class="fas fa-plus"></i> Aggiungi</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- IMPOSTAZIONI -->
-    <div id="sec-settings" class="section">
-        <h2>️ Impostazioni</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <!-- CATEGORIE -->
+        <div id="sec-categories" class="section">
+            <h2>📂 Categorie</h2>
             <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">🔒 Cambio PIN</h3>
-                <div class="form-group"><label>PIN Attuale</label><input type="password" id="oldPin" class="form-control"></div>
-                <div class="form-group"><label>Nuovo PIN</label><input type="password" id="newPin" class="form-control"></div>
-                <button class="btn btn-gold" onclick="changePin()">Salva PIN</button>
-            </div>
-            <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">🕒 Orari</h3>
-                <div class="form-group"><label>Orario 1</label><input type="text" id="h1" class="form-control" placeholder="11:00-15:00"></div>
-                <div class="form-group"><label>Orario 2</label><input type="text" id="h2" class="form-control" placeholder="18:00-23:00"></div>
-                <button class="btn btn-gold" onclick="saveSettings()">Salva Orari</button>
+                <table>
+                    <thead><tr><th>Nome</th><th>Icona</th><th>Azioni</th></tr></thead>
+                    <tbody id="catTable"></tbody>
+                </table>
+                <button class="btn btn-gold" style="margin-top:15px" onclick="addCategory()"><i class="fas fa-plus"></i> Nuova Categoria</button>
             </div>
         </div>
-    </div>
 
+        <!-- IMMAGINI -->
+        <div id="sec-images" class="section">
+            <h2>🖼️ Gestione Immagini</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="card">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">Copertina (Hero)</h3>
+                    <div class="upload-box" onclick="uploadImage('hero')">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>Clicca per caricare immagine</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">Logo Fattorini</h3>
+                    <div class="upload-box" onclick="uploadImage('driverLogo')">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>Clicca per caricare logo</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top:20px;">
+                <h3 style="color:var(--gold); margin-bottom:15px;">Foto Categorie</h3>
+                <div class="form-group">
+                    <label>Seleziona Categoria:</label>
+                    <select id="imgCatSelect" class="form-control" onchange="renderCatImageSection()"></select>
+                </div>
+                <div id="catImageArea" style="display:none;">
+                    <div class="upload-box" onclick="uploadImage('category')">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>Clicca per caricare foto categoria</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IMPOSTAZIONI -->
+        <div id="sec-settings" class="section">
+            <h2>⚙️ Impostazioni</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="card">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">🔒 Cambio PIN</h3>
+                    <div class="form-group"><label>PIN Attuale</label><input type="password" id="oldPin" class="form-control"></div>
+                    <div class="form-group"><label>Nuovo PIN</label><input type="password" id="newPin" class="form-control"></div>
+                    <button class="btn btn-gold" onclick="changePin()">Salva PIN</button>
+                </div>
+                <div class="card">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">🕒 Orari</h3>
+                    <div class="form-group"><label>Orario 1</label><input type="text" id="h1" class="form-control" placeholder="11:00-15:00"></div>
+                    <div class="form-group"><label>Orario 2</label><input type="text" id="h2" class="form-control" placeholder="18:00-23:00"></div>
+                    <button class="btn btn-gold" onclick="saveSettings()">Salva Orari</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <!-- INPUT NASCOSTO PER UPLOAD -->
 <input type="file" id="fileInput" class="hidden-input" onchange="handleFile(this)">
 
 <script>
-// === CONFIG FIREBASE IDENTICA ALL'APP ===
+// === CONFIG FIREBASE (ESATTA COME L'APP) ===
 const firebaseConfig = { 
     apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", 
     authDomain: "teogra-c8cf5.firebaseapp.com", 
@@ -247,66 +264,74 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// === MENU INIZIALE (Copia esatta dell'app) ===
-const DEFAULT_BIBITE = [{name:"Coca Cola",price:2.00,desc:"Lattina 33cl"},{name:"Sprite",price:2.00,desc:"Lattina 33cl"},{name:"Fanta",price:2.00,desc:"Lattina 33cl"},{name:"Coca Cola Zero",price:2.00,desc:"Lattina 33cl"},{name:"Estathè Limone",price:2.50,desc:"Bottiglietta"},{name:"Estathè Pesca",price:2.50,desc:"Bottiglietta"},{name:"Pepsi",price:2.00,desc:"Lattina 33cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"},{name:"Peroni 66cl",price:3.00,desc:"Birra"},{name:"Tennent's 33cl",price:3.50,desc:"Birra"},{name:"Dreher Limone 33cl",price:2.50,desc:"Birra aromatizzata"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"}];
-
-let appData = {
-    categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍟 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:" Bibite",icon:"fa-glass-martini-alt"} },
-    menu: {
-        pizze:[{name:"Pomodorino e Mozzarella",price:6.00,desc:""},{name:"Marinara",price:4.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Margherita",price:5.00,desc:""},{name:"Würstel",price:7.00,desc:""},{name:"Prosciutto Cotto",price:7.00,desc:""},{name:"Salame Piccante",price:7.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Fornarina",price:3.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Mozzarella, scamorza affumicata"}],
-        focacce:[{name:"Pomodoro Fresco",price:8.00,desc:""},{name:"Pomodoro Pelato",price:8.00,desc:""},{name:"Patate",price:8.00,desc:""},{name:"Vegetariana",price:8.00,desc:"Zucchine, melanzane, pomodoro"},{name:"Salsiccia e Patate",price:8.00,desc:""},{name:"Prosciutto e Patate",price:8.00,desc:""},{name:"Mozzarella",price:8.00,desc:""},{name:"Würstel",price:8.00,desc:""},{name:"Prosciutto Cotto",price:8.00,desc:""},{name:"Salame Piccante",price:8.00,desc:""},{name:"Melanzane",price:8.00,desc:""},{name:"Zucchine",price:8.00,desc:""},{name:"Salsiccia e Caciocavallo",price:8.00,desc:""},{name:"Salsiccia e Funghi",price:8.00,desc:""},{name:"Salsiccia e Peperoni",price:8.00,desc:""},{name:"Tonno e Capperi",price:8.00,desc:""},{name:"Salame Piccante e Salsiccia",price:8.00,desc:""},{name:"Bianca",price:6.00,desc:""},{name:"Cipolla, Olive e Capperi",price:8.00,desc:""},{name:"Quattro Formaggi",price:8.00,desc:"Caciocavallo, gorgonzola, mozzarella, scamorza"}],
-        frittura:[{name:"Patatina Piccola",price:2.00,desc:""},{name:"Patatina Grande",price:3.00,desc:""},{name:"Scagliozzi (5 pz)",price:1.00,desc:""},{name:"Olive Ascolane (4 pz)",price:2.00,desc:""},{name:"Panzerottini (4 pz)",price:2.00,desc:""},{name:"Mozzarelline (4 pz)",price:2.00,desc:""},{name:"Chele di Granchio (5 pz)",price:3.00,desc:""},{name:"Crocchette di Patate (5 pz)",price:2.50,desc:""}],
-        bibite:[...DEFAULT_BIBITE]
-    },
-    settings: { whatsappNumber:"+390884660377", visiblePhone:"0884660377", manualStatus:"auto", openDays:"lun,mar,mer,gio,ven,sab,dom", hours:"11:00-15:00,18:00-23:00", specialClosures:"", adminPin:"1234", deliveryEnabled:true, pickupEnabled:true, deliveryFee:2.00, minDeliveryOrder:15 }
+// === MENU DI BACKUP (SE IL DB E' VUOTO) ===
+const DEFAULT_MENU = {
+    pizze:[{name:"Pomodorino e Mozzarella",price:6.00},{name:"Marinara",price:4.00},{name:"Patate",price:8.00},{name:"Margherita",price:5.00},{name:"Diavola",price:7.00},{name:"Quattro Formaggi",price:8.00}],
+    focacce:[{name:"Rosso",price:6.00},{name:"Bianca",price:6.00}],
+    frittura:[{name:"Patatine",price:3.00},{name:"Crocchette",price:4.00}],
+    bibite:[{name:"Coca Cola",price:2.00},{name:"Acqua",price:1.00}]
+};
+const DEFAULT_CATS = {
+    pizze:{name:"🍕 Pizze",icon:"fa-pizza-slice"},
+    focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"},
+    frittura:{name:"🍟 Frittura",icon:"fa-drumstick-bite"},
+    bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"}
 };
 
+let appData = { categories:{}, menu:{}, settings:{} };
 let currentCat = 'pizze';
 let uploadTarget = null;
 
-// === AUTH ===
+// === AUTH (PIN FIX DEFINITIVO) ===
 function checkLogin() {
     const pinInput = document.getElementById('pinInput').value;
     if(!pinInput) return;
 
-    // ✅ FIX PIN: Legge da Firebase e converte tutto in Stringa
+    // Leggiamo il PIN dal DB
     db.ref('settings/adminPin').once('value').then(snap => {
         const savedPin = String(snap.val() || '1234');
+        
+        // Confronto sicuro
         if (String(pinInput) === savedPin) {
-            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appMain').style.display = 'flex';
             initApp();
         } else {
-            alert('❌ PIN Errato! (Il sistema ha letto: ' + savedPin + ')');
+            alert('❌ PIN Errato! (Il sistema legge: ' + savedPin + ')');
         }
     }).catch(err => {
         console.error(err);
-        alert("Errore di connessione al database");
+        alert("Errore connessione database.");
     });
 }
-
 function logout() { location.reload(); }
 
 // === INIT ===
 function initApp() {
-    // Carica Categorie
+    // 1. Se non ci sono categorie, carico quelle di default
+    db.ref('categories').once('value').then(s => {
+        if(!s.exists()) {
+            db.ref('categories').set(DEFAULT_CATS);
+            db.ref('menu').set(DEFAULT_MENU);
+        }
+    });
+
+    // 2. Listeners
     db.ref('categories').on('value', snap => {
-        appData.categories = snap.val() || appData.categories;
+        appData.categories = snap.val() || {};
         renderCategorySelect();
         renderCategoryTable();
         renderCatImageSection();
     });
-    // Carica Menu
     db.ref('menu').on('value', snap => {
-        appData.menu = snap.val() || appData.menu;
+        appData.menu = snap.val() || {};
         renderProducts();
     });
-    // Carica Ordini
     db.ref('ordini').orderByChild('timestamp').limitToLast(20).on('value', snap => {
         const orders = [];
         snap.forEach(c => orders.push(c.val()));
         renderOrders(orders.reverse());
     });
-    // Carica Impostazioni
     db.ref('settings').on('value', snap => {
         if(snap.exists()) appData.settings = {...appData.settings, ...snap.val()};
         updateSettingsUI();
@@ -358,7 +383,7 @@ function updateOrder(id, st) { db.ref(`ordini/${id}/status`).set(st); }
 function delOrder(id) { if(confirm('Eliminare?')) db.ref(`ordini/${id}`).remove(); }
 function clearAllOrders() { if(confirm('⚠️ ELIMINARE TUTTI GLI ORDINI DAL DATABASE?')) db.ref('ordini').remove(); }
 
-// === MENU & PRODOTTI ===
+// === MENU ===
 function renderCategorySelect() {
     const sel = document.getElementById('catSelect');
     sel.innerHTML = Object.keys(appData.categories).map(k => `<option value="${k}">${appData.categories[k].name}</option>`).join('');
@@ -402,7 +427,7 @@ function addProduct() {
     document.getElementById('newProdPrice').value = '';
 }
 
-// === CATEGORIES ===
+// === CATEGORIE ===
 function renderCategoryTable() {
     document.getElementById('catTable').innerHTML = Object.keys(appData.categories).map(k => `
         <tr><td>${appData.categories[k].name}</td><td>${appData.categories[k].icon}</td>
@@ -441,16 +466,13 @@ function handleFile(input) {
     storage.ref(uploadTarget.path).put(file).then(snap => {
         snap.ref.getDownloadURL().then(url => {
             if(uploadTarget.cat && uploadTarget.i !== undefined) {
-                // Prodotto
                 db.ref(`menu/${uploadTarget.cat}/${uploadTarget.i}/img`).set(url);
             } else if(uploadTarget.cat) {
-                // Categoria
                 if(!appData.images) appData.images = {};
                 if(!appData.images.categories) appData.images.categories = {};
                 appData.images.categories[uploadTarget.cat] = url;
                 db.ref(`images/categories/${uploadTarget.cat}`).set(url);
             } else {
-                // Generiche
                 db.ref(uploadTarget.path).set(url);
             }
             alert('Immagine caricata!');
