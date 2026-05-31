@@ -3,58 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antica Pizzeria Grasso - Gestionale Admin Pro</title>
+<title>Antica Pizzeria Grasso - Gestionale Pro</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <style>
-:root {
-    --bg: #121212; --bg-card: #1e1e1e; --bg-hover: #2a2a2a;
-    --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b;
-    --text: #f5f5f5; --muted: #aaa; --danger: #ef4444; --success: #4ade80;
-    --radius: 12px; --shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+:root { --bg:#121212; --bg-card:#1e1e1e; --bg-hover:#2a2a2a; --gold:#d4a84b; --gold-light:#f0d78c; --gold-dark:#b8860b; --text:#f5f5f5; --muted:#aaa; --danger:#ef4444; --success:#4ade80; --warning:#fbbf24; --info:#60a5fa; --radius:12px; --sidebar:260px; }
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
 body { background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
 
 /* LOGIN */
 #loginScreen { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; }
 #loginScreen.hidden { display:none; }
-.login-box { background:var(--bg-card); padding:40px; border-radius:var(--radius); text-align:center; width:350px; border:1px solid var(--gold-dark); }
-.login-box h1 { color:var(--gold); font-size:1.5rem; margin-bottom:20px; }
-.login-box input { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--bg-hover); color:var(--text); font-size:1.2rem; text-align:center; margin-bottom:15px; }
-.login-box button { width:100%; padding:12px; background:var(--gold); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer; }
+.login-box { background:var(--bg-card); padding:40px; border-radius:var(--radius); text-align:center; width:380px; border:1px solid var(--gold-dark); }
+.login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.6rem; margin-bottom:8px; }
+.login-box p { color:var(--muted); margin-bottom:20px; font-size:0.9rem; }
+.login-box input { width:100%; padding:14px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--bg-hover); color:var(--text); font-size:1.2rem; text-align:center; margin-bottom:15px; }
+.login-box button { width:100%; padding:14px; background:var(--gold); color:var(--bg); border:none; border-radius:8px; font-weight:700; font-size:1rem; cursor:pointer; }
+.login-box button:hover { background:var(--gold-light); }
 
 /* LAYOUT */
-.sidebar { width:260px; background:var(--bg-card); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; flex-shrink:0; }
+.sidebar { width:var(--sidebar); background:var(--bg-card); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; flex-shrink:0; overflow-y:auto; }
 .sidebar-header { padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
-.sidebar-header h2 { color:var(--gold); font-size:1.2rem; }
-.sidebar-nav { flex:1; overflow-y:auto; padding:10px; }
-.nav-item { padding:12px 15px; display:flex; align-items:center; gap:12px; color:var(--muted); cursor:pointer; border-radius:8px; margin-bottom:5px; transition:0.2s; }
+.sidebar-header h2 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.2rem; }
+.sidebar-header span { font-size:0.75rem; color:var(--muted); }
+.sidebar-nav { flex:1; padding:10px; }
+.nav-item { padding:12px 15px; display:flex; align-items:center; gap:12px; color:var(--muted); cursor:pointer; border-radius:8px; margin-bottom:5px; transition:0.2s; font-size:0.9rem; }
 .nav-item:hover { background:var(--bg-hover); color:var(--text); }
 .nav-item.active { background:rgba(212,168,75,0.15); color:var(--gold); }
 .nav-item i { width:20px; text-align:center; }
+.nav-badge { background:var(--danger); color:#fff; padding:2px 8px; border-radius:10px; font-size:0.7rem; font-weight:700; margin-left:auto; }
 
-.main-content { flex:1; overflow-y:auto; padding:30px; }
+.main-content { flex:1; overflow-y:auto; padding:25px; }
 .section { display:none; }
 .section.active { display:block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
+.top-bar { background:var(--bg-card); padding:15px 25px; display:flex; justify-content:space-between; align-items:center; border-radius:var(--radius); margin-bottom:20px; border:1px solid rgba(255,255,255,0.05); }
+.top-bar h1 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.4rem; }
+.status-indicator { display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:20px; font-size:0.85rem; font-weight:600; }
+.status-indicator.open { background:rgba(74,222,128,0.15); color:var(--success); }
+.status-indicator.closed { background:rgba(248,113,113,0.15); color:var(--danger); }
+
 /* COMPONENTS */
 .card { background:var(--bg-card); border-radius:var(--radius); padding:20px; margin-bottom:20px; border:1px solid rgba(255,255,255,0.05); }
 .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px; }
-.card-header h3 { color:var(--gold); font-size:1.1rem; }
-.btn { padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+.card-header h3 { color:var(--gold); font-size:1.1rem; display:flex; align-items:center; gap:8px; }
+.btn { padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; }
 .btn-gold { background:var(--gold); color:var(--bg); }
 .btn-gold:hover { background:var(--gold-light); }
 .btn-danger { background:var(--danger); color:#fff; }
+.btn-success { background:var(--success); color:var(--bg); }
+.btn-warning { background:var(--warning); color:var(--bg); }
 .btn-sm { padding:5px 10px; font-size:0.75rem; }
 .btn-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; border:none; cursor:pointer; }
 .btn-icon.del { background:rgba(239,68,68,0.2); color:var(--danger); }
 .btn-icon.del:hover { background:var(--danger); color:#fff; }
 .btn-icon.edit { background:rgba(212,168,75,0.2); color:var(--gold); }
+.btn-icon.edit:hover { background:var(--gold); color:var(--bg); }
 
 /* TABLES */
 table { width:100%; border-collapse:collapse; }
@@ -66,191 +74,304 @@ tr:hover td { background:var(--bg-hover); }
 /* FORMS */
 .form-group { margin-bottom:15px; }
 .form-group label { display:block; margin-bottom:6px; font-size:0.85rem; color:var(--muted); }
-.form-control { width:100%; padding:10px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--bg-hover); color:var(--text); }
+.form-control { width:100%; padding:10px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--bg-hover); color:var(--text); font-size:0.9rem; }
 .form-control:focus { outline:none; border-color:var(--gold); }
-.toggle { width:40px; height:22px; background:#555; border-radius:11px; position:relative; cursor:pointer; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.toggle { width:44px; height:24px; background:#555; border-radius:12px; position:relative; cursor:pointer; transition:0.2s; }
 .toggle.on { background:var(--success); }
-.toggle::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:0.2s; }
-.toggle.on::after { left:20px; }
+.toggle::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#fff; border-radius:50%; transition:0.2s; }
+.toggle.on::after { left:22px; }
 
 /* BADGES */
-.badge { padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:700; }
-.badge-new { background:rgba(239,68,68,0.2); color:#f87171; }
+.badge { padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:700; }
+.badge-new { background:rgba(248,113,113,0.2); color:#f87171; }
 .badge-prep { background:rgba(251,191,36,0.2); color:#fbbf24; }
 .badge-ready { background:rgba(74,222,128,0.2); color:#4ade80; }
+.badge-delivered { background:rgba(96,165,250,0.2); color:#60a5fa; }
+
+/* ORDER CARDS */
+.order-card { background:var(--bg-card); border-radius:12px; padding:15px; margin-bottom:12px; border-left:4px solid var(--gold-dark); }
+.order-card.status-new { border-left-color:var(--danger); animation:pulse 2s infinite; }
+.order-card.status-preparing { border-left-color:var(--warning); }
+.order-card.status-ready { border-left-color:var(--success); }
+.order-card.status-delivered { border-left-color:var(--info); opacity:0.7; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 50%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
 
 /* UPLOAD */
 .upload-box { border:2px dashed var(--gold-dark); border-radius:8px; padding:20px; text-align:center; cursor:pointer; color:var(--muted); transition:0.2s; }
 .upload-box:hover { border-color:var(--gold); color:var(--gold); }
+
+/* STATS */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-bottom:20px; }
+.stat-card { background:var(--bg-card); border-radius:var(--radius); padding:18px; border:1px solid rgba(255,255,255,0.05); }
+.stat-card .label { color:var(--muted); font-size:0.8rem; margin-bottom:8px; }
+.stat-card .value { font-size:1.8rem; font-weight:700; color:var(--gold); }
+.stat-card .sub { color:var(--muted); font-size:0.75rem; margin-top:4px; }
+
+/* PRODUCT ROW */
+.product-row { display:grid; grid-template-columns:60px 2fr 1fr 1fr 100px; gap:15px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.product-row:last-child { border:none; }
+.product-name { font-weight:600; }
+.product-desc { color:var(--muted); font-size:0.8rem; }
+
+/* TOAST */
+.toast { position:fixed; bottom:30px; right:30px; background:var(--bg-card); color:var(--gold); padding:14px 24px; border-radius:12px; font-weight:600; font-size:0.9rem; z-index:10000; opacity:0; transform:translateY(20px); transition:all .3s; border:1px solid rgba(212,168,75,0.3); pointer-events:none; }
+.toast.show { opacity:1; transform:translateY(0); }
+.toast.success { border-color:rgba(74,222,128,0.3); color:var(--success); }
+.toast.error { border-color:rgba(248,113,113,0.3); color:var(--danger); }
+
+/* DAYS GRID */
+.days-grid { display:flex; gap:6px; flex-wrap:wrap; }
+.day-btn { padding:8px 12px; border-radius:6px; background:var(--bg-hover); color:var(--muted); cursor:pointer; font-size:0.85rem; border:1px solid transparent; }
+.day-btn.active { background:var(--gold); color:var(--bg); font-weight:600; }
+
+/* PROMOS */
+.promo-card { background:var(--bg-card); border-radius:var(--radius); padding:15px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05); }
+.promo-header { display:flex; justify-content:space-between; align-items:start; margin-bottom:10px; }
+
+/* HIDDEN INPUTS */
+.hidden-input { display:none; }
+
+@media(max-width:1024px) {
+.sidebar { width:60px; }
+.sidebar .nav-text, .sidebar-header span, .nav-badge { display:none; }
+.sidebar-header h2 { font-size:0; }
+.sidebar-header h2::after { content:'🍕'; font-size:1.5rem; }
+.main-content { padding:15px; }
+.form-row { grid-template-columns:1fr; }
+.product-row { grid-template-columns:50px 1.5fr 1fr 100px; }
+.product-row > div:nth-child(3) { display:none; }
+}
+@media(max-width:768px) {
+.sidebar { display:none; }
+.main-content { padding:10px; }
+}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="loginScreen">
-    <div class="login-box">
-        <h1>🔐 Admin Grasso</h1>
-        <input type="password" id="pinInput" placeholder="PIN di accesso" maxlength="6">
-        <button onclick="checkLogin()">Entra</button>
-    </div>
+<div class="login-box">
+<h1> Admin Grasso</h1>
+<p>Gestionale Pizzeria</p>
+<input type="password" id="pinInput" placeholder="PIN (4-6 cifre)" maxlength="6">
+<button onclick="checkLogin()">Entra</button>
+</div>
 </div>
 
-<!-- APP -->
+<!-- SIDEBAR -->
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h2> Antica Pizzeria Grasso</h2>
-        <span style="font-size:0.75rem;color:var(--muted)">Gestionale Pro</span>
-    </div>
-    <div class="sidebar-nav">
-        <div class="nav-item active" onclick="showSection('orders',this)"><i class="fas fa-receipt"></i> Ordini</div>
-        <div class="nav-item" onclick="showSection('products',this)"><i class="fas fa-utensils"></i> Menu & Prodotti</div>
-        <div class="nav-item" onclick="showSection('categories',this)"><i class="fas fa-layer-group"></i> Categorie</div>
-        <div class="nav-item" onclick="showSection('promos',this)"><i class="fas fa-gift"></i> Promozioni</div>
-        <div class="nav-item" onclick="showSection('drivers',this)"><i class="fas fa-motorcycle"></i> Fattorini</div>
-        <div class="nav-item" onclick="showSection('images',this)"><i class="fas fa-images"></i> Immagini</div>
-        <div class="nav-item" onclick="showSection('settings',this)"><i class="fas fa-cog"></i> Impostazioni</div>
-        <div class="nav-item" onclick="logout()" style="margin-top:auto;color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Esci</div>
-    </div>
+<div class="sidebar-header">
+<h2>Antica Pizzeria Grasso</h2>
+<span>Gestionale Pro</span>
+</div>
+<div class="sidebar-nav">
+<div class="nav-item active" onclick="showSection('dashboard',this)"><i class="fas fa-chart-line"></i><span class="nav-text">Dashboard</span></div>
+<div class="nav-item" onclick="showSection('orders',this)"><i class="fas fa-receipt"></i><span class="nav-text">Ordini</span><span class="nav-badge" id="ordersBadge">0</span></div>
+<div class="nav-item" onclick="showSection('products',this)"><i class="fas fa-utensils"></i><span class="nav-text">Menu</span></div>
+<div class="nav-item" onclick="showSection('categories',this)"><i class="fas fa-layer-group"></i><span class="nav-text">Categorie</span></div>
+<div class="nav-item" onclick="showSection('promos',this)"><i class="fas fa-gift"></i><span class="nav-text">Promo</span></div>
+<div class="nav-item" onclick="showSection('reviews',this)"><i class="fas fa-star"></i><span class="nav-text">Recensioni</span></div>
+<div class="nav-item" onclick="showSection('drivers',this)"><i class="fas fa-users"></i><span class="nav-text">Fattorini</span></div>
+<div class="nav-item" onclick="showSection('images',this)"><i class="fas fa-images"></i><span class="nav-text">Immagini</span></div>
+<div class="nav-item" onclick="showSection('settings',this)"><i class="fas fa-cog"></i><span class="nav-text">Impostazioni</span></div>
+<div class="nav-item" onclick="logout()" style="margin-top:auto;color:var(--danger)"><i class="fas fa-sign-out-alt"></i><span class="nav-text">Esci</span></div>
+</div>
 </div>
 
+<!-- MAIN CONTENT -->
 <div class="main-content">
 
-    <!-- ORDINI -->
-    <div id="sec-orders" class="section active">
-        <h2 style="color:var(--gold);margin-bottom:20px">📋 Ordini in Tempo Reale</h2>
-        <div class="card">
-            <div class="card-header">
-                <h3>Ultimi 50 Ordini</h3>
-                <div style="display:flex;gap:10px">
-                    <button class="btn btn-sm btn-gold" onclick="filterOrders('all')">Tutti</button>
-                    <button class="btn btn-sm" style="background:var(--bg-hover);color:var(--text)" onclick="filterOrders('new')">Nuovi</button>
-                    <button class="btn btn-sm" style="background:var(--bg-hover);color:var(--text)" onclick="filterOrders('preparing')">In Prep</button>
-                </div>
-            </div>
-            <table>
-                <thead><tr><th>ID / Ora</th><th>Cliente</th><th>Totale</th><th>Stato</th><th>Azioni</th></tr></thead>
-                <tbody id="ordersTable"></tbody>
-            </table>
-        </div>
-    </div>
+<!-- DASHBOARD -->
+<div id="sec-dashboard" class="section active">
+<div class="top-bar">
+<h1>Dashboard</h1>
+<div class="status-indicator open" id="statusIndicator"><i class="fas fa-circle" style="font-size:0.5rem"></i> <span id="statusText">APERTO</span></div>
+</div>
+<div class="stats-grid">
+<div class="stat-card"><div class="label">Ordini Oggi</div><div class="value" id="statToday">0</div><div class="sub">Da mezzanotte</div></div>
+<div class="stat-card"><div class="label">In Attesa</div><div class="value" id="statPending">0</div><div class="sub">Nuovi + In Prep</div></div>
+<div class="stat-card"><div class="label">Fatturato Oggi</div><div class="value" id="statRevenue">€0</div><div class="sub">Ordini completati</div></div>
+<div class="stat-card"><div class="label">Recensioni</div><div class="value" id="statReviews">0</div><div class="sub">Da approvare</div></div>
+</div>
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-bell"></i> Ordini Recenti</h3></div>
+<div id="dashboardOrders"></div>
+</div>
+</div>
 
-    <!-- PRODOTTI -->
-    <div id="sec-products" class="section">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h2 style="color:var(--gold)">🍕 Menu & Prodotti</h2>
-            <div style="display:flex;gap:10px">
-                <select id="prodCatSelect" class="form-control" style="width:200px" onchange="renderProductsTable()"></select>
-                <button class="btn btn-gold" onclick="addProduct()"><i class="fas fa-plus"></i> Nuovo</button>
-            </div>
-        </div>
-        <div class="card" style="padding:0;overflow:hidden">
-            <table>
-                <thead><tr><th>Foto</th><th>Nome</th><th>Prezzo</th><th>Disp.</th><th>Azioni</th></tr></thead>
-                <tbody id="productsTable"></tbody>
-            </table>
-        </div>
-    </div>
+<!-- ORDINI -->
+<div id="sec-orders" class="section">
+<div class="top-bar">
+<h1>📋 Ordini</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-sm btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Svuota Tutto</button>
+<button class="btn btn-sm btn-warning" onclick="cleanOldOrders()"><i class="fas fa-broom"></i> Pulisci Vecchi</button>
+</div>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+<button class="btn btn-sm btn-gold" onclick="filterOrders('all')">Tutti</button>
+<button class="btn btn-sm" style="background:var(--bg-card);color:var(--text)" onclick="filterOrders('new')">🔴 Nuovi</button>
+<button class="btn btn-sm" style="background:var(--bg-card);color:var(--text)" onclick="filterOrders('preparing')">🟡 In Prep</button>
+<button class="btn btn-sm" style="background:var(--bg-card);color:var(--text)" onclick="filterOrders('ready')"> Pronti</button>
+</div>
+<div id="ordersList"></div>
+</div>
 
-    <!-- CATEGORIE -->
-    <div id="sec-categories" class="section">
-        <h2 style="color:var(--gold);margin-bottom:20px">📂 Categorie</h2>
-        <div class="card">
-            <table>
-                <thead><tr><th>Nome</th><th>Icona</th><th>Azioni</th></tr></thead>
-                <tbody id="categoriesTable"></tbody>
-            </table>
-            <button class="btn btn-gold" style="margin-top:15px" onclick="addCategory()"><i class="fas fa-plus"></i> Aggiungi Categoria</button>
-        </div>
-    </div>
+<!-- PRODOTTI -->
+<div id="sec-products" class="section">
+<div class="top-bar">
+<h1>🍕 Menu & Prodotti</h1>
+<div style="display:flex;gap:10px">
+<select id="prodCatSelect" class="form-control" style="width:180px" onchange="renderProductsTable()"></select>
+<button class="btn btn-sm btn-gold" onclick="addProduct()"><i class="fas fa-plus"></i> Nuovo</button>
+</div>
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+<table>
+<thead><tr><th>Foto</th><th>Nome</th><th>Descrizione</th><th>Prezzo</th><th>Disp.</th><th>Azioni</th></tr></thead>
+<tbody id="productsTable"></tbody>
+</table>
+</div>
+</div>
 
-    <!-- PROMOZIONI -->
-    <div id="sec-promos" class="section">
-        <h2 style="color:var(--gold);margin-bottom:20px">🎁 Promozioni</h2>
-        <div class="card">
-            <div id="promoList"></div>
-        </div>
-    </div>
+<!-- CATEGORIE -->
+<div id="sec-categories" class="section">
+<div class="top-bar">
+<h1>📂 Categorie</h1>
+<button class="btn btn-sm btn-gold" onclick="addCategory()"><i class="fas fa-plus"></i> Aggiungi</button>
+</div>
+<div class="card">
+<table>
+<thead><tr><th>Nome</th><th>Icona</th><th>Prodotti</th><th>Azioni</th></tr></thead>
+<tbody id="categoriesTable"></tbody>
+</table>
+</div>
+</div>
 
-    <!-- FATTORINI -->
-    <div id="sec-drivers" class="section">
-        <h2 style="color:var(--gold);margin-bottom:20px">🛵 Fattorini</h2>
-        <div class="card">
-            <div id="driversList"></div>
-            <button class="btn btn-gold" style="margin-top:15px" onclick="addDriver()"><i class="fas fa-plus"></i> Aggiungi</button>
-            <button class="btn btn-gold" style="margin-top:15px;margin-left:10px" onclick="saveDrivers()"><i class="fas fa-save"></i> Salva</button>
-        </div>
-    </div>
+<!-- PROMOZIONI -->
+<div id="sec-promos" class="section">
+<div class="top-bar">
+<h1>🎁 Promozioni</h1>
+<button class="btn btn-sm btn-gold" onclick="createPromo()"><i class="fas fa-plus"></i> Crea Promo</button>
+</div>
+<div id="promoList"></div>
+</div>
 
-    <!-- IMMAGINI -->
-    <div id="sec-images" class="section">
-        <h2 style="color:var(--gold);margin-bottom:20px">🖼️ Gestione Immagini</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-            <div class="card">
-                <div class="card-header"><h3>Hero (Home)</h3></div>
-                <div class="upload-box" onclick="uploadImage('hero')">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem;margin-bottom:10px"></i><br>Clicca per caricare
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h3>Logo Fattorini</h3></div>
-                <div class="upload-box" onclick="uploadImage('driverLogo')">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem;margin-bottom:10px"></i><br>Clicca per caricare
-                </div>
-            </div>
-            <div class="card" style="grid-column:span 2">
-                <div class="card-header"><h3>Immagini Categorie</h3></div>
-                <div id="categoryImagesList"></div>
-            </div>
-        </div>
-    </div>
+<!-- RECENSIONI -->
+<div id="sec-reviews" class="section">
+<div class="top-bar">
+<h1>⭐ Recensioni</h1>
+</div>
+<div id="reviewsList"></div>
+</div>
 
-    <!-- IMPOSTAZIONI -->
-    <div id="sec-settings" class="section">
-        <h2 style="color:var(--gold);margin-bottom:20px">⚙️ Impostazioni</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-            <div class="card">
-                <div class="card-header"><h3>📅 Orari & Chiusure</h3></div>
-                <div class="form-group">
-                    <label>Giorni Apertura</label>
-                    <div id="daysGrid" style="display:flex;gap:5px;flex-wrap:wrap">
-                        <!-- Days buttons generated by JS -->
-                    </div>
-                </div>
-                <div class="form-group"><label>Orario 1</label><input type="text" class="form-control" id="hours1"></div>
-                <div class="form-group"><label>Orario 2</label><input type="text" class="form-control" id="hours2"></div>
-                <div class="form-group"><label>Chiusure (YYYY-MM-DD)</label><input type="text" class="form-control" id="specialClosures"></div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h3>🛵 Consegne</h3></div>
-                <div class="form-group"><label>Costo Consegna</label><input type="number" class="form-control" id="deliveryFee"></div>
-                <div class="form-group"><label>Minimo Ordine</label><input type="number" class="form-control" id="minDelivery"></div>
-                <div class="form-group" style="display:flex;justify-content:space-between;align-items:center">
-                    <span>Abilita Consegna</span>
-                    <div class="toggle" id="toggleDelivery" onclick="this.classList.toggle('on')"></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h3>🔒 Sicurezza</h3></div>
-                <div class="form-group"><label>PIN Attuale</label><input type="password" class="form-control" id="currentPin"></div>
-                <div class="form-group"><label>Nuovo PIN (4-6 cifre)</label><input type="password" class="form-control" id="newPin"></div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h3>🎨 Video Hero</h3></div>
-                <div class="form-group"><label>URL Video (o carica sotto)</label><input type="text" class="form-control" id="heroVideoUrl"></div>
-                <div class="upload-box" onclick="uploadVideo()">
-                    <i class="fas fa-video" style="font-size:1.5rem"></i> Carica Video MP4
-                </div>
-                <button class="btn btn-danger" style="margin-top:10px;width:100%" onclick="removeVideo()">Rimuovi Video</button>
-            </div>
-        </div>
-        <button class="btn btn-gold" style="margin-top:20px;padding:15px 30px;font-size:1rem" onclick="saveSettings()">💾 Salva Tutto</button>
-    </div>
+<!-- FATTORINI -->
+<div id="sec-drivers" class="section">
+<div class="top-bar">
+<h1>🛵 Fattorini</h1>
+<button class="btn btn-sm btn-gold" onclick="saveDrivers()"><i class="fas fa-save"></i> Salva</button>
+</div>
+<div class="card">
+<div id="driversList"></div>
+<button class="btn btn-sm btn-gold" style="margin-top:15px" onclick="addDriver()"><i class="fas fa-plus"></i> Aggiungi Fattorino</button>
+</div>
+</div>
+
+<!-- IMMAGINI -->
+<div id="sec-images" class="section">
+<div class="top-bar">
+<h1>🖼️ Gestione Immagini</h1>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="card">
+<div class="card-header"><h3>Hero (Home)</h3></div>
+<div class="upload-box" onclick="uploadImage('hero')">
+<i class="fas fa-cloud-upload-alt" style="font-size:2rem;margin-bottom:10px"></i><br>Clicca per caricare
+</div>
+</div>
+<div class="card">
+<div class="card-header"><h3>Logo Fattorini</h3></div>
+<div class="upload-box" onclick="uploadImage('driverLogo')">
+<i class="fas fa-cloud-upload-alt" style="font-size:2rem;margin-bottom:10px"></i><br>Clicca per caricare
+</div>
+</div>
+<div class="card" style="grid-column:span 2">
+<div class="card-header"><h3>Immagini Categorie</h3></div>
+<div id="categoryImagesList"></div>
+</div>
+</div>
+</div>
+
+<!-- IMPOSTAZIONI -->
+<div id="sec-settings" class="section">
+<div class="top-bar">
+<h1>⚙️ Impostazioni</h1>
+<button class="btn btn-sm btn-gold" onclick="saveSettings()"><i class="fas fa-save"></i> Salva Tutto</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="card">
+<div class="card-header"><h3>📅 Orari & Chiusure</h3></div>
+<div class="form-group">
+<label>Giorni Apertura</label>
+<div class="days-grid" id="daysGrid"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Orario 1</label><input type="text" class="form-control" id="hours1" placeholder="11:00-15:00"></div>
+<div class="form-group"><label>Orario 2</label><input type="text" class="form-control" id="hours2" placeholder="18:00-23:00"></div>
+</div>
+<div class="form-group"><label>Chiusure (YYYY-MM-DD)</label><input type="text" class="form-control" id="specialClosures" placeholder="2026-12-25"></div>
+</div>
+<div class="card">
+<div class="card-header"><h3> Consegne</h3></div>
+<div class="form-row">
+<div class="form-group"><label>Costo Consegna (€)</label><input type="number" class="form-control" id="deliveryFee" step="0.50"></div>
+<div class="form-group"><label>Minimo Ordine (€)</label><input type="number" class="form-control" id="minDelivery" step="0.50"></div>
+</div>
+<div class="form-group" style="display:flex;justify-content:space-between;align-items:center">
+<span>Abilita Consegna</span>
+<div class="toggle" id="toggleDelivery" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="form-group" style="display:flex;justify-content:space-between;align-items:center">
+<span>Abilita Ritiro</span>
+<div class="toggle" id="togglePickup" onclick="this.classList.toggle('on')"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><h3>🔒 Sicurezza</h3></div>
+<div class="form-group"><label>PIN Attuale</label><input type="password" class="form-control" id="currentPin"></div>
+<div class="form-group"><label>Nuovo PIN (4-6 cifre)</label><input type="password" class="form-control" id="newPin"></div>
+</div>
+<div class="card">
+<div class="card-header"><h3>🎨 Palette & Video</h3></div>
+<div class="form-group">
+<label>Tema Colori</label>
+<select class="form-control" id="paletteSelect">
+<option value="autunno"> Autunno</option>
+<option value="inverno">❄️ Inverno</option>
+<option value="primavera">🌱 Primavera</option>
+<option value="estate">☀️ Estate</option>
+<option value="natale"> Natale</option>
+<option value="san_valentino">❤️ San Valentino</option>
+<option value="notte">🌙 Notte</option>
+</select>
+</div>
+<div class="form-group"><label>URL Video Hero</label><input type="text" class="form-control" id="heroVideoUrl"></div>
+<div class="upload-box" onclick="document.getElementById('videoInput').click()">
+<i class="fas fa-video" style="font-size:1.5rem"></i> Carica Video MP4
+</div>
+<button class="btn btn-sm btn-danger" style="margin-top:10px;width:100%" onclick="removeVideo()">Rimuovi Video</button>
+</div>
+</div>
+</div>
 
 </div>
 
-<!-- HIDDEN INPUTS FOR UPLOADS -->
-<input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(this)">
-<input type="file" id="videoInput" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
+<!-- HIDDEN INPUTS -->
+<input type="file" id="fileInput" class="hidden-input" onchange="handleFileSelect(this)">
+<input type="file" id="videoInput" accept="video/*" class="hidden-input" onchange="handleVideoSelect(this)">
+<div class="toast" id="toast"></div>
 
 <script>
 // === CONFIG ===
@@ -259,302 +380,421 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-let appData = { settings:{}, menu:{}, categories:{}, promotions:{}, drivers:{} };
+let appData = { settings:{}, menu:{}, categories:{}, promotions:{}, drivers:{}, images:{} };
 let currentCat = 'pizze';
-let uploadContext = null; // To track what we are uploading
+let currentOrderFilter = 'all';
+let uploadContext = null;
 
 // === AUTH ===
 function checkLogin() {
-    const pin = document.getElementById('pinInput').value;
-    db.ref('settings/adminPin').once('value').then(s => {
-        const saved = s.val() || '1234';
-        if (String(pin) === String(saved)) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            initApp();
-        } else {
-            alert('PIN Errato!');
-        }
-    });
+const pin = document.getElementById('pinInput').value;
+if(!pin) return;
+db.ref('settings/adminPin').once('value').then(s => {
+const saved = s.val() || '1234';
+if(String(pin) === String(saved)) {
+document.getElementById('loginScreen').classList.add('hidden');
+initApp();
+} else {
+showToast(' PIN Errato','error');
+}
+});
 }
 function logout() { location.reload(); }
 
 // === INIT ===
 function initApp() {
-    loadAllData();
-    setupDaysGrid();
+loadAllData();
+setupDaysGrid();
 }
 
 function loadAllData() {
-    db.ref('settings').on('value', s => { if(s.exists()) { appData.settings = s.val(); updateSettingsUI(); } });
-    db.ref('menu').on('value', s => { if(s.exists()) { appData.menu = s.val(); renderCategoriesSelect(); renderProductsTable(); } });
-    db.ref('categories').on('value', s => { if(s.exists()) { appData.categories = s.val(); renderCategoriesTable(); renderCategoryImages(); } });
-    db.ref('promotions').on('value', s => { appData.promotions = s.exists() ? s.val() : {}; renderPromos(); });
-    db.ref('drivers').on('value', s => { appData.drivers = s.exists() ? s.val() : {}; renderDrivers(); });
-    db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => {
-        const o = {}; s.forEach(c => { o[c.key] = c.val(); });
-        renderOrders(o);
-    });
+db.ref('settings').on('value', s => { if(s.exists()) { appData.settings = s.val(); updateSettingsUI(); } });
+db.ref('menu').on('value', s => { if(s.exists()) { appData.menu = s.val(); renderCategoriesSelect(); renderProductsTable(); renderCategoriesTable(); } });
+db.ref('categories').on('value', s => { if(s.exists()) { appData.categories = s.val(); renderCategoriesTable(); renderCategoryImages(); } });
+db.ref('promotions').on('value', s => { appData.promotions = s.exists() ? s.val() : {}; renderPromos(); });
+db.ref('drivers').on('value', s => { appData.drivers = s.exists() ? s.val() : {}; renderDrivers(); });
+db.ref('recensioni').on('value', s => renderReviews(s));
+db.ref('images').on('value', s => { if(s.exists()) appData.images = s.val(); });
+db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => {
+const o = {}; s.forEach(c => { o[c.key] = c.val(); });
+renderOrders(o);
+updateDashboardStats(o);
+});
 }
 
 // === NAV ===
 function showSection(id, el) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('sec-'+id).classList.add('active');
-    if(el) el.classList.add('active');
+document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+document.getElementById('sec-'+id).classList.add('active');
+if(el) el.classList.add('active');
+}
+
+// === DASHBOARD ===
+function updateDashboardStats(orders) {
+const today = new Date().toISOString().split('T')[0];
+let todayCount = 0, pending = 0, revenue = 0;
+Object.values(orders).forEach(o => {
+const d = new Date(o.timestamp).toISOString().split('T')[0];
+if(d === today) todayCount++;
+if(o.status === 'new' || o.status === 'preparing') pending++;
+if(o.status === 'delivered' && d === today) revenue += (o.finalTotal || 0);
+});
+document.getElementById('statToday').textContent = todayCount;
+document.getElementById('statPending').textContent = pending;
+document.getElementById('statRevenue').textContent = '€' + revenue.toFixed(2);
+document.getElementById('ordersBadge').textContent = pending;
+
+const recent = Object.entries(orders).filter(([id,o]) => o.status === 'new' || o.status === 'preparing').slice(0,5);
+document.getElementById('dashboardOrders').innerHTML = recent.length ? recent.map(([id,o]) => createOrderCard(id,o,true)).join('') : '<p style="color:var(--muted);text-align:center;padding:20px;">Nessun ordine in attesa ✅</p>';
 }
 
 // === ORDERS ===
 function renderOrders(orders) {
-    const tb = document.getElementById('ordersTable');
-    let html = '';
-    Object.entries(orders).reverse().forEach(([id, o]) => {
-        const dt = new Date(o.timestamp).toLocaleString('it-IT');
-        let badgeClass = o.status==='new'?'badge-new':o.status==='preparing'?'badge-prep':'badge-ready';
-        let statusText = o.status==='new'?'Nuovo':o.status==='preparing'?'In Prep':'Pronto';
-        html += `<tr>
-            <td><div style="font-weight:700;color:var(--gold)">${o.orderId||id}</div><div style="font-size:0.8rem;color:var(--muted)">${dt}</div></td>
-            <td>${o.customerName}<br><span style="font-size:0.8rem;color:var(--muted)">${o.customerPhone}</span></td>
-            <td>€${(o.finalTotal||0).toFixed(2)}</td>
-            <td><span class="badge ${badgeClass}">${statusText}</span></td>
-            <td>
-                ${o.status==='new'?`<button class="btn btn-sm btn-gold" onclick="updateOrder('${id}','preparing')">Prep</button>`:''}
-                ${o.status==='preparing'?`<button class="btn btn-sm btn-gold" onclick="updateOrder('${id}','ready')">Pronto</button>`:''}
-                <button class="btn btn-sm btn-danger" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>`;
-    });
-    tb.innerHTML = html || '<tr><td colspan="5" style="text-align:center;padding:20px">Nessun ordine</td></tr>';
+let filtered = Object.entries(orders);
+if(currentOrderFilter !== 'all') filtered = filtered.filter(([id,o]) => o.status === currentOrderFilter);
+filtered.sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
+document.getElementById('ordersList').innerHTML = filtered.length ? filtered.map(([id,o]) => createOrderCard(id,o)).join('') : '<p style="color:var(--muted);text-align:center;padding:30px;">Nessun ordine</p>';
 }
-function updateOrder(id, st) { db.ref(`ordini/${id}/status`).set(st); }
+
+function createOrderCard(id, o, compact=false) {
+const dt = new Date(o.timestamp||0);
+const ts = dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+const ds = dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+let actions = '';
+if(o.status === 'new') actions = `<button class="btn btn-sm btn-warning" onclick="updateOrder('${id}','preparing')"><i class="fas fa-fire"></i> Prep</button><button class="btn btn-sm btn-danger" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+else if(o.status === 'preparing') actions = `<button class="btn btn-sm btn-success" onclick="updateOrder('${id}','ready')"><i class="fas fa-check"></i> Pronto</button><button class="btn btn-sm btn-danger" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+else if(o.status === 'ready') actions = `<button class="btn btn-sm btn-gold" onclick="updateOrder('${id}','delivered')"><i class="fas fa-truck"></i> Consegnato</button><button class="btn btn-sm btn-danger" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+else actions = `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+
+const items = (o.items||[]).map(i => ` ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}`).join('<br>');
+
+return `<div class="order-card status-${o.status||'new'}">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+<div><strong style="color:var(--gold)">${o.orderId||id}</strong><br><span style="font-size:0.8rem;color:var(--muted)">${ds} ${ts}</span></div>
+<span class="badge ${o.status==='new'?'badge-new':o.status==='preparing'?'badge-prep':'badge-ready'}">${o.status==='new'?'Nuovo':o.status==='preparing'?'In Prep':'Pronto'}</span>
+</div>
+<div style="font-weight:600;margin-bottom:4px"><i class="fas fa-user"></i> ${o.customerName||'N/A'} • ${o.customerPhone||'N/A'}</div>
+<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' • '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div>
+<div style="background:rgba(0,0,0,0.2);padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:0.85rem">${items}</div>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-weight:700;color:var(--gold)">Totale: €${(o.finalTotal||0).toFixed(2)}</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">${actions}</div>
+</div>
+</div>`;
+}
+
+function filterOrders(f) { currentOrderFilter = f; db.ref('ordini').orderByChild('timestamp').limitToLast(50).once('value', snap => { const o={}; snap.forEach(c=>{o[c.key]=c.val();}); renderOrders(o); }); }
+function updateOrder(id, st) { db.ref(`ordini/${id}/status`).set(st); showToast(`✅ Stato: ${st}`,'success'); }
 function deleteOrder(id) { if(confirm('Eliminare?')) db.ref(`ordini/${id}`).remove(); }
+function clearAllOrders() { if(confirm('️ ELIMINARE TUTTI GLI ORDINI?')) { db.ref('ordini').remove(); showToast('Database svuotato','success'); } }
+function cleanOldOrders() {
+if(!confirm('Cancellare ordini completati > 60gg?')) return;
+const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
+db.ref('ordini').orderByChild('timestamp').endAt(cutoff).once('value', snap => {
+let count=0;
+snap.forEach(c => { if(c.val().status==='delivered') { c.ref.remove(); count++; } });
+showToast(`Puliti ${count} ordini`,'success');
+});
+}
 
 // === PRODUCTS ===
 function renderCategoriesSelect() {
-    const sel = document.getElementById('prodCatSelect');
-    sel.innerHTML = Object.keys(appData.categories).map(k => `<option value="${k}">${appData.categories[k].name}</option>`).join('');
-    if(!sel.value && Object.keys(appData.categories).length) sel.value = Object.keys(appData.categories)[0];
-    currentCat = sel.value;
-    renderProductsTable();
+const sel = document.getElementById('prodCatSelect');
+sel.innerHTML = Object.keys(appData.categories).map(k => `<option value="${k}">${appData.categories[k].name}</option>`).join('');
+if(!sel.value && Object.keys(appData.categories).length) sel.value = Object.keys(appData.categories)[0];
+currentCat = sel.value;
+renderProductsTable();
 }
 
 function renderProductsTable() {
-    currentCat = document.getElementById('prodCatSelect').value;
-    const tb = document.getElementById('productsTable');
-    const prods = appData.menu[currentCat] || [];
-    tb.innerHTML = prods.map((p, i) => `
-        <tr>
-            <td>${p.img ? `<img src="${p.img}" class="img-thumb">` : '<div class="img-thumb" style="display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="color:#555"></i></div>'}</td>
-            <td>${p.name}<br><span style="font-size:0.8rem;color:var(--muted)">${p.desc||''}</span></td>
-            <td>€${p.price.toFixed(2)}</td>
-            <td><div class="toggle ${p.available!==false?'on':''}" onclick="toggleProdAvail('${currentCat}',${i})"></div></td>
-            <td>
-                <button class="btn-icon edit" title="Carica Foto" onclick="uploadProductImage('${currentCat}',${i})"><i class="fas fa-camera"></i></button>
-                <button class="btn-icon del" onclick="deleteProduct('${currentCat}',${i})"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
+currentCat = document.getElementById('prodCatSelect').value;
+const tb = document.getElementById('productsTable');
+const prods = appData.menu[currentCat] || [];
+tb.innerHTML = prods.map((p, i) => `
+<tr>
+<td>${p.img ? `<img src="${p.img}" class="img-thumb">` : '<div class="img-thumb" style="display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="color:#555"></i></div>'}</td>
+<td><div class="product-name">${p.name}</div></td>
+<td><div class="product-desc">${p.desc||''}</div></td>
+<td>€${p.price.toFixed(2)}</td>
+<td><div class="toggle ${p.available!==false?'on':''}" onclick="toggleProdAvail('${currentCat}',${i})"></div></td>
+<td>
+<button class="btn-icon edit" onclick="uploadProductImage('${currentCat}',${i})" title="Carica Foto"><i class="fas fa-camera"></i></button>
+<button class="btn-icon del" onclick="deleteProduct('${currentCat}',${i})"><i class="fas fa-trash"></i></button>
+</td>
+</tr>
+`).join('');
 }
 
 function toggleProdAvail(cat, i) {
-    const val = appData.menu[cat][i].available !== false;
-    appData.menu[cat][i].available = !val;
-    db.ref(`menu/${cat}/${i}`).update({available: appData.menu[cat][i].available});
-    renderProductsTable();
+const val = appData.menu[cat][i].available !== false;
+appData.menu[cat][i].available = !val;
+db.ref(`menu/${cat}/${i}`).update({available: appData.menu[cat][i].available});
+renderProductsTable();
+showToast(appData.menu[cat][i].available?'✅ Disponibile':' Esaurito','success');
 }
-function deleteProduct(cat, i) { if(confirm('Eliminare?')) { appData.menu[cat].splice(i,1); db.ref('menu').set(appData.menu); } }
+function deleteProduct(cat, i) { if(confirm('Eliminare?')) { appData.menu[cat].splice(i,1); db.ref('menu').set(appData.menu); showToast('Eliminato','success'); } }
 function addProduct() {
-    const name = prompt("Nome Prodotto:"); if(!name) return;
-    const price = parseFloat(prompt("Prezzo (es. 7.00):")) || 0;
-    const desc = prompt("Descrizione:") || "";
-    if(!appData.menu[currentCat]) appData.menu[currentCat] = [];
-    appData.menu[currentCat].push({name, price, desc, available:true});
-    db.ref('menu').set(appData.menu);
+const name = prompt("Nome:"); if(!name) return;
+const price = parseFloat(prompt("Prezzo:","5.00")) || 5;
+const desc = prompt("Descrizione:") || "";
+if(!appData.menu[currentCat]) appData.menu[currentCat] = [];
+appData.menu[currentCat].push({name, price, desc, available:true});
+db.ref('menu').set(appData.menu);
+showToast('Prodotto aggiunto','success');
 }
-
-// === IMAGES UPLOAD LOGIC ===
-function uploadImage(type) { uploadContext = {type}; document.getElementById('fileInput').click(); }
-function uploadProductImage(cat, idx) { uploadContext = {type:'product', cat, idx}; document.getElementById('fileInput').click(); }
-function uploadVideo() { document.getElementById('videoInput').click(); }
-
-function handleFileSelect(input) {
-    const file = input.files[0]; if(!file) return;
-    const path = uploadContext.type === 'hero' ? `images/hero_${Date.now()}` : 
-                 uploadContext.type === 'driverLogo' ? `images/driverLogo_${Date.now()}` :
-                 `images/prod_${Date.now()}`;
-    
-    storage.ref(path).put(file).then(snap => {
-        snap.ref.getDownloadURL().then(url => {
-            if(uploadContext.type === 'hero') db.ref('images/hero').set(url);
-            else if(uploadContext.type === 'driverLogo') db.ref('settings/driverLogo').set(url);
-            else {
-                appData.menu[uploadContext.cat][uploadContext.idx].img = url;
-                db.ref(`menu/${uploadContext.cat}/${uploadContext.idx}/img`).set(url);
-            }
-            alert('Caricato con successo!');
-        });
-    });
-    input.value = '';
-}
-
-function handleVideoSelect(input) {
-    const file = input.files[0]; if(!file) return;
-    const path = `videos/hero_${Date.now()}.mp4`;
-    storage.ref(path).put(file).then(snap => {
-        snap.ref.getDownloadURL().then(url => {
-            db.ref('settings/heroVideoUrl').set(url);
-            alert('Video caricato!');
-        });
-    });
-}
-function removeVideo() { db.ref('settings/heroVideoUrl').remove(); }
 
 // === CATEGORIES ===
 function renderCategoriesTable() {
-    const tb = document.getElementById('categoriesTable');
-    tb.innerHTML = Object.keys(appData.categories).map(k => `
-        <tr>
-            <td>${appData.categories[k].name}</td>
-            <td>${appData.categories[k].icon||'fa-utensils'}</td>
-            <td><button class="btn-icon del" onclick="deleteCategory('${k}')"><i class="fas fa-trash"></i></button></td>
-        </tr>
-    `).join('');
+const tb = document.getElementById('categoriesTable');
+tb.innerHTML = Object.keys(appData.categories).map(k => {
+const count = (appData.menu[k]||[]).length;
+return `<tr>
+<td><strong style="color:var(--gold)">${appData.categories[k].name}</strong></td>
+<td>${appData.categories[k].icon||'fa-utensils'}</td>
+<td>${count}</td>
+<td><button class="btn-icon del" onclick="deleteCategory('${k}')"><i class="fas fa-trash"></i></button></td>
+</tr>`;
+}).join('');
 }
-function deleteCategory(k) { if(confirm('Eliminare?')) { delete appData.categories[k]; delete appData.menu[k]; db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); } }
+function deleteCategory(k) { if(confirm(`Eliminare "${appData.categories[k].name}"?`)) { delete appData.categories[k]; delete appData.menu[k]; db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu); showToast('Eliminata','success'); } }
 function addCategory() {
-    const name = prompt("Nome:"); if(!name) return;
-    const icon = prompt("Icona (es. fa-pizza-slice):") || "fa-utensils";
-    const key = prompt("Chiave (minuscole, no spazi):");
-    if(!key || appData.categories[key]) return;
-    appData.categories[key] = {name, icon};
-    appData.menu[key] = [];
-    db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu);
+const name = prompt("Nome:"); if(!name) return;
+const icon = prompt("Icona (es. fa-pizza-slice):") || "fa-utensils";
+const key = prompt("Chiave (minuscole, no spazi):");
+if(!key || appData.categories[key]) { showToast('Chiave non valida','error'); return; }
+appData.categories[key] = {name, icon};
+appData.menu[key] = [];
+db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu);
+showToast('Categoria aggiunta','success');
 }
 
-// === SETTINGS & DAYS ===
+// === PROMOZIONI ===
+function renderPromos() {
+const list = document.getElementById('promoList');
+const entries = Object.entries(appData.promotions);
+list.innerHTML = entries.length ? entries.map(([id,p]) => {
+const used = p.currentUses||0; const total = p.maxUses||0;
+const status = !p.active ? 'Off' : used >= total ? 'Esaurita' : 'Attiva';
+const statusClass = !p.active ? 'badge-delivered' : used >= total ? 'badge-prep' : 'badge-ready';
+const products = (p.products||[]).map(pr => `${pr.name} ×${pr.qty}`).join(', ');
+return `<div class="promo-card">
+<div class="promo-header">
+<div><strong style="color:var(--gold)">${p.title}</strong><br><span style="color:var(--muted);font-size:0.85rem">${p.message||''}</span></div>
+<span class="badge ${statusClass}">${status}</span>
+</div>
+<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Prodotti: ${products}</div>
+<div style="font-size:0.85rem">Periodo: ${p.startDate} → ${p.endDate} | Usati: ${used}/${total}</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${id}')">${p.active?'Disattiva':'Attiva'}</button>
+<button class="btn btn-sm btn-danger" onclick="deletePromo('${id}')"><i class="fas fa-trash"></i> Elimina</button>
+</div>
+</div>`;
+}).join('') : '<p style="color:var(--muted);text-align:center;padding:30px">Nessuna promozione</p>';
+}
+function togglePromo(id) { db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active); showToast('Aggiornato','success'); }
+function deletePromo(id) { if(confirm('Eliminare?')) { db.ref(`promotions/${id}`).remove(); showToast('Eliminata'); } }
+function createPromo() {
+const title = prompt("Titolo:"); if(!title) return;
+const maxUses = parseInt(prompt("Max utilizzi:","50")) || 50;
+const startDate = new Date().toISOString().split('T')[0];
+const endDate = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+const id = 'promo_'+Date.now();
+db.ref(`promotions/${id}`).set({title, message:'', startDate, endDate, maxUses, currentUses:0, active:true, products:[], createdAt:Date.now()});
+showToast('Promo creata','success');
+}
+
+// === RECENSIONI ===
+function renderReviews(snap) {
+const reviews = []; snap.forEach(c => { reviews.push({id:c.key,...c.val()}); });
+const pending = reviews.filter(r => r.status === 'pending');
+document.getElementById('statReviews').textContent = pending.length;
+document.getElementById('reviewsList').innerHTML = pending.length ? pending.map(r => `
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start">
+<div><strong style="color:var(--gold)">${r.name}</strong> <span style="color:var(--gold)">${'★'.repeat(r.stars)}</span><br><span style="color:var(--muted);font-size:0.85rem">${r.text}</span>${r.orderId?`<br><span style="color:var(--info);font-size:0.75rem">Ordine: ${r.orderId}</span>`:''}</div>
+<div style="display:flex;gap:6px">
+<button class="btn btn-sm btn-success" onclick="approveReview('${r.id}')"><i class="fas fa-check"></i> Approva</button>
+<button class="btn btn-sm btn-danger" onclick="rejectReview('${r.id}')"><i class="fas fa-times"></i> Rifiuta</button>
+</div>
+</div>
+</div>`).join('') : '<p style="color:var(--muted);text-align:center;padding:30px">Nessuna recensione in attesa ✅</p>';
+}
+function approveReview(id) { db.ref(`recensioni/${id}`).update({status:'approved'}); showToast('Approvata','success'); }
+function rejectReview(id) { db.ref(`recensioni/${id}`).update({status:'rejected'}); showToast('Rifiutata'); }
+
+// === FATTORINI ===
+function renderDrivers() {
+document.getElementById('driversList').innerHTML = Object.entries(appData.drivers).map(([pin,name]) => `
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+<input type="text" class="form-control" style="flex:1" value="${name}" data-pin="${pin}" data-type="name">
+<input type="text" class="form-control" style="width:100px" value="${pin}" data-pin="${pin}" data-type="pin" maxlength="6">
+<button class="btn-icon del" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
+</div>`).join('');
+}
+function addDriver() {
+const container = document.getElementById('driversList');
+container.insertAdjacentHTML('beforeend', `
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+<input type="text" class="form-control" style="flex:1" placeholder="Nome">
+<input type="text" class="form-control" style="width:100px" placeholder="PIN" maxlength="6">
+<button class="btn-icon del" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
+</div>`);
+}
+function saveDrivers() {
+const drivers = {}; let valid = true;
+document.querySelectorAll('#driversList > div').forEach(row => {
+const inputs = row.querySelectorAll('input');
+const name = inputs[0].value.trim();
+const pin = inputs[1].value.trim();
+if(!name || !pin || pin.length < 4) { valid = false; return; }
+drivers[pin] = name;
+});
+if(!valid || !Object.keys(drivers).length) { showToast('Compila tutti i campi','error'); return; }
+db.ref('drivers').set(drivers); showToast('Fattorini salvati','success');
+}
+
+// === IMMAGINI ===
+function uploadImage(type) { uploadContext = {type}; document.getElementById('fileInput').click(); }
+function uploadProductImage(cat, idx) { uploadContext = {type:'product', cat, idx}; document.getElementById('fileInput').click(); }
+function uploadCategoryImage(key) { uploadContext = {type:'catImg', key}; document.getElementById('fileInput').click(); }
+
+function handleFileSelect(input) {
+const file = input.files[0]; if(!file) return;
+if(file.size > 2*1024*1024) { showToast('Max 2MB','error'); return; }
+
+if(uploadContext.type === 'hero') {
+const path = `images/hero_${Date.now()}`;
+storage.ref(path).put(file).then(snap => snap.ref.getDownloadURL().then(url => { db.ref('images/hero').set(url); showToast('Caricata','success'); }));
+} else if(uploadContext.type === 'driverLogo') {
+const path = `images/driverLogo_${Date.now()}`;
+storage.ref(path).put(file).then(snap => snap.ref.getDownloadURL().then(url => { db.ref('settings/driverLogo').set(url); showToast('Caricata','success'); }));
+} else if(uploadContext.type === 'product') {
+const path = `images/prod_${Date.now()}`;
+storage.ref(path).put(file).then(snap => snap.ref.getDownloadURL().then(url => { appData.menu[uploadContext.cat][uploadContext.idx].img = url; db.ref(`menu/${uploadContext.cat}/${uploadContext.idx}/img`).set(url); showToast('Caricata','success'); renderProductsTable(); }));
+} else if(uploadContext.type === 'catImg') {
+const path = `images/cat_${uploadContext.key}_${Date.now()}`;
+storage.ref(path).put(file).then(snap => snap.ref.getDownloadURL().then(url => { if(!appData.images) appData.images = {categories:{}}; if(!appData.images.categories) appData.images.categories = {}; appData.images.categories[uploadContext.key] = url; db.ref('images/categories/'+uploadContext.key).set(url); showToast('Caricata','success'); renderCategoryImages(); }));
+}
+input.value = '';
+}
+
+function handleVideoSelect(input) {
+const file = input.files[0]; if(!file) return;
+if(file.size > 15*1024*1024) { showToast('Max 15MB','error'); return; }
+const path = `videos/hero_${Date.now()}.mp4`;
+storage.ref(path).put(file).then(snap => snap.ref.getDownloadURL().then(url => { db.ref('settings/heroVideoUrl').set(url); showToast('Video caricato','success'); }));
+}
+function removeVideo() { db.ref('settings/heroVideoUrl').remove(); showToast('Video rimosso','success'); }
+
+function renderCategoryImages() {
+const list = document.getElementById('categoryImagesList');
+list.innerHTML = Object.keys(appData.categories).map(k => `
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+<span style="width:120px">${appData.categories[k].name}</span>
+${appData.images?.categories?.[k] ? `<img src="${appData.images.categories[k]}" style="height:40px;border-radius:4px">` : '<span style="color:var(--muted);font-size:0.8rem">Nessuna immagine</span>'}
+<button class="btn btn-sm btn-gold" onclick="uploadCategoryImage('${k}')">Carica</button>
+</div>
+`).join('');
+}
+
+// === IMPOSTAZIONI ===
 function setupDaysGrid() {
-    const days = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
-    const keys = ['lun','mar','mer','gio','ven','sab','dom'];
-    document.getElementById('daysGrid').innerHTML = keys.map((k,i) => `
-        <div class="toggle ${appData.settings.openDays?.includes(k)?'on':''}" data-key="${k}" onclick="this.classList.toggle('on')" style="width:35px;height:35px;border-radius:50%"></div>
-    `).join('') + `<span style="font-size:0.75rem;color:var(--muted);align-self:center;margin-left:10px">Accesi = Aperto</span>`;
+const days = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+const keys = ['lun','mar','mer','gio','ven','sab','dom'];
+document.getElementById('daysGrid').innerHTML = keys.map((k,i) => `
+<div class="day-btn" data-key="${k}" onclick="this.classList.toggle('active')">${days[i]}</div>
+`).join('');
 }
 
 function updateSettingsUI() {
-    const s = appData.settings;
-    document.getElementById('hours1').value = (s.hours||'').split(',')[0]||'';
-    document.getElementById('hours2').value = (s.hours||'').split(',')[1]||'';
-    document.getElementById('specialClosures').value = s.specialClosures||'';
-    document.getElementById('deliveryFee').value = s.deliveryFee||0;
-    document.getElementById('minDelivery').value = s.minDeliveryOrder||0;
-    document.getElementById('heroVideoUrl').value = s.heroVideoUrl||'';
-    
-    const del = document.getElementById('toggleDelivery');
-    if(s.deliveryEnabled !== false) del.classList.add('on'); else del.classList.remove('on');
-    
-    // Days
-    document.querySelectorAll('#daysGrid .toggle').forEach(el => {
-        if(s.openDays?.includes(el.dataset.key)) el.classList.add('on'); else el.classList.remove('on');
-    });
+const s = appData.settings;
+document.getElementById('hours1').value = (s.hours||'').split(',')[0]||'';
+document.getElementById('hours2').value = (s.hours||'').split(',')[1]||'';
+document.getElementById('specialClosures').value = s.specialClosures||'';
+document.getElementById('deliveryFee').value = s.deliveryFee||0;
+document.getElementById('minDelivery').value = s.minDeliveryOrder||0;
+document.getElementById('heroVideoUrl').value = s.heroVideoUrl||'';
+document.getElementById('paletteSelect').value = s.colorPalette||'autunno';
+
+const del = document.getElementById('toggleDelivery');
+if(s.deliveryEnabled !== false) del.classList.add('on'); else del.classList.remove('on');
+const pick = document.getElementById('togglePickup');
+if(s.pickupEnabled !== false) pick.classList.add('on'); else pick.classList.remove('on');
+
+document.querySelectorAll('#daysGrid .day-btn').forEach(el => {
+if(s.openDays?.includes(el.dataset.key)) el.classList.add('active'); else el.classList.remove('active');
+});
+
+// Status indicator
+const isOpen = checkIfOpen();
+const ind = document.getElementById('statusIndicator');
+ind.className = 'status-indicator ' + (isOpen ? 'open' : 'closed');
+document.getElementById('statusText').textContent = isOpen ? 'APERTO' : 'CHIUSO';
+}
+
+function checkIfOpen() {
+const s = appData.settings;
+if(s.manualStatus === 'open') return true;
+if(s.manualStatus === 'closed') return false;
+const days = ['dom','lun','mar','mer','gio','ven','sab'];
+const today = days[new Date().getDay()];
+if(s.openDays && s.openDays.length > 0 && !s.openDays.includes(today)) return false;
+const dateStr = new Date().toISOString().split('T')[0];
+if(s.specialClosures && s.specialClosures.split(',').map(d => d.trim()).includes(dateStr)) return false;
+const hoursStr = s.hours || "11:00-15:00,18:00-23:00";
+const ranges = hoursStr.split(',').map(r => r.trim()).filter(Boolean);
+const currentMins = new Date().getHours() * 60 + new Date().getMinutes();
+for(let range of ranges) {
+const parts = range.split('-');
+if(parts.length !== 2) continue;
+const [sh,sm] = parts[0].split(':').map(Number);
+const [eh,em] = parts[1].split(':').map(Number);
+if(isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue;
+if(currentMins >= sh*60+sm && currentMins < eh*60+em) return true;
+}
+return false;
 }
 
 function saveSettings() {
-    const days = Array.from(document.querySelectorAll('#daysGrid .toggle.on')).map(e => e.dataset.key);
-    const h1 = document.getElementById('hours1').value.trim();
-    const h2 = document.getElementById('hours2').value.trim();
-    const hours = [h1,h2].filter(Boolean).join(',');
-    
-    db.ref('settings').update({
-        openDays: days.join(','),
-        hours: hours,
-        specialClosures: document.getElementById('specialClosures').value,
-        deliveryFee: parseFloat(document.getElementById('deliveryFee').value),
-        minDeliveryOrder: parseFloat(document.getElementById('minDelivery').value),
-        deliveryEnabled: document.getElementById('toggleDelivery').classList.contains('on'),
-        heroVideoUrl: document.getElementById('heroVideoUrl').value
-    });
+const days = Array.from(document.querySelectorAll('#daysGrid .day-btn.active')).map(e => e.dataset.key);
+const h1 = document.getElementById('hours1').value.trim();
+const h2 = document.getElementById('hours2').value.trim();
+const hours = [h1,h2].filter(Boolean).join(',');
 
-    const newPin = document.getElementById('newPin').value;
-    const currPin = document.getElementById('currentPin').value;
-    if(newPin) {
-        if(currPin !== String(appData.settings.adminPin||'1234')) { alert('PIN attuale errato!'); return; }
-        db.ref('settings/adminPin').set(newPin);
-    }
-    alert('Impostazioni salvate!');
-}
+const palette = document.getElementById('paletteSelect').value;
 
-// === DRIVERS & PROMOS (Simplified for brevity but functional) ===
-function renderDrivers() {
-    document.getElementById('driversList').innerHTML = Object.entries(appData.drivers).map(([pin,name]) => `
-        <div style="display:flex;gap:10px;margin-bottom:10px">
-            <input class="form-control" value="${name}" data-pin="${pin}">
-            <input class="form-control" value="${pin}" maxlength="6" data-pin="${pin}">
-            <button class="btn-icon del" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
-        </div>
-    `).join('');
+db.ref('settings').update({
+openDays: days.join(','),
+hours: hours,
+specialClosures: document.getElementById('specialClosures').value,
+deliveryFee: parseFloat(document.getElementById('deliveryFee').value) || 0,
+minDeliveryOrder: parseFloat(document.getElementById('minDelivery').value) || 0,
+deliveryEnabled: document.getElementById('toggleDelivery').classList.contains('on'),
+pickupEnabled: document.getElementById('togglePickup').classList.contains('on'),
+heroVideoUrl: document.getElementById('heroVideoUrl').value,
+colorPalette: palette
+});
+
+const newPin = document.getElementById('newPin').value;
+const currPin = document.getElementById('currentPin').value;
+if(newPin) {
+if(currPin !== String(appData.settings.adminPin||'1234')) { showToast('PIN attuale errato','error'); return; }
+db.ref('settings/adminPin').set(newPin);
 }
-function addDriver() {
-    document.getElementById('driversList').insertAdjacentHTML('beforeend', `
-        <div style="display:flex;gap:10px;margin-bottom:10px">
-            <input class="form-control" placeholder="Nome">
-            <input class="form-control" placeholder="PIN" maxlength="6">
-            <button class="btn-icon del" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
-        </div>
-    `);
-}
-function saveDrivers() {
-    const drivers = {};
-    document.querySelectorAll('#driversList > div').forEach(row => {
-        const inputs = row.querySelectorAll('input');
-        const name = inputs[0].value; const pin = inputs[1].value;
-        if(name && pin) drivers[pin] = name;
-    });
-    db.ref('drivers').set(drivers);
-    alert('Fattorini salvati');
+showToast('Impostazioni salvate','success');
 }
 
-function renderPromos() {
-    document.getElementById('promoList').innerHTML = Object.entries(appData.promotions).map(([id,p]) => `
-        <div style="padding:15px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between">
-            <div><strong>${p.title}</strong> <span style="color:var(--muted)">(Usati: ${p.currentUses||0}/${p.maxUses})</span></div>
-            <button class="btn-icon del" onclick="db.ref('promotions/${id}').remove()"><i class="fas fa-trash"></i></button>
-        </div>
-    `).join('');
+// === TOAST ===
+function showToast(msg, type='') {
+const t = document.getElementById('toast');
+t.textContent = msg;
+t.className = 'toast show ' + type;
+setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
-function renderCategoryImages() {
-    const list = document.getElementById('categoryImagesList');
-    list.innerHTML = Object.keys(appData.categories).map(k => `
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-            <span style="width:100px">${appData.categories[k].name}</span>
-            ${appData.images?.categories?.[k] ? `<img src="${appData.images.categories[k]}" style="height:40px;border-radius:4px">` : ''}
-            <button class="btn btn-sm btn-gold" onclick="uploadCategoryImage('${k}')">Carica</button>
-        </div>
-    `).join('');
-}
-function uploadCategoryImage(key) {
-    uploadContext = {type:'catImg', key};
-    document.getElementById('fileInput').click();
-}
-// Handle category image specifically in the file handler
-const origHandleFileSelect = handleFileSelect;
-handleFileSelect = function(input) {
-    if(uploadContext.type === 'catImg') {
-        const file = input.files[0]; if(!file) return;
-        storage.ref(`images/cat_${uploadContext.key}_${Date.now()}`).put(file).then(snap => {
-            snap.ref.getDownloadURL().then(url => {
-                if(!appData.images) appData.images = {categories:{}};
-                if(!appData.images.categories) appData.images.categories = {};
-                appData.images.categories[uploadContext.key] = url;
-                db.ref('images/categories/'+uploadContext.key).set(url);
-                alert('Caricata!');
-            });
-        });
-    } else {
-        origHandleFileSelect(input);
-    }
-    input.value = '';
-}
+// === INIT ON LOAD ===
+document.getElementById('pinInput').addEventListener('keypress', e => { if(e.key === 'Enter') checkLogin(); });
 </script>
 </body>
 </html>
