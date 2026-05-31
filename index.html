@@ -968,15 +968,67 @@ db.ref(`recensioni/${id}`).remove().then(()=>{ showToast('️ Eliminata'); loadA
 }
 }
 function renderAdminOrders(orders){
-const l=document.getElementById('ordersList'), c=document.getElementById('ordersCount');
-const gruppi = { new:[], preparing:[], ready:[], delivered:[] };
-Object.entries(orders||{}).forEach(([id,o])=>{ const st=o.status||'new'; if(gruppi[st]) gruppi[st].push([id,o]); });
-Object.keys(gruppi).forEach(k=>gruppi[k].sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0)));
-const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length;
-c.textContent = attivi;
-if (!attivi && !gruppi.delivered.length) { l.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>'; return; }
-const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:' Consegnati' };
-let html = '';
+    const l=document.getElementById('ordersList'), c=document.getElementById('ordersCount');
+    const gruppi = { new:[], preparing:[], ready:[], delivered:[] };
+    Object.entries(orders||{}).forEach(([id,o])=>{ const st=o.status||'new'; if(gruppi[st]) gruppi[st].push([id,o]); });
+    Object.keys(gruppi).forEach(k=>gruppi[k].sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0)));
+    const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length;
+    c.textContent = attivi;
+    if (!attivi && !gruppi.delivered.length) { l.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>'; return; }
+    const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:'✅ Consegnati' };
+    let html = '';
+    Object.keys(gruppi).forEach(stato=>{
+        if (!gruppi[stato].length) return;
+        html += `<div class="orders-group-title ${stato}"><i class="fas fa-${stato==='new'?'bell':stato==='preparing'?'fire':stato==='ready'?'check': 'truck'}"></i> ${titoli[stato]} (${gruppi[stato].length})</div>`;
+        html += gruppi[stato].map(([id,o])=>{
+            const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+            let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
+            
+            // 👇 QUI INSERIAMO IL BLOCCO FATTORINO
+            let driverHtml = '';
+            if(o.driverName) {
+                driverHtml = `<div style="background:rgba(74,222,128,0.1); border:1px solid #4ade80; color:#4ade80; padding:6px 10px; border-radius:8px; margin:8px 0; font-size:0.8rem; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fas fa-motorcycle"></i> Fattorino: ${o.driverName}</span>
+                    <span style="font-size:0.7rem; opacity:0.8;">${o.acceptedAt ? new Date(o.acceptedAt).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : ''}</span>
+                </div>`;
+            } else if (stato !== 'delivered' && stato !== 'new') {
+                driverHtml = `<button onclick="assignDriverPrompt('${id}')" style="width:100%; background:rgba(251,191,36,0.15); border:1px solid #fbbf24; color:#fbbf24; padding:6px; border-radius:8px; margin:8px 0; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; justify-content:center; gap:6px; font-weight:600;">
+                    <i class="fas fa-exclamation-circle"></i> Assegna Fattorino Manualmente
+                </button>`;
+            }
+
+            let ah='';
+            if(stato==='new') ah=`<button class="order-action-btn btn-preparing" onclick="updateOrderStatus('${id}','preparing')">🍕 Prep</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            
+            return `<div class="order-card ${stato}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span></div>${driverHtml}<div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} •  ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' •  '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
+        }).join('');
+    });
+    l.innerHTML = html;
+}
+function assignDriverPrompt(orderId) {
+    db.ref('drivers').once('value').then(snap => {
+        const drivers = snap.val();
+        if (!drivers || !Object.keys(drivers).length) {
+            showToast("⚠️ Nessun fattorino registrato!");
+            return;
+        }
+        let msg = "Seleziona il PIN del fattorino:\n";
+        Object.entries(drivers).forEach(([pin, name]) => msg += `${pin} - ${name}\n`);
+        const scelta = prompt(msg, Object.keys(drivers)[0]);
+        if (scelta && drivers[scelta]) {
+            db.ref(`ordini/${orderId}`).update({
+                driverPin: scelta,
+                driverName: drivers[scelta],
+                acceptedAt: Date.now()
+            }).then(() => showToast(`✅ Ordine assegnato a ${drivers[scelta]}`));
+        } else if (scelta) {
+            showToast("❌ PIN non trovato");
+        }
+    });
+}
 Object.keys(gruppi).forEach(stato=>{
 if (!gruppi[stato].length) return;
 html += `<div class="orders-group-title ${stato}"><i class="fas fa-${stato==='new'?'bell':stato==='preparing'?'fire':stato==='ready'?'check': 'truck'}"></i> ${titoli[stato]} (${gruppi[stato].length})</div>`;
