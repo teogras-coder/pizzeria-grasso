@@ -383,7 +383,36 @@ function switchTab(id) {
   document.getElementById(id).classList.add('active');
   event.currentTarget.classList.add('active');
 }
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+function assignDriverPrompt(orderId) {
+    // Recupera la lista dei fattorini salvati nel database
+    db.ref('drivers').once('value').then(snap => {
+        const drivers = snap.val();
+        if (!drivers) {
+            showToast("⚠️ Nessun fattorino registrato!");
+            return;
+        }
+        
+        let msg = "Seleziona il numero del fattorino:\n";
+        Object.entries(drivers).forEach(([pin, name]) => {
+            msg += `${pin} - ${name}\n`;
+        });
+        
+        const scelta = prompt(msg, Object.keys(drivers)[0]);
+        
+        if (scelta && drivers[scelta]) {
+            // Aggiorna l'ordine nel database con i dati del fattorino
+            db.ref(`ordini/${orderId}`).update({
+                driverPin: scelta,
+                driverName: drivers[scelta],
+                acceptedAt: Date.now() // Aggiunge il timestamp dell'accettazione
+            }).then(() => {
+                showToast(`✅ Ordine assegnato a ${drivers[scelta]}`);
+            }).catch(e => showToast("❌ Errore assegnazione"));
+        } else if (scelta) {
+            showToast("❌ PIN non trovato");
+        }
+    });
+}
 
 // 📦 ORDINI
 function renderOrders(orders) {
