@@ -975,7 +975,7 @@ function renderAdminOrders(orders){
     const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length;
     c.textContent = attivi;
     if (!attivi && !gruppi.delivered.length) { l.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block;"></i>Nessun ordine ancora</div>'; return; }
-    const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:'✅ Consegnati' };
+    const titoli = { new:'🔴 Nuovi', preparing:'🟡 In Preparazione', ready:'🟢 Pronti', delivered:' Consegnati' };
     let html = '';
     Object.keys(gruppi).forEach(stato=>{
         if (!gruppi[stato].length) return;
@@ -983,7 +983,7 @@ function renderAdminOrders(orders){
         html += gruppi[stato].map(([id,o])=>{
             const dt=new Date(o.timestamp||0), ts=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}), ds=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
             let ih = o.items && Array.isArray(o.items) ? o.items.map(i=>`<div>▸ ${i.name} ×${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('') : '';
-
+            
             // 👇 QUI INSERIAMO IL BLOCCO FATTORINO
             let driverHtml = '';
             if(o.driverName) {
@@ -1002,6 +1002,7 @@ function renderAdminOrders(orders){
             else if(stato==='preparing') ah=`<button class="order-action-btn btn-ready" onclick="updateOrderStatus('${id}','ready')">✅ Pronto</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
             else if(stato==='ready') ah=`<button class="order-action-btn btn-delivered" onclick="updateOrderStatus('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
             else ah=`<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+            
             return `<div class="order-card ${stato}"><div class="order-header"><span class="order-id">${o.orderId||id}</span><span class="order-time">${ds} ${ts}</span></div>${driverHtml}<div class="order-customer"><i class="fas fa-user"></i> ${o.customerName||'N/A'} •  ${o.customerPhone||'N/A'}</div><div class="order-details"><i class="fas fa-${o.type==='delivery'?'motorcycle':'store'}"></i> ${o.type==='delivery'?'Consegna':'Ritiro'}${o.scheduledTime?' •  '+o.scheduledTime:''}${o.type==='delivery'&&o.address?'<br><i class="fas fa-map-marker-alt"></i> '+o.address:''}${o.notes?'<br><i class="fas fa-sticky-note"></i> '+o.notes:''}</div><div class="order-items">${ih}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal||0).toFixed(2)}</span></div><div class="order-actions">${ah}</div></div>`;
         }).join('');
     });
@@ -1171,6 +1172,7 @@ const orderId='ORD-'+ref.key.slice(-6).toUpperCase();
 d.orderId=orderId;
 const coords=document.getElementById('customerCoords')?.value||null;
 const tipoLbl=d.type==='delivery'?'CONSEGNA':'RITIRO';
+// 🔧 RAGGRUPPAMENTO PRODOTTI PER CATEGORIA
 let catMap = {};
 (d.items||[]).forEach(item=>{
 let cat = item.cat || 'VARIE';
@@ -1197,8 +1199,12 @@ d.notes?`Note: ${d.notes}`:'',
 d.deliveryFee>0?`Consegna: €${d.deliveryFee.toFixed(2)}`:'',
 `TOTALE: €${d.finalTotal.toFixed(2)}`,
 `${new Date().toLocaleString('it-IT')}`
-].filter(Boolean).join('\n');
-const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO\nManfredonia • 0884 660377\n"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕\n"};
+].filter(Boolean).join('
+');
+const printFormat={width:42,header:"ANTICA PIZZERIA GRASSO
+Manfredonia • 0884 660377
+"+'='.repeat(32),body:printBody,footer:"Grazie! 🍕
+"};
 await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now(),createdAt:new Date().toISOString(),stampato:false,coordinates:coords,printFormat});
 localStorage.setItem('lastOrderTime',Date.now());
 incrementProductCounters(d.items);
