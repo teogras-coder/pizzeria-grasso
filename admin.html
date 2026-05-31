@@ -19,41 +19,42 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat',sans-serif; }
 body { background:var(--dark); color:var(--cream); height:100vh; display:flex; overflow:hidden; }
 
-/* LOGIN */
+/* LOGIN SCREEN */
 #loginScreen { position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center; }
-.login-box { background:var(--card); padding:40px; border-radius:20px; text-align:center; border:2px solid var(--gold); width:400px; }
-.login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); margin-bottom:20px; }
+.login-box { background:var(--card); padding:40px; border-radius:20px; text-align:center; border:2px solid var(--gold); width:400px; box-shadow:0 20px 50px rgba(0,0,0,0.8); }
+.login-box h1 { font-family:'Playfair Display',serif; color:var(--gold); margin-bottom:20px; font-size:2rem; }
 .login-box input { width:100%; padding:15px; border-radius:10px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--gold); font-size:1.5rem; text-align:center; margin-bottom:20px; }
 .login-box button { width:100%; padding:15px; background:var(--gold); color:var(--dark); font-weight:700; border:none; border-radius:10px; font-size:1.1rem; cursor:pointer; }
 
 /* SIDEBAR */
 .sidebar { width:250px; background:var(--brown); border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; }
 .sidebar-header { padding:20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); }
-.sidebar-header h2 { font-family:'Playfair Display',serif; color:var(--gold); }
-.nav-item { padding:15px 20px; cursor:pointer; color:var(--cream); display:flex; align-items:center; gap:10px; transition:0.2s; }
+.sidebar-header h2 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.5rem; }
+.nav-item { padding:15px 20px; cursor:pointer; color:var(--cream); display:flex; align-items:center; gap:10px; transition:0.2s; font-weight:600; }
 .nav-item:hover, .nav-item.active { background:var(--gold); color:var(--dark); }
 .nav-item i { width:20px; text-align:center; }
 
-/* MAIN */
+/* MAIN CONTENT */
 .main { flex:1; padding:30px; overflow-y:auto; }
 .section { display:none; }
 .section.active { display:block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-h2 { font-family:'Playfair Display',serif; color:var(--gold); border-bottom:1px solid var(--gold-dark); padding-bottom:10px; margin-bottom:20px; }
+h2 { font-family:'Playfair Display',serif; color:var(--gold); border-bottom:1px solid var(--gold-dark); padding-bottom:10px; margin-bottom:20px; font-size:1.8rem; }
 
-/* CARDS */
+/* CARDS & FORMS */
 .card { background:var(--card); padding:20px; border-radius:15px; border:1px solid rgba(212,168,75,0.2); margin-bottom:20px; }
 .form-group { margin-bottom:15px; }
 .form-group label { display:block; color:var(--gold); margin-bottom:5px; font-weight:600; }
 .form-control { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gold-dark); background:var(--brown); color:var(--cream); }
-.btn { padding:10px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer; }
+.btn { padding:10px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
 .btn-gold { background:var(--gold); color:var(--dark); }
 .btn-danger { background:var(--danger); color:white; }
+.btn-success { background:var(--success); color:var(--dark); }
 
 /* TABLES */
 table { width:100%; border-collapse:collapse; }
-th { text-align:left; padding:12px; color:var(--gold); border-bottom:2px solid var(--gold-dark); }
+th { text-align:left; padding:12px; color:var(--gold); border-bottom:2px solid var(--gold-dark); font-size:0.9rem; }
 td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-align:middle; }
 .img-thumb { width:50px; height:50px; border-radius:8px; object-fit:cover; }
 
@@ -68,6 +69,11 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 .upload-box:hover { border-color:var(--gold); }
 .hidden-input { display:none; }
 
+/* ORDERS */
+.order-card { background:var(--card); padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--gold); }
+.order-card.new { border-left-color:var(--danger); }
+.order-card.prep { border-left-color:var(--warning); }
+
 /* RESPONSIVE */
 @media(max-width:1024px) {
     .sidebar { width:70px; }
@@ -81,7 +87,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 <!-- LOGIN -->
 <div id="loginScreen">
     <div class="login-box">
-        <h1>🔐 Admin Grasso</h1>
+        <h1> Admin Grasso</h1>
         <input type="password" id="pinInput" placeholder="PIN (4 o 6 cifre)" maxlength="6">
         <button onclick="checkLogin()">Accedi</button>
     </div>
@@ -138,7 +144,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- MENU -->
     <div id="sec-menu" class="section">
-        <h2> Menu Prodotti</h2>
+        <h2>🍕 Menu Prodotti</h2>
         <div class="form-group">
             <label>Seleziona Categoria:</label>
             <select id="catSelect" class="form-control" onchange="renderProducts()"></select>
@@ -204,7 +210,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
 
     <!-- IMPOSTAZIONI -->
     <div id="sec-settings" class="section">
-        <h2>⚙️ Impostazioni</h2>
+        <h2>️ Impostazioni</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
             <div class="card">
                 <h3 style="color:var(--gold); margin-bottom:15px;">🔒 Cambio PIN</h3>
@@ -213,7 +219,7 @@ td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-alig
                 <button class="btn btn-gold" onclick="changePin()">Salva PIN</button>
             </div>
             <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;"> Orari</h3>
+                <h3 style="color:var(--gold); margin-bottom:15px;">🕒 Orari</h3>
                 <div class="form-group"><label>Orario 1</label><input type="text" id="h1" class="form-control" placeholder="11:00-15:00"></div>
                 <div class="form-group"><label>Orario 2</label><input type="text" id="h2" class="form-control" placeholder="18:00-23:00"></div>
                 <button class="btn btn-gold" onclick="saveSettings()">Salva Orari</button>
@@ -263,7 +269,7 @@ function checkLogin() {
     const pinInput = document.getElementById('pinInput').value;
     if(!pinInput) return;
 
-    //  FIX PIN: Legge da Firebase e converte tutto in Stringa
+    // ✅ FIX PIN: Legge da Firebase e converte tutto in Stringa
     db.ref('settings/adminPin').once('value').then(snap => {
         const savedPin = String(snap.val() || '1234');
         if (String(pinInput) === savedPin) {
