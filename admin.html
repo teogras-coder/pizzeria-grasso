@@ -3,632 +3,608 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestionale Admin - Antica Pizzeria Grasso</title>
+  <title>Gestionale Admin - Pizzeria Grasso</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <style>
-    :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', 'Segoe UI', sans-serif; }
-    body { background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); min-height: 100vh; color: var(--cream); }
+    :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; --success: #4ade80; --danger: #f87171; --warning: #fbbf24; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+    body { background: var(--dark); color: var(--cream); min-height: 100vh; }
     
-    /* LOGIN */
     #loginScreen { position: fixed; inset: 0; background: rgba(26,18,9,0.98); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-    .login-box { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 2.5rem; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; border: 2px solid var(--gold-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-    .login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.5rem; font-size: 1.8rem; }
-    .login-box p { color: #8a7a5a; margin-bottom: 2rem; }
-    .pin-input { width: 100%; padding: 16px; font-size: 2rem; text-align: center; letter-spacing: 15px; border: 2px solid var(--gold-dark); border-radius: 12px; margin-bottom: 1.5rem; background: var(--card); color: var(--gold); font-weight: 700; }
-    .pin-input:focus { outline: none; border-color: var(--gold-light); box-shadow: 0 0 15px rgba(212,168,75,0.3); }
-    .login-btn { width: 100%; padding: 16px; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); transition: all 0.2s; }
-    .login-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--gold-dark); }
-    .error-msg { color: #f87171; margin-top: 15px; font-weight: 600; min-height: 24px; }
-
-    /* DASHBOARD */
-    #dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
-    .header-admin { background: linear-gradient(180deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%); padding: 25px; border-radius: 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
-    .header-admin h1 { font-family: 'Playfair Display', serif; color: var(--dark); font-size: 2rem; margin-bottom: 5px; }
-    .header-admin p { color: var(--brown); font-weight: 600; }
+    .login-box { background: var(--card-light); padding: 2.5rem; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 2px solid var(--gold-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    .login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.5rem; }
+    .pin-input { width: 100%; padding: 16px; font-size: 2rem; text-align: center; letter-spacing: 15px; border: 2px solid var(--gold-dark); border-radius: 12px; margin: 1.5rem 0; background: var(--card); color: var(--gold); font-weight: 700; }
+    .login-btn { width: 100%; padding: 16px; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
+    .login-btn:active { transform: translateY(3px); }
     
-    .tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-    .tab-btn { background: var(--card); border: 2px solid var(--gold-dark); color: var(--cream); padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
-    .tab-btn:hover { background: var(--card-light); border-color: var(--gold); }
-    .tab-btn.active { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border-color: var(--gold-light); box-shadow: 0 5px 0 var(--gold-dark); }
+    #dashboard { display: none; height: 100vh; }
+    .sidebar { width: 240px; background: var(--brown); padding: 1rem; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--gold-dark); }
+    .sidebar h2 { color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; text-align: center; }
+    .nav-btn { background: transparent; border: none; color: #8a7a5a; padding: 12px 15px; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 6px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .nav-btn:hover, .nav-btn.active { background: var(--card-light); color: var(--gold); }
+    .nav-btn i { width: 20px; text-align: center; }
     
-    .section { display: none; animation: fadeIn 0.4s ease; }
+    .main { flex: 1; overflow-y: auto; padding: 2rem; }
+    .section { display: none; animation: fadeIn 0.3s; }
     .section.active { display: block; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     
-    .card { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid rgba(212,168,75,0.2); box-shadow: 0 6px 0 var(--shadow); }
-    .card h2 { color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 20px; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
-    
-    /* ACCORDION CATEGORIES */
-    .category-accordion { background: var(--card-light); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); overflow: hidden; }
-    .category-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; cursor: pointer; user-select: none; background: linear-gradient(145deg, rgba(212,168,75,0.1) 0%, transparent 100%); transition: all 0.3s; }
-    .category-header:hover { background: linear-gradient(145deg, rgba(212,168,75,0.2) 0%, transparent 100%); }
-    .category-header-left { display: flex; align-items: center; gap: 15px; flex: 1; }
-    .category-icon { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; color: var(--dark); font-size: 1.5rem; box-shadow: 0 4px 0 var(--gold-dark); }
-    .category-title { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; }
-    .category-count { background: var(--gold-dark); color: var(--dark); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-left: auto; margin-right: 15px; }
-    .category-arrow { color: var(--gold); font-size: 1.2rem; transition: transform 0.3s; }
-    .category-accordion.open .category-arrow { transform: rotate(180deg); }
-    
-    .category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: rgba(0,0,0,0.2); }
-    .category-accordion.open .category-body { max-height: 5000px; }
-    .category-content { padding: 20px; }
-    
-    /* FORM ELEMENTS */
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.95rem; }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--gold-light); box-shadow: 0 0 10px rgba(212,168,75,0.2); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    
-    /* IMAGE UPLOAD */
-    .upload-area { border: 2px dashed var(--gold-dark); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(212,168,75,0.05); }
-    .upload-area:hover { border-color: var(--gold); background: rgba(212,168,75,0.1); }
-    .upload-area i { font-size: 2.5rem; color: var(--gold); margin-bottom: 10px; }
-    .upload-area p { color: #8a7a5a; font-size: 0.9rem; }
-    .img-preview { max-width: 100%; max-height: 200px; border-radius: 10px; margin-top: 15px; border: 2px solid var(--gold-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-    .img-preview-small { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 2px solid var(--gold-dark); cursor: pointer; }
-    
-    /* BUTTONS */
-    .btn { padding: 12px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; }
-    .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 5px 0 var(--gold-dark); }
-    .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--gold-dark); }
-    .btn-success { background: linear-gradient(180deg, #27ae60 0%, #229954 100%); color: white; box-shadow: 0 5px 0 #1e8449; }
-    .btn-danger { background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 5px 0 #922b21; }
-    .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
-    
-    /* PRODUCT LIST */
-    .product-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.1); }
-    .product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .product-name { color: var(--gold-light); font-weight: 700; font-size: 1.05rem; }
-    .product-actions { display: flex; gap: 8px; }
-    
-    /* HERO SECTION */
-    .hero-preview { width: 100%; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; border: 3px solid var(--gold-dark); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-    .hero-preview img, .hero-preview video { width: 100%; height: auto; display: block; }
-    
-    /* TOAST */
-    .toast { position: fixed; bottom: 30px; right: 30px; background: var(--card); color: var(--gold); padding: 16px 28px; border-radius: 12px; font-weight: 600; z-index: 10000; opacity: 0; transition: all 0.3s; border: 2px solid var(--gold-dark); box-shadow: 0 6px 20px rgba(0,0,0,0.4); transform: translateY(100px); }
+    .card { background: var(--card-light); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem; border: 1px solid rgba(212,168,75,0.2); }
+    .card h3 { color: var(--gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; color: var(--cream); }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; }
+    input:focus, select:focus { outline: none; border-color: var(--gold); }
+    .btn { padding: 10px 16px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
+    .btn-success { background: var(--success); color: var(--dark); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .toggle-switch { width: 50px; height: 28px; background: #555; border-radius: 14px; position: relative; cursor: pointer; }
+    .toggle-switch.on { background: var(--success); }
+    .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: 0.3s; }
+    .toggle-switch.on::after { left: 25px; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .bg-new { background: rgba(248,113,113,0.2); color: #f87171; }
+    .bg-prep { background: rgba(251,191,36,0.2); color: #fbbf24; }
+    .bg-ready { background: rgba(74,222,128,0.2); color: #4ade80; }
+    .bg-del { background: rgba(96,165,250,0.2); color: #60a5fa; }
+    .order-card { background: var(--card); padding: 1rem; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold-dark); }
+    .order-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .product-accordion { background: var(--card); border-radius: 10px; margin-bottom: 10px; overflow: hidden; border: 1px solid rgba(212,168,75,0.15); }
+    .accordion-header { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(212,168,75,0.1); }
+    .accordion-body { max-height: 0; overflow: hidden; transition: 0.3s; background: rgba(0,0,0,0.15); }
+    .product-accordion.open .accordion-body { max-height: 3000px; }
+    .product-item { padding: 12px; border-bottom: 1px solid rgba(212,168,75,0.1); }
+    .product-item:last-child { border-bottom: none; }
+    .review-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+    .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .palette-btn { padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; color: white; font-weight: 700; border: 2px solid transparent; }
+    .palette-btn.active { border-color: var(--gold); transform: scale(1.05); }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--card); color: var(--gold); padding: 12px 24px; border-radius: 10px; font-weight: 600; z-index: 1000; opacity: 0; transition: 0.3s; border: 1px solid var(--gold-dark); transform: translateY(20px); }
     .toast.show { opacity: 1; transform: translateY(0); }
-    
-    /* PROGRESS BAR */
-    .progress-bar { background: var(--card); border-radius: 8px; height: 10px; overflow: hidden; margin-top: 12px; border: 1px solid var(--gold-dark); }
-    .progress-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); height: 100%; width: 0%; transition: width 0.3s; }
-    
-    @media(max-width: 768px) {
-      .form-row { grid-template-columns: 1fr; }
-      .tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 10px; }
-      .category-header { padding: 12px 15px; }
-      .category-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-      .category-title { font-size: 1rem; }
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .days-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .day-tog { padding: 6px 10px; background: var(--card); border: 1px solid var(--gold-dark); border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .day-tog.active { background: var(--gold-dark); color: var(--dark); border-color: var(--gold); }
+    .img-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 10px; border: 1px dashed var(--gold-dark); }
+    .progress-bar { background: var(--card); height: 6px; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .progress-fill { background: var(--gold); height: 100%; width: 0%; transition: width 0.3s; }
+    @media(max-width: 900px) { .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 0.5rem; } .main { padding: 1rem; } .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
-    <h1><i class="fas fa-crown" style="color:var(--gold)"></i> Gestionale Admin</h1>
-    <p>Antica Pizzeria Grasso</p>
-    <input type="password" id="adminPin" class="pin-input" maxlength="6" placeholder="••••">
+    <h1><i class="fas fa-crown"></i> Admin Pizzeria</h1>
+    <p style="color:#8a7a5a;">Inserisci il PIN per accedere</p>
+    <input type="password" id="adminPinInput" class="pin-input" maxlength="6" placeholder="••••">
     <button class="login-btn" onclick="verifyPin()"><i class="fas fa-sign-in-alt"></i> Accedi</button>
-    <div class="error-msg" id="loginError"></div>
+    <p id="loginError" style="color:#f87171; margin-top:10px; font-weight:600;"></p>
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard">
-  <div class="header-admin">
-    <h1><i class="fas fa-pizza-slice"></i> Pizzeria Grasso</h1>
-    <p>Pannello di Gestione Completo</p>
-  </div>
+  <nav class="sidebar">
+    <h2><i class="fas fa-utensils"></i> Gestionale</h2>
+    <button class="nav-btn active" onclick="showTab('orders')"><i class="fas fa-receipt"></i> Ordini Live</button>
+    <button class="nav-btn" onclick="showTab('counters')"><i class="fas fa-chart-bar"></i> Contatori</button>
+    <button class="nav-btn" onclick="showTab('reviews')"><i class="fas fa-star"></i> Recensioni</button>
+    <button class="nav-btn" onclick="showTab('promos')"><i class="fas fa-gift"></i> Promozioni</button>
+    <button class="nav-btn" onclick="showTab('menu')"><i class="fas fa-pizza-slice"></i> Menu & Categorie</button>
+    <button class="nav-btn" onclick="showTab('images')"><i class="fas fa-image"></i> Foto & Video</button>
+    <button class="nav-btn" onclick="showTab('settings')"><i class="fas fa-cog"></i> Impostazioni</button>
+    <button class="nav-btn" onclick="showTab('drivers')"><i class="fas fa-motorcycle"></i> Fattorini</button>
+    <button class="nav-btn" onclick="showTab('theme')"><i class="fas fa-palette"></i> Tema & Sicurezza</button>
+    <button class="nav-btn" onclick="logout()" style="margin-top:auto; color:#f87171;"><i class="fas fa-power-off"></i> Esci</button>
+  </nav>
   
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('categories')"><i class="fas fa-layer-group"></i> Categorie</button>
-    <button class="tab-btn" onclick="switchTab('hero')"><i class="fas fa-image"></i> Hero & Video</button>
-    <button class="tab-btn" onclick="switchTab('branding')"><i class="fas fa-pen-fancy"></i> Testi & Brand</button>
-    <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Impostazioni</button>
-  </div>
-  
-  <!-- CATEGORIES SECTION -->
-  <div id="categoriesSection" class="section active">
-    <div class="card">
-      <h2><i class="fas fa-folder-open"></i> Gestione Categorie</h2>
-      <p style="color:#8a7a5a; margin-bottom:20px;">Clicca su una categoria per espanderla e gestire i prodotti</p>
-      <div id="categoriesList"></div>
-      <button class="btn btn-success" onclick="addNewCategory()" style="width:100%; margin-top:15px;"><i class="fas fa-plus"></i> Aggiungi Nuova Categoria</button>
-    </div>
-  </div>
-  
-  <!-- HERO SECTION -->
-  <div id="heroSection" class="section">
-    <div class="card">
-      <h2><i class="fas fa-image"></i> Immagine Hero</h2>
-      <div class="hero-preview" id="heroPreviewContainer">
-        <img id="heroPreview" src="" alt="Hero">
-      </div>
-      <div class="upload-area" onclick="document.getElementById('heroInput').click()">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <p>Clicca per caricare nuova immagine hero</p>
-        <input type="file" id="heroInput" accept="image/*" style="display:none" onchange="uploadHeroImage(this)">
-      </div>
-      <div class="progress-bar" id="heroProgress" style="display:none;"><div class="progress-fill" id="heroProgressBar"></div></div>
-    </div>
-    
-    <div class="card">
-      <h2><i class="fas fa-video"></i> Video Hero (Opzionale)</h2>
-      <div class="form-group">
-        <label>URL Video (MP4)</label>
-        <input type="text" id="videoUrl" placeholder="https://...">
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-primary" onclick="saveVideoUrl()"><i class="fas fa-save"></i> Salva URL</button>
-        <button class="btn btn-danger" onclick="removeVideo()"><i class="fas fa-trash"></i> Rimuovi Video</button>
-      </div>
-      <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.2); border-radius:10px;">
-        <p style="color:#8a7a5a; font-size:0.9rem; margin-bottom:10px;"><i class="fas fa-info-circle"></i> Oppure carica un video dal dispositivo:</p>
-        <input type="file" id="videoInput" accept="video/*" style="display:none" onchange="uploadVideo(this)">
-        <button class="btn btn-success" onclick="document.getElementById('videoInput').click()" style="width:100%;"><i class="fas fa-camera"></i> Carica Video</button>
-        <div class="progress-bar" id="videoProgress" style="display:none; margin-top:10px;"><div class="progress-fill" id="videoProgressBar"></div></div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- BRANDING SECTION -->
-  <div id="brandingSection" class="section">
-    <div class="card">
-      <h2><i class="fas fa-pen-fancy"></i> Testi e Branding</h2>
-      <div class="form-group">
-        <label>Nome Pizzeria</label>
-        <input type="text" id="brandName" placeholder="Antica Pizzeria Grasso">
-      </div>
-      <div class="form-group">
-        <label>Sottotitolo</label>
-        <input type="text" id="brandSubtitle" placeholder="Dal 1980 • Tradizione">
-      </div>
-      <div class="form-group">
-        <label>Città</label>
-        <input type="text" id="brandCity" placeholder="Manfredonia">
-      </div>
-      <div class="form-group">
-        <label>Telefono Visibile</label>
-        <input type="tel" id="brandPhone" placeholder="0884 660377">
-      </div>
-      <button class="btn btn-primary" onclick="saveBranding()" style="width:100%;"><i class="fas fa-save"></i> Salva Testi</button>
-    </div>
-  </div>
-  
-  <!-- SETTINGS SECTION -->
-  <div id="settingsSection" class="section">
-    <div class="card">
-      <h2><i class="fas fa-cog"></i> Impostazioni Generali</h2>
-      <div class="form-group">
-        <label>PIN Admin Attuale</label>
-        <input type="password" id="currentPin" placeholder="••••">
-      </div>
-      <div class="form-group">
-        <label>Nuovo PIN</label>
-        <input type="password" id="newPin" placeholder="••••">
-      </div>
-      <div class="form-group">
-        <label>Conferma Nuovo PIN</label>
-        <input type="password" id="confirmPin" placeholder="••••">
-      </div>
-      <button class="btn btn-primary" onclick="changePin()" style="width:100%;"><i class="fas fa-key"></i> Cambia PIN</button>
-    </div>
-    
-    <div class="card">
-      <h2><i class="fas fa-motorcycle"></i> Costi Consegna</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Costo Consegna (€)</label>
-          <input type="number" id="deliveryFee" step="0.50" min="0" placeholder="2.00">
-        </div>
-        <div class="form-group">
-          <label>Minimo Ordine (€)</label>
-          <input type="number" id="minOrder" step="0.50" min="0" placeholder="15.00">
+  <main class="main">
+    <!-- ORDINI -->
+    <section id="orders" class="section active">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="color:var(--gold);"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h2>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-danger btn-sm" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Azzera Tutto</button>
+          <button class="btn btn-sm" style="background:var(--card-light); border:1px solid var(--gold-dark); color:var(--cream);" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci Vecchi</button>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="saveDeliverySettings()" style="width:100%;"><i class="fas fa-save"></i> Salva Costi</button>
-    </div>
-  </div>
+      <div id="ordersList"></div>
+    </section>
+
+    <!-- CONTATORI -->
+    <section id="counters" class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="color:var(--gold);"><i class="fas fa-chart-bar"></i> Contatori di Oggi</h2>
+        <button class="btn btn-danger btn-sm" onclick="resetCounters()"><i class="fas fa-undo"></i> Azzera Oggi</button>
+      </div>
+      <div id="countersList" class="card" style="text-align:center;">Caricamento...</div>
+    </section>
+
+    <!-- RECENSIONI -->
+    <section id="reviews" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-star"></i> Recensioni Clienti</h2>
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card" style="text-align:center;"><div style="font-size:2rem; font-weight:700; color:var(--gold);" id="revTotal">0</div><div style="font-size:0.8rem;">Totali</div></div>
+        <div class="card" style="text-align:center;"><div style="font-size:2rem; font-weight:700; color:var(--gold);" id="revAvg">0</div><div style="font-size:0.8rem;">Media ⭐</div></div>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:1rem;">
+        <button class="btn btn-sm active-filter" onclick="filterReviews('all')" style="background:var(--gold-dark); color:var(--dark);">Tutte</button>
+        <button class="btn btn-sm" onclick="filterReviews('pending')" style="background:var(--card); border:1px solid var(--gold-dark);">⏳ In Attesa</button>
+        <button class="btn btn-sm" onclick="filterReviews('approved')" style="background:var(--card); border:1px solid var(--gold-dark);">✅ Approvate</button>
+      </div>
+      <div id="reviewsList"></div>
+    </section>
+
+    <!-- PROMOZIONI -->
+    <section id="promos" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-gift"></i> Gestione Promozioni</h2>
+      <div id="promosList"></div>
+      <div class="card" style="margin-top:1.5rem;">
+        <h3><i class="fas fa-plus-circle"></i> Nuova Promozione</h3>
+        <div class="grid-2">
+          <div class="form-group"><label>Titolo</label><input id="promoTitle"></div>
+          <div class="form-group"><label>Messaggio</label><input id="promoMsg"></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group"><label>Inizio</label><input type="date" id="promoStart"></div>
+          <div class="form-group"><label>Fine</label><input type="date" id="promoEnd"></div>
+        </div>
+        <div class="form-group"><label>Max Utilizzi</label><input type="number" id="promoMax" min="1" value="50"></div>
+        <div class="form-group"><label>Prodotti (scegli dal menu)</label>
+          <div id="promoProdRows"></div>
+          <button class="btn btn-sm" style="background:var(--card-light); color:var(--gold); margin-top:8px; border:1px dashed var(--gold);" onclick="addPromoRow()"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>
+        </div>
+        <button class="btn btn-primary" onclick="createPromo()" style="width:100%; margin-top:10px;"><i class="fas fa-save"></i> Crea Promozione</button>
+      </div>
+    </section>
+
+    <!-- MENU & CATEGORIE -->
+    <section id="menu" class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="color:var(--gold);"><i class="fas fa-pizza-slice"></i> Menu & Categorie</h2>
+        <button class="btn btn-success" onclick="addCategory()"><i class="fas fa-plus"></i> Nuova Categoria</button>
+      </div>
+      <div id="menuList"></div>
+    </section>
+
+    <!-- FOTO & VIDEO -->
+    <section id="images" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-image"></i> Foto & Video</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>🖼️ Hero Principale</h3>
+          <div class="form-group">
+            <div class="img-preview" id="heroPreview" style="height:150px; display:flex; align-items:center; justify-content:center; color:#8a7a5a;">Nessuna immagine</div>
+            <input type="file" id="heroInput" accept="image/*" style="display:none" onchange="uploadImage('hero', this)">
+            <button class="btn btn-primary" onclick="document.getElementById('heroInput').click()" style="margin-top:10px; width:100%;">Carica Foto</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🎥 Video Hero</h3>
+          <div class="form-group"><label>URL Video MP4</label><input id="heroVideoUrl"></div>
+          <button class="btn btn-primary" onclick="saveVideoUrl()" style="width:100%;">Salva URL</button>
+          <div class="form-group" style="margin-top:15px;">
+            <label>Oppure carica video (max 15MB)</label>
+            <input type="file" id="videoFileInput" accept="video/*" style="display:none" onchange="uploadVideo(this)">
+            <button class="btn btn-success" onclick="document.getElementById('videoFileInput').click()" style="width:100%;"><i class="fas fa-upload"></i> Carica Video</button>
+            <div class="progress-bar" id="videoProgress" style="display:none;"><div class="progress-fill" id="videoBar"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📷 Foto Categorie</h3>
+        <div class="form-group">
+          <select id="catImgSelect" onchange="loadCatImgPreview()"><option value="">Seleziona categoria...</option></select>
+          <div id="catImgArea" style="display:none; margin-top:10px;">
+            <div class="img-preview" id="catImgPreview" style="height:100px;"></div>
+            <input type="file" id="catImgInput" accept="image/*" style="display:none" onchange="uploadImage('category', this)">
+            <button class="btn btn-primary" onclick="document.getElementById('catImgInput').click()" style="margin-top:10px; width:100%;">Aggiorna Immagine</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPOSTAZIONI -->
+    <section id="settings" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-cog"></i> Impostazioni Generali</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3><i class="fas fa-store"></i> Branding</h3>
+          <div class="form-group"><label>Nome</label><input id="s_name"></div>
+          <div class="form-group"><label>Sottotitolo</label><input id="s_sub"></div>
+          <div class="form-group"><label>Città</label><input id="s_city"></div>
+          <div class="form-group"><label>Telefono</label><input id="s_phone"></div>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-motorcycle"></i> Consegna & Servizi</h3>
+          <div class="grid-2">
+            <div class="form-group"><label>Costo Consegna (€)</label><input type="number" id="s_fee" step="0.5"></div>
+            <div class="form-group"><label>Minimo Ordine (€)</label><input type="number" id="s_min" step="0.5"></div>
+          </div>
+          <div class="form-group"><label>Stato Manuale</label>
+            <select id="s_status"><option value="auto">🤖 Automatico</option><option value="open">🟢 Aperto</option><option value="closed">🔴 Chiuso</option></select>
+          </div>
+          <label>Giorni Apertura</label>
+          <div class="days-wrap" id="daysWrap"></div>
+          <div class="form-group" style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+            <div class="toggle-switch on" id="togDel" onclick="this.classList.toggle('on')"></div><span>Consegna Attiva</span>
+          </div>
+          <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+            <div class="toggle-switch on" id="togPick" onclick="this.classList.toggle('on')"></div><span>Ritiro Attivo</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-clock"></i> Orari & Chiusure</h3>
+        <div class="grid-2">
+          <div class="form-group"><label>Orari (es. 11:00-15:00,18:00-23:00)</label><input id="s_hours"></div>
+          <div class="form-group"><label>Chiusure Speciali (YYYY-MM-DD)</label><input id="s_close" placeholder="2026-12-25, 2027-01-01"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%;"><i class="fas fa-save"></i> Salva Tutte le Impostazioni</button>
+      </div>
+    </section>
+
+    <!-- FATTORINI -->
+    <section id="drivers" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-motorcycle"></i> Gestione Fattorini</h2>
+      <div class="card">
+        <div id="driversList"></div>
+        <button class="btn btn-success btn-sm" onclick="addDriverRow()" style="margin:10px 0;"><i class="fas fa-plus"></i> Aggiungi Fattorino</button>
+        <button class="btn btn-primary" onclick="saveDrivers()" style="width:100%;"><i class="fas fa-save"></i> Salva Fattorini</button>
+      </div>
+    </section>
+
+    <!-- TEMA & SICUREZZA -->
+    <section id="theme" class="section">
+      <h2 style="color:var(--gold); margin-bottom:1.5rem;"><i class="fas fa-palette"></i> Tema & Sicurezza</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>🎨 Palette Colori</h3>
+          <div class="palette-grid" id="paletteGrid"></div>
+        </div>
+        <div class="card">
+          <h3>🔒 Cambia PIN Admin</h3>
+          <div class="form-group"><label>PIN Attuale</label><input type="password" id="curPin"></div>
+          <div class="form-group"><label>Nuovo PIN (min 4 cifre)</label><input type="password" id="newPin"></div>
+          <div class="form-group"><label>Conferma</label><input type="password" id="confPin"></div>
+          <button class="btn btn-primary" onclick="changePin()" style="width:100%;">Aggiorna PIN</button>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// Firebase Config
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-let appData = { categories: {}, menu: {}, settings: {}, branding: {}, images: {} };
-let openCategories = new Set();
+let appData = { categories:{}, menu:{}, settings:{}, branding:{}, promotions:{}, drivers:{}, images:{} };
+let currentCatImg = '';
+let reviewFilter = 'all';
 
 // LOGIN
 async function verifyPin() {
-  const input = document.getElementById('adminPin').value;
-  const error = document.getElementById('loginError');
+  const input = document.getElementById('adminPinInput').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
   try {
     const snap = await db.ref('settings/adminPin').once('value');
-    const savedPin = snap.val() || '1234';
-    if (input === savedPin) {
+    if (input === (snap.val() || '1234')) {
       document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      loadData();
-    } else {
-      error.textContent = '❌ PIN errato';
-    }
-  } catch(e) {
-    error.textContent = '⚠️ Errore connessione';
-  }
+      document.getElementById('dashboard').style.display = 'flex';
+      initDashboard();
+    } else { err.textContent = '❌ PIN errato'; }
+  } catch(e) { err.textContent = '⚠️ Errore connessione'; }
 }
-document.getElementById('adminPin').addEventListener('keypress', (e) => { if(e.key==='Enter') verifyPin(); });
+document.getElementById('adminPinInput').addEventListener('keypress', e => { if(e.key==='Enter') verifyPin(); });
 
-// LOAD DATA
-function loadData() {
-  db.ref('categories').on('value', s => { if(s.exists()) { appData.categories = s.val(); renderCategories(); } });
-  db.ref('menu').on('value', s => { if(s.exists()) { appData.menu = s.val(); renderCategories(); } });
-  db.ref('branding').on('value', s => { if(s.exists()) { appData.branding = s.val(); loadBranding(); } });
-  db.ref('images').on('value', s => { if(s.exists()) { appData.images = s.val(); loadHeroImage(); } });
-  db.ref('settings').on('value', s => { if(s.exists()) { appData.settings = s.val(); loadSettings(); } });
+// INIT
+function initDashboard() {
+  setupListeners();
+  renderDays();
+  renderPalette();
+  loadSettingsForm();
+}
+function setupListeners() {
+  db.ref('categories').on('value', s => { if(s.exists()) { appData.categories=s.val(); renderMenu(); updateCatSelect(); } });
+  db.ref('menu').on('value', s => { if(s.exists()) { appData.menu=s.val(); renderMenu(); updatePromoDropdowns(); } });
+  db.ref('settings').on('value', s => { if(s.exists()) { appData.settings={...appData.settings, ...s.val()}; loadSettingsForm(); loadImages(); } });
+  db.ref('branding').on('value', s => { if(s.exists()) appData.branding={...appData.branding, ...s.val()}; });
+  db.ref('promotions').on('value', s => { appData.promotions=s.exists()?s.val():{}; renderPromos(); });
+  db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => renderOrders(s.val()||{}));
+  db.ref('contatori').on('value', s => renderCounters(s.val()||{}));
+  db.ref('recensioni').on('value', s => renderReviews(s.val()||{}));
+  db.ref('drivers').on('value', s => { appData.drivers=s.val()||{}; renderDrivers(); });
 }
 
-// RENDER CATEGORIES (ACCORDION)
-function renderCategories() {
-  const container = document.getElementById('categoriesList');
-  if (!container) return;
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+
+// ORDINI
+function renderOrders(orders) {
+  const list = document.getElementById('ordersList');
+  const gruppi = {new:[], preparing:[], ready:[], delivered:[]};
+  Object.entries(orders).forEach(([id,o]) => { const st=o.status||'new'; if(gruppi[st]) gruppi[st].push([id,o]); });
+  Object.keys(gruppi).forEach(k => gruppi[k].sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0)));
   
-  let html = '';
-  Object.keys(appData.categories).forEach(key => {
-    const cat = appData.categories[key];
-    const products = appData.menu[key] || [];
-    const isOpen = openCategories.has(key);
-    const catImg = appData.images.categories && appData.images.categories[key] ? appData.images.categories[key] : '';
-    
-    html += `
-      <div class="category-accordion ${isOpen ? 'open' : ''}" id="acc-${key}">
-        <div class="category-header" onclick="toggleCategory('${key}')">
-          <div class="category-header-left">
-            <div class="category-icon"><i class="fas ${cat.icon || 'fa-utensils'}"></i></div>
-            <span class="category-title">${cat.name || key}</span>
-          </div>
-          <span class="category-count">${products.length} prodotti</span>
-          <i class="fas fa-chevron-down category-arrow"></i>
+  let html='';
+  const titoli = {new:'🔴 Nuovi', preparing:'🟡 In Prep', ready:'🟢 Pronti', delivered:'🔵 Consegnati'};
+  Object.keys(gruppi).forEach(stato => {
+    if(!gruppi[stato].length) return;
+    html += `<h3 style="margin:1rem 0 0.5rem; color:var(--cream);">${titoli[stato]} (${gruppi[stato].length})</h3>`;
+    gruppi[stato].forEach(([id,o]) => {
+      const items = (o.items||[]).map(i=>`<div>▸ ${i.name} x${i.qty} - €${(i.price*i.qty).toFixed(2)}</div>`).join('');
+      let acts = '';
+      if(stato==='new') acts = `<button class="btn btn-warning btn-sm" onclick="updOrder('${id}','preparing')">🍕 Prep</button>`;
+      else if(stato==='preparing') acts = `<button class="btn btn-success btn-sm" onclick="updOrder('${id}','ready')">✅ Pronto</button>`;
+      else if(stato==='ready') acts = `<button class="btn btn-primary btn-sm" onclick="updOrder('${id}','delivered')">🛵 Cons.</button>`;
+      acts += `<button class="btn btn-danger btn-sm" onclick="delOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+      html += `<div class="order-card"><div style="display:flex;justify-content:space-between;"><strong>${o.orderId||id}</strong> <span class="badge bg-${stato==='preparing'?'prep':stato==='ready'?'ready':stato==='delivered'?'del':'new'}">${stato}</span></div><div style="margin:8px 0; font-size:0.9rem;">👤 ${o.customerName} • 📞 ${o.customerPhone} • 🕐 ${o.scheduledTime||'Subito'}</div>${o.address?`<div style="font-size:0.85rem; color:#8a7a5a;">📍 ${o.address}</div>`:''}<div style="background:rgba(0,0,0,0.2); padding:8px; border-radius:6px; margin:8px 0;">${items}</div><div style="font-weight:700; text-align:right;">Totale: €${o.finalTotal.toFixed(2)}</div><div class="order-actions">${acts}</div></div>`;
+    });
+  });
+  list.innerHTML = html || '<p style="text-align:center; padding:40px; color:#8a7a5a;">Nessun ordine attivo</p>';
+}
+function updOrder(id,st){ db.ref(`ordini/${id}/status`).set(st); showToast(`Stato: ${st}`); }
+function delOrder(id){ if(confirm('Eliminare ordine?')){ db.ref(`ordini/${id}`).remove(); showToast('Eliminato'); } }
+function clearAllOrders(){ if(confirm('⚠️ CANCELLARE TUTTI GLI ORDINI?')){ db.ref('ordini').remove(); showToast('Database svuotato'); } }
+function clearOldOrders(){ if(!confirm('Pulire ordini >60gg?'))return; const cut=Date.now()-(60*86400000); db.ref('ordini').orderByChild('timestamp').endAt(cut).once('value',s=>{ let c=0; s.forEach(x=>{ if(x.val().status==='delivered'){ x.ref.remove(); c++; } }); showToast(`Puliti ${c} ordini vecchi`); }); }
+
+// CONTATORI
+function renderCounters(data) {
+  const list = document.getElementById('countersList');
+  const today = new Date().toISOString().split('T')[0];
+  const day = data[today]||{};
+  if(!Object.keys(day).length){ list.innerHTML='<p style="padding:30px;">Nessun ordine oggi</p>'; return; }
+  let tot=0, html='<table style="width:100%; text-align:left;"><thead><tr><th>Prodotto</th><th>Q.tà</th></tr></thead><tbody>';
+  db.ref(`contatori_nomi/${today}`).once('value', ns => {
+    const nomi = ns.val()||{};
+    Object.entries(day).sort((a,b)=>b[1]-a[1]).forEach(([k,q]) => {
+      tot+=q;
+      html += `<tr><td>${nomi[k]||k.replace(/_/g,' ')}</td><td style="font-weight:700; text-align:center;">${q}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    list.innerHTML = `<div style="margin-bottom:15px; font-weight:700; color:var(--gold);">Totale pezzi oggi: ${tot}</div>` + html;
+  });
+}
+function resetCounters(){ const t=new Date().toISOString().split('T')[0]; if(confirm('Azzerare contatori?')){ db.ref(`contatori/${t}`).remove(); db.ref(`contatori_nomi/${t}`).remove(); showToast('Azzerati'); } }
+
+// RECENSIONI
+function renderReviews(data) {
+  const reviews = Object.entries(data||{}).map(([id,r])=>({id,...r}));
+  let tot=0, stars=0, pend=0;
+  reviews.forEach(r=>{ tot++; stars+=r.stars; if(r.status==='pending') pend++; });
+  document.getElementById('revTotal').textContent = tot;
+  document.getElementById('revAvg').textContent = tot ? (stars/tot).toFixed(1)+'⭐' : '0';
+  
+  const list = document.getElementById('reviewsList');
+  let filtered = reviews.filter(r => reviewFilter==='all' || r.status===reviewFilter);
+  filtered.sort((a,b)=>b.timestamp-a.timestamp);
+  list.innerHTML = filtered.map(r => {
+    const st = r.status==='approved'?'✅ Approvata':r.status==='rejected'?'❌ Rifiutata':'⏳ In Attesa';
+    let acts = r.status==='pending' ? `<button class="btn btn-success btn-sm" onclick="updReview('${r.id}','approved')">✅</button><button class="btn btn-danger btn-sm" onclick="updReview('${r.id}','rejected')">❌</button>` : '';
+    return `<div class="review-card"><div style="display:flex;justify-content:space-between;"><strong>${r.name}</strong> <span style="font-size:0.8rem; color:#8a7a5a;">${new Date(r.timestamp).toLocaleString()} | ${st}</span></div><div style="color:var(--gold); margin:5px 0;">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><p style="font-style:italic;">"${r.text}"</p><small style="color:#8a7a5a;">Ordine: ${r.orderId||'N/A'}</small><div style="margin-top:8px; display:flex; gap:6px;">${acts} <button class="btn btn-danger btn-sm" onclick="delReview('${r.id}')"><i class="fas fa-trash"></i></button></div></div>`;
+  }).join('') || '<p style="text-align:center;padding:20px;">Nessuna recensione</p>';
+}
+function filterReviews(f) { reviewFilter=f; renderReviews(appData.recensioni||{}); showToast('Filtro applicato'); }
+function updReview(id,st){ db.ref(`recensioni/${id}/status`).set(st); showToast('Aggiornata'); renderReviews(); }
+function delReview(id){ if(confirm('Eliminare?')){ db.ref(`recensioni/${id}`).remove(); showToast('Eliminata'); } }
+
+// PROMOZIONI
+function renderPromos() {
+  const list = document.getElementById('promosList');
+  const td = new Date().toISOString().split('T')[0];
+  list.innerHTML = Object.entries(appData.promotions).map(([id,p]) => {
+    const act = p.active && p.startDate<=td && p.endDate>=td && (p.currentUses||0)<p.maxUses;
+    const tp = (p.products||[]).reduce((s,pr)=>s+(pr.price*pr.qty),0);
+    const prodsHtml = (p.products||[]).map(pr => `<div style="font-size:0.85rem; margin:2px 0;">▸ ${pr.name} x${pr.qty}</div>`).join('');
+    return `<div class="card" style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><h3 style="margin:0;">${p.title} <span style="color:var(--danger); font-size:0.9rem;">-€${tp.toFixed(2)}</span></h3><span class="badge ${act?'bg-ready':'bg-del'}">${act?'ATTIVA':'INATTIVA'}</span></div>${prodsHtml}<div style="display:flex;gap:6px; margin-top:10px;"><button class="btn btn-sm" onclick="togglePromo('${id}')">${act?'⏸️ Off':'▶️ On'}</button><button class="btn btn-sm" onclick="resetPromo('${id}')">🔄 Reset Usi</button><button class="btn btn-danger btn-sm" onclick="delPromo('${id}')"><i class="fas fa-trash"></i></button></div></div>`;
+  }).join('') || '<p style="color:#8a7a5a; padding:10px;">Nessuna promozione</p>';
+}
+function updatePromoDropdowns() {
+  const rows = document.querySelectorAll('.promo-prod-select');
+  let opts = '<option value="">-- Seleziona --</option>';
+  Object.keys(appData.categories).forEach(c => {
+    const cat = appData.categories[c];
+    const prods = appData.menu[c]||[];
+    if(prods.length) { opts += `<optgroup label="${cat.name||c}">`; prods.forEach(p=>{ opts += `<option value="${p.name}|||${p.price}">${p.name} - €${p.price}</option>`; }); opts += '</optgroup>'; }
+  });
+  rows.forEach(s => { const old = s.value; s.innerHTML = opts; s.value = old; });
+}
+function addPromoRow() {
+  const c = document.getElementById('promoProdRows');
+  const r = document.createElement('div'); r.className = 'form-group'; r.style.display='flex'; r.style.gap='8px';
+  r.innerHTML = `<select class="promo-prod-select" style="flex:2;"></select><input type="number" placeholder="Prezzo" style="flex:1;" step="0.5"><input type="number" placeholder="Q.tà" style="width:60px;" value="1" min="1"><button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(r); updatePromoDropdowns();
+}
+function getPromoProds() {
+  const rows = document.querySelectorAll('#promoProdRows > div');
+  let ps = [];
+  rows.forEach(r => {
+    const s=r.querySelector('select'), p=parseFloat(r.querySelectorAll('input')[0].value), q=parseInt(r.querySelectorAll('input')[1].value)||1;
+    if(s.value && !isNaN(p)) ps.push({name:s.value.split('|||')[0], price:p, qty:q});
+  });
+  return ps;
+}
+function createPromo() {
+  const t=document.getElementById('promoTitle').value.trim(), m=document.getElementById('promoMsg').value.trim(), s=document.getElementById('promoStart').value, e=document.getElementById('promoEnd').value, mx=parseInt(document.getElementById('promoMax').value);
+  if(!t||!s||!e||!mx) return showToast('Compila tutti i campi');
+  const ps = getPromoProds();
+  if(!ps.length) return showToast('Aggiungi almeno 1 prodotto');
+  db.ref('promotions').push({title:t, message:m, startDate:s, endDate:e, maxUses:mx, currentUses:0, active:true, products:ps, createdAt:Date.now()});
+  document.querySelectorAll('#promoProdRows > div').forEach(d=>d.remove());
+  showToast('✅ Promozione creata'); renderPromos();
+}
+function togglePromo(id){ db.ref(`promotions/${id}/active`).set(!appData.promotions[id].active); showToast('Stato aggiornato'); }
+function resetPromo(id){ if(confirm('Reset utilizzi?')){ db.ref(`promotions/${id}/currentUses`).set(0); showToast('Resettato'); } }
+function delPromo(id){ if(confirm('Eliminare promo?')){ db.ref(`promotions/${id}`).remove(); showToast('Eliminata'); } }
+
+// MENU & CATEGORIE
+function renderMenu() {
+  const list = document.getElementById('menuList');
+  list.innerHTML = Object.keys(appData.categories).map(c => {
+    const cat = appData.categories[c], prods = appData.menu[c]||[];
+    let prodHtml = prods.map((p,i) => `
+      <div class="product-item">
+        <div class="grid-2" style="gap:8px; margin-bottom:6px;">
+          <input value="${p.name}" onchange="updProd('${c}',${i},'name',this.value)" placeholder="Nome">
+          <input type="number" step="0.5" value="${p.price}" onchange="updProd('${c}',${i},'price',this.value)" placeholder="Prezzo">
         </div>
-        <div class="category-body">
-          <div class="category-content">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Nome Categoria</label>
-                <input type="text" value="${cat.name || ''}" onchange="updateCategory('${key}', 'name', this.value)">
-              </div>
-              <div class="form-group">
-                <label>Icona (FontAwesome)</label>
-                <input type="text" value="${cat.icon || 'fa-utensils'}" onchange="updateCategory('${key}', 'icon', this.value)" placeholder="fa-pizza-slice">
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>Immagine Categoria</label>
-              ${catImg ? `<img src="${catImg}" class="img-preview-small" onclick="removeCategoryImage('${key}')" title="Clicca per rimuovere">` : ''}
-              <div class="upload-area" onclick="document.getElementById('catImg-${key}').click()" style="margin-top:10px;">
-                <i class="fas fa-camera"></i>
-                <p>Carica immagine categoria</p>
-                <input type="file" id="catImg-${key}" accept="image/*" style="display:none" onchange="uploadCategoryImage('${key}', this)">
-              </div>
-            </div>
-            
-            <h3 style="color:var(--gold); margin:20px 0 15px; font-size:1.1rem;"><i class="fas fa-utensils"></i> Prodotti</h3>
-            <div id="products-${key}">
-              ${products.map((prod, idx) => `
-                <div class="product-item">
-                  <div class="product-header">
-                    <span class="product-name">${prod.name}</span>
-                    <div class="product-actions">
-                      <button class="btn btn-danger btn-sm" onclick="deleteProduct('${key}', ${idx})"><i class="fas fa-trash"></i></button>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <input type="text" value="${prod.name}" onchange="updateProduct('${key}', ${idx}, 'name', this.value)" placeholder="Nome prodotto">
-                    </div>
-                    <div class="form-group">
-                      <input type="number" step="0.50" value="${prod.price}" onchange="updateProduct('${key}', ${idx}, 'price', parseFloat(this.value))" placeholder="Prezzo">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <input type="text" value="${prod.desc || ''}" onchange="updateProduct('${key}', ${idx}, 'desc', this.value)" placeholder="Descrizione">
-                  </div>
-                  <div class="form-group">
-                    ${prod.img ? `<img src="${prod.img}" class="img-preview-small" onclick="removeProductImage('${key}', ${idx})" style="margin-right:10px;">` : ''}
-                    <label class="btn btn-sm" style="background:var(--card); border:1px solid var(--gold-dark); color:var(--gold); cursor:pointer;">
-                      <i class="fas fa-camera"></i> Foto Prodotto
-                      <input type="file" accept="image/*" style="display:none" onchange="uploadProductImage('${key}', ${idx}, this)">
-                    </label>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            <button class="btn btn-success btn-sm" onclick="addProduct('${key}')" style="width:100%; margin-top:10px;"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>
-          </div>
+        <input value="${p.desc||''}" onchange="updProd('${c}',${i},'desc',this.value)" placeholder="Descrizione" style="margin-bottom:6px;">
+        <div style="display:flex; gap:6px; align-items:center;">
+          ${p.img?`<img src="${p.img}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="delProdImg('${c}',${i})">`:''}
+          <label class="btn btn-sm" style="background:var(--card); border:1px dashed var(--gold); color:var(--gold); cursor:pointer;">
+            📷 Foto <input type="file" accept="image/*" style="display:none" onchange="uploadProdImg('${c}',${i},this)">
+          </label>
+          <button class="btn btn-danger btn-sm" onclick="delProd('${c}',${i})"><i class="fas fa-trash"></i></button>
         </div>
       </div>
-    `;
-  });
-  
-  container.innerHTML = html || '<p style="text-align:center; color:#8a7a5a; padding:40px;">Nessuna categoria. Clicca sotto per aggiungere la prima!</p>';
+    `).join('');
+    return `<div class="product-accordion"><div class="accordion-header" onclick="this.parentElement.classList.toggle('open')"><span style="color:var(--gold); font-weight:700;"><i class="fas ${cat.icon||'fa-utensils'}"></i> ${cat.name||c}</span><span style="background:var(--gold-dark); color:var(--dark); padding:2px 8px; border-radius:10px; font-size:0.8rem;">${prods.length} prodotti</span></div><div class="accordion-body"><div style="padding:12px;">${prodHtml}<button class="btn btn-success btn-sm" onclick="addProd('${c}')" style="margin-top:8px; width:100%;"><i class="fas fa-plus"></i> Aggiungi Prodotto</button><button class="btn btn-danger btn-sm" onclick="delCat('${c}')" style="margin-top:6px; width:100%; background:rgba(248,113,113,0.2); border:1px solid #f87171;">🗑️ Elimina Categoria</button></div></div></div>`;
+  }).join('');
 }
+function addCat(){ const n=prompt("Nome:"); if(!n)return; const i=prompt("Icona (fa-...):","fa-utensils"); const k=prompt("Chiave univoca (es. pizze):"); if(!k||!/^[a-z0-9_]+$/.test(k)||appData.categories[k]) return showToast("Chiave non valida o esistente"); db.ref(`categories/${k}`).set({name:n, icon:i}); db.ref(`menu/${k}`).set([]); showToast("Categoria creata"); }
+function delCat(k){ if(confirm("Eliminare categoria e prodotti?")){ db.ref(`categories/${k}`).remove(); db.ref(`menu/${k}`).remove(); db.ref(`images/categories/${k}`).remove(); showToast("Eliminata"); } }
+function addProd(c){ const n=prompt("Nome:"); if(!n)return; const p=parseFloat(prompt("Prezzo:","5"))||5; const d=prompt("Desc:","")||""; db.ref(`menu/${c}`).push({name:n, price:p, desc:d}); showToast("Aggiunto"); }
+function updProd(c,i,f,v){ if(f==='price')v=parseFloat(v); db.ref(`menu/${c}/${i}/${f}`).set(v); }
+function delProd(c,i){ if(confirm("Eliminare prodotto?")){ db.ref(`menu/${c}/${i}`).remove(); showToast("Eliminato"); } }
+function uploadProdImg(c,i,input){ const f=input.files[0]; if(!f||f.size>2*1024*1024) return showToast("Max 2MB"); const r=new FileReader(); r.onload=e=>{ db.ref(`menu/${c}/${i}/img`).set(e.target.result); showToast("Foto caricata"); }; r.readAsDataURL(f); }
+function delProdImg(c,i){ if(confirm("Rimuovere foto?")){ db.ref(`menu/${c}/${i}/img`).remove(); showToast("Foto rimossa"); } }
 
-function toggleCategory(key) {
-  if (openCategories.has(key)) {
-    openCategories.delete(key);
-  } else {
-    openCategories.add(key);
-  }
-  renderCategories();
+// IMMAGINI & VIDEO
+function loadImages() {
+  if(appData.images.hero){ document.getElementById('heroPreview').innerHTML=`<img src="${appData.images.hero}" class="img-preview" style="max-height:100%; width:100%;">`; }
+  document.getElementById('heroVideoUrl').value = appData.settings.heroVideoUrl || '';
 }
-
-// CATEGORY FUNCTIONS
-function addNewCategory() {
-  const name = prompt('Nome categoria:');
-  if (!name) return;
-  const icon = prompt('Icona (es. fa-pizza-slice):', 'fa-utensils') || 'fa-utensils';
-  const key = prompt('Chiave univoca (minuscole, no spazi):');
-  if (!key || !/^[a-z0-9_]+$/.test(key)) {
-    showToast('❌ Chiave non valida');
-    return;
-  }
-  
-  db.ref(`categories/${key}`).set({ name, icon });
-  db.ref(`menu/${key}`).set([]);
-  openCategories.add(key);
-  showToast('✅ Categoria aggiunta');
+function updateCatSelect() {
+  const sel = document.getElementById('catImgSelect');
+  sel.innerHTML = '<option value="">Seleziona categoria...</option>' + Object.keys(appData.categories).map(c=>`<option value="${c}">${appData.categories[c].name||c}</option>`).join('');
 }
-
-function updateCategory(key, field, value) {
-  db.ref(`categories/${key}/${field}`).set(value);
+function loadCatImgPreview() {
+  const k = document.getElementById('catImgSelect').value;
+  const area = document.getElementById('catImgArea');
+  area.style.display = k ? 'block' : 'none';
+  currentCatImg = k;
+  if(k && appData.images.categories && appData.images.categories[k]) document.getElementById('catImgPreview').innerHTML = `<img src="${appData.images.categories[k]}" class="img-preview" style="max-height:100%; width:100%;">`;
+  else document.getElementById('catImgPreview').textContent = 'Nessuna immagine';
 }
-
-function deleteCategory(key) {
-  if (!confirm('Eliminare questa categoria e tutti i prodotti?')) return;
-  db.ref(`categories/${key}`).remove();
-  db.ref(`menu/${key}`).remove();
-  db.ref(`images/categories/${key}`).remove();
-  showToast('🗑️ Categoria eliminata');
-}
-
-// PRODUCT FUNCTIONS
-function addProduct(catKey) {
-  const name = prompt('Nome prodotto:');
-  if (!name) return;
-  const price = parseFloat(prompt('Prezzo:', '5.00')) || 5;
-  const desc = prompt('Descrizione:', '') || '';
-  
-  db.ref(`menu/${catKey}`).push({ name, price, desc });
-  showToast('✅ Prodotto aggiunto');
-}
-
-function updateProduct(catKey, idx, field, value) {
-  db.ref(`menu/${catKey}/${idx}/${field}`).set(value);
-}
-
-function deleteProduct(catKey, idx) {
-  if (!confirm('Eliminare prodotto?')) return;
-  db.ref(`menu/${catKey}/${idx}`).remove();
-  showToast('🗑️ Prodotto eliminato');
-}
-
-// IMAGE UPLOAD FUNCTIONS
-function uploadCategoryImage(key, input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('❌ Max 2MB');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const url = e.target.result;
-    db.ref(`images/categories/${key}`).set(url);
-    showToast('✅ Immagine caricata');
+function uploadImage(type, input) {
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload = e => {
+    const ref = type==='hero' ? 'images/hero' : `images/categories/${currentCatImg}`;
+    db.ref(ref).set(e.target.result);
+    showToast('✅ Caricata');
+    if(type==='category') loadCatImgPreview();
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 }
-
-function removeCategoryImage(key) {
-  if (!confirm('Rimuovere immagine categoria?')) return;
-  db.ref(`images/categories/${key}`).remove();
-  showToast('🗑️ Immagine rimossa');
-}
-
-function uploadProductImage(catKey, idx, input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('❌ Max 2MB');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    db.ref(`menu/${catKey}/${idx}/img`).set(e.target.result);
-    showToast('✅ Foto prodotto caricata');
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeProductImage(catKey, idx) {
-  if (!confirm('Rimuovere foto prodotto?')) return;
-  db.ref(`menu/${catKey}/${idx}/img`).remove();
-  showToast('🗑️ Foto rimossa');
-}
-
-function uploadHeroImage(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 3 * 1024 * 1024) {
-    showToast('❌ Max 3MB');
-    return;
-  }
-  
-  const progress = document.getElementById('heroProgress');
-  const bar = document.getElementById('heroProgressBar');
-  progress.style.display = 'block';
-  
-  const reader = new FileReader();
-  reader.onprogress = (e) => {
-    if (e.lengthComputable) {
-      const percent = (e.loaded / e.total) * 100;
-      bar.style.width = percent + '%';
-    }
-  };
-  reader.onload = (e) => {
-    db.ref('images/hero').set(e.target.result);
-    progress.style.display = 'none';
-    bar.style.width = '0%';
-    showToast('✅ Hero image caricata');
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadHeroImage() {
-  const img = document.getElementById('heroPreview');
-  if (img && appData.images.hero) {
-    img.src = appData.images.hero;
-  }
-}
-
-function saveVideoUrl() {
-  const url = document.getElementById('videoUrl').value.trim();
-  if (!url) {
-    showToast('❌ Inserisci URL');
-    return;
-  }
-  db.ref('settings/heroVideoUrl').set(url);
-  showToast('✅ Video salvato');
-}
-
-function removeVideo() {
-  db.ref('settings/heroVideoUrl').remove();
-  document.getElementById('videoUrl').value = '';
-  showToast('🗑️ Video rimosso');
-}
-
+function saveVideoUrl() { db.ref('settings/heroVideoUrl').set(document.getElementById('heroVideoUrl').value.trim()); showToast('URL salvato'); }
 function uploadVideo(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 15 * 1024 * 1024) {
-    showToast('❌ Max 15MB');
-    return;
-  }
-  
-  const progress = document.getElementById('videoProgress');
-  const bar = document.getElementById('videoProgressBar');
-  progress.style.display = 'block';
-  
-  const ts = Date.now();
-  const ref = storage.ref(`hero_videos/video_${ts}.mp4`);
-  const task = ref.put(file);
-  
-  task.on('state_changed', 
-    (snapshot) => {
-      const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      bar.style.width = percent + '%';
-    },
-    (error) => {
-      showToast('❌ Errore: ' + error.message);
-      progress.style.display = 'none';
-    },
-    () => {
-      task.snapshot.ref.getDownloadURL().then((url) => {
-        db.ref('settings/heroVideoUrl').set(url);
-        progress.style.display = 'none';
-        bar.style.width = '0%';
-        showToast('✅ Video caricato');
-      });
-    }
-  );
+  const f=input.files[0]; if(!f||f.size>15*1024*1024) return showToast("Max 15MB");
+  const prog = document.getElementById('videoProgress'), bar = document.getElementById('videoBar');
+  prog.style.display='block';
+  const ref = storage.ref(`videos/hero_${Date.now()}.mp4`);
+  const task = ref.put(f);
+  task.on('state_changed', s=>{ bar.style.width=`${(s.bytesTransferred/s.totalBytes)*100}%`; }, e=>{ showToast("❌ "+e.message); prog.style.display='none'; }, ()=>{ task.snapshot.ref.getDownloadURL().then(u=>{ db.ref('settings/heroVideoUrl').set(u); showToast("✅ Video caricato"); prog.style.display='none'; }); });
 }
 
-// BRANDING
-function loadBranding() {
-  document.getElementById('brandName').value = appData.branding.name || '';
-  document.getElementById('brandSubtitle').value = appData.branding.subtitle || '';
-  document.getElementById('brandCity').value = appData.branding.city || '';
-  document.getElementById('brandPhone').value = appData.settings.visiblePhone || '';
+// IMPOSTAZIONI
+function renderDays() {
+  const days = ['lun','mar','mer','gio','ven','sab','dom'];
+  document.getElementById('daysWrap').innerHTML = days.map(d=>`<div class="day-tog" data-day="${d}" onclick="this.classList.toggle('active')">${d.charAt(0).toUpperCase()+d.slice(1)}</div>`).join('');
+}
+function loadSettingsForm() {
+  const s=appData.settings, b=appData.branding;
+  document.getElementById('s_name').value=b.name||'';
+  document.getElementById('s_sub').value=b.subtitle||'';
+  document.getElementById('s_city').value=b.city||'';
+  document.getElementById('s_phone').value=s.visiblePhone||'';
+  document.getElementById('s_hours').value=s.hours||'';
+  document.getElementById('s_close').value=s.specialClosures||'';
+  document.getElementById('s_fee').value=s.deliveryFee||0;
+  document.getElementById('s_min').value=s.minDeliveryOrder||0;
+  document.getElementById('s_status').value=s.manualStatus||'auto';
+  document.getElementById('togDel').classList.toggle('on', s.deliveryEnabled!==false);
+  document.getElementById('togPick').classList.toggle('on', s.pickupEnabled!==false);
+  const od = s.openDays?s.openDays.split(','):[];
+  document.querySelectorAll('.day-tog').forEach(el=>{ if(od.includes(el.dataset.day)) el.classList.add('active'); else el.classList.remove('active'); });
+}
+function saveAllSettings() {
+  const od = Array.from(document.querySelectorAll('.day-tog.active')).map(e=>e.dataset.day).join(',');
+  db.ref('branding').update({ name:document.getElementById('s_name').value, subtitle:document.getElementById('s_sub').value, city:document.getElementById('s_city').value });
+  db.ref('settings').update({ visiblePhone:document.getElementById('s_phone').value, hours:document.getElementById('s_hours').value, specialClosures:document.getElementById('s_close').value, deliveryFee:parseFloat(document.getElementById('s_fee').value)||0, minDeliveryOrder:parseFloat(document.getElementById('s_min').value)||0, deliveryEnabled:document.getElementById('togDel').classList.contains('on'), pickupEnabled:document.getElementById('togPick').classList.contains('on'), openDays:od, manualStatus:document.getElementById('s_status').value });
+  showToast("✅ Impostazioni salvate!");
 }
 
-function saveBranding() {
-  db.ref('branding').update({
-    name: document.getElementById('brandName').value,
-    subtitle: document.getElementById('brandSubtitle').value,
-    city: document.getElementById('brandCity').value
+// FATTORINI
+function renderDrivers() {
+  const list = document.getElementById('driversList');
+  list.innerHTML = Object.entries(appData.drivers).map(([p,n])=>`
+    <div class="product-item" style="display:flex; gap:8px; align-items:center;">
+      <input value="${n}" class="d-name" style="flex:2;" placeholder="Nome">
+      <input value="${p}" class="d-pin" maxlength="4" style="width:80px;" placeholder="PIN 4 cifre">
+      <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+function addDriverRow() { document.getElementById('driversList').insertAdjacentHTML('beforeend', `<div class="product-item" style="display:flex; gap:8px; align-items:center;"><input class="d-name" style="flex:2;" placeholder="Nome"><input class="d-pin" maxlength="4" style="width:80px;" placeholder="PIN"><button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button></div>`); }
+function saveDrivers() {
+  const d={}; let ok=true;
+  document.querySelectorAll('#driversList > .product-item').forEach(r=>{
+    const n=r.querySelector('.d-name').value.trim(), p=r.querySelector('.d-pin').value.trim();
+    if(!n||!/^\d{4}$/.test(p)){ok=false; return;}
+    d[p]=n;
   });
-  db.ref('settings/visiblePhone').set(document.getElementById('brandPhone').value);
-  showToast('✅ Testi salvati');
+  if(!ok) return showToast("⚠️ Inserisci Nome e PIN (4 cifre)");
+  if(!Object.keys(d).length) return showToast("⚠️ Aggiungi almeno 1 fattorino");
+  db.ref('drivers').set(d); showToast("✅ Fattorini salvati");
 }
 
-// SETTINGS
-function loadSettings() {
-  document.getElementById('deliveryFee').value = appData.settings.deliveryFee || 0;
-  document.getElementById('minOrder').value = appData.settings.minDeliveryOrder || 0;
+// TEMA & SICUREZZA
+function renderPalette() {
+  const palettes = {
+    autunno: {bg:'#2d1f12', gold:'#d4a84b', name:'Autunno'},
+    inverno: {bg:'#1a2530', gold:'#a8c3d4', name:'Inverno'},
+    primavera: {bg:'#1a2d1f', gold:'#8cd4a8', name:'Primavera'},
+    estate: {bg:'#3d2510', gold:'#e8a84b', name:'Estate'},
+    natale: {bg:'#0f2018', gold:'#c41e3a', name:'Natale'},
+    notte: {bg:'#050510', gold:'#7209b7', name:'Notte'}
+  };
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = Object.entries(palettes).map(([k,p])=>`
+    <div class="palette-btn" style="background:linear-gradient(135deg, ${p.gold}, ${p.bg});" onclick="changePalette('${k}')">
+      <i class="fas fa-${k==='natale'?'tree':k==='inverno'?'snowflake':k==='notte'?'moon':'palette'}"></i><br>${p.name}
+    </div>
+  `).join('');
+}
+function changePalette(name) { db.ref('settings/colorPalette').set(name); showToast(`Tema ${name} applicato`); }
+async function changePin() {
+  const cur = document.getElementById('curPin').value;
+  const nw = document.getElementById('newPin').value;
+  const cf = document.getElementById('confPin').value;
+  if(cur !== (appData.settings.adminPin||'1234')) return showToast("❌ PIN attuale errato");
+  if(!/^\d{4,}$/.test(nw)) return showToast("❌ Minimo 4 cifre");
+  if(nw!==cf) return showToast("❌ I PIN non coincidono");
+  await db.ref('settings/adminPin').set(nw);
+  document.getElementById('curPin').value=''; document.getElementById('newPin').value=''; document.getElementById('confPin').value='';
+  showToast("✅ PIN cambiato con successo!");
 }
 
-function changePin() {
-  const current = document.getElementById('currentPin').value;
-  const newPin = document.getElementById('newPin').value;
-  const confirm = document.getElementById('confirmPin').value;
-  
-  if (current !== (appData.settings.adminPin || '1234')) {
-    showToast('❌ PIN attuale errato');
-    return;
-  }
-  if (!/^\d{4,}$/.test(newPin)) {
-    showToast('❌ Min 4 cifre');
-    return;
-  }
-  if (newPin !== confirm) {
-    showToast('❌ PIN non coincidono');
-    return;
-  }
-  
-  db.ref('settings/adminPin').set(newPin);
-  document.getElementById('currentPin').value = '';
-  document.getElementById('newPin').value = '';
-  document.getElementById('confirmPin').value = '';
-  showToast('✅ PIN cambiato');
-}
-
-function saveDeliverySettings() {
-  db.ref('settings').update({
-    deliveryFee: parseFloat(document.getElementById('deliveryFee').value) || 0,
-    minDeliveryOrder: parseFloat(document.getElementById('minOrder').value) || 0
-  });
-  showToast('✅ Costi salvati');
-}
-
-// UTILS
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  
-  event.target.closest('.tab-btn').classList.add('active');
-  document.getElementById(tab + 'Section').classList.add('active');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+function logout() { location.reload(); }
 </script>
 </body>
 </html>
