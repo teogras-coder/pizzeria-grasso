@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestionale Admin - Antica Pizzeria Grasso</title>
+<title>Gestionale PC - Antica Pizzeria Grasso</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -12,26 +12,24 @@
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-body { background: var(--dark); color: var(--cream); min-height: 100vh; }
+body { background: var(--dark); color: var(--cream); min-height: 100vh; display: flex; }
 
 #loginScreen { position: fixed; inset: 0; background: rgba(26,18,9,0.98); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .login-box { background: var(--card-light); padding: 2.5rem; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 2px solid var(--gold-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-.login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.5rem; }
-.login-box p { color: #8a7a5a; margin-bottom: 1rem; }
+.login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.5rem; font-size: 1.8rem; }
 .pin-input { width: 100%; padding: 16px; font-size: 2rem; text-align: center; letter-spacing: 15px; border: 2px solid var(--gold-dark); border-radius: 12px; margin: 1.5rem 0; background: var(--card); color: var(--gold); font-weight: 700; }
 .login-btn { width: 100%; padding: 16px; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 .login-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--gold-dark); }
 .login-error { color: #f87171; margin-top: 10px; font-weight: 600; min-height: 20px; }
 
-#dashboard { display: none; height: 100vh; }
-.sidebar { width: 260px; background: var(--brown); padding: 1rem; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--gold-dark); position: fixed; height: 100vh; }
-.sidebar h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem; }
+.sidebar { width: 280px; background: var(--brown); padding: 1rem; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--gold-dark); position: fixed; height: 100vh; }
+.sidebar h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 1.5rem; text-align: center; font-size: 1.3rem; }
 .nav-btn { background: transparent; border: none; color: #8a7a5a; padding: 12px 15px; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 6px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; width: 100%; }
 .nav-btn:hover, .nav-btn.active { background: var(--card-light); color: var(--gold); }
 .nav-btn i { width: 20px; text-align: center; }
 .logout-btn { margin-top: auto; color: #f87171 !important; }
 
-.main { margin-left: 260px; padding: 2rem; min-height: 100vh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); }
+.main { margin-left: 280px; flex: 1; padding: 2rem; min-height: 100vh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); overflow-y: auto; }
 .section { display: none; animation: fadeIn 0.3s; }
 .section.active { display: block; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -51,12 +49,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 
 .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-.bg-new { background: rgba(248,113,113,0.2); color: #f87171; }
-.bg-prep { background: rgba(251,191,36,0.2); color: #fbbf24; }
-.bg-ready { background: rgba(74,222,128,0.2); color: #4ade80; }
-.bg-del { background: rgba(96,165,250,0.2); color: #60a5fa; }
-.bg-active { background: rgba(74,222,128,0.2); color: #4ade80; }
-.bg-inactive { background: rgba(248,113,113,0.2); color: #f87171; }
 
 .order-card { background: var(--card); padding: 1rem; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold-dark); }
 .order-card.new { border-left-color: #f87171; animation: pulseNew 2s infinite; }
@@ -91,28 +83,22 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
 .btn-delivered { background: #60a5fa; color: white; }
 .btn-delete-order { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 
-.accordion { background: var(--card); border-radius: 10px; margin-bottom: 10px; overflow: hidden; border: 1px solid rgba(212,168,75,0.15); }
-.accordion-header { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(212,168,75,0.1); }
-.accordion-body { max-height: 0; overflow: hidden; transition: 0.3s; background: rgba(0,0,0,0.15); }
-.accordion.open .accordion-body { max-height: 5000px; }
-.product-row { padding: 12px; border-bottom: 1px solid rgba(212,168,75,0.1); }
-.product-row:last-child { border-bottom: none; }
-
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 
-.review-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(212,168,75,0.15); }
-.promo-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
-
 .driver-card { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); padding: 12px; border-radius: 10px; margin-bottom: 10px; }
-.driver-card.offline { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); }
-
 .gps-link { background: var(--card-light); border: 1px solid var(--gold); color: var(--gold); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
 .gps-link:hover { background: var(--gold); color: var(--dark); }
 
 .counter-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(0,0,0,0.15); border-radius: 10px; margin-bottom: 8px; }
 .counter-row-name { color: var(--cream); font-size: 0.9rem; flex: 1; }
 .counter-row-qty { background: var(--gold-dark); color: var(--dark); font-weight: 800; font-size: 1.1rem; min-width: 42px; text-align: center; padding: 6px 12px; border-radius: 10px; }
+
+.review-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(212,168,75,0.15); }
+.promo-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.2); }
+
+.driver-row { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.driver-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
 
 .img-upload-area { border: 2px dashed var(--gold-dark); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; }
 .img-upload-area:hover { border-color: var(--gold); }
@@ -128,20 +114,21 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
 .day-toggle { padding: 10px 14px; border-radius: 8px; background: var(--card); border: 1px solid var(--gold-dark); color: #8a7a5a; text-align: center; font-size: 0.85rem; cursor: pointer; user-select: none; transition: all 0.2s; }
 .day-toggle.active { background: var(--gold-dark); color: var(--dark); border-color: var(--gold); font-weight: 700; }
 
-.driver-row { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-.driver-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
-.driver-row .pin-input { width: 80px; flex: 0 0 80px; text-align: center; }
+.accordion { background: var(--card); border-radius: 10px; margin-bottom: 10px; overflow: hidden; border: 1px solid rgba(212,168,75,0.15); }
+.accordion-header { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(212,168,75,0.1); }
+.accordion-body { max-height: 0; overflow: hidden; transition: 0.3s; background: rgba(0,0,0,0.15); }
+.accordion.open .accordion-body { max-height: 5000px; }
+.product-row { padding: 12px; border-bottom: 1px solid rgba(212,168,75,0.1); }
 
 .toast { position: fixed; bottom: 20px; right: 20px; background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 10px; font-weight: 600; z-index: 3000; opacity: 0; transition: 0.3s; border: 1px solid rgba(212,168,75,0.2); pointer-events: none; transform: translateY(20px); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
 .toast.show { opacity: 1; transform: translateY(0); }
 
 .orders-empty { text-align: center; color: #8a7a5a; padding: 30px 0; }
-.orders-empty i { font-size: 2rem; margin-bottom: 10px; display: block; }
 
 @media(max-width: 900px) {
-.sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; }
-.main { margin-left: 0; }
-.grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; }
+  .main { margin-left: 0; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -149,15 +136,15 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
 
 <div id="loginScreen">
   <div class="login-box">
-    <h1>👑 Admin Pizzeria</h1>
-    <p>Antica Pizzeria Grasso</p>
+    <h1>👑 Gestionale PC</h1>
+    <p style="color:#8a7a5a; margin-bottom:1rem;">Antica Pizzeria Grasso</p>
     <input type="password" id="pinInput" class="pin-input" maxlength="6" placeholder="••••">
     <button class="login-btn" onclick="verifyPin()">Accedi</button>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
-<div id="dashboard">
+<div id="dashboard" style="display:none;">
   <nav class="sidebar">
     <h2>🍕 Gestionale</h2>
     <button class="nav-btn active" onclick="showSection('orders')"><i class="fas fa-receipt"></i> Ordini Live</button>
@@ -174,40 +161,38 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
   </nav>
 
   <main class="main">
-    <!-- ORDINI -->
     <section id="orders" class="section active">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h2 style="color:var(--gold); font-family:'Playfair Display',serif;"><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h2>
         <div style="display:flex; gap:8px; align-items:center;">
-          <span id="ordersCount" class="badge bg-prep" style="font-size:1rem; padding:6px 14px;">0</span>
+          <span id="ordersCount" class="badge" style="background:var(--gold-dark); color:var(--dark); font-size:1rem; padding:6px 14px;">0</span>
           <button class="btn btn-danger btn-sm" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Azzera</button>
           <button class="btn btn-sm" style="background:var(--card-light); border:1px solid var(--gold-dark);" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci Vecchi</button>
+          <button class="btn btn-sm" style="background:var(--gold-dark); color:var(--dark); font-weight:700;" onclick="resetOrdersCounter()"><i class="fas fa-sync"></i> Azzera Contatore</button>
         </div>
       </div>
       <p style="color:#8a7a5a; font-size:0.85rem; margin-bottom:1rem;">🔔 Gli ordini arrivano in tempo reale con suono di notifica. Assegna manualmente il fattorino se necessario.</p>
       <div id="ordersList"></div>
     </section>
 
-    <!-- FATTORINI -->
     <section id="drivers" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-motorcycle"></i> Fattorini & Tracking GPS</h2>
       <div class="grid-2">
         <div class="card">
           <h3><i class="fas fa-users"></i> Gestione Fattorini</h3>
           <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:1rem;">Aggiungi o rimuovi i fattorini. PIN a 4 cifre.</p>
-          <div id="driversList"></div>
-          <button class="btn btn-success btn-sm" onclick="addDriverRow()" style="width:100%; margin-top:10px;"><i class="fas fa-plus"></i> Aggiungi Fattorino</button>
-          <button class="btn btn-primary" onclick="saveDrivers()" style="width:100%; margin-top:10px;"><i class="fas fa-save"></i> Salva Fattorini</button>
+          <div id="driversList" style="max-height:300px; overflow-y:auto; margin-bottom:1rem;"></div>
+          <button class="btn btn-success btn-sm" onclick="addDriverRow()" style="width:100%; margin-bottom:8px;"><i class="fas fa-plus"></i> Aggiungi Fattorino</button>
+          <button class="btn btn-primary" onclick="saveDrivers()" style="width:100%;"><i class="fas fa-save"></i> Salva Team</button>
         </div>
         <div class="card">
           <h3><i class="fas fa-map-marked-alt"></i> Ordini in Consegna</h3>
           <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:1rem;">Ordini assegnati ai fattorini con posizione GPS.</p>
-          <div id="activeDeliveries"></div>
+          <div id="activeDeliveries" style="max-height:500px; overflow-y:auto;"></div>
         </div>
       </div>
     </section>
 
-    <!-- CONTATORI -->
     <section id="counters" class="section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h2 style="color:var(--gold); font-family:'Playfair Display',serif;"><i class="fas fa-chart-bar"></i> Contatori di Oggi</h2>
@@ -219,7 +204,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       <div id="countersList" class="card"></div>
     </section>
 
-    <!-- RECENSIONI -->
     <section id="reviews" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-star"></i> Recensioni Clienti</h2>
       <div class="grid-3" style="margin-bottom:1.5rem;">
@@ -230,7 +214,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       <div id="reviewsList"></div>
     </section>
 
-    <!-- PROMOZIONI -->
     <section id="promos" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-gift"></i> Gestione Promozioni</h2>
       <div id="promosList"></div>
@@ -253,7 +236,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       </div>
     </section>
 
-    <!-- MENU -->
     <section id="menu" class="section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h2 style="color:var(--gold); font-family:'Playfair Display',serif;"><i class="fas fa-layer-group"></i> Menu & Categorie</h2>
@@ -262,7 +244,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       <div id="menuList"></div>
     </section>
 
-    <!-- IMMAGINI -->
     <section id="images" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-image"></i> Foto & Video</h2>
       <div class="grid-2">
@@ -305,7 +286,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       </div>
     </section>
 
-    <!-- IMPOSTAZIONI -->
     <section id="settings" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-cog"></i> Impostazioni Generali</h2>
       <div class="grid-2">
@@ -343,7 +323,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       </div>
     </section>
 
-    <!-- ORARI -->
     <section id="hours" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-clock"></i> Orari & Disponibilità</h2>
       <div class="card">
@@ -357,7 +336,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold-light); }
       </div>
     </section>
 
-    <!-- SICUREZZA -->
     <section id="security" class="section">
       <h2 style="color:var(--gold); font-family:'Playfair Display',serif; margin-bottom:1.5rem;"><i class="fas fa-lock"></i> Sicurezza</h2>
       <div class="card">
@@ -383,7 +361,6 @@ let knownOrderIds = new Set();
 let currentCatImg = '';
 let audioCtx = null;
 
-// AUDIO
 function unlockAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -403,7 +380,6 @@ function playSound() {
   }
 }
 
-// LOGIN
 async function verifyPin() {
   const input = document.getElementById('pinInput').value;
   const error = document.getElementById('loginError');
@@ -412,7 +388,7 @@ async function verifyPin() {
     const snap = await db.ref('settings/adminPin').once('value');
     if (input === (snap.val() || '1234')) {
       document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'flex';
       initDashboard();
     } else {
       error.textContent = '❌ PIN errato';
@@ -423,7 +399,6 @@ async function verifyPin() {
 }
 document.getElementById('pinInput').addEventListener('keypress', e => { if(e.key === 'Enter') verifyPin(); });
 
-// INIT
 function initDashboard() {
   setupListeners();
   renderDays();
@@ -469,7 +444,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ORDINI
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
   const count = document.getElementById('ordersCount');
@@ -507,7 +481,7 @@ function renderOrders(orders) {
       if(o.driverName) {
         driverHtml = `<div class="driver-info-box"><span><i class="fas fa-motorcycle"></i> Fattorino: ${o.driverName}</span><span style="font-size:0.7rem; opacity:0.8;">${o.acceptedAt ? new Date(o.acceptedAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'}) : ''}</span></div>`;
       } else if (stato !== 'delivered' && stato !== 'new') {
-        driverHtml = `<button class="assign-driver-btn" onclick="assignDriverPrompt('${id}')"><i class="fas fa-exclamation-circle"></i> Assegna Fattorino Manualmente</button>`;
+        driverHtml = `<button class="assign-driver-btn" onclick="assignDriverPrompt('${id}')"><i class="fas fa-exclamation-circle"></i> Assegna Fattorino</button>`;
       }
       
       let actions = '';
@@ -516,15 +490,7 @@ function renderOrders(orders) {
       else if(stato === 'ready') actions = `<button class="order-action-btn btn-delivered" onclick="updateOrder('${id}','delivered')">🛵 Cons.</button><button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
       else actions = `<button class="order-action-btn btn-delete-order" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
       
-      html += `<div class="order-card ${stato}">
-        <div class="order-header"><span class="order-id">${o.orderId || id}</span><span class="order-time">${ds} ${ts}</span></div>
-        ${driverHtml}
-        <div class="order-customer"><i class="fas fa-user"></i> ${o.customerName || 'N/A'} • ${o.customerPhone || 'N/A'}</div>
-        <div class="order-details"><i class="fas fa-${o.type === 'delivery' ? 'motorcycle' : 'store'}"></i> ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}${o.scheduledTime ? ' • ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br><i class="fas fa-map-marker-alt"></i> ' + o.address : ''}${o.notes ? '<br><i class="fas fa-sticky-note"></i> ' + o.notes : ''}</div>
-        <div class="order-items">${items}</div>
-        <div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div>
-        <div class="order-actions">${actions}</div>
-      </div>`;
+      html += `<div class="order-card ${stato}"><div class="order-header"><span class="order-id">${o.orderId || id}</span><span class="order-time">${ds} ${ts}</span></div>${driverHtml}<div class="order-customer"><i class="fas fa-user"></i> ${o.customerName || 'N/A'} • ${o.customerPhone || 'N/A'}</div><div class="order-details"><i class="fas fa-${o.type === 'delivery' ? 'motorcycle' : 'store'}"></i> ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}${o.scheduledTime ? ' • ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br><i class="fas fa-map-marker-alt"></i> ' + o.address : ''}${o.notes ? '<br><i class="fas fa-sticky-note"></i> ' + o.notes : ''}</div><div class="order-items">${items}</div><div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div><div class="order-actions">${actions}</div></div>`;
     });
   });
   
@@ -560,7 +526,11 @@ function clearOldOrders() {
   });
 }
 
-// ASSEGNA FATTORINO
+function resetOrdersCounter() {
+  knownOrderIds.clear();
+  showToast('🔄 Contatore ordini azzerato');
+}
+
 function assignDriverPrompt(orderId) {
   db.ref('drivers').once('value').then(snap => {
     const drivers = snap.val();
@@ -583,9 +553,10 @@ function assignDriverPrompt(orderId) {
   });
 }
 
-// FATTORINI & GPS
 function renderActiveDeliveries(orders) {
   const list = document.getElementById('activeDeliveries');
+  if(!list) return;
+  
   const assigned = Object.entries(orders || {}).filter(([id, o]) => o.driverPin && o.status !== 'delivered');
   
   if(!assigned.length) {
@@ -597,39 +568,36 @@ function renderActiveDeliveries(orders) {
     const coords = o.coordinates ? o.coordinates.split(',').map(x => x.trim()) : null;
     const gpsUrl = coords ? `https://www.google.com/maps?q=${coords[0]},${coords[1]}` : null;
     const acceptTime = o.acceptedAt ? new Date(o.acceptedAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'}) : 'N/D';
-    const st = o.status === 'ready' ? '🟢 Pronto per la partenza' : '🟡 In preparazione';
+    const st = o.status === 'ready' ? '🟢 Pronto per partenza' : '🟡 In preparazione';
     
     return `<div class="driver-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <strong><i class="fas fa-motorcycle"></i> ${o.driverName}</strong>
         <span style="font-size:0.8rem; color:#8a7a5a;">${acceptTime}</span>
       </div>
-      <div style="margin-bottom:8px;"><b>${o.orderId}</b> - ${st}</div>
-      <div style="font-size:0.85rem; margin-bottom:10px;">📍 ${o.address || 'N/D'}</div>
+      <div style="margin-bottom:8px;"><b>${o.orderId || id}</b> - ${st}</div>
+      <div style="font-size:0.85rem; color:var(--cream); margin-bottom:6px;">📍 ${o.address || 'N/D'}</div>
       ${gpsUrl ? `<a href="${gpsUrl}" target="_blank" class="gps-link"><i class="fas fa-map-marker-alt"></i> Apri su Maps</a>` : '<span style="font-size:0.8rem; color:#8a7a5a;">GPS non disponibile</span>'}
       <div style="margin-top:10px; display:flex; gap:6px;">
-        ${o.status === 'ready' ? `<button class="btn btn-warning btn-sm" onclick="updateOrder('${id}','preparing')">🚗 In Viaggio</button>` : ''}
-        ${o.status === 'preparing' ? `<button class="btn btn-success btn-sm" onclick="updateOrder('${id}','delivered')">✅ Consegnato</button>` : ''}
-        <button class="btn btn-danger btn-sm" onclick="unassignDriver('${id}')"><i class="fas fa-times"></i> Rimuovi</button>
+        <button onclick="unassignDriver('${id}')" style="background:rgba(248,113,113,0.2); color:#f87171; border:1px solid rgba(248,113,113,0.3); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer;"><i class="fas fa-times"></i> Stacca</button>
       </div>
     </div>`;
   }).join('');
 }
 
 function unassignDriver(id) {
-  if(confirm('Rimuovere fattorino?')) {
+  if(confirm('Staccare il fattorino da questo ordine?')) {
     db.ref(`ordini/${id}`).update({ driverPin: null, driverName: null });
-    showToast('Rimosso');
+    showToast('🔄 Fattorino staccato');
   }
 }
 
-// FATTORINI ADMIN
 function renderDrivers() {
   const list = document.getElementById('driversList');
   list.innerHTML = Object.entries(appData.drivers).map(([pin, name]) => 
     `<div class="driver-row">
       <input type="text" value="${name}" class="driver-name" placeholder="Nome">
-      <input type="text" value="${pin}" class="pin-input" maxlength="4" placeholder="PIN">
+      <input type="text" value="${pin}" class="driver-pin" maxlength="4" placeholder="PIN" style="width:80px;">
       <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
     </div>`
   ).join('') || '<p style="text-align:center; color:#8a7a5a;">Nessun fattorino</p>';
@@ -639,7 +607,7 @@ function addDriverRow() {
   document.getElementById('driversList').insertAdjacentHTML('beforeend',
     `<div class="driver-row">
       <input type="text" class="driver-name" placeholder="Nome">
-      <input type="text" class="pin-input" maxlength="4" placeholder="PIN">
+      <input type="text" class="driver-pin" maxlength="4" placeholder="PIN" style="width:80px;">
       <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
     </div>`
   );
@@ -650,7 +618,7 @@ function saveDrivers() {
   let err = false;
   document.querySelectorAll('.driver-row').forEach(r => {
     const n = r.querySelector('.driver-name').value.trim();
-    const p = r.querySelector('.pin-input').value.trim();
+    const p = r.querySelector('.driver-pin').value.trim();
     if(!n || !p) { showToast('⚠️ Compila tutti i campi'); err = true; return; }
     if(!/^\d{4}$/.test(p)) { showToast('⚠️ PIN deve essere 4 cifre'); err = true; return; }
     d[p] = n;
@@ -661,7 +629,6 @@ function saveDrivers() {
   showToast('✅ Fattorini salvati');
 }
 
-// CONTATORI
 function renderCounters(data) {
   const list = document.getElementById('countersList');
   const today = new Date().toISOString().split('T')[0];
@@ -692,7 +659,6 @@ function resetCounters() {
   showToast('✅ Contatori azzerati');
 }
 
-// RECENSIONI
 function renderReviews(data) {
   const reviews = Object.entries(data || {}).map(([id, r]) => ({id, ...r}));
   let tot = 0, stars = 0, pend = 0;
@@ -737,7 +703,6 @@ function deleteReview(id) {
   }
 }
 
-// PROMOZIONI
 function renderPromos() {
   const list = document.getElementById('promosList');
   const td = new Date().toISOString().split('T')[0];
@@ -750,7 +715,7 @@ function renderPromos() {
     return `<div class="promo-card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
         <h3 style="margin:0; color:var(--gold);">${p.title} <span style="color:#f87171; font-size:0.9rem;">- €${tp.toFixed(2)}</span></h3>
-        <span class="badge ${act ? 'bg-active' : 'bg-inactive'}">${act ? 'ATTIVA' : 'INATTIVA'}</span>
+        <span class="badge" style="background:${act ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.2)'}; color:${act ? '#4ade80' : '#f87171'};">${act ? 'ATTIVA' : 'INATTIVA'}</span>
       </div>
       ${p.message ? `<p style="color:#8a7a5a; font-size:0.85rem; margin-bottom:8px;">${p.message}</p>` : ''}
       ${prodsHtml}
@@ -838,7 +803,6 @@ function deletePromo(id) {
   }
 }
 
-// MENU
 function renderMenu() {
   const list = document.getElementById('menuList');
   list.innerHTML = Object.keys(appData.categories).map(c => {
@@ -954,7 +918,6 @@ function removeProductImg(c, i) {
   }
 }
 
-// IMMAGINI
 function loadImages() {
   if(appData.images.hero) {
     const p = document.getElementById('heroPreview');
@@ -1036,7 +999,6 @@ function uploadVideo(input) {
   });
 }
 
-// IMPOSTAZIONI
 function renderDays() {
   const days = ['lun','mar','mer','gio','ven','sab','dom'];
   document.getElementById('daysWrap').innerHTML = days.map(d => 
