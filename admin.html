@@ -101,6 +101,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-printer-reset { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
@@ -285,6 +286,10 @@ select.form-input { cursor: pointer; }
 .progress-bar { background: var(--card); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 10px; }
 .progress-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); height: 100%; width: 0%; transition: width 0.3s; border-radius: 4px; }
 
+.printer-status-card { background: linear-gradient(145deg, rgba(139,92,246,0.15) 0%, rgba(109,40,217,0.05) 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(139,92,246,0.3); }
+.printer-status-title { color: #8b5cf6; font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.printer-status-value { color: var(--gold); font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
@@ -367,6 +372,13 @@ select.form-input { cursor: pointer; }
           <button class="btn-secondary" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci</button>
         </div>
       </div>
+      
+      <div class="printer-status-card">
+        <div class="printer-status-title"><i class="fas fa-print"></i> Stampante - Prossimo Numero Ordine</div>
+        <div class="printer-status-value" id="nextOrderNumber">--</div>
+        <button class="btn-printer-reset" onclick="resetPrinterOrderNumber()"><i class="fas fa-undo"></i> Azzera Numero Stampante</button>
+      </div>
+      
       <div class="stats-row">
         <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">Nuovi</div></div>
         <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">In Prep</div></div>
@@ -583,6 +595,7 @@ function initApp() {
   loadAllData();
   setupListeners();
   renderPalettes();
+  loadNextOrderNumber();
 }
 
 function updateClock() {
@@ -612,6 +625,27 @@ function setupListeners() {
   db.ref('contatori').on('value', s => renderContatori(s.val()));
   db.ref('recensioni').on('value', s => loadReviews());
   db.ref('settings').on('value', s => { if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; loadSettings(); } });
+  db.ref('settings/nextOrderNum').on('value', s => {
+    const num = s.val() || 1;
+    document.getElementById('nextOrderNumber').textContent = String(num).padStart(4, '0');
+  });
+}
+
+function loadNextOrderNumber() {
+  db.ref('settings/nextOrderNum').once('value').then(s => {
+    const num = s.val() || 1;
+    document.getElementById('nextOrderNumber').textContent = String(num).padStart(4, '0');
+  });
+}
+
+function resetPrinterOrderNumber() {
+  if (confirm('⚠️ Sei sicuro di voler azzerare il numero ordini della stampante?\n\nIl prossimo ordine stampato avrà il numero 0001.')) {
+    db.ref('settings/nextOrderNum').set(1).then(() => {
+      showToast('✅ Numero stampante azzerato! Prossimo ordine: 0001');
+    }).catch(err => {
+      showToast('❌ Errore: ' + err.message);
+    });
+  }
 }
 
 function showSection(name, el) {
