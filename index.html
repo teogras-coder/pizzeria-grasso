@@ -689,7 +689,7 @@ document.getElementById('customerNumber').value='';
 document.getElementById('customerNotes').value='';
 document.getElementById('scheduledTime').value='';
 document.getElementById('privacyConsent').checked=false;
-selectTimeMode('asap');showToast('✅ Ordine inviato!');
+selectTimeMode('asap');showToast('✅ Ordine inviato!');showHome();
 }catch(e){
 console.error(e);
 cart=cartBackup;updateCartBadge();
