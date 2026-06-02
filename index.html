@@ -370,7 +370,36 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+// RIGA 371
+firebase.initializeApp(firebaseConfig);
 
+// RIGA 372
+const db = firebase.database();
+
+//  APPLICA PALETTE COLORI IN TEMPO REALE
+const paletteColors = {
+  autunno: { '--gold': '#d4a84b', '--gold-light': '#f0d78c', '--gold-dark': '#b8860b', '--dark': '#1a1209', '--brown': '#2d1f12' },
+  inverno: { '--gold': '#a8c3d4', '--gold-light': '#d4e5f0', '--gold-dark': '#7a9bb0', '--dark': '#1a2530', '--brown': '#253040' },
+  primavera: { '--gold': '#8cd4a8', '--gold-light': '#b8e8cc', '--gold-dark': '#5fa87e', '--dark': '#1a2d1f', '--brown': '#254030' },
+  estate: { '--gold': '#e8a84b', '--gold-light': '#f5d4a8', '--gold-dark': '#c4862e', '--dark': '#3d2510', '--brown': '#5a3a1a' },
+  natale: { '--gold': '#c41e3a', '--gold-light': '#e8708a', '--gold-dark': '#8b1028', '--dark': '#0f2018', '--brown': '#1a3020' },
+  san_valentino: { '--gold': '#ff4d6d', '--gold-light': '#ff8fa3', '--gold-dark': '#cc2e4d', '--dark': '#1a0a0f', '--brown': '#2d1520' },
+  notte: { '--gold': '#7209b7', '--gold-light': '#a855d4', '--gold-dark': '#500682', '--dark': '#050510', '--brown': '#101020' }
+};
+
+function applicaPalette(nome) {
+  const colors = paletteColors[nome] || paletteColors.autunno;
+  for (const [key, value] of Object.entries(colors)) {
+    document.documentElement.style.setProperty(key, value);
+  }
+}
+
+// Ascolta i cambiamenti della palette su Firebase
+db.ref('settings/colorPalette').on('value', snapshot => {
+  applicaPalette(snapshot.val() || 'autunno');
+});
+
+const CACHE_DURATION = 3600000;
 const CACHE_DURATION = 3600000;
 
 let appData = {
