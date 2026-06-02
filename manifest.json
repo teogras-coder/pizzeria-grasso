@@ -3,6 +3,7 @@
   "short_name": "Grasso",
   "description": "Ordina la vera pizza a Manfredonia",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0704",
