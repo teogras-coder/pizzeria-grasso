@@ -330,8 +330,8 @@ function checkForNewAvailableOrders() {
 
 // ===== FILTRI ORDINI =====
 function getAvailableOrders() {
-  // Ordini "new" senza assegnazione = disponibili per tutti i fattorini
-  return Object.values(allOrders).filter(o => o.status === 'new' && !o.assignedTo);
+  // Ordini "new" senza assegnazione E SOLO di tipo consegna (niente ritiri)
+  return Object.values(allOrders).filter(o => o.status === 'new' && !o.assignedTo && o.type === 'delivery');
 }
 
 function getMyOrders() {
