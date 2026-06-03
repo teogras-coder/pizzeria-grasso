@@ -344,7 +344,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="close-btn-3d" onclick="closeReviewModal()">×</button>
 </div>
 <div class="form-group">
-<label>Quante stelle? ⭐</label>
+<label>Quante stelle? </label>
 <div class="stars-input" id="starsInput">
 <span class="star" data-value="1" onclick="selectStar(1)">★</span>
 <span class="star" data-value="2" onclick="selectStar(2)">★</span>
@@ -373,7 +373,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <ul><li>Nome e cognome</li><li>Telefono</li><li>Indirizzo</li><li>Note ordine</li></ul>
 <h3>🔒 Sicurezza</h3>
 <p>Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3>🕒 Conservazione</h3>
+<h3> Conservazione</h3>
 <p>Conserviamo i dati per 24 mesi.</p>
 </div>
 </div>
@@ -420,7 +420,7 @@ images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600
 };
 let cart=[], orderType='delivery', timeMode='asap', currentSearchCat='';
 let selectedStars = 0, pendingReviewOrderId = null;
-let orderStatusListeners = {}; // Traccia i listener Firebase per rimuoverli correttamente
+let orderStatusListeners = {};
 
 document.addEventListener('click', function(e) {
 const btn = e.target.closest('button, .menu-btn-3d, .action-btn-3d, .add-btn-3d, .checkout-btn-3d, .type-option, .time-option, .qty-btn');
@@ -471,10 +471,8 @@ db.ref('promotions').on('value', s=>{
 db.ref('.info/connected').on('value', s=>{ const el=document.getElementById('offlineBanner'); if(!el)return; el.style.display=s.val()===false?'block':'none'; });
 }
 
-// ✅ TRACKING ORDINI - Versione corretta con .off() per rimuovere i listener
 function startOrderStatusTracking() {
     try {
-        // Rimuove correttamente tutti i vecchi listener
         Object.keys(orderStatusListeners).forEach(orderId => {
             try { orderStatusListeners[orderId].off('value'); } catch(e){}
         });
@@ -509,7 +507,7 @@ function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
                 o.status = newStatus;
                 if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
                 if (o.status && o.status !== newStatus && document.getElementById('myOrdersView').style.display === 'block') {
-                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': '📦 Ritirato dal fattorino', 'delivering': '🛵 In consegna!', 'delivered': '🎉 Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
+                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': ' Ritirato', 'delivering': ' In consegna!', 'delivered': ' Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
                     if (statusNames[newStatus]) {
                         showToast(statusNames[newStatus]);
                         if (newStatus === 'delivering' || newStatus === 'rifiutato') {
@@ -633,7 +631,6 @@ function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('🗑️ Svuotato');}}
 function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
 
-// ✅ FUNZIONE MODIFICATA: Nasconde indirizzo/GPS se è Ritiro
 function selectOrderType(t){ 
     orderType=t; 
     document.getElementById('typeDelivery').classList.toggle('active',t==='delivery'); 
@@ -653,7 +650,7 @@ function selectOrderType(t){
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime();}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
 function openCart(){ 
-if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} 
+if(!checkIfOpen()){showToast('️ Chiuso');return;} 
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); 
 if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} 
 else { 
@@ -671,35 +668,41 @@ m.classList.add('active');
 function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),streetInput=document.getElementById('customerStreet'),numberInput=document.getElementById('customerNumber'); if(!navigator.geolocation){showToast('GPS non disponibile');return;} b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; streetInput.value = a.road || a.pedestrian || ''; numberInput.value = a.house_number || ''; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere posizione');} finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
-async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const street=document.getElementById('customerStreet').value.trim(); const number=document.getElementById('customerNumber').value.trim(); const address = `${street} ${number}`; const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('⚠️ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('⚠️ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){ if(!street||!number){showToast('⚠️ Completa indirizzo');return;} if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} } const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
+async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(' Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const street=document.getElementById('customerStreet').value.trim(); const number=document.getElementById('customerNumber').value.trim(); const address = `${street} ${number}`; const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('⚠️ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('⚠️ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){ if(!street||!number){showToast('⚠️ Completa indirizzo');return;} if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} } const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
 async function sendOrder(d){ const btn=document.getElementById('checkoutBtn'); const cartBackup=[...cart]; if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} try{ const ref=db.ref('ordini').push(); const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); d.orderId=orderId; await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now()}); localStorage.setItem('lastOrderTime',Date.now()); saveOrderToLocal(d); const promos=cart.filter(i=>i.isPromo); promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); cart=[];updateCartBadge();closeCart(); document.getElementById('customerName').value=''; document.getElementById('customerPhone').value=''; document.getElementById('customerStreet').value=''; document.getElementById('customerNumber').value=''; document.getElementById('customerNotes').value=''; document.getElementById('scheduledTime').value=''; document.getElementById('privacyConsent').checked=false; selectTimeMode('asap');showToast('✅ Ordine inviato!');showHome(); setTimeout(() => startOrderStatusTracking(), 1000); }catch(e){ console.error(e); cart=cartBackup;updateCartBadge(); showToast('❌ Errore invio'); }finally{ if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} } }
 function openReviewModal(){ document.getElementById('reviewModal').classList.add('active'); }
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
 function updateStarsDisplay(){ document.querySelectorAll('#starsInput .star').forEach((s,i)=>{ s.classList.toggle('active', i<selectedStars); }); }
-function submitReview(){ const name = document.getElementById('reviewName').value.trim(); const text = document.getElementById('reviewText').value.trim(); const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } if(!name){ showToast('❌ Inserisci il nome'); return; } if(!text){ showToast('❌ Scrivi un commento'); return; } db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ if(pendingReviewOrderId) { let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); renderMyOrders(); } closeReviewModal(); showToast('⭐ Grazie per la recensione!'); }); }
+function submitReview(){ const name = document.getElementById('reviewName').value.trim(); const text = document.getElementById('reviewText').value.trim(); const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } if(!name){ showToast(' Inserisci il nome'); return; } if(!text){ showToast('❌ Scrivi un commento'); return; } db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ if(pendingReviewOrderId) { let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); renderMyOrders(); } closeReviewModal(); showToast('⭐ Grazie per la recensione!'); }); }
 function showMyOrders(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('reviewsPublicView').style.display='none'; document.getElementById('myOrdersView').style.display='block'; window.scrollTo(0,0); startOrderStatusTracking(); renderMyOrders(); }
 function cleanLocalHistory(){ try { let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); const now = Date.now(); const thirtyDays = 30 * 24 * 60 * 60 * 1000; orders = orders.filter(o => (now - o.date) < thirtyDays); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders)); } catch(e){} }
 
-// ✅ FUNZIONE CORRETTA: Salva l'ordine nel telefono del cliente (con controllo duplicati)
+// ✅ MODIFICATO: Salva anche il type (delivery/pickup) per mostrare il tracking corretto
 function saveOrderToLocal(orderData){
     try {
         let orders = [];
         try { orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); } catch(e) { orders = []; }
         const giàPresente = orders.find(o => o.orderId === orderData.orderId);
         if (giàPresente) return;
-        orders.unshift({ orderId: orderData.orderId, date: Date.now(), total: orderData.finalTotal, items: orderData.items.map(i=>i.name).join(', '), reviewed: false, status: 'new' });
+        orders.unshift({ 
+            orderId: orderData.orderId, 
+            date: Date.now(), 
+            total: orderData.finalTotal, 
+            items: orderData.items.map(i=>i.name).join(', '), 
+            reviewed: false, 
+            status: 'new',
+            type: orderData.type || 'delivery'  // ✅ Salviamo il tipo
+        });
         if(orders.length > 5) orders = orders.slice(0, 5);
         localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
         renderMyOrders();
-        console.log('✅ Ordine salvato in locale:', orderData.orderId);
+        console.log('✅ Ordine salvato:', orderData.orderId, 'type:', orderData.type);
     } catch(e){ console.error('❌ Errore localStorage:', e); }
 }
 
-// ✅ FUNZIONE CORRETTA: Cancella lo storico locale (rimuove anche i listener Firebase)
 function clearLocalHistory(){
     if(confirm('Cancellare tutto lo storico ordini locale?')){
-        // Rimuove correttamente tutti i listener Firebase
         Object.keys(orderStatusListeners).forEach(orderId => {
             try { orderStatusListeners[orderId].off('value'); } catch(e){}
         });
@@ -710,10 +713,121 @@ function clearLocalHistory(){
     }
 }
 
-function getOrderProgress(status) { const steps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } }; return steps[status] || steps['new']; }
-function renderOrderTracker(status, motivoRifiuto) { const progress = getOrderProgress(status); if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; } if (status === 'delivered') { return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> Ordine Consegnato!</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; } const steps = [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }]; return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`; }
+// ✅ MODIFICATO: Progressi diversi per consegna e ritiro
+function getOrderProgress(status, orderType) {
+    // Se è RITIRO - tracking semplificato
+    if (orderType === 'pickup') {
+        const pickupSteps = { 
+            'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 
+            'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 
+            'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 
+            'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '', class: 'status-picked' },
+            'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' },
+            'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } 
+        };
+        return pickupSteps[status] || pickupSteps['new'];
+    }
+    
+    // Se è CONSEGNA - tracking completo
+    const deliverySteps = { 
+        'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 
+        'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 
+        'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 
+        'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 
+        'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 
+        'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 
+        'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } 
+    };
+    return deliverySteps[status] || deliverySteps['new'];
+}
 
-function renderMyOrders(){ const list = document.getElementById('myOrdersList'); if(!list) return; try { let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); if(orders.length === 0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; return; } list.innerHTML = orders.map(o=>{ const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'}); const status = o.status || 'new'; const tracker = renderOrderTracker(status, o.motivoRifiuto); const canReview = status === 'delivered' && !o.reviewed; return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' ? '#22c55e' : 'var(--gold-dark)'};"><div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr}</span></div><div class="my-order-items">${o.items}</div><div class="my-order-total">€${o.total.toFixed(2)}</div>${tracker}<div class="my-order-actions" style="margin-top:8px;">${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>` : ''}${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : ''}</div></div>`;}).join(''); } catch(e){ list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; } }
+// ✅ MODIFICATO: Rendering tracker diverso in base al tipo
+function renderOrderTracker(status, motivoRifiuto, orderType) {
+    const type = orderType || 'delivery'; // fallback se non c'è
+    const progress = getOrderProgress(status, type);
+    
+    if (status === 'rifiutato') {
+        return `<div class="order-status-tracker">
+            <div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>
+            ${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}
+        </div>`;
+    }
+    
+    if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) {
+        const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!';
+        return `<div class="order-status-tracker">
+            <div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div>
+            <div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div>
+        </div>`;
+    }
+    
+    // Step diversi in base al tipo
+    const steps = type === 'pickup' 
+        ? [
+            { label: 'Ricevuto', icon: '' }, 
+            { label: 'Preparaz.', icon: '🍕' }, 
+            { label: 'Pronto', icon: '✅' }, 
+            { label: 'Ritirato ✓', icon: '🎉' }
+          ]
+        : [
+            { label: 'Ricevuto', icon: '📥' }, 
+            { label: 'Preparaz.', icon: '🍕' }, 
+            { label: 'Pronto', icon: '✅' }, 
+            { label: 'Ritirato', icon: '' }, 
+            { label: 'Consegna', icon: '🛵' }, 
+            { label: 'Fatto!', icon: '' }
+          ];
+    
+    return `<div class="order-status-tracker">
+        <div class="order-status-badge ${progress.class}">
+            <span>${progress.icon}</span> ${progress.label}
+            <span class="order-live-indicator">LIVE</span>
+        </div>
+        <div class="order-progress-bar">
+            <div class="order-progress-fill" style="width: ${progress.percent}%;"></div>
+        </div>
+        <div class="order-progress-steps">
+            ${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}
+        </div>
+    </div>`;
+}
+
+// ✅ MODIFICATO: Passa il type al tracker
+function renderMyOrders(){ 
+    const list = document.getElementById('myOrdersList'); 
+    if(!list) return; 
+    try { 
+        let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); 
+        if(orders.length === 0){ 
+            list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; 
+            return; 
+        } 
+        list.innerHTML = orders.map(o=>{ 
+            const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'}); 
+            const status = o.status || 'new'; 
+            const orderType = o.type || 'delivery'; // ✅ Usa il type salvato
+            const tracker = renderOrderTracker(status, o.motivoRifiuto, orderType); // ✅ Passa il type
+            const canReview = (status === 'delivered' || (orderType === 'pickup' && status === 'picked')) && !o.reviewed;
+            const typeLabel = orderType === 'pickup' ? ' Ritiro' : '🛵 Consegna';
+            return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' || (orderType === 'pickup' && status === 'picked') ? '#22c55e' : 'var(--gold-dark)'};">
+                <div class="my-order-header">
+                    <span class="my-order-id">📦 ${o.orderId}</span>
+                    <span class="my-order-date">${dateStr} • ${typeLabel}</span>
+                </div>
+                <div class="my-order-items">${o.items}</div>
+                <div class="my-order-total">€${o.total.toFixed(2)}</div>
+                ${tracker}
+                <div class="my-order-actions" style="margin-top:8px;">
+                    ${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>` : ''}
+                    ${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : ''}
+                </div>
+            </div>`;
+        }).join(''); 
+    } catch(e){ 
+        list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; 
+    } 
+}
+
 function openReviewForOrder(orderId){ pendingReviewOrderId = orderId; document.getElementById('reviewOrderId').value = orderId; openReviewModal(); }
 function showReviewsPublic(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('myOrdersView').style.display='none'; document.getElementById('reviewsPublicView').style.display='block'; window.scrollTo(0,0); }
 function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! ⭐</div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
