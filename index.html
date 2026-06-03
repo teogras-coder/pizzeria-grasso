@@ -260,34 +260,34 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 
 <div class="phone-frame">
 <header class="header" style="padding: 0; background: transparent; box-shadow: none;">
-    <!-- Immagine Logo con padding per iPhone -->
+    <!-- Logo con padding iPhone -->
     <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top);">
         <img src="https://i.imgur.com/nWLqs68.png" 
-             alt="Antica Pizzeria Grasso - La pizza fatta con il cuore" 
-             style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 180px;">
+             alt="Antica Pizzeria Grasso" 
+             style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 160px;">
         <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,18,9,0.1), rgba(26,18,9,0.4)); pointer-events: none;"></div>
     </div>
     
-    <!-- Barra Dorata 3D Scintillante -->
-    <div class="gold-shimmer-bar">
+    <!-- Barra Dorata 3D -->
+    <div class="gold-shimmer-bar" style="margin: 5px 15px 5px;">
         <div class="shimmer-light"></div>
     </div>
     
-    <!-- ✅ STATUS BANNER SPOSTATO SOTTO LA HERO (centrato) -->
-    <div id="statusBanner" class="status-banner status-open" style="margin: 12px auto; display: block; text-align: center; width: fit-content;">
+    <!-- Hero Image - attaccata alla barra -->
+    <div class="hero-section" style="margin: 0; height: 220px;">
+        <img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
+        <div class="hero-overlay"></div>
+    </div>
+    
+    <!-- Status Banner - nascosto all'avvio, centrato -->
+    <div id="statusBanner" class="status-banner status-open" style="margin: 8px auto 15px; display: inline-flex; text-align: center;">
         <span id="statusText">APERTO</span>
     </div>
 </header>
-<div id="statusBanner" class="status-banner status-closed"><span id="statusText">Caricamento...</span></div>
 <div id="offersBanner" class="offers-banner">
 <span id="offerText"></span>
 <i class="fas fa-times close-offer" onclick="event.stopPropagation(); document.getElementById('offersBanner').classList.remove('show')"></i>
 </div>
-<div class="hero-section">
-<img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
-<div class="hero-overlay"></div>
-</div>
-
 <div id="mainMenu">
 <div class="section-divider"><span>Il Nostro Menu</span></div>
 <div class="menu-list" id="categoriesList"></div>
