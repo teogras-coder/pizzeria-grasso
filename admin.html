@@ -54,7 +54,6 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .sidebar-footer { padding-top: 15px; border-top: 1px solid rgba(212,168,75,0.2); }
 .logout-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.1); color: #f87171; font-weight: 600; cursor: pointer; }
 
-/* HAMBURGER MENU */
 .hamburger-btn { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); align-items: center; justify-content: center; }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(3px); }
 .sidebar-overlay.active { display: block; }
@@ -107,7 +106,6 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.btn-printer-reset { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
@@ -292,10 +290,6 @@ select.form-input { cursor: pointer; }
 .progress-bar { background: var(--card); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 10px; }
 .progress-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); height: 100%; width: 0%; transition: width 0.3s; border-radius: 4px; }
 
-.printer-status-card { background: linear-gradient(145deg, rgba(139,92,246,0.15) 0%, rgba(109,40,217,0.05) 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(139,92,246,0.3); }
-.printer-status-title { color: #8b5cf6; font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.printer-status-value { color: var(--gold); font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
-
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
@@ -333,7 +327,6 @@ select.form-input { cursor: pointer; }
   </div>
 </div>
 
-<!-- HAMBURGER BUTTON -->
 <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -381,15 +374,8 @@ select.form-input { cursor: pointer; }
           <div class="subtitle">🔔 Il fattorino accetta → Tu prepari → Fattorino ritira e consegna</div>
         </div>
         <div class="header-actions">
-          <button class="btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Azzera</button>
           <button class="btn-secondary" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci</button>
         </div>
-      </div>
-      
-      <div class="printer-status-card">
-        <div class="printer-status-title"><i class="fas fa-print"></i> Stampante - Prossimo Numero Ordine</div>
-        <div class="printer-status-value" id="nextOrderNumber">--</div>
-        <button class="btn-printer-reset" onclick="resetPrinterOrderNumber()"><i class="fas fa-undo"></i> Azzera Numero Stampante</button>
       </div>
       
       <div class="stats-row">
@@ -464,14 +450,29 @@ select.form-input { cursor: pointer; }
     <div class="section" id="section-services">
       <div class="content-header"><h1><i class="fas fa-concierge-bell"></i> Servizi</h1></div>
       <div class="card">
-        <div class="form-group"><label>Costo Fattorino (€)</label><input type="number" class="form-input" id="deliveryFeeInput" step="0.50" min="0"></div>
         <div class="form-group"><label>Minimo Ordine (€)</label><input type="number" class="form-input" id="minDeliveryInput" step="0.50"></div>
+      </div>
+      <div class="card" style="border:2px solid #4ade80;">
+        <div class="card-title" style="color:#4ade80;"><i class="fas fa-satellite"></i> Calcolo GPS Consegna</div>
+        <div style="background:rgba(74,222,128,0.1);padding:12px;border-radius:10px;margin-bottom:15px;border:1px solid rgba(74,222,128,0.3);">
+          <p style="color:#4ade80;font-size:0.85rem;margin-bottom:0;">💡 Il costo di consegna viene calcolato automaticamente in base alla distanza GPS dal cliente</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label>📍 Latitudine Pizzeria</label><input type="number" step="0.000001" class="form-input" id="pizzeriaLat" placeholder="41.6274"></div>
+          <div class="form-group"><label>📍 Longitudine Pizzeria</label><input type="number" step="0.000001" class="form-input" id="pizzeriaLng" placeholder="15.5514"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label>💰 Costo Base (€)</label><input type="number" step="0.50" class="form-input" id="deliveryBaseFee" placeholder="2.00"></div>
+          <div class="form-group"><label>🛣️ Costo per Km (€/km)</label><input type="number" step="0.10" class="form-input" id="deliveryPerKm" placeholder="1.00"></div>
+        </div>
+        <div class="form-group"><label>📏 Raggio Massimo Consegna (km)</label><input type="number" step="0.5" class="form-input" id="deliveryMaxRadius" placeholder="10"></div>
+        <button class="btn-primary" onclick="saveDeliveryGPS()"><i class="fas fa-save"></i> Salva Impostazioni GPS</button>
       </div>
       <div class="card">
         <div class="toggle-row"><div><i class="fas fa-motorcycle"></i> Consegna</div><div class="toggle-switch on" id="deliveryToggle" onclick="toggleSwitch(this)"></div></div>
         <div class="toggle-row"><div><i class="fas fa-store"></i> Ritiro</div><div class="toggle-switch on" id="pickupToggle" onclick="toggleSwitch(this)"></div></div>
       </div>
-      <button class="btn-primary" onclick="saveServices()"><i class="fas fa-save"></i> Salva</button>
+      <button class="btn-primary" onclick="saveServices()"><i class="fas fa-save"></i> Salva Servizi</button>
     </div>
 
     <div class="section" id="section-categories">
@@ -570,7 +571,7 @@ const db = firebase.database(), storage = firebase.storage();
 
 let appData = {
   categories: {}, menu: {}, promotions: {},
-  settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, deliveryFee: 2.00, minDeliveryOrder: 15 },
+  settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15 },
   branding: { name: "Antica Pizzeria Grasso", subtitle: "Tradizione", city: "Manfredonia" },
   images: { hero: "", categories: {} }
 };
@@ -578,7 +579,6 @@ let currentReviewFilter = 'all';
 let openCategories = new Set();
 let driversList = {};
 
-// HAMBURGER MENU
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -616,7 +616,6 @@ function initApp() {
   loadAllData();
   setupListeners();
   renderPalettes();
-  loadNextOrderNumber();
 }
 
 function updateClock() {
@@ -646,27 +645,6 @@ function setupListeners() {
   db.ref('contatori').on('value', s => renderContatori(s.val()));
   db.ref('recensioni').on('value', s => loadReviews());
   db.ref('settings').on('value', s => { if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; loadSettings(); } });
-  db.ref('settings/nextOrderNum').on('value', s => {
-    const num = s.val() || 1;
-    document.getElementById('nextOrderNumber').textContent = String(num).padStart(4, '0');
-  });
-}
-
-function loadNextOrderNumber() {
-  db.ref('settings/nextOrderNum').once('value').then(s => {
-    const num = s.val() || 1;
-    document.getElementById('nextOrderNumber').textContent = String(num).padStart(4, '0');
-  });
-}
-
-function resetPrinterOrderNumber() {
-  if (confirm('⚠️ Sei sicuro di voler azzerare il numero ordini della stampante?\n\nIl prossimo ordine stampato avrà il numero 0001.')) {
-    db.ref('settings/nextOrderNum').set(1).then(() => {
-      showToast('✅ Numero stampante azzerato! Prossimo ordine: 0001');
-    }).catch(err => {
-      showToast('❌ Errore: ' + err.message);
-    });
-  }
 }
 
 function showSection(name, el) {
@@ -676,7 +654,6 @@ function showSection(name, el) {
   if (el) el.classList.add('active');
   const navItem = document.querySelector(`.nav-item[data-section="${name}"]`);
   if (navItem) navItem.classList.add('active');
-  // Chiudi sidebar su mobile dopo aver selezionato
   if (window.innerWidth <= 768) {
     toggleSidebar();
   }
@@ -803,10 +780,6 @@ function rifiutaOrdine(id) {
 
 function deleteOrder(id) {
   if (confirm('Eliminare?')) { db.ref(`ordini/${id}`).remove(); showToast('🗑️ Eliminato'); }
-}
-
-function clearAllOrders() {
-  if (confirm('⚠️ ELIMINARE TUTTI?')) { db.ref('ordini').remove(); showToast('🗑️ Svuotato'); }
 }
 
 function clearOldOrders() {
@@ -980,12 +953,19 @@ function deletePromo(id) {
 }
 
 function loadSettings() {
-  document.getElementById('deliveryFeeInput').value = appData.settings.deliveryFee || 2.00;
   document.getElementById('minDeliveryInput').value = appData.settings.minDeliveryOrder || 15;
   document.getElementById('deliveryToggle').classList.toggle('on', appData.settings.deliveryEnabled !== false);
   document.getElementById('pickupToggle').classList.toggle('on', appData.settings.pickupEnabled !== false);
   document.getElementById('hoursInput').value = appData.settings.hours || '';
   document.getElementById('specialClosures').value = appData.settings.specialClosures || '';
+  
+  // Carica impostazioni GPS
+  document.getElementById('pizzeriaLat').value = appData.settings.pizzeriaLat || '';
+  document.getElementById('pizzeriaLng').value = appData.settings.pizzeriaLng || '';
+  document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee || 2.00;
+  document.getElementById('deliveryPerKm').value = appData.settings.deliveryPerKm || 1.00;
+  document.getElementById('deliveryMaxRadius').value = appData.settings.deliveryMaxRadius || 10;
+  
   const mst = document.getElementById('manualStatusToggle'), msl = document.getElementById('manualStatusLabel');
   mst.classList.remove('on', 'closed');
   if (appData.settings.manualStatus === 'open') { mst.classList.add('on'); msl.textContent = '✅ APERTO'; }
@@ -995,13 +975,36 @@ function loadSettings() {
   document.querySelectorAll('.day-btn').forEach(el => el.classList.toggle('active', od.includes(el.dataset.day)));
 }
 
+function saveDeliveryGPS() {
+  const lat = parseFloat(document.getElementById('pizzeriaLat').value);
+  const lng = parseFloat(document.getElementById('pizzeriaLng').value);
+  const baseFee = parseFloat(document.getElementById('deliveryBaseFee').value);
+  const perKm = parseFloat(document.getElementById('deliveryPerKm').value);
+  const maxRadius = parseFloat(document.getElementById('deliveryMaxRadius').value);
+  
+  if (isNaN(lat) || isNaN(lng)) {
+    showToast('❌ Inserisci coordinate valide');
+    return;
+  }
+  
+  db.ref('settings').update({
+    pizzeriaLat: lat,
+    pizzeriaLng: lng,
+    deliveryBaseFee: isNaN(baseFee) ? 2.00 : baseFee,
+    deliveryPerKm: isNaN(perKm) ? 1.00 : perKm,
+    deliveryMaxRadius: isNaN(maxRadius) ? 10 : maxRadius
+  }).then(() => {
+    showToast('✅ Impostazioni GPS salvate!');
+  }).catch(err => {
+    showToast('❌ Errore: ' + err.message);
+  });
+}
+
 function saveServices() {
-  const dfv = parseFloat(document.getElementById('deliveryFeeInput').value);
-  const df = isNaN(dfv) || dfv < 0 ? 0 : dfv;
   const minOv = parseFloat(document.getElementById('minDeliveryInput').value);
   const minO = isNaN(minOv) || minOv < 0 ? 0 : minOv;
   db.ref('settings').update({ 
-    deliveryFee: df, minDeliveryOrder: minO, 
+    minDeliveryOrder: minO, 
     deliveryEnabled: document.getElementById('deliveryToggle').classList.contains('on'), 
     pickupEnabled: document.getElementById('pickupToggle').classList.contains('on') 
   }).then(() => showToast('✅ Salvato'));
