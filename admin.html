@@ -724,8 +724,12 @@ function renderOrders(orders) {
               <button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">❌ Rifiuta</button>
               <button class="btn-delete" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
       } else if (stato === 'ready') {
-        ah = `<span style="color:#a08b6d;font-size:0.8rem;"><i class="fas fa-hourglass-half"></i> In attesa fattorino...</span>
-              <button class="btn-delete" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
+    const isPickup = o.type === 'pickup';
+    ah = isPickup 
+        ? `<button class="btn-ready" style="background:linear-gradient(180deg,#8b5cf6 0%,#6d28d9 100%);color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">🏪 Segna Ritirato dal Cliente</button>
+           <button class="btn-delete" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`
+        : `<span style="color:#a08b6d;font-size:0.8rem;"><i class="fas fa-hourglass-half"></i> In attesa fattorino...</span>
+           <button class="btn-delete" onclick="deleteOrder('${id}')"><i class="fas fa-trash"></i></button>`;
       } else if (stato === 'picked') {
         ah = `<span style="color:#8b5cf6;font-size:0.8rem;"><i class="fas fa-box-open"></i> Fattorino ha ritirato</span>`;
       } else if (stato === 'delivering') {
@@ -742,7 +746,9 @@ function renderOrders(orders) {
         </div>
         <div class="order-customer"><i class="fas fa-user"></i> ${o.customerName || 'N/A'} •  ${o.customerPhone || 'N/A'}</div>
         <div class="order-details">
-          <i class="fas fa-${o.type === 'delivery' ? 'motorcycle' : 'store'}"></i> ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}
+         ${o.type === 'delivery' 
+    ? '<i class="fas fa-motorcycle" style="color:#fbbf24;"></i> Consegna' 
+    : '<i class="fas fa-store" style="color:#4ade80;"></i> Ritiro in negozio'}
           ${o.scheduledTime ? ' • 🕐 ' + o.scheduledTime : ''}
           ${o.type === 'delivery' && o.address ? '<br><i class="fas fa-map-marker-alt"></i> ' + o.address : ''}
           ${o.notes ? '<br><i class="fas fa-sticky-note"></i> ' + o.notes : ''}
@@ -758,13 +764,20 @@ function renderOrders(orders) {
   list.innerHTML = html;
 }
 
-function updateOrderStatus(id, st) {
-  if (st === 'delivered') {
+function updateOrderStatus(id, st, orderType) {
+  // Permetti 'delivered' solo se è un ordine di ritiro (pickup)
+  if (st === 'delivered' && orderType !== 'pickup') {
     showToast('❌ Solo il fattorino può confermare la consegna!');
     return;
   }
   db.ref(`ordini/${id}/status`).set(st);
-  showToast({ preparing: ' In prep', ready: '✅ Pronto - Fattorini allertati! 🔔' }[st] || 'Aggiornato');
+  const messages = { 
+    preparing: '🍕 In preparazione', 
+    ready: '✅ Pronto!',
+    picked: '📦 Ritirato dal fattorino',
+    delivered: orderType === 'pickup' ? ' Ordine ritirato dal cliente!' : '✅ Consegnato!'
+  };
+  showToast(messages[st] || 'Aggiornato');
 }
 
 function rifiutaOrdine(id) {
