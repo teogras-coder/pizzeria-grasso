@@ -219,27 +219,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;">⚠️ Sei offline — riconnessione in corso...</div>
 
 <div class="phone-frame">
-// Carica header personalizzato dal gestionale
-db.ref('settings/headerImage').on('value', snap => {
-    const imageUrl = snap.val();
-    const headerContent = document.getElementById('headerContent');
-    
-    if (imageUrl) {
-        // Mostra immagine invece del testo
-        headerContent.innerHTML = `
-            <img src="${imageUrl}" alt="Logo Pizzeria" 
-                 style="max-height:70px; width:auto; object-fit:contain; 
-                        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-                        border-radius:8px;">
-        `;
-    } else {
-        // Torna al testo standard se non c'è immagine
-        headerContent.innerHTML = `
-            <div class="logo-main" id="headerTitle">Antica Pizzeria<span class="logo-grasso">GRASSO</span></div>
-            <div class="logo-sub" id="headerSubtitle">Dal 1980 • Tradizione</div>
-        `;
-    }
-});
+<header class="header">
+<div class="logo-main" id="headerTitle">Antica Pizzeria<span class="logo-grasso">GRASSO</span></div>
+<div class="logo-sub" id="headerSubtitle">Dal 1980 • Tradizione</div>
+</header>
 <div id="statusBanner" class="status-banner status-closed"><span id="statusText">Caricamento...</span></div>
 <div id="offersBanner" class="offers-banner">
 <span id="offerText"></span>
