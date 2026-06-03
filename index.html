@@ -219,24 +219,27 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;">⚠️ Sei offline — riconnessione in corso...</div>
 
 <div class="phone-frame">
-<header class="header">
-<div style="display: flex; align-items: center; gap: 15px;">
-    <div class="logo-container" style="flex-shrink: 0;">
-        <svg width="75" height="75" viewBox="0 0 200 200" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));">
-            <circle cx="100" cy="100" r="95" fill="none" stroke="#1a1209" stroke-width="8" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"/>
-            <text x="100" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="52" fill="#1a1209" font-style="italic" font-weight="bold" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));">AG</text>
-            <text x="100" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#1a1209" font-weight="bold" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">Grasso</text>
-            <text x="100" y="148" text-anchor="middle" font-family="Georgia, serif" font-size="19" fill="#1a1209" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">Antica Pizzeria</text>
-            <rect x="50" y="158" width="100" height="4" fill="#1a1209" rx="2" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));"/>
-            <ellipse cx="150" cy="160" rx="12" ry="6" fill="#1a1209" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));"/>
-        </svg>
-    </div>
-    <div style="flex: 1;">
-        <div class="logo-main" id="headerTitle" style="margin: 0;">Antica Pizzeria<span class="logo-grasso">GRASSO</span></div>
-        <div class="logo-sub" id="headerSubtitle" style="margin-top: 4px;">Dal 1980 • Tradizione</div>
-    </div>
-</div>
-</header>
+// Carica header personalizzato dal gestionale
+db.ref('settings/headerImage').on('value', snap => {
+    const imageUrl = snap.val();
+    const headerContent = document.getElementById('headerContent');
+    
+    if (imageUrl) {
+        // Mostra immagine invece del testo
+        headerContent.innerHTML = `
+            <img src="${imageUrl}" alt="Logo Pizzeria" 
+                 style="max-height:70px; width:auto; object-fit:contain; 
+                        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+                        border-radius:8px;">
+        `;
+    } else {
+        // Torna al testo standard se non c'è immagine
+        headerContent.innerHTML = `
+            <div class="logo-main" id="headerTitle">Antica Pizzeria<span class="logo-grasso">GRASSO</span></div>
+            <div class="logo-sub" id="headerSubtitle">Dal 1980 • Tradizione</div>
+        `;
+    }
+});
 <div id="statusBanner" class="status-banner status-closed"><span id="statusText">Caricamento...</span></div>
 <div id="offersBanner" class="offers-banner">
 <span id="offerText"></span>
