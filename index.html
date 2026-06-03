@@ -196,6 +196,46 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 #bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
 #bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
 #bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+/* ✅ BARRA DORATA 3D SCINTILLANTE */
+.gold-shimmer-bar {
+    position: relative;
+    height: 8px;
+    margin: 8px 0 15px 0;
+    background: linear-gradient(180deg, 
+        #f0d78c 0%, 
+        #d4a84b 30%, 
+        #b8860b 50%, 
+        #8b6914 70%, 
+        #d4a84b 100%);
+    box-shadow: 
+        0 2px 4px rgba(0,0,0,0.6),
+        0 4px 8px rgba(0,0,0,0.4),
+        inset 0 1px 2px rgba(255,255,255,0.5),
+        inset 0 -1px 2px rgba(0,0,0,0.3),
+        0 0 15px rgba(212, 168, 75, 0.6);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.shimmer-light {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 30%, 
+        rgba(255,255,255,0.8) 50%, 
+        rgba(255,255,255,0.1) 70%, 
+        transparent 100%);
+    animation: shimmerMove 3s ease-in-out infinite;
+}
+
+@keyframes shimmerMove {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
 </style>
 </head>
 <body>
@@ -220,7 +260,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 
 <div class="phone-frame">
 <header class="header" style="padding: 0; background: transparent; box-shadow: none;">
-    <div style="position: relative; width: 100%; overflow: hidden; border-bottom: 2px solid var(--gold-dark); padding-top: env(safe-area-inset-top);">
+    <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top);">
         <!-- Immagine Header Personalizzata -->
         <img src="https://i.imgur.com/nWLqs68.png" 
              alt="Antica Pizzeria Grasso - La pizza fatta con il cuore" 
@@ -228,6 +268,11 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
         
         <!-- Overlay scuro opzionale per leggere meglio se l'immagine è chiara -->
         <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,18,9,0.1), rgba(26,18,9,0.4)); pointer-events: none;"></div>
+    </div>
+    
+    <!-- ✅ BARRA DORATA 3D SCINTILLANTE -->
+    <div class="gold-shimmer-bar">
+        <div class="shimmer-light"></div>
     </div>
     
     <!-- Status Banner (sempre visibile sotto l'immagine) -->
