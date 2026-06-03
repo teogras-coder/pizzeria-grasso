@@ -154,6 +154,29 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .btn-review-order { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 .btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
 .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; width: 100%; margin-bottom: 15px; }
+
+/* 🆕 TRACKING ORDINE - NUOVI STILI */
+.order-status-tracker { margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; }
+.order-status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; }
+.status-new { background: rgba(156,163,175,0.2); color: #9ca3af; border: 1px solid rgba(156,163,175,0.4); }
+.status-preparing { background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); animation: statusPulse 2s infinite; }
+.status-ready { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.4); animation: statusPulse 2s infinite; }
+.status-picked { background: rgba(139,92,246,0.2); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.4); }
+.status-delivering { background: rgba(96,165,250,0.2); color: #60a5fa; border: 1px solid rgba(96,165,250,0.4); animation: statusPulse 2s infinite; }
+.status-delivered { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.4); }
+.status-rifiutato { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+@keyframes statusPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+.order-progress-bar { position: relative; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+.order-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%); border-radius: 3px; transition: width 0.5s ease; box-shadow: 0 0 10px var(--gold); }
+.order-progress-steps { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.65rem; color: #8a7a5a; }
+.order-progress-steps span { text-align: center; flex: 1; }
+.order-progress-steps span.active { color: var(--gold); font-weight: 700; }
+.order-reject-message { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 10px; margin-top: 8px; color: #fca5a5; font-size: 0.8rem; }
+.order-reject-message strong { color: #ef4444; display: block; margin-bottom: 4px; }
+.order-live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #4ade80; margin-left: 8px; }
+.order-live-indicator::before { content: ''; width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: liveBlink 1.5s infinite; }
+@keyframes liveBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
 .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
 .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .app-footer { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); padding: 20px; text-align: center; border-top: 2px solid var(--gold-dark); }
@@ -234,7 +257,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="myOrdersView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 class="category-title">📦 I Miei Ordini</h2>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti.</p>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
 <button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
 <div id="myOrdersList"></div>
 </div>
@@ -339,6 +362,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <button class="review-submit-btn" onclick="submitReview()"><i class="fas fa-paper-plane"></i> Invia Recensione</button>
 </div>
 </div>
+</div>
 
 <div class="modal-3d" id="privacyModal">
 <div class="modal-content-3d">
@@ -370,7 +394,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-// 🎨 APPLICA PALETTE COLORI IN TEMPO REALE
+
 const paletteColors = {
   autunno: { '--gold': '#d4a84b', '--gold-light': '#f0d78c', '--gold-dark': '#b8860b', '--dark': '#1a1209', '--brown': '#2d1f12' },
   inverno: { '--gold': '#a8c3d4', '--gold-light': '#d4e5f0', '--gold-dark': '#7a9bb0', '--dark': '#1a2530', '--brown': '#253040' },
@@ -387,13 +411,9 @@ function applicaPalette(nome) {
     document.documentElement.style.setProperty(key, value);
   }
 }
+db.ref('settings/colorPalette').on('value', snapshot => { applicaPalette(snapshot.val() || 'autunno'); });
 
-// Ascolta i cambiamenti della palette su Firebase
-db.ref('settings/colorPalette').on('value', snapshot => {
-  applicaPalette(snapshot.val() || 'autunno');
-});
 const CACHE_DURATION = 3600000;
-
 let appData = {
 categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍟 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
 menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
@@ -404,6 +424,7 @@ images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600
 };
 let cart=[], orderType='delivery', timeMode='asap', currentSearchCat='';
 let selectedStars = 0, pendingReviewOrderId = null;
+let orderStatusListeners = {}; // 🆕 Tiene traccia dei listener sugli ordini
 
 document.addEventListener('click', function(e) {
 const btn = e.target.closest('button, .menu-btn-3d, .action-btn-3d, .add-btn-3d, .checkout-btn-3d, .type-option, .time-option, .qty-btn');
@@ -438,27 +459,107 @@ loadFromFirebase();
 setupRealtimeListeners(); 
 loadReviewsPublic(); 
 renderMyOrders(); 
+startOrderStatusTracking(); // 🆕 Avvia il tracking in tempo reale
 controllaRifiutiCliente();
 try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s); if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){} 
 const pl=document.getElementById('productList'); 
 if(pl){pl.addEventListener('click',e=>{const btn=e.target.closest('[data-cat][data-idx][data-delta]'); if(!btn)return; e.preventDefault(); e.stopPropagation(); changeProductQty(btn.dataset.cat,parseInt(btn.dataset.idx,10),parseInt(btn.dataset.delta,10));});} 
 });
 
-// ✅ OTTIMIZZAZIONE: Solo listener essenziali + PROMO in tempo reale
 function setupRealtimeListeners(){
-// ✅ Settings realtime per stato aperto/chiuso
 db.ref('settings').on('value', s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI();}});
-// ✅ PROMO in tempo reale (aggiornamento immediato per tutti i clienti)
 db.ref('promotions').on('value', s=>{
     appData.promotions = s.exists() ? s.val() : {};
     localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
     renderPromotionsBanner();
 });
-// ✅ Banner offline
 db.ref('.info/connected').on('value', s=>{ const el=document.getElementById('offlineBanner'); if(!el)return; el.style.display=s.val()===false?'block':'none'; });
 }
 
-// ✅ Cache locale per menu, categorie, immagini, branding
+// 🆕 TRACKING ORDINI IN TEMPO REALE
+function startOrderStatusTracking() {
+  try {
+    const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+    if (localOrders.length === 0) return;
+    
+    // Rimuovi vecchi listener
+    Object.values(orderStatusListeners).forEach(unsub => unsub());
+    orderStatusListeners = {};
+    
+    // Ascolta ogni ordine in locale
+    localOrders.forEach(order => {
+      if (!order.orderId) return;
+      
+      // Cerca l'ordine su Firebase per orderId
+      const query = db.ref('ordini').orderByChild('orderId').equalTo(order.orderId);
+      
+      orderStatusListeners[order.orderId] = query.on('value', snapshot => {
+        let found = false;
+        snapshot.forEach(child => {
+          found = true;
+          const data = child.val();
+          if (data) {
+            updateLocalOrderStatus(order.orderId, data.status, data.motivoRifiuto);
+          }
+        });
+        
+        // Se l'ordine non esiste più su Firebase (troppo vecchio), lascialo in locale
+        if (!found) {
+          // Non fare nulla, l'ordine rimane nello storico locale
+        }
+      });
+    });
+  } catch(e) {
+    console.log('Errore tracking ordini:', e);
+  }
+}
+
+// 🆕 Aggiorna lo stato nel localStorage e nella UI
+function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
+  try {
+    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+    let changed = false;
+    
+    orders = orders.map(o => {
+      if (o.orderId === orderId && o.status !== newStatus) {
+        changed = true;
+        const oldStatus = o.status;
+        o.status = newStatus;
+        if (newStatus === 'rifiutato' && motivoRifiuto) {
+          o.motivoRifiuto = motivoRifiuto;
+        }
+        
+        // Notifica se lo stato è cambiato (non per il primo caricamento)
+        if (oldStatus && oldStatus !== newStatus && document.getElementById('myOrdersView').style.display === 'block') {
+          const statusNames = {
+            'preparing': '🍕 In preparazione',
+            'ready': '✅ Pronto per il ritiro',
+            'picked': '📦 Ritirato dal fattorino',
+            'delivering': '🛵 In consegna!',
+            'delivered': '🎉 Consegnato!',
+            'rifiutato': '❌ Ordine rifiutato'
+          };
+          if (statusNames[newStatus]) {
+            showToast(statusNames[newStatus]);
+            if (newStatus === 'delivering' || newStatus === 'rifiutato') {
+              playNotificationSound();
+              if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+          }
+        }
+      }
+      return o;
+    });
+    
+    if (changed) {
+      localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
+      renderMyOrders();
+    }
+  } catch(e) {
+    console.log('Errore aggiornamento stato:', e);
+  }
+}
+
 function loadFromFirebase(){
 const now = Date.now();
 const cacheTimestamp = localStorage.getItem('pg_cache_timestamp');
@@ -478,7 +579,6 @@ if (cacheValid) {
         if (cachedBrand) appData.branding = JSON.parse(cachedBrand);
         if (cachedPromo) appData.promotions = JSON.parse(cachedPromo);
         
-        console.log('✅ Dati caricati da cache locale');
         renderCategories();
         applyBranding();
         applyImages();
@@ -486,7 +586,6 @@ if (cacheValid) {
     } catch(e) { console.log('Cache corrotta'); }
 }
 
-// Aggiorna in background
 db.ref('categories').once('value').then(s=>{
     if(s.exists()){
         appData.categories=s.val();
@@ -711,6 +810,10 @@ document.getElementById('customerNotes').value='';
 document.getElementById('scheduledTime').value='';
 document.getElementById('privacyConsent').checked=false;
 selectTimeMode('asap');showToast('✅ Ordine inviato!');showHome();
+
+// 🆕 Riavvia il tracking dopo aver inviato un nuovo ordine
+setTimeout(() => startOrderStatusTracking(), 1000);
+
 }catch(e){
 console.error(e);
 cart=cartBackup;updateCartBadge();
@@ -753,6 +856,7 @@ document.getElementById('productsView').style.display='none';
 document.getElementById('reviewsPublicView').style.display='none';
 document.getElementById('myOrdersView').style.display='block';
 window.scrollTo(0,0);
+startOrderStatusTracking(); // 🆕 Riavvia il tracking quando si apre la pagina
 renderMyOrders();
 }
 
@@ -779,6 +883,73 @@ renderMyOrders();
 } catch(e){}
 }
 
+// 🆕 NUOVA FUNZIONE: Calcola progresso e stato dell'ordine
+function getOrderProgress(status) {
+  const steps = {
+    'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' },
+    'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' },
+    'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' },
+    'picked': { percent: 70, step: 3, label: 'Ritirato', icon: '📦', class: 'status-picked' },
+    'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' },
+    'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' },
+    'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' }
+  };
+  return steps[status] || steps['new'];
+}
+
+// 🆕 NUOVA FUNZIONE: Renderizza il tracker dell'ordine
+function renderOrderTracker(status, motivoRifiuto) {
+  const progress = getOrderProgress(status);
+  
+  if (status === 'rifiutato') {
+    return `
+      <div class="order-status-tracker">
+        <div class="order-status-badge status-rifiutato">
+          <span>❌</span> Ordine Rifiutato
+        </div>
+        ${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}
+      </div>
+    `;
+  }
+  
+  if (status === 'delivered') {
+    return `
+      <div class="order-status-tracker">
+        <div class="order-status-badge status-delivered">
+          <span>🎉</span> Ordine Consegnato!
+        </div>
+        <div class="order-progress-bar">
+          <div class="order-progress-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+    `;
+  }
+  
+  const steps = [
+    { label: 'Ricevuto', icon: '📥' },
+    { label: 'Preparaz.', icon: '🍕' },
+    { label: 'Pronto', icon: '✅' },
+    { label: 'Ritirato', icon: '📦' },
+    { label: 'Consegna', icon: '🛵' },
+    { label: 'Fatto!', icon: '🎉' }
+  ];
+  
+  return `
+    <div class="order-status-tracker">
+      <div class="order-status-badge ${progress.class}">
+        <span>${progress.icon}</span> ${progress.label}
+        <span class="order-live-indicator">LIVE</span>
+      </div>
+      <div class="order-progress-bar">
+        <div class="order-progress-fill" style="width: ${progress.percent}%;"></div>
+      </div>
+      <div class="order-progress-steps">
+        ${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
 function renderMyOrders(){
 const list = document.getElementById('myOrdersList');
 if(!list) return;
@@ -787,13 +958,18 @@ let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
 if(orders.length === 0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; return; }
 list.innerHTML = orders.map(o=>{
 const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
+const status = o.status || 'new';
+const tracker = renderOrderTracker(status, o.motivoRifiuto);
+const canReview = status === 'delivered' && !o.reviewed;
 return `
-<div class="my-order-card">
+<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' ? '#22c55e' : 'var(--gold-dark)'};">
 <div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr}</span></div>
 <div class="my-order-items">${o.items}</div>
 <div class="my-order-total">€${o.total.toFixed(2)}</div>
-<div class="my-order-actions">
-${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>`}
+${tracker}
+<div class="my-order-actions" style="margin-top:8px;">
+${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>` : ''}
+${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : ''}
 </div>
 </div>`;
 }).join('');
@@ -808,6 +984,9 @@ openReviewModal();
 
 function clearLocalHistory(){
 if(confirm('Cancellare tutto lo storico ordini locale?')){
+// Rimuovi tutti i listener
+Object.values(orderStatusListeners).forEach(unsub => unsub());
+orderStatusListeners = {};
 localStorage.removeItem('pizzeria_grasso_orders');
 renderMyOrders();
 showToast('🗑️ Storico cancellato');
