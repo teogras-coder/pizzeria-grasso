@@ -36,7 +36,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .logo-main { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; color: var(--dark); letter-spacing: 1px; line-height: 1.1; }
 .logo-grasso { display: block; font-size: 1.3rem; letter-spacing: 6px; margin-top: 4px; color: var(--brown); font-weight: 700; }
 .logo-sub { font-size: 0.72rem; color: var(--brown); letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; font-weight: 600; }
-.status-banner { padding: 0; margin: 10px 0 0 18px; text-align: left; font-weight: 800; font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; }
+.status-banner { padding: 8px 20px; margin: 0 auto; text-align: center; font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; display: inline-flex; align-items: center; border-radius: 20px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);}
 .status-open { color: #4ade80; text-shadow: 0 0 10px #4ade80; animation: statusGlow 2s ease-in-out infinite; }
 .status-closed { color: #f87171; text-shadow: 0 0 10px #f87171; }
 @keyframes statusGlow { 0%, 100% { text-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80; } 50% { text-shadow: 0 0 20px #4ade80, 0 0 40px #4ade80, 0 0 60px #4ade80; } }
@@ -260,24 +260,22 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 
 <div class="phone-frame">
 <header class="header" style="padding: 0; background: transparent; box-shadow: none;">
+    <!-- Immagine Logo con padding per iPhone -->
     <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top);">
-        <!-- Immagine Header Personalizzata -->
         <img src="https://i.imgur.com/nWLqs68.png" 
              alt="Antica Pizzeria Grasso - La pizza fatta con il cuore" 
              style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 180px;">
-        
-        <!-- Overlay scuro opzionale per leggere meglio se l'immagine è chiara -->
         <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,18,9,0.1), rgba(26,18,9,0.4)); pointer-events: none;"></div>
     </div>
     
-    <!-- ✅ BARRA DORATA 3D SCINTILLANTE -->
+    <!-- Barra Dorata 3D Scintillante -->
     <div class="gold-shimmer-bar">
         <div class="shimmer-light"></div>
     </div>
     
-    <!-- Status Banner (sempre visibile sotto l'immagine) -->
-    <div id="statusBanner" class="status-banner status-closed" style="margin: 10px 0 0 18px;">
-        <span id="statusText">Caricamento...</span>
+    <!-- ✅ STATUS BANNER SPOSTATO SOTTO LA HERO (centrato) -->
+    <div id="statusBanner" class="status-banner status-open" style="margin: 12px auto; display: block; text-align: center; width: fit-content;">
+        <span id="statusText">APERTO</span>
     </div>
 </header>
 <div id="statusBanner" class="status-banner status-closed"><span id="statusText">Caricamento...</span></div>
@@ -665,7 +663,7 @@ function filterProducts(term){ if(currentSearchCat) renderProductList(currentSea
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
-function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'APERTO':'CHIUSO';}
+function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':'🔴 CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
