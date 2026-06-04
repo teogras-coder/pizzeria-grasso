@@ -33,12 +33,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
 .phone-frame { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); position: relative; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; z-index: 10; }
 .header { background: transparent; padding: 0; text-align: center; position: relative; z-index: 20; flex-shrink: 0; overflow: hidden; }
-
-/* Hero e Status Banner */
 .hero-section { position: relative; height: 130px; overflow: hidden; flex-shrink: 0; margin-bottom: 0; }
 .hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
-
 .status-banner {
     position: absolute;
     bottom: 15px;
@@ -61,7 +58,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 }
 .status-open { color: #f0d78c !important; text-shadow: 0 0 8px rgba(212, 168, 75, 0.8) !important; }
 .status-closed { color: #f87171 !important; text-shadow: 0 0 8px rgba(248, 113, 113, 0.6) !important; }
-
 .section-divider { display: flex; align-items: center; padding: 12px 25px 10px; }
 .section-divider span { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); text-shadow: 0 0 10px var(--gold); }
 .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark), transparent); margin: 0 15px; }
@@ -75,7 +71,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .menu-btn-3d .btn-content h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold-light); margin-bottom: 4px; }
 .menu-btn-3d .btn-content p { font-size: 0.75rem; color: #a08b6d; }
 .menu-btn-3d .arrow { margin-left: auto; width: 30px; height: 30px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.7rem; }
-
 .quick-actions-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; padding: 5px 0 0 0; }
 .quick-btn-rect { flex: 1; max-width: calc(50% - 4px); height: 52px; border-radius: 14px; border: none; color: white; font-size: 0.95rem; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; box-shadow: 0 6px 0 var(--shadow), 0 8px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; position: relative; letter-spacing: 0.5px; }
 .quick-btn-rect:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow), 0 4px 8px rgba(0,0,0,0.4); }
@@ -83,7 +78,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .quick-btn-rect .cart-badge { position: absolute; top: -6px; right: -6px; background: #e74c3c; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 0 10px #e74c3c; }
 .quick-btn-chiama { background: linear-gradient(180deg, #5a9e4b 0%, #2d5a22 100%); color: #e8f5e3; }
 .quick-btn-carrello { background: linear-gradient(180deg, #8b1a1a 0%, #4a0e0e 100%); color: #fde8e8; }
-
 .actions-section { padding: 10px 20px 30px; display: flex; flex-direction: column; gap: 14px; }
 .action-btn-3d { width: 100%; padding: 18px 20px; border-radius: 14px; border: none; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 6px 0 var(--shadow); }
 .action-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow); }
@@ -125,6 +119,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .delivery-fee-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-top: 8px; border-top: 1px dashed rgba(212,168,75,0.3); }
 .delivery-fee-label { color: #a08b6d; font-size: 0.85rem; font-weight: 600; }
 .delivery-fee-value { color: var(--gold); font-weight: 700; }
+.distance-info { background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 8px; padding: 10px; margin-top: 10px; }
+.distance-info-text { color: #3498db; font-size: 0.85rem; font-weight: 600; text-align: center; }
 .cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
 .cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
 .cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
@@ -209,8 +205,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 #bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
 #bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
 #bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-
-/* ✅ BARRA DORATA 3D SCINTILLANTE */
 .gold-shimmer-bar {
     position: relative;
     width: 100%;
@@ -227,7 +221,6 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
     animation: shimmerMove 3s ease-in-out infinite;
 }
 @keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
-/* Nasconde solo la crocetta nera delle offerte */
 .offers-banner .close-offer {
     display: none !important;
 }
@@ -250,22 +243,18 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 
 <div class="phone-frame">
 <header class="header">
-    <!-- Logo Grande -->
     <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: 8px;">
         <img src="https://i.imgur.com/nWLqs68.png" 
      alt="Antica Pizzeria Grasso" 
      style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.08); transform-origin: left center;">
-    <!-- Barra Dorata 3D -->
     <div class="gold-shimmer-bar">
         <div class="shimmer-light"></div>
     </div>
     
-    <!-- Hero Piccola con Status Sovrapposto -->
     <div class="hero-section">
         <img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
         <div class="hero-overlay"></div>
         
-        <!-- Status Banner sovrapposto a destra -->
         <div id="statusBanner" class="status-banner status-closed">
             <span id="statusText">🔴 CHIUSO</span>
         </div>
@@ -337,6 +326,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="delivery-fee-row" id="deliveryFeeRow" style="display:none;">
 <span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> Costo consegna</span>
 <span class="delivery-fee-value" id="deliveryFeeValue">€0.00</span>
+</div>
+<div class="distance-info" id="distanceInfo" style="display:none;">
+<div class="distance-info-text" id="distanceText">📍 Distanza: -- km</div>
 </div>
 <div class="cart-total-3d" id="cartTotalSection" style="display:none;">
 <span class="cart-total-label">Totale</span>
@@ -670,22 +662,163 @@ function updateCartBadge(){
 }
 
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('🗑️ Svuotato');}}
-function updateCartTotals(){let t=0;cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0,ft=t+df,fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue');if(df>0&&cart.length){fr.style.display='flex';fv.textContent=`€${df.toFixed(2)}`;}else fr.style.display='none';document.getElementById('totalAmount').textContent=`€${ft.toFixed(2)}`;}
+
+// Funzione per calcolare la distanza GPS
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raggio della Terra in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// Funzione per calcolare il costo di consegna in base alla distanza
+async function calculateDeliveryFee() {
+    const pizzeriaLat = appData.settings.pizzeriaLat;
+    const pizzeriaLng = appData.settings.pizzeriaLng;
+    const customerLat = window.customerGPSLat;
+    const customerLng = window.customerGPSLng;
+    
+    if (!pizzeriaLat || !pizzeriaLng || !customerLat || !customerLng) {
+        // Se non ci sono coordinate, usa il costo fisso
+        const df = parseFloat(appData.settings.deliveryFee) || 2.00;
+        updateDeliveryFeeDisplay(df, null);
+        return;
+    }
+    
+    const distance = calculateDistance(pizzeriaLat, pizzeriaLng, customerLat, customerLng);
+    const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 2.00;
+    const perKm = parseFloat(appData.settings.deliveryPerKm) || 1.00;
+    const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 10;
+    
+    if (distance > maxRadius) {
+        showToast('❌ Indirizzo fuori dal raggio di consegna');
+        updateDeliveryFeeDisplay(0, distance, true);
+        return;
+    }
+    
+    const deliveryFee = baseFee + (distance * perKm);
+    updateDeliveryFeeDisplay(deliveryFee, distance);
+}
+
+function updateDeliveryFeeDisplay(fee, distance, outOfRange = false) {
+    const feeRow = document.getElementById('deliveryFeeRow');
+    const feeValue = document.getElementById('deliveryFeeValue');
+    const distanceInfo = document.getElementById('distanceInfo');
+    const distanceText = document.getElementById('distanceText');
+    
+    if (outOfRange) {
+        feeRow.style.display = 'none';
+        distanceInfo.style.display = 'block';
+        distanceText.textContent = '📍 Fuori dal raggio di consegna';
+        distanceText.style.color = '#ef4444';
+        document.getElementById('checkoutBtn').disabled = true;
+    } else if (distance !== null) {
+        feeRow.style.display = 'flex';
+        feeValue.textContent = '€' + fee.toFixed(2);
+        distanceInfo.style.display = 'block';
+        distanceText.textContent = '📍 Distanza: ' + distance.toFixed(1) + ' km';
+        distanceText.style.color = '#3498db';
+        document.getElementById('checkoutBtn').disabled = false;
+    } else {
+        feeRow.style.display = fee > 0 ? 'flex' : 'none';
+        feeValue.textContent = '€' + fee.toFixed(2);
+        distanceInfo.style.display = 'none';
+        document.getElementById('checkoutBtn').disabled = false;
+    }
+    
+    updateCartTotals();
+}
+
+function updateCartTotals(){
+    let t=0;
+    cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});
+    
+    if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
+        // Se abbiamo le coordinate GPS del cliente, calcola automaticamente
+        if (window.customerGPSLat && window.customerGPSLng) {
+            calculateDeliveryFee();
+            return;
+        } else {
+            // Altrimenti usa il costo fisso
+            const df = parseFloat(appData.settings.deliveryFee) || 0;
+            const ft = t + df;
+            document.getElementById('deliveryFeeRow').style.display = 'flex';
+            document.getElementById('deliveryFeeValue').textContent = '€' + df.toFixed(2);
+            document.getElementById('distanceInfo').style.display = 'none';
+            document.getElementById('totalAmount').textContent = '€' + ft.toFixed(2);
+        }
+    } else {
+        document.getElementById('deliveryFeeRow').style.display = 'none';
+        document.getElementById('distanceInfo').style.display = 'none';
+        document.getElementById('totalAmount').textContent = '€' + t.toFixed(2);
+    }
+}
+
 function selectOrderType(t){ 
     orderType=t; 
     document.getElementById('typeDelivery').classList.toggle('active',t==='delivery'); 
     document.getElementById('typePickup').classList.toggle('active',t==='pickup'); 
     document.getElementById('timeTypeLabel').textContent=t==='delivery'?'consegna':'ritiro'; 
     if(t==='delivery'){ document.getElementById('addressGroup').style.display='block'; } 
-    else { document.getElementById('addressGroup').style.display='none'; document.getElementById('customerStreet').value=''; document.getElementById('customerNumber').value=''; } 
+    else { 
+        document.getElementById('addressGroup').style.display='none'; 
+        document.getElementById('customerStreet').value=''; 
+        document.getElementById('customerNumber').value='';
+        window.customerGPSLat = null;
+        window.customerGPSLng = null;
+    } 
     updateCartTotals(); 
 }
+
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime();}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
+
+async function getGPSLocation(){ 
+    const b=document.getElementById('gpsBtn');
+    if(!navigator.geolocation){
+        showToast('GPS non disponibile');
+        return;
+    }
+    
+    b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';
+    
+    try{ 
+        const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
+        const{latitude,longitude}=pos.coords;
+        
+        // Salva le coordinate
+        window.customerGPSLat = latitude;
+        window.customerGPSLng = longitude;
+        
+        // Ottieni l'indirizzo inverso
+        const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
+        const d=await r.json(),a=d.address; 
+        
+        // Compila i campi indirizzo
+        document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
+        document.getElementById('customerNumber').value = a.house_number || ''; 
+        
+        showToast('📍 Posizione trovata!');
+        
+        // Ricalcola il costo di consegna
+        if (orderType === 'delivery') {
+            calculateDeliveryFee();
+        }
+    } catch(e){
+        showToast('❌ Impossibile ottenere posizione');
+    } finally{
+        b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';
+    } 
+}
+
 function openCart(){ 
 if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} 
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); 
-if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';} 
+if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';} 
 else { 
 let h=''; 
 cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button><div style="font-size:0.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;}); 
@@ -698,11 +831,130 @@ selectTimeMode(timeMode);updateCartTotals();
 } 
 m.classList.add('active'); 
 }
+
 function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
-async function getGPSLocation(){ const b=document.getElementById('gpsBtn'),streetInput=document.getElementById('customerStreet'),numberInput=document.getElementById('customerNumber'); if(!navigator.geolocation){showToast('GPS non disponibile');return;} b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...'; try{ const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); const{latitude,longitude}=pos.coords; const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); const d=await r.json(),a=d.address; streetInput.value = a.road || a.pedestrian || ''; numberInput.value = a.house_number || ''; showToast('📍 Posizione trovata!'); }catch(e){showToast('❌ Impossibile ottenere posizione');} finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} }
-async function confirmAndSendOrder(){ if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} const pc=document.getElementById('privacyConsent'); if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} if(document.getElementById('honeypot').value!=='')return; const n=document.getElementById('customerName').value.trim(); const p=document.getElementById('customerPhone').value.trim(); const street=document.getElementById('customerStreet').value.trim(); const number=document.getElementById('customerNumber').value.trim(); const address = `${street} ${number}`; const nt=document.getElementById('customerNotes').value.trim(); if(!n){showToast('⚠️ Nome');return;} const ph=p.replace(/\D/g,''); if(!/^3[0-9]{9}$/.test(ph)){showToast('️ Telefono');return;} let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);}); const df=(orderType==='delivery'&&appData.settings.deliveryEnabled!==false)?(parseFloat(appData.settings.deliveryFee)||0):0; const minO=parseFloat(appData.settings.minDeliveryOrder)||0; if(orderType==='delivery'){ if(!street||!number){showToast('⚠️ Completa indirizzo');return;} if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} } const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi}; await sendOrder(oc); }
-async function sendOrder(d){ const btn=document.getElementById('checkoutBtn'); const cartBackup=[...cart]; if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} try{ const ref=db.ref('ordini').push(); const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); d.orderId=orderId; await ref.set({orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,status:'new',timestamp:Date.now()}); localStorage.setItem('lastOrderTime',Date.now()); saveOrderToLocal(d); const promos=cart.filter(i=>i.isPromo); promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); cart=[];updateCartBadge();closeCart(); document.getElementById('customerName').value=''; document.getElementById('customerPhone').value=''; document.getElementById('customerStreet').value=''; document.getElementById('customerNumber').value=''; document.getElementById('customerNotes').value=''; document.getElementById('scheduledTime').value=''; document.getElementById('privacyConsent').checked=false; selectTimeMode('asap');showToast('✅ Ordine inviato!');showHome(); setTimeout(() => startOrderStatusTracking(), 1000); }catch(e){ console.error(e); cart=cartBackup;updateCartBadge(); showToast(' Errore invio'); }finally{ if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} } }
+
+async function confirmAndSendOrder(){ 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
+    const pc=document.getElementById('privacyConsent'); 
+    if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
+    if(document.getElementById('honeypot').value!=='')return; 
+    const n=document.getElementById('customerName').value.trim(); 
+    const p=document.getElementById('customerPhone').value.trim(); 
+    const street=document.getElementById('customerStreet').value.trim(); 
+    const number=document.getElementById('customerNumber').value.trim(); 
+    const address = `${street} ${number}`; 
+    const nt=document.getElementById('customerNotes').value.trim(); 
+    if(!n){showToast('⚠️ Nome');return;} 
+    const ph=p.replace(/\D/g,''); 
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('️ Telefono');return;} 
+    
+    let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
+    
+    // Calcola il costo di consegna
+    let df = 0;
+    if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
+        if (window.customerGPSLat && window.customerGPSLng) {
+            const pizzeriaLat = appData.settings.pizzeriaLat;
+            const pizzeriaLng = appData.settings.pizzeriaLng;
+            const distance = calculateDistance(pizzeriaLat, pizzeriaLng, window.customerGPSLat, window.customerGPSLng);
+            const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 2.00;
+            const perKm = parseFloat(appData.settings.deliveryPerKm) || 1.00;
+            const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 10;
+            
+            if (distance > maxRadius) {
+                showToast('❌ Indirizzo fuori dal raggio di consegna');
+                return;
+            }
+            df = baseFee + (distance * perKm);
+        } else {
+            df = parseFloat(appData.settings.deliveryFee) || 0;
+        }
+    }
+    
+    const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
+    if(orderType==='delivery'){ 
+        if(!street||!number){showToast('⚠️ Completa indirizzo');return;} 
+        if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} 
+    } 
+    
+    const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; 
+    cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
+    
+    const oc={
+        name:n,
+        phone:p,
+        address:orderType==='delivery'?sanitizeWA(address):'',
+        notes:sanitizeWA(nt),
+        type:orderType,
+        scheduledTime:st,
+        productsTotal:pt,
+        deliveryFee:df,
+        finalTotal:ft,
+        items:oi,
+        customerLat: window.customerGPSLat || null,
+        customerLng: window.customerGPSLng || null
+    }; 
+    
+    await sendOrder(oc); 
+}
+
+async function sendOrder(d){ 
+    const btn=document.getElementById('checkoutBtn'); 
+    const cartBackup=[...cart]; 
+    if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';} 
+    try{ 
+        const ref=db.ref('ordini').push(); 
+        const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); 
+        d.orderId=orderId; 
+        await ref.set({
+            orderId,
+            customerName:sanitizeWA(d.name),
+            customerPhone:sanitizeWA(d.phone),
+            address:d.type==='delivery'?sanitizeWA(d.address):'',
+            notes:sanitizeWA(d.notes),
+            type:d.type,
+            scheduledTime:d.scheduledTime,
+            items:d.items,
+            productsTotal:d.productsTotal,
+            deliveryFee:d.deliveryFee,
+            finalTotal:d.finalTotal,
+            customerLat: d.customerLat,
+            customerLng: d.customerLng,
+            status:'new',
+            timestamp:Date.now()
+        }); 
+        localStorage.setItem('lastOrderTime',Date.now()); 
+        saveOrderToLocal(d); 
+        const promos=cart.filter(i=>i.isPromo); 
+        promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
+        cart=[];
+        updateCartBadge();
+        closeCart(); 
+        document.getElementById('customerName').value=''; 
+        document.getElementById('customerPhone').value=''; 
+        document.getElementById('customerStreet').value=''; 
+        document.getElementById('customerNumber').value=''; 
+        document.getElementById('customerNotes').value=''; 
+        document.getElementById('scheduledTime').value=''; 
+        document.getElementById('privacyConsent').checked=false;
+        window.customerGPSLat = null;
+        window.customerGPSLng = null;
+        selectTimeMode('asap');
+        showToast('✅ Ordine inviato!');
+        showHome(); 
+        setTimeout(() => startOrderStatusTracking(), 1000); 
+    } catch(e){ 
+        console.error(e); 
+        cart=cartBackup;
+        updateCartBadge(); 
+        showToast(' Errore invio'); 
+    } finally{ 
+        if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} 
+    } 
+}
+
 function openReviewModal(){ document.getElementById('reviewModal').classList.add('active'); }
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
