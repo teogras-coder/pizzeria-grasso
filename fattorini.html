@@ -66,8 +66,8 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .notification-banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); padding: 15px 30px; border-radius: 12px; font-weight: 900; z-index: 9998; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 90%; text-align: center; }
 .notification-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .notification-banner button { margin-top: 10px; padding: 8px 20px; background: var(--dark); color: var(--gold); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, var(--card) 0%, var(--dark) 100%); padding: 10px 20px; display: flex; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #8a8a8a; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s; padding: 10px; border-radius: 10px; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, var(--card) 0%, var(--dark) 100%); padding: 10px 20px; display: flex; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; pointer-events: auto; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #8a8a8a; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s; padding: 10px; border-radius: 10px; -webkit-user-select: none; user-select: none; touch-action: manipulation; position: relative; z-index: 10; }
 .nav-item.active { color: var(--gold); background: rgba(212,136,6,0.1); }
 .nav-item i { font-size: 1.5rem; pointer-events: none; }
 .nav-item span { pointer-events: none; }
@@ -96,7 +96,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">⚠️ Offline - Riconnessione...</div>
-<div class="wake-lock-indicator" id="wakeLockIndicator"> Schermo attivo</div>
+<div class="wake-lock-indicator" id="wakeLockIndicator">🔋 Schermo attivo</div>
 <div class="notification-banner" id="notificationBanner">
   <div style="font-size: 1.2rem; margin-bottom: 5px;">🔔 NUOVO ORDINE!</div>
   <div id="notificationText">1 ordine disponibile</div>
@@ -104,7 +104,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </div>
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <h1> Area Fattorini</h1>
+    <h1>🛵 Area Fattorini</h1>
     <p>Antica Pizzeria Grasso</p>
     <input type="password" id="pinInput" placeholder="••••" maxlength="6" autofocus>
     <button onclick="checkPin()">Accedi</button>
@@ -136,16 +136,16 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
     </div>
   </div>
 </div>
-<div class="bottom-nav">
-  <div class="nav-item active" id="tabAvailable" onclick="showTab('available')">
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-item active" id="tabAvailable">
     <i class="fas fa-list"></i>
     <span>Disponibili</span>
   </div>
-  <div class="nav-item" id="tabMy" onclick="showTab('my')">
+  <div class="nav-item" id="tabMy">
     <i class="fas fa-box"></i>
     <span>Le Mie</span>
   </div>
-  <div class="nav-item" onclick="logout()">
+  <div class="nav-item" id="tabLogout">
     <i class="fas fa-sign-out-alt"></i>
     <span>Esci</span>
   </div>
@@ -172,6 +172,7 @@ let wakeLock = null;
 let lastOrderCount = 0;
 let notificationSound = null;
 let pizzeriaSettings = { lat: 41.6274, lng: 15.5514 };
+let isRendering = false;
 
 function loadPizzeriaSettings() {
   db.ref('settings').once('value').then(s => {
@@ -270,29 +271,19 @@ function loadOrders() {
 }
 
 function setupRealtimeListeners() {
-  // Listener principale per ordini - si aggiorna in tempo reale
   db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
     const newOrdersData = {};
     snapshot.forEach(child => {
       newOrdersData[child.key] = { id: child.key, ...child.val() };
     });
-    
-    // Conta ordini nuovi disponibili (senza fattorino)
     const oldCount = Object.values(ordersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
     const newCount = Object.values(newOrdersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
-    
     ordersData = newOrdersData;
-    renderOrders(); // Aggiorna SEMPRE la vista
-    
-    // Notifica solo se ci sono nuovi ordini disponibili
+    renderOrders();
     if (newCount > oldCount && newCount > 0) {
       showNotification(newCount);
     }
-  }, error => {
-    console.error('Errore listener ordini:', error);
   });
-
-  // Listener connessione
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -337,6 +328,10 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function renderOrders() {
+  if (isRendering) return;
+  isRendering = true;
+  setTimeout(() => { isRendering = false; }, 100);
+  
   const container = document.getElementById('ordersContainer');
   const availableCount = document.getElementById('availableCount');
   const myOrdersCount = document.getElementById('myOrdersCount');
@@ -346,14 +341,10 @@ function renderOrders() {
   
   Object.values(ordersData).forEach(order => {
     if (order.type !== 'delivery') return;
-    
-    // DISPONIBILI: ordini nuovi SENZA fattorino assegnato
     if (order.status === 'new' && !order.assignedDriver) {
       available.push(order);
-    }
-    // LE MIE: tutti gli ordini assegnati a me (qualsiasi stato tranne delivered)
-    else if (order.assignedDriver === currentDriver?.pin && 
-             ['new', 'preparing', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)) {
+    } else if (order.assignedDriver === currentDriver?.pin && 
+               ['new', 'preparing', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)) {
       myOrders.push(order);
     }
   });
@@ -376,7 +367,6 @@ function renderOrders() {
     const timeStr = date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
     const items = order.items?.map(i => `${i.name} x${i.qty}`).join('<br>') || '';
     
-    // MAPPA GPS
     let mapHtml = '';
     let distanceHtml = '';
     const customerLat = order.customerLat;
@@ -389,7 +379,6 @@ function renderOrders() {
       const bboxLat = 0.006;
       const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${customerLng-bboxLng},${customerLat-bboxLat},${customerLng+bboxLng},${customerLat+bboxLat}&layer=mapnik&marker=${customerLat},${customerLng}`;
       const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${pizzeriaSettings.lat},${pizzeriaSettings.lng}&destination=${customerLat},${customerLng}&travelmode=driving`;
-      
       mapHtml = `<div class="map-container"><iframe src="${mapUrl}" loading="lazy"></iframe><a href="${gmapsUrl}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
       distanceHtml = `<div class="distance-info"><span class="label">📏 Distanza:</span><span class="distance">${distanceText} km</span></div>`;
     } else if (order.address) {
@@ -397,7 +386,6 @@ function renderOrders() {
       mapHtml = `<div class="map-container" style="padding: 15px; text-align: center;"><i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i><p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${order.address}</p><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
     }
     
-    // MESSAGGI DI STATO E PULSANTI
     let statusMessage = '';
     let actions = '';
     
@@ -405,10 +393,8 @@ function renderOrders() {
       actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Accetta</button>`;
     } else if (order.status === 'new' && order.assignedDriver === currentDriver?.pin) {
       statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria metta in preparazione...</div>`;
-      actions = `<button class="btn-view" onclick="showOrderDetails('${order.id}')">️ Dettagli</button>`;
     } else if (order.status === 'preparing') {
-      statusMessage = `<div class="status-message status-preparing">🍕 La pizzeria sta preparando...</div>`;
-      actions = `<button class="btn-view" onclick="showOrderDetails('${order.id}')">️ Dettagli</button>`;
+      statusMessage = `<div class="status-message status-preparing"> La pizzeria sta preparando...</div>`;
     } else if (order.status === 'ready') {
       statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro!</div>`;
       actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
@@ -418,7 +404,6 @@ function renderOrders() {
       actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Consegnato</button>`;
     } else if (order.status === 'delivered') {
       statusMessage = `<div class="status-message" style="background: rgba(74,222,128,0.2); color: #4ade80;">✅ Consegnato!</div>`;
-      actions = '';
     }
     
     return `
@@ -446,7 +431,6 @@ function renderOrders() {
   }).join('');
 }
 
-// ACCETTA: assegna solo il fattorino, status resta 'new'
 function acceptOrder(orderId) {
   if (!confirm('Accettare questo ordine?')) return;
   db.ref(`ordini/${orderId}`).update({
@@ -465,7 +449,6 @@ function acceptOrder(orderId) {
   });
 }
 
-// RITIRA: cambia da 'ready' a 'picked'
 function pickOrder(orderId) {
   if (!confirm('Hai ritirato l\'ordine dalla pizzeria?')) return;
   db.ref(`ordini/${orderId}`).update({
@@ -476,7 +459,6 @@ function pickOrder(orderId) {
   });
 }
 
-// CONSEGNA: cambia da 'picked' a 'delivering' poi a 'delivered'
 function deliverOrder(orderId) {
   const order = ordersData[orderId];
   const isDelivering = order?.status === 'delivering';
@@ -508,12 +490,11 @@ function showOrderDetails(orderId) {
   alert(`Ordine: ${order.orderId || orderId}\n\nCliente: ${order.customerName}\nTelefono: ${order.customerPhone}\nIndirizzo: ${order.address}\nOrario: ${order.scheduledTime || 'Subito'}\n\nProdotti:\n${items}\n\nTotale: €${(order.finalTotal || 0).toFixed(2)}\n\nNote: ${order.notes || 'Nessuna'}\n\nStato: ${order.status}${distanceText}`);
 }
 
-// FIX: Tab sempre cliccabili con ID espliciti
 function showTab(tab) {
   currentTab = tab;
-  // Aggiorna classi active usando ID espliciti
   document.getElementById('tabAvailable').classList.toggle('active', tab === 'available');
   document.getElementById('tabMy').classList.toggle('active', tab === 'my');
+  isRendering = false;
   renderOrders();
 }
 
@@ -545,6 +526,26 @@ document.getElementById('pinInput').addEventListener('input', function() {
 document.addEventListener('visibilitychange', async () => {
   if (wakeLock !== null && document.visibilityState === 'visible') {
     await requestWakeLock();
+  }
+});
+
+// EVENT DELEGATION FISSO SULLA BOTTOM-NAV (risolve il problema del click bloccato)
+document.addEventListener('DOMContentLoaded', function() {
+  const bottomNav = document.getElementById('bottomNav');
+  if (bottomNav) {
+    bottomNav.addEventListener('click', function(e) {
+      const navItem = e.target.closest('.nav-item');
+      if (!navItem) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (navItem.id === 'tabMy') {
+        showTab('my');
+      } else if (navItem.id === 'tabAvailable') {
+        showTab('available');
+      } else if (navItem.id === 'tabLogout') {
+        logout();
+      }
+    });
   }
 });
 </script>
