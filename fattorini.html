@@ -23,7 +23,7 @@
 body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg, var(--dark) 0%, #2a2a2a 100%); color: var(--cream); min-height: 100vh; overflow-x: hidden; }
 .login-screen { position: fixed; inset: 0; background: linear-gradient(170deg, var(--dark) 0%, #2a2a2a 50%, #3a3a3a 100%); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
 .login-box { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 40px; border-radius: 20px; text-align: center; border: 2px solid var(--gold); box-shadow: 0 0 50px rgba(212,136,6,0.3); max-width: 400px; width: 100%; }
-.login-box h1 { font-family: 'Montserrat', sans-serif; color: var(--gold); font-size: 2rem; margin-bottom: 10px; font-weight: 900; }
+.login-box h1 { color: var(--gold); font-size: 2rem; margin-bottom: 10px; font-weight: 900; }
 .login-box p { color: #8a8a8a; margin-bottom: 30px; }
 .login-box input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--gold); background: var(--dark); color: var(--gold); font-size: 1.5rem; text-align: center; letter-spacing: 10px; font-weight: 700; margin-bottom: 20px; }
 .login-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 900; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
@@ -41,6 +41,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .order-card { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 2px solid var(--gold); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 .order-card.new { border-left: 6px solid var(--warning); animation: pulseNew 2s infinite; }
 .order-card.preparing { border-left: 6px solid var(--gold); }
+.order-card.ready { border-left: 6px solid #a855f7; }
 .order-card.picked { border-left: 6px solid var(--success); }
 .order-card.delivering { border-left: 6px solid #60a5fa; }
 .order-card.delivered { border-left: 6px solid #60a5fa; opacity: 0.7; }
@@ -81,6 +82,9 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .distance-info .distance { color: var(--gold); font-weight: 700; font-size: 1.1rem; }
 .distance-info .label { color: #8a8a8a; font-size: 0.85rem; }
 .map-link { display: block; text-align: center; margin-top: 8px; padding: 8px; background: rgba(96,165,250,0.2); color: #60a5fa; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+.status-message { padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
+.status-waiting { background: rgba(251,191,36,0.2); color: var(--warning); }
+.status-preparing { background: rgba(212,136,6,0.2); color: var(--gold); }
 @media (max-width: 768px) {
   .stats-container { grid-template-columns: 1fr 1fr; }
   .order-actions { flex-direction: column; }
@@ -90,7 +94,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">⚠️ Offline - Riconnessione...</div>
-<div class="wake-lock-indicator" id="wakeLockIndicator">🔋 Schermo attivo</div>
+<div class="wake-lock-indicator" id="wakeLockIndicator"> Schermo attivo</div>
 <div class="notification-banner" id="notificationBanner">
   <div style="font-size: 1.2rem; margin-bottom: 5px;">🔔 NUOVO ORDINE!</div>
   <div id="notificationText">1 ordine disponibile</div>
@@ -98,7 +102,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </div>
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <h1>🛵 Area Fattorini</h1>
+    <h1> Area Fattorini</h1>
     <p>Antica Pizzeria Grasso</p>
     <input type="password" id="pinInput" placeholder="••••" maxlength="6" autofocus>
     <button onclick="checkPin()">Accedi</button>
@@ -110,17 +114,17 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
     <h1>🛵 Fattorini Grasso</h1>
     <p id="driverGreeting">Caricamento...</p>
     <div class="header-status">
-      <i class="fas fa-info-circle"></i> Tieni l'app aperta per le notifiche
+      <i class="fas fa-info-circle"></i> Tieni l'app aperta per ricevere notifiche
     </div>
   </div>
   <div class="stats-container">
     <div class="stat-card">
       <div class="number" id="availableCount">0</div>
-      <div class="label">📢 Disponibili</div>
+      <div class="label"> Disponibili</div>
     </div>
     <div class="stat-card">
       <div class="number" id="myOrdersCount">0</div>
-      <div class="label">📦 Le Mie</div>
+      <div class="label"> Le Mie</div>
     </div>
   </div>
   <div class="orders-container" id="ordersContainer">
@@ -167,7 +171,6 @@ let lastOrderCount = 0;
 let notificationSound = null;
 let pizzeriaSettings = { lat: 41.6274, lng: 15.5514 };
 
-// Carica impostazioni pizzeria (coordinate)
 function loadPizzeriaSettings() {
   db.ref('settings').once('value').then(s => {
     if (s.exists()) {
@@ -270,15 +273,14 @@ function setupRealtimeListeners() {
     snapshot.forEach(child => {
       newOrdersData[child.key] = { id: child.key, ...child.val() };
     });
-    const oldCount = Object.values(ordersData).filter(o => o.status === 'new' && o.type === 'delivery').length;
-    const newCount = Object.values(newOrdersData).filter(o => o.status === 'new' && o.type === 'delivery').length;
+    const oldCount = Object.values(ordersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
+    const newCount = Object.values(newOrdersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
     ordersData = newOrdersData;
     renderOrders();
     if (newCount > oldCount && newCount > 0) {
       showNotification(newCount);
     }
   });
-
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -310,7 +312,6 @@ function viewNewOrders() {
   showTab('available');
 }
 
-// Calcola distanza tra due coordinate GPS (in km)
 function calculateDistance(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371;
@@ -333,9 +334,14 @@ function renderOrders() {
   
   Object.values(ordersData).forEach(order => {
     if (order.type !== 'delivery') return;
-    if (order.status === 'new') {
+    
+    // DISPONIBILI: ordini nuovi SENZA fattorino assegnato
+    if (order.status === 'new' && !order.assignedDriver) {
       available.push(order);
-    } else if (['preparing', 'ready', 'picked', 'delivering'].includes(order.status) && order.assignedDriver === currentDriver?.pin) {
+    }
+    // LE MIE: ordini che ho accettato (new con assignedDriver) O stati successivi
+    else if (order.assignedDriver === currentDriver?.pin && 
+             ['new', 'preparing', 'ready', 'picked', 'delivering'].includes(order.status)) {
       myOrders.push(order);
     }
   });
@@ -367,13 +373,9 @@ function renderOrders() {
     if (customerLat && customerLng) {
       const distance = calculateDistance(pizzeriaSettings.lat, pizzeriaSettings.lng, customerLat, customerLng);
       const distanceText = distance !== null ? distance.toFixed(1) : '?';
-      
-      // Mappa OpenStreetMap
       const bboxLng = 0.008;
       const bboxLat = 0.006;
       const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${customerLng-bboxLng},${customerLat-bboxLat},${customerLng+bboxLng},${customerLat+bboxLat}&layer=mapnik&marker=${customerLat},${customerLng}`;
-      
-      // Link per Google Maps
       const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${pizzeriaSettings.lat},${pizzeriaSettings.lng}&destination=${customerLat},${customerLng}&travelmode=driving`;
       
       mapHtml = `
@@ -384,39 +386,48 @@ function renderOrders() {
           </a>
         </div>
       `;
-      
       distanceHtml = `
         <div class="distance-info">
-          <span class="label">📏 Distanza dalla pizzeria:</span>
+          <span class="label"> Distanza dalla pizzeria:</span>
           <span class="distance">${distanceText} km</span>
         </div>
       `;
-    } else {
-      // Se non ci sono coordinate GPS, mostra solo l'indirizzo con link a Maps
-      if (order.address) {
-        const encodedAddr = encodeURIComponent(order.address + ' Manfredonia');
-        mapHtml = `
-          <div class="map-container" style="padding: 15px; text-align: center;">
-            <i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i>
-            <p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${order.address}</p>
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link">
-              <i class="fas fa-directions"></i> Apri in Google Maps
-            </a>
-          </div>
-        `;
-      }
+    } else if (order.address) {
+      const encodedAddr = encodeURIComponent(order.address + ' Manfredonia');
+      mapHtml = `
+        <div class="map-container" style="padding: 15px; text-align: center;">
+          <i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i>
+          <p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${order.address}</p>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link">
+            <i class="fas fa-directions"></i> Apri in Google Maps
+          </a>
+        </div>
+      `;
     }
     
+    // MESSAGGI DI STATO E PULSANTI
+    let statusMessage = '';
     let actions = '';
-    if (order.status === 'new') {
+    
+    if (order.status === 'new' && !order.assignedDriver) {
+      // Disponibile per tutti
       actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Accetta</button>`;
+    } else if (order.status === 'new' && order.assignedDriver === currentDriver?.pin) {
+      // L'ho accettato io, aspetto che l'admin metta in prep
+      statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria metta in preparazione...</div>`;
+      actions = `<button class="btn-view" onclick="showOrderDetails('${order.id}')">️ Dettagli</button>`;
     } else if (order.status === 'preparing') {
-      actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
+      // La pizzeria sta preparando
+      statusMessage = `<div class="status-message status-preparing">🍕 La pizzeria sta preparando...</div>`;
+      actions = `<button class="btn-view" onclick="showOrderDetails('${order.id}')">👁️ Dettagli</button>`;
     } else if (order.status === 'ready') {
-      actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
+      // Pronto per il ritiro
+      actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')"> Ritirato</button>`;
     } else if (order.status === 'picked') {
+      // Ritirato, ora devo partire
       actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">🏍️ In Consegna</button>`;
     } else if (order.status === 'delivering') {
+      // In consegna, devo completare
       actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Consegnato</button>`;
     }
     
@@ -430,6 +441,7 @@ function renderOrders() {
         <div class="order-address">📍 ${order.address || 'N/A'}<br>📞 ${order.customerPhone || ''}</div>
         ${mapHtml}
         ${distanceHtml}
+        ${statusMessage}
         <div class="order-items">${items}</div>
         <div class="order-total">
           <span>Totale:</span>
@@ -444,27 +456,27 @@ function renderOrders() {
   }).join('');
 }
 
-// ACCETTA ORDINE - Usa status 'preparing' (sincronizzato con admin!)
+// ACCETTA: NON cambia status, solo assegna il fattorino
 function acceptOrder(orderId) {
   if (!confirm('Accettare questo ordine?')) return;
   db.ref(`ordini/${orderId}`).update({
-    status: 'preparing',
     assignedDriver: currentDriver.pin,
     assignedName: currentDriver.name,
     acceptedAt: Date.now()
+    // status resta 'new' finché l'admin non clicca Prep
   }).then(() => {
-    showToast('✅ Ordine accettato! La pizzeria sta preparando...');
+    showToast('✅ Ordine accettato! In attesa che la pizzeria lo metta in preparazione...');
     playNotificationSound();
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('Ordine Accettato!', {
-        body: 'La pizzeria sta preparando',
+        body: 'In attesa che la pizzeria metta in preparazione',
         icon: 'https://i.imgur.com/nWLqs68.png'
       });
     }
   });
 }
 
-// RITIRA ORDINE - Usa status 'picked'
+// RITIRA: cambia da 'ready' a 'picked'
 function pickOrder(orderId) {
   if (!confirm('Hai ritirato l\'ordine dalla pizzeria?')) return;
   db.ref(`ordini/${orderId}`).update({
@@ -475,7 +487,7 @@ function pickOrder(orderId) {
   });
 }
 
-// CONSEGNA - Usa status 'delivering' poi 'delivered'
+// CONSEGNA: cambia da 'picked' a 'delivering' poi a 'delivered'
 function deliverOrder(orderId) {
   const order = ordersData[orderId];
   const isDelivering = order?.status === 'delivering';
