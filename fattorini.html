@@ -13,9 +13,10 @@
 <link rel="apple-touch-icon" href="https://i.imgur.com/nWLqs68.png">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/nWLqs68.png">
+<link rel="icon" type="image/png" sizes="512x512" href="https://i.imgur.com/nWLqs68.png">
 
-<!-- Manifest -->
-<link rel="manifest" href='data:application/manifest+json;base64,eyJuYW1lIjoiR3Jhc3NvIERlbGl2ZXJ5IC0gRmF0dG9yaW5pIiwic2hvcnRfbmFtZSI6IkZhdHRvcmluaSIsInN0YXJ0X3VybCI6Ii9mYXR0b3JpbmkuaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxYTFhMWEiLCJ0aGVtZV9jb2xvciI6IiNENDg4MDYiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9uV0xxczY4LnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vaS5pbWd1ci5jb20vbldMcXM2OC5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ=='>
+<!-- Manifest Inline -->
+<link rel="manifest" href='data:application/manifest+json;base64,eyJuYW1lIjoiR3Jhc3NvIERlbGl2ZXJ5IC0gRmF0dG9yaW5pIiwic2hvcnRfbmFtZSI6IkZhdHRvcmluaSIsInN0YXJ0X3VybCI6Ii9mYXR0b3JpbmkuaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxYTFhMWEiLCJ0aGVtZV9jb2xvciI6IiNENDg4MDYiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0IiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaS5pbWd1ci5jb20vbldMcXM2OC5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6ImFueSJ9LHsic3JjIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9uV0xxczY4LnBuZyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmciLCJwdXJwb3NlIjoiYW55In1dfQ=='>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -41,6 +42,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .header { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 .header h1 { color: var(--dark); font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; }
 .header p { color: rgba(0,0,0,0.7); font-size: 0.9rem; }
+.header-status { margin-top: 10px; font-size: 0.85rem; color: rgba(0,0,0,0.7); }
 
 /* Stats Cards */
 .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
@@ -79,8 +81,9 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .offline-banner { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(90deg, var(--danger) 0%, #dc2626 100%); color: white; padding: 12px; text-align: center; font-weight: 700; z-index: 9999; display: none; }
 
 /* Notification Banner */
-.notification-banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); padding: 15px 30px; border-radius: 12px; font-weight: 900; z-index: 9998; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.notification-banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); padding: 15px 30px; border-radius: 12px; font-weight: 900; z-index: 9998; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 90%; text-align: center; }
 .notification-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.notification-banner button { margin-top: 10px; padding: 8px 20px; background: var(--dark); color: var(--gold); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
 /* Bottom Nav */
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, var(--card) 0%, var(--dark) 100%); padding: 10px 20px; display: flex; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; }
@@ -96,6 +99,10 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 700; z-index: 9999; opacity: 0; transition: all 0.3s; border: 2px solid var(--gold); max-width: 90%; text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Wake Lock Indicator */
+.wake-lock-indicator { position: fixed; top: 10px; right: 10px; background: var(--success); color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; z-index: 9997; display: none; }
+.wake-lock-indicator.show { display: block; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .stats-container { grid-template-columns: 1fr 1fr; }
@@ -109,11 +116,14 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner">⚠️ Offline - Riconnessione...</div>
 
+<!-- Wake Lock Indicator -->
+<div class="wake-lock-indicator" id="wakeLockIndicator">🔋 Schermo attivo</div>
+
 <!-- Notification Banner -->
 <div class="notification-banner" id="notificationBanner">
   <div style="font-size: 1.2rem; margin-bottom: 5px;">🔔 NUOVO ORDINE!</div>
   <div id="notificationText">1 ordine disponibile</div>
-  <button onclick="viewNewOrders()" style="margin-top: 10px; padding: 8px 20px; background: var(--dark); color: var(--gold); border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">👁️ VEDI ORDINI</button>
+  <button onclick="viewNewOrders()">👁️ VEDI ORDINI</button>
 </div>
 
 <!-- Login Screen -->
@@ -131,9 +141,9 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 <div class="app-container" id="mainApp">
   <div class="header">
     <h1>🛵 Fattorini Grasso</h1>
-    <p>Caricamento...</p>
-    <div style="margin-top: 10px; font-size: 0.85rem; color: rgba(0,0,0,0.7);">
-      <i class="fas fa-info-circle"></i> iPhone: Tieni l'app aperta per ricevere notifiche
+    <p id="driverGreeting">Caricamento...</p>
+    <div class="header-status">
+      <i class="fas fa-info-circle"></i> Tieni l'app aperta per le notifiche
     </div>
   </div>
 
@@ -174,7 +184,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 <div class="toast" id="toast"></div>
 
 <script>
-// Firebase Config
+// Firebase Config - SYNCHRONIZED WITH ALL APPS
 const firebaseConfig = {
   apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
   authDomain: "teogra-c8cf5.firebaseapp.com",
@@ -191,16 +201,79 @@ let currentDriver = null;
 let currentTab = 'available';
 let driversData = {};
 let ordersData = {};
+let wakeLock = null;
+let lastOrderCount = 0;
+let notificationSound = null;
+
+// Initialize Notification Sound
+function initNotificationSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    notificationSound = new AudioContext();
+  } catch(e) {
+    console.log('Audio Context non supportato');
+  }
+}
+
+// Play Notification Sound
+function playNotificationSound() {
+  if (!notificationSound) return;
+  
+  try {
+    const osc = notificationSound.createOscillator();
+    const gain = notificationSound.createGain();
+    osc.connect(gain);
+    gain.connect(notificationSound.destination);
+    
+    // Suono tipo "ding-dong"
+    osc.frequency.setValueAtTime(880, notificationSound.currentTime);
+    osc.frequency.setValueAtTime(1100, notificationSound.currentTime + 0.1);
+    osc.frequency.setValueAtTime(880, notificationSound.currentTime + 0.2);
+    osc.frequency.setValueAtTime(1100, notificationSound.currentTime + 0.3);
+    
+    gain.gain.setValueAtTime(0.3, notificationSound.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, notificationSound.currentTime + 0.6);
+    
+    osc.start(notificationSound.currentTime);
+    osc.stop(notificationSound.currentTime + 0.6);
+  } catch(e) {
+    console.log('Errore suono:', e);
+  }
+}
 
 // Request Notification Permission
-function requestNotificationPermission() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(permission => {
+async function requestNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission === 'default') {
+      const permission = await Notification.requestPermission();
       console.log('Notification permission:', permission);
       if (permission === 'granted') {
         showToast('🔔 Notifiche attivate!');
       }
-    });
+    } else if (Notification.permission === 'granted') {
+      showToast('🔔 Notifiche già attive');
+    }
+  }
+  
+  // Keep screen awake
+  await requestWakeLock();
+}
+
+// Request Wake Lock (keep screen on)
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      document.getElementById('wakeLockIndicator').classList.add('show');
+      console.log('Wake Lock attivo');
+      
+      wakeLock.addEventListener('release', () => {
+        document.getElementById('wakeLockIndicator').classList.remove('show');
+        console.log('Wake Lock rilasciato');
+      });
+    }
+  } catch (err) {
+    console.log('Wake Lock non supportato:', err);
   }
 }
 
@@ -209,24 +282,28 @@ function checkPin() {
   const pin = document.getElementById('pinInput').value;
   db.ref('drivers').once('value').then(snapshot => {
     driversData = snapshot.val() || {};
-    const driverName = Object.entries(driversData).find(([p]) => p === pin)?.[1];
+    const driverEntry = Object.entries(driversData).find(([p]) => p === pin);
     
-    if (driverName) {
-      currentDriver = { pin, name: driverName };
+    if (driverEntry) {
+      currentDriver = { pin, name: driverEntry[1] };
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'block';
-      document.querySelector('.header p').textContent = `Ciao, ${driverName}!`;
+      document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
       
-      // Request notification permission after login
+      // Initialize
+      initNotificationSound();
       requestNotificationPermission();
-      
-      // Load orders
       loadOrders();
       setupRealtimeListeners();
+      
+      showToast(`Benvenuto, ${currentDriver.name}!`);
     } else {
       document.getElementById('loginError').style.display = 'block';
       document.getElementById('pinInput').value = '';
     }
+  }).catch(err => {
+    console.error('Errore login:', err);
+    showToast('❌ Errore connessione');
   });
 }
 
@@ -242,38 +319,46 @@ function loadOrders() {
       ordersData[child.key] = { id: child.key, ...child.val() };
     });
     renderOrders();
+  }).catch(err => {
+    console.error('Errore caricamento ordini:', err);
   });
 }
 
-// Setup Realtime Listeners
+// Setup Realtime Listeners - SYNCHRONIZED
 function setupRealtimeListeners() {
   db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
-    ordersData = {};
+    const newOrdersData = {};
     snapshot.forEach(child => {
-      ordersData[child.key] = { id: child.key, ...child.val() };
+      newOrdersData[child.key] = { id: child.key, ...child.val() };
     });
+    
+    // Check for new orders
+    const oldCount = Object.values(ordersData).filter(o => 
+      o.status === 'new' && o.type === 'delivery'
+    ).length;
+    
+    const newCount = Object.values(newOrdersData).filter(o => 
+      o.status === 'new' && o.type === 'delivery'
+    ).length;
+    
+    ordersData = newOrdersData;
     renderOrders();
-    checkForNewOrders();
+    
+    // Notify if new orders
+    if (newCount > oldCount && newCount > 0) {
+      showNotification(newCount);
+    }
+  }, error => {
+    console.error('Errore listener:', error);
   });
 
   // Online/Offline status
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
-    if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
+    if (banner) {
+      banner.style.display = snapshot.val() === false ? 'block' : 'none';
+    }
   });
-}
-
-// Check for new orders and show notification
-let lastOrderCount = 0;
-function checkForNewOrders() {
-  const newOrders = Object.values(ordersData).filter(o => 
-    o.status === 'new' && o.type === 'delivery'
-  );
-  
-  if (newOrders.length > lastOrderCount && newOrders.length > 0) {
-    showNotification(newOrders.length);
-  }
-  lastOrderCount = newOrders.length;
 }
 
 // Show Notification
@@ -283,39 +368,35 @@ function showNotification(count) {
   text.textContent = `${count} ordine${count > 1 ? 'i' : ''} disponibile${count > 1 ? 'i' : ''} per la consegna`;
   banner.classList.add('show');
   
-  // Play sound
-  playNotificationSound();
+  // Play sound multiple times based on count
+  for (let i = 0; i < Math.min(count, 3); i++) {
+    setTimeout(() => playNotificationSound(), i * 700);
+  }
   
   // Vibrate if available
   if (navigator.vibrate) {
-    navigator.vibrate([200, 100, 200]);
+    navigator.vibrate([300, 100, 300, 100, 300]);
+  }
+  
+  // Send browser notification if permitted
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('🔔 Nuovo Ordine Grasso!', {
+      body: `${count} ordine${count > 1 ? 'i' : ''} disponibile${count > 1 ? 'i' : ''}`,
+      icon: 'https://i.imgur.com/nWLqs68.png',
+      badge: 'https://i.imgur.com/nWLqs68.png',
+      tag: 'new-order',
+      requireInteraction: true
+    });
   }
   
   setTimeout(() => {
     banner.classList.remove('show');
-  }, 5000);
+  }, 8000);
 }
 
 function viewNewOrders() {
   document.getElementById('notificationBanner').classList.remove('show');
   showTab('available');
-}
-
-function playNotificationSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
-    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  } catch(e) {}
 }
 
 // Render Orders
@@ -332,14 +413,13 @@ function renderOrders() {
     
     if (order.status === 'new') {
       available.push(order);
-    } else if (order.status === 'accepted' && order.assignedDriver === currentDriver?.pin) {
-      myOrders.push(order);
-    } else if (order.status === 'picked' && order.assignedDriver === currentDriver?.pin) {
-      myOrders.push(order);
-    } else if (order.status === 'delivering' && order.assignedDriver === currentDriver?.pin) {
+    } else if (['accepted', 'picked', 'delivering'].includes(order.status) && order.assignedDriver === currentDriver?.pin) {
       myOrders.push(order);
     }
   });
+  
+  available.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  myOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   
   availableCount.textContent = available.length;
   myOrdersCount.textContent = myOrders.length;
@@ -367,9 +447,9 @@ function renderOrders() {
     } else if (order.status === 'accepted') {
       actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
     } else if (order.status === 'picked') {
-      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')"> Consegnato</button>`;
+      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">🏍️ In Consegna</button>`;
     } else if (order.status === 'delivering') {
-      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Completa</button>`;
+      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Consegnato</button>`;
     }
     
     return `
@@ -394,7 +474,7 @@ function renderOrders() {
   }).join('');
 }
 
-// Accept Order
+// Accept Order - SYNCHRONIZED WITH ADMIN
 function acceptOrder(orderId) {
   if (!confirm('Accettare questo ordine?')) return;
   
@@ -402,34 +482,64 @@ function acceptOrder(orderId) {
     status: 'accepted',
     assignedDriver: currentDriver.pin,
     assignedName: currentDriver.name,
-    acceptedAt: Date.now()
+    acceptedAt: Date.now(),
+    acceptedBy: currentDriver.name
   }).then(() => {
     showToast('✅ Ordine accettato!');
     playNotificationSound();
+    
+    // Browser notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Ordine Accettato!', {
+        body: 'Hai accettato un ordine',
+        icon: 'https://i.imgur.com/nWLqs68.png'
+      });
+    }
+  }).catch(err => {
+    console.error('Errore accettazione:', err);
+    showToast('❌ Errore accettazione');
   });
 }
 
 // Pick Order
 function pickOrder(orderId) {
-  if (!confirm('Hai ritirato l\'ordine?')) return;
+  if (!confirm('Hai ritirato l\'ordine dalla pizzeria?')) return;
   
   db.ref(`ordini/${orderId}`).update({
     status: 'picked',
     pickedAt: Date.now()
   }).then(() => {
     showToast('📦 Ordine ritirato!');
+  }).catch(err => {
+    console.error('Errore ritiro:', err);
+    showToast('❌ Errore aggiornamento');
   });
 }
 
 // Deliver Order
 function deliverOrder(orderId) {
-  if (!confirm('Confermi la consegna?')) return;
+  const order = ordersData[orderId];
+  const isDelivering = order?.status === 'delivering';
+  
+  if (!confirm(isDelivering ? 'Confermi la consegna completata?' : 'Sei in consegna?')) return;
+  
+  const newStatus = isDelivering ? 'delivered' : 'delivering';
   
   db.ref(`ordini/${orderId}`).update({
-    status: 'delivered',
-    deliveredAt: Date.now()
+    status: newStatus,
+    [isDelivering ? 'deliveredAt' : 'deliveringAt']: Date.now()
   }).then(() => {
-    showToast('✅ Ordine consegnato!');
+    showToast(isDelivering ? '✅ Ordine consegnato!' : '🏍️ In consegna...');
+    
+    if (isDelivering && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification('Consegna Completata!', {
+        body: 'Ottimo lavoro!',
+        icon: 'https://i.imgur.com/nWLqs68.png'
+      });
+    }
+  }).catch(err => {
+    console.error('Errore consegna:', err);
+    showToast('❌ Errore aggiornamento');
   });
 }
 
@@ -438,8 +548,24 @@ function showOrderDetails(orderId) {
   const order = ordersData[orderId];
   if (!order) return;
   
-  const items = order.items?.map(i => `${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}`).join('\n') || '';
-  alert(`Ordine: ${order.orderId || orderId}\n\nCliente: ${order.customerName}\nTelefono: ${order.customerPhone}\nIndirizzo: ${order.address}\n\nProdotti:\n${items}\n\nTotale: €${(order.finalTotal || 0).toFixed(2)}\n\nNote: ${order.notes || 'Nessuna'}`);
+  const items = order.items?.map(i => `• ${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}`).join('\n') || '';
+  const details = `Ordine: ${order.orderId || orderId}
+  
+Cliente: ${order.customerName}
+Telefono: ${order.customerPhone}
+Indirizzo: ${order.address}
+Orario: ${order.scheduledTime || 'Subito'}
+
+Prodotti:
+${items}
+
+Totale: €${(order.finalTotal || 0).toFixed(2)}
+
+Note: ${order.notes || 'Nessuna'}
+
+Stato: ${order.status}`;
+  
+  alert(details);
 }
 
 // Show Tab
@@ -454,12 +580,25 @@ function showTab(tab) {
 // Logout
 function logout() {
   if (!confirm('Uscire dall\'app?')) return;
+  
+  // Release wake lock
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+  
   currentDriver = null;
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pinInput').value = '';
   document.getElementById('loginError').style.display = 'none';
+  document.getElementById('wakeLockIndicator').classList.remove('show');
+  
+  // Remove listeners
   db.ref('ordini').off();
+  db.ref('.info/connected').off();
+  
+  showToast('👋 Arrivederci');
 }
 
 // Toast
@@ -470,10 +609,25 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// Handle PIN input
+// Handle PIN input - only numbers
 document.getElementById('pinInput').addEventListener('input', function() {
   this.value = this.value.replace(/\D/g, '');
 });
+
+// Handle visibility change - re-request wake lock
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    await requestWakeLock();
+  }
+});
+
+// Service Worker Registration (for future PWA features)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Service worker can be added later for offline support
+    console.log('Service Worker supportato');
+  });
+}
 </script>
 </body>
 </html>
