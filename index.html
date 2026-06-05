@@ -6,12 +6,13 @@
 <title>Antica Pizzeria Grasso - Ordina Pizza Online a Manfredonia</title>
 <meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a0f0a' stroke='%23d4af37' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E🍕%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='%23d4af37'%3EGRASSO%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a0f0a' stroke='%23d4af37' stroke-width='12'/%3E%3Ctext x='256' y='290' text-anchor='middle' font-size='180'%3E%3C/text%3E%3Ctext x='256' y='440' text-anchor='middle' font-family='Georgia,serif' font-size='80' font-weight='900' fill='%23d4af37'%3EGRASSO%3C/text%3E%3C/svg%3E">
 <meta name="theme-color" content="#d4a84b">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,26 +37,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .hero-section { position: relative; height: 130px; overflow: hidden; flex-shrink: 0; margin-bottom: 0; }
 .hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
-.status-banner {
-    position: relative;
-    bottom: auto;
-    right: auto;
-    margin: 8px auto 4px !important;
-    padding: 6px 16px !important;
-    z-index: 10;
-    font-weight: 700;
-    font-size: 0.6rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    background: rgba(26, 18, 9, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border: 1px solid rgba(212, 168, 75, 0.4);
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
+.status-banner { position: relative; bottom: auto; right: auto; margin: 8px auto 4px !important; padding: 6px 16px !important; z-index: 10; font-weight: 700; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; background: rgba(26, 18, 9, 0.85) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(212, 168, 75, 0.4); border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 .status-open { color: #f0d78c !important; text-shadow: 0 0 8px rgba(212, 168, 75, 0.8) !important; }
 .status-closed { color: #f87171 !important; text-shadow: 0 0 8px rgba(248, 113, 113, 0.6) !important; }
 .section-divider { display: flex; align-items: center; padding: 12px 25px 10px; }
@@ -205,25 +187,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 #bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
 #bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
 #bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-.gold-shimmer-bar {
-    position: relative;
-    width: 100%;
-    height: 4px;
-    margin: 0;
-    background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5);
-    border-radius: 0;
-    overflow: hidden;
-}
-.shimmer-light {
-    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%);
-    animation: shimmerMove 3s ease-in-out infinite;
-}
+.gold-shimmer-bar { position: relative; width: 100%; height: 4px; margin: 0; background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%); box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5); border-radius: 0; overflow: hidden; }
+.shimmer-light { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%); animation: shimmerMove 3s ease-in-out infinite; }
 @keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
-.offers-banner .close-offer {
-    display: none !important;
-}
+.offers-banner .close-offer { display: none !important; }
 </style>
 </head>
 <body>
@@ -428,6 +395,47 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+// ✅ NUOVO: Inizializza Firebase Messaging
+const messaging = firebase.messaging();
+const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
+
+// Chiedi il permesso per le notifiche
+function requestNotificationPermission() {
+  messaging.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Permesso notifiche concesso');
+      return messaging.getToken({ vapidKey: vapidKey });
+    } else {
+      console.log('Permesso notifiche negato');
+    }
+  }).then((token) => {
+    if (token) {
+      console.log('Token FCM:', token);
+      // Salva il token nel database per poter inviare notifiche a questo dispositivo
+      const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('device_id', deviceId);
+      db.ref('fcm_tokens/' + deviceId).set({
+        token: token,
+        type: 'client',
+        lastSeen: Date.now()
+      });
+    }
+  }).catch((err) => {
+    console.log('Errore token FCM:', err);
+  });
+}
+
+// Ascolta le notifiche quando l'app è aperta
+messaging.onMessage((payload) => {
+  console.log('Notifica ricevuta in foreground:', payload);
+  showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+});
+
+// Avvia la richiesta di permesso all'apertura
+requestNotificationPermission();
+
 const paletteColors = {
   autunno: { '--gold': '#d4a84b', '--gold-light': '#f0d78c', '--gold-dark': '#b8860b', '--dark': '#1a1209', '--brown': '#2d1f12' },
   inverno: { '--gold': '#a8c3d4', '--gold-light': '#d4e5f0', '--gold-dark': '#7a9bb0', '--dark': '#1a2530', '--brown': '#253040' },
@@ -446,7 +454,7 @@ function applicaPalette(nome) {
 db.ref('settings/colorPalette').on('value', snapshot => { applicaPalette(snapshot.val() || 'autunno'); });
 const CACHE_DURATION = 3600000;
 let appData = {
-categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:" Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
+categories: { focacce:{name:" Focacce",icon:"fa-bread-slice"}, pizze:{name:" Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:" Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
 menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
 promotions:{},
 settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15},
@@ -532,7 +540,7 @@ function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
                 o.status = newStatus;
                 if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
                 if (document.getElementById('myOrdersView').style.display === 'block') {
-                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': ' Ritirato', 'delivering': ' In consegna!', 'delivered': ' Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
+                    const statusNames = { 'preparing': ' In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': ' Ritirato', 'delivering': ' In consegna!', 'delivered': ' Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
                     if (statusNames[newStatus]) {
                         showToast(statusNames[newStatus]);
                         if (newStatus === 'delivering' || newStatus === 'rifiutato') {
@@ -662,9 +670,8 @@ function updateCartBadge(){
 
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('🗑️ Svuotato');}}
 
-// Funzione per calcolare la distanza GPS
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Raggio della Terra in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -674,7 +681,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Funzione per calcolare il costo di consegna in base alla distanza
 async function calculateDeliveryFee() {
     const pizzeriaLat = appData.settings.pizzeriaLat;
     const pizzeriaLng = appData.settings.pizzeriaLng;
@@ -682,7 +688,6 @@ async function calculateDeliveryFee() {
     const customerLng = window.customerGPSLng;
     
     if (!pizzeriaLat || !pizzeriaLng || !customerLat || !customerLng) {
-        // Se non ci sono coordinate, usa il costo fisso
         const df = parseFloat(appData.settings.deliveryFee) || 2.00;
         updateDeliveryFeeDisplay(df, null);
         return;
@@ -694,7 +699,7 @@ async function calculateDeliveryFee() {
     const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 10;
     
     if (distance > maxRadius) {
-        showToast('❌ Indirizzo fuori dal raggio di consegna');
+        showToast(' Indirizzo fuori dal raggio di consegna');
         updateDeliveryFeeDisplay(0, distance, true);
         return;
     }
@@ -737,12 +742,10 @@ function updateCartTotals(){
     cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});
     
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
-        // Se abbiamo le coordinate GPS del cliente, calcola automaticamente
         if (window.customerGPSLat && window.customerGPSLng) {
             calculateDeliveryFee();
             return;
         } else {
-            // Altrimenti usa il costo fisso
             const df = parseFloat(appData.settings.deliveryFee) || 0;
             const ft = t + df;
             document.getElementById('deliveryFeeRow').style.display = 'flex';
@@ -789,21 +792,17 @@ async function getGPSLocation(){
         const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
         const{latitude,longitude}=pos.coords;
         
-        // Salva le coordinate
         window.customerGPSLat = latitude;
         window.customerGPSLng = longitude;
         
-        // Ottieni l'indirizzo inverso
         const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
         const d=await r.json(),a=d.address; 
         
-        // Compila i campi indirizzo
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
         
-        showToast('📍 Posizione trovata!');
+        showToast(' Posizione trovata!');
         
-        // Ricalcola il costo di consegna
         if (orderType === 'delivery') {
             calculateDeliveryFee();
         }
@@ -831,7 +830,7 @@ selectTimeMode(timeMode);updateCartTotals();
 m.classList.add('active'); 
 }
 
-function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
+function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('️ Rimossa');}}
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
@@ -851,7 +850,6 @@ async function confirmAndSendOrder(){
     
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
     
-    // Calcola il costo di consegna
     let df = 0;
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
         if (window.customerGPSLat && window.customerGPSLng) {
@@ -979,15 +977,15 @@ function clearLocalHistory(){
         orderStatusListeners = {};
         localStorage.removeItem('pizzeria_grasso_orders');
         renderMyOrders();
-        showToast('🗑️ Storico cancellato!');
+        showToast('️ Storico cancellato!');
     }
 }
 function getOrderProgress(status, orderType) {
     if (orderType === 'pickup') {
-        const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+        const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
         return pickupSteps[status] || pickupSteps['new'];
     }
-    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
     return deliverySteps[status] || deliverySteps['new'];
 }
 function renderOrderTracker(status, motivoRifiuto, orderType) {
@@ -995,7 +993,7 @@ function renderOrderTracker(status, motivoRifiuto, orderType) {
     const progress = getOrderProgress(status, type);
     if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
     if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
