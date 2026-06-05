@@ -762,7 +762,6 @@ function loadSettings() {
   document.getElementById('hoursInput').value = appData.settings.hours || '';
   document.getElementById('specialClosures').value = appData.settings.specialClosures || '';
   
-  // ✅ MODIFICA: Formattazione corretta delle coordinate GPS
   document.getElementById('pizzeriaLat').value = appData.settings.pizzeriaLat ? Number(appData.settings.pizzeriaLat).toFixed(6) : '';
   document.getElementById('pizzeriaLng').value = appData.settings.pizzeriaLng ? Number(appData.settings.pizzeriaLng).toFixed(6) : '';
   document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee ? Number(appData.settings.deliveryBaseFee).toFixed(2) : '2.00';
@@ -793,9 +792,7 @@ async function getPizzeriaGPS() {
   }
 }
 
-// ✅ MODIFICA: Salvataggio corretto delle coordinate GPS (gestisce virgole e punti)
 function saveDeliveryGPS() {
-  // Converti virgole in punti per compatibilità
   const latStr = document.getElementById('pizzeriaLat').value.replace(',', '.');
   const lngStr = document.getElementById('pizzeriaLng').value.replace(',', '.');
   const baseFeeStr = document.getElementById('deliveryBaseFee').value.replace(',', '.');
@@ -905,19 +902,31 @@ function deleteProduct(c, i) {
 }
 function updateProduct(c, i, f, v) { appData.menu[c][i][f] = v; db.ref('menu').set(appData.menu); }
 
+// ✅ MODIFICA PRINCIPALE: Carica immagini su Firebase Storage invece di base64 nel database
 async function uploadProductImage(cat, idx, input) {
   const file = input.files[0];
   if (!file) return;
   showToast('Compressione...');
   const compressed = await compressImage(file);
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    appData.menu[cat][idx].img = e.target.result;
-    await db.ref('menu/' + cat + '/' + idx + '/img').set(e.target.result);
+  
+  // Carica su Firebase Storage
+  const fileName = `products/${cat}_${idx}_${Date.now()}.webp`;
+  const storageRef = storage.ref(fileName);
+  
+  try {
+    showToast('Caricamento...');
+    const snapshot = await storageRef.put(compressed);
+    const url = await snapshot.ref.getDownloadURL();
+    
+    // Salva solo l'URL nel database (non base64!)
+    appData.menu[cat][idx].img = url;
+    await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
+    
     showToast('Foto caricata!');
     renderMenu();
-  };
-  reader.readAsDataURL(compressed);
+  } catch (err) {
+    showToast('Errore: ' + err.message);
+  }
 }
 
 function removeProductImage(cat, idx) {
