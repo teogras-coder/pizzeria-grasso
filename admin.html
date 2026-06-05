@@ -472,6 +472,32 @@ let appData = {
 let currentReviewFilter = 'all';
 let openCategories = new Set();
 let driversList = {};
+let notificationSound = null;
+
+// ✅ MODIFICA 1: Sistema audio per notifiche
+function initNotificationSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    notificationSound = new AudioContext();
+  } catch(e) { console.log('Audio non supportato'); }
+}
+
+function playAdminNotification() {
+  if (!notificationSound) return;
+  try {
+    const osc = notificationSound.createOscillator();
+    const gain = notificationSound.createGain();
+    osc.connect(gain);
+    gain.connect(notificationSound.destination);
+    osc.frequency.setValueAtTime(880, notificationSound.currentTime);
+    osc.frequency.setValueAtTime(1100, notificationSound.currentTime + 0.1);
+    osc.frequency.setValueAtTime(880, notificationSound.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, notificationSound.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, notificationSound.currentTime + 0.4);
+    osc.start(notificationSound.currentTime);
+    osc.stop(notificationSound.currentTime + 0.4);
+  } catch(e) {}
+}
 
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
@@ -480,24 +506,44 @@ function toggleSidebar() {
   overlay.classList.toggle('active');
 }
 
+// ✅ MODIFICA 1: Login persistente con localStorage
 function checkPin() {
   const pin = document.getElementById('pinInput').value;
   db.ref('settings/adminPin').once('value').then(s => {
     const correctPin = s.val() || "1234";
     if (pin === correctPin) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'grid';
-      initApp();
+      localStorage.setItem('admin_logged_in', 'true');
+      localStorage.setItem('admin_pin', pin);
+      enterAdmin();
     } else {
       document.getElementById('loginError').style.display = 'block';
       document.getElementById('pinInput').value = '';
     }
   });
 }
+
+// ✅ MODIFICA 1: Entra direttamente se già loggato
+function enterAdmin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'grid';
+  initNotificationSound();
+  initApp();
+}
+
+// ✅ MODIFICA 1: Controlla se è già loggato all'apertura
+window.addEventListener('DOMContentLoaded', () => {
+  const isLoggedIn = localStorage.getItem('admin_logged_in');
+  if (isLoggedIn === 'true') {
+    enterAdmin();
+  }
+});
+
 document.getElementById('pinInput').addEventListener('keypress', e => { if (e.key === 'Enter') checkPin(); });
 
 function logout() {
   if (!confirm('Uscire dal gestionale?')) return;
+  localStorage.removeItem('admin_logged_in');
+  localStorage.removeItem('admin_pin');
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pinInput').value = '';
@@ -530,12 +576,42 @@ function loadAllData() {
   db.ref('drivers').once('value').then(s => { driversList = s.val() || {}; renderDrivers(driversList); });
 }
 
+// ✅ MODIFICA 2: Notifiche sonore quando il fattorino cambia stato
 function setupListeners() {
+  let previousOrders = {};
+  
   db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => {
     const orders = {};
     s.forEach(c => { orders[c.key] = { id: c.key, ...c.val() }; });
+    
+    // Confronta con gli ordini precedenti per trovare cambiamenti
+    Object.values(orders).forEach(order => {
+      const prev = previousOrders[order.id];
+      if (prev && prev.status !== order.status) {
+        // Il fattorino ha cambiato stato
+        const driverName = order.assignedName || 'Fattorino';
+        const orderId = order.orderId || order.id;
+        
+        if (order.status === 'preparing' && prev.status === 'new') {
+          // Fattorino ha accettato
+          playAdminNotification();
+          showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
+        } else if (order.status === 'picked' && prev.status === 'ready') {
+          // Fattorino ha ritirato
+          playAdminNotification();
+          showToast(` ${driverName} ha ritirato l'ordine ${orderId}`);
+        } else if (order.status === 'delivered' && prev.status === 'delivering') {
+          // Fattorino ha consegnato
+          playAdminNotification();
+          showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
+        }
+      }
+    });
+    
+    previousOrders = orders;
     renderOrders(orders);
   });
+  
   db.ref('recensioni').on('value', s => loadReviews());
   db.ref('settings').on('value', s => { if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; loadSettings(); } });
 }
@@ -902,14 +978,12 @@ function deleteProduct(c, i) {
 }
 function updateProduct(c, i, f, v) { appData.menu[c][i][f] = v; db.ref('menu').set(appData.menu); }
 
-// ✅ MODIFICA PRINCIPALE: Carica immagini su Firebase Storage invece di base64 nel database
 async function uploadProductImage(cat, idx, input) {
   const file = input.files[0];
   if (!file) return;
   showToast('Compressione...');
   const compressed = await compressImage(file);
   
-  // Carica su Firebase Storage
   const fileName = `products/${cat}_${idx}_${Date.now()}.webp`;
   const storageRef = storage.ref(fileName);
   
@@ -918,7 +992,6 @@ async function uploadProductImage(cat, idx, input) {
     const snapshot = await storageRef.put(compressed);
     const url = await snapshot.ref.getDownloadURL();
     
-    // Salva solo l'URL nel database (non base64!)
     appData.menu[cat][idx].img = url;
     await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
     
