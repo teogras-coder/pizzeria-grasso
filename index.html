@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
- <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -37,26 +37,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .hero-section { position: relative; height: 130px; overflow: hidden; flex-shrink: 0; margin-bottom: 0; }
 .hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
-.status-banner {
-    position: relative;
-    bottom: auto;
-    right: auto;
-    margin: 8px auto 4px !important;
-    padding: 6px 16px !important;
-    z-index: 10;
-    font-weight: 700;
-    font-size: 0.6rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    background: rgba(26, 18, 9, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border: 1px solid rgba(212, 168, 75, 0.4);
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
+.status-banner { position: relative; bottom: auto; right: auto; margin: 8px auto 4px !important; padding: 6px 16px !important; z-index: 10; font-weight: 700; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; background: rgba(26, 18, 9, 0.85) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(212, 168, 75, 0.4); border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 .status-open { color: #f0d78c !important; text-shadow: 0 0 8px rgba(212, 168, 75, 0.8) !important; }
 .status-closed { color: #f87171 !important; text-shadow: 0 0 8px rgba(248, 113, 113, 0.6) !important; }
 .section-divider { display: flex; align-items: center; padding: 12px 25px 10px; }
@@ -206,25 +187,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 #bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
 #bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
 #bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-.gold-shimmer-bar {
-    position: relative;
-    width: 100%;
-    height: 4px;
-    margin: 0;
-    background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5);
-    border-radius: 0;
-    overflow: hidden;
-}
-.shimmer-light {
-    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%);
-    animation: shimmerMove 3s ease-in-out infinite;
-}
+.gold-shimmer-bar { position: relative; width: 100%; height: 4px; margin: 0; background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%); box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5); border-radius: 0; overflow: hidden; }
+.shimmer-light { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%); animation: shimmerMove 3s ease-in-out infinite; }
 @keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
-.offers-banner .close-offer {
-    display: none !important;
-}
+.offers-banner .close-offer { display: none !important; }
 </style>
 </head>
 <body>
@@ -245,13 +211,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="phone-frame">
 <header class="header">
     <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: 8px;">
-        <img src="https://i.imgur.com/nWLqs68.png" 
-     alt="Antica Pizzeria Grasso" 
-     style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.18); transform-origin: center center;">
+        <img src="https://i.imgur.com/nWLqs68.png" alt="Antica Pizzeria Grasso" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.18); transform-origin: center center;">
     <div class="gold-shimmer-bar">
         <div class="shimmer-light"></div>
     </div>
-    
        <div class="hero-section">
         <img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
         <div class="hero-overlay"></div>
@@ -407,11 +370,11 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 <div class="privacy-text">
 <p><strong>Antica Pizzeria Grasso</strong> rispetta la tua privacy.</p>
-<h3>📋 Quali dati raccogliamo</h3>
+<h3> Quali dati raccogliamo</h3>
 <ul><li>Nome e cognome</li><li>Telefono</li><li>Indirizzo</li><li>Note ordine</li></ul>
-<h3>🔒 Sicurezza</h3>
+<h3> Sicurezza</h3>
 <p>Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3>🕒 Conservazione</h3>
+<h3> Conservazione</h3>
 <p>Conserviamo i dati per 24 mesi.</p>
 </div>
 </div>
@@ -429,67 +392,68 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-    // ✅ NOTIFICHE PUSH
+
+// ✅ DATI APP (PRIMA delle notifiche!)
+const CACHE_DURATION = 3600000;
+let appData = {
+  categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍗 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
+  menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
+  promotions:{},
+  settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15},
+  branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
+  images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{}}
+};
+
+// ✅ NOTIFICHE PUSH (DOPO appData)
 const messaging = firebase.messaging();
 const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
 
 function requestNotificationPermission() {
-  messaging.requestPermission().then((permission) => {
-    if (permission === 'granted') {
-      console.log('Permesso notifiche concesso');
-      return messaging.getToken({ vapidKey: vapidKey });
-    }
-  }).then((token) => {
-    if (token) {
-      console.log('Token FCM:', token);
-      const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('device_id', deviceId);
-      db.ref('fcm_tokens/' + deviceId).set({
-        token: token,
-        type: 'client',
-        lastSeen: Date.now()
-      });
-    }
+  if ('Notification' in window) {
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        console.log('Permesso notifiche concesso');
+        return messaging.getToken({ vapidKey: vapidKey });
+      }
+    }).then((token) => {
+      if (token) {
+        console.log('Token FCM:', token);
+        const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('device_id', deviceId);
+        db.ref('fcm_tokens/' + deviceId).set({
+          token: token,
+          type: 'client',
+          lastSeen: Date.now()
+        });
+      }
+    }).catch((err) => {
+      console.log('Errore token FCM:', err);
+    });
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js').then(() => {
+    console.log('Service Worker registrato');
+    requestNotificationPermission();
   }).catch((err) => {
-    console.log('Errore token FCM:', err);
+    console.log('Errore Service Worker:', err);
   });
 }
 
 messaging.onMessage((payload) => {
   console.log('Notifica ricevuta:', payload);
-  showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
+  if (window.showToast) {
+    showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
+  }
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 });
 
-requestNotificationPermission();
-const paletteColors = {
-  autunno: { '--gold': '#d4a84b', '--gold-light': '#f0d78c', '--gold-dark': '#b8860b', '--dark': '#1a1209', '--brown': '#2d1f12' },
-  inverno: { '--gold': '#a8c3d4', '--gold-light': '#d4e5f0', '--gold-dark': '#7a9bb0', '--dark': '#1a2530', '--brown': '#253040' },
-  primavera: { '--gold': '#8cd4a8', '--gold-light': '#b8e8cc', '--gold-dark': '#5fa87e', '--dark': '#1a2d1f', '--brown': '#254030' },
-  estate: { '--gold': '#e8a84b', '--gold-light': '#f5d4a8', '--gold-dark': '#c4862e', '--dark': '#3d2510', '--brown': '#5a3a1a' },
-  natale: { '--gold': '#c41e3a', '--gold-light': '#e8708a', '--gold-dark': '#8b1028', '--dark': '#0f2018', '--brown': '#1a3020' },
-  san_valentino: { '--gold': '#ff4d6d', '--gold-light': '#ff8fa3', '--gold-dark': '#cc2e4d', '--dark': '#1a0a0f', '--brown': '#2d1520' },
-  notte: { '--gold': '#7209b7', '--gold-light': '#a855d4', '--gold-dark': '#500682', '--dark': '#050510', '--brown': '#101020' }
-};
-function applicaPalette(nome) {
-  const colors = paletteColors[nome] || paletteColors.autunno;
-  for (const [key, value] of Object.entries(colors)) {
-    document.documentElement.style.setProperty(key, value);
-  }
-}
-db.ref('settings/colorPalette').on('value', snapshot => { applicaPalette(snapshot.val() || 'autunno'); });
-const CACHE_DURATION = 3600000;
-let appData = {
-categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:" Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
-menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
-promotions:{},
-settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15},
-branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
-images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{}}
-};
+// ✅ RESTO DEL CODICE ORIGINALE
 let cart=[], orderType='delivery', timeMode='asap', currentSearchCat='';
 let selectedStars = 0, pendingReviewOrderId = null;
 let orderStatusListeners = {};
+
 document.addEventListener('click', function(e) {
 const btn = e.target.closest('button, .menu-btn-3d, .action-btn-3d, .add-btn-3d, .checkout-btn-3d, .type-option, .time-option, .qty-btn, .quick-btn-rect');
 if (!btn) return;
@@ -504,17 +468,22 @@ btn.style.position = 'relative';
 btn.appendChild(ripple);
 setTimeout(() => ripple.remove(), 600);
 });
+
 function playNotificationSound() { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination); o.frequency.setValueAtTime(880,c.currentTime); o.frequency.setValueAtTime(1100,c.currentTime+0.1); o.frequency.setValueAtTime(880,c.currentTime+0.2); g.gain.setValueAtTime(0.3,c.currentTime); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.4); o.start(c.currentTime);o.stop(c.currentTime+0.4); } catch(e){} }
 function acceptCookies(){ localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display='none'; }
 function openPrivacyModal(){ document.getElementById('privacyModal').classList.add('active'); }
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
 function sanitizeWA(t){ return String(t).replace(/[*_~`]/g, '\\$&'); }
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
+
 window.onload=function(){ 
 if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; 
 cleanLocalHistory(); 
 updateStatusBanner();
+renderCategories();
+applyImages();
 }
+
 document.addEventListener('DOMContentLoaded', ()=>{ 
 loadFromFirebase(); 
 setupRealtimeListeners(); 
@@ -526,6 +495,7 @@ try{const s=localStorage.getItem('pizzeria_cart_v3'); if(s){const p=JSON.parse(s
 const pl=document.getElementById('productList'); 
 if(pl){pl.addEventListener('click',e=>{const btn=e.target.closest('[data-cat][data-idx][data-delta]'); if(!btn)return; e.preventDefault(); e.stopPropagation(); changeProductQty(btn.dataset.cat,parseInt(btn.dataset.idx,10),parseInt(btn.dataset.delta,10));});} 
 });
+
 function setupRealtimeListeners(){
 db.ref('settings').on('value', s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI();}});
 db.ref('promotions').on('value', s=>{
@@ -535,6 +505,7 @@ db.ref('promotions').on('value', s=>{
 });
 db.ref('.info/connected').on('value', s=>{ const el=document.getElementById('offlineBanner'); if(!el)return; el.style.display=s.val()===false?'block':'none'; });
 }
+
 function startOrderStatusTracking() {
     try {
         Object.keys(orderStatusListeners).forEach(orderId => {
@@ -556,6 +527,7 @@ function startOrderStatusTracking() {
         });
     } catch(e) { console.log('Errore tracking:', e); }
 }
+
 function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
     try {
         let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
@@ -581,6 +553,7 @@ function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
         if (changed) { localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders)); renderMyOrders(); }
     } catch(e) { console.log('Errore aggiornamento stato:', e); }
 }
+
 function loadFromFirebase(){
 const now = Date.now();
 const cacheTimestamp = localStorage.getItem('pg_cache_timestamp');
@@ -605,6 +578,7 @@ db.ref('menu').once('value').then(s=>{ if(s.exists()){ appData.menu=s.val(); loc
 db.ref('images').once('value').then(s=>{ if(s.exists()){ appData.images=s.val(); localStorage.setItem('pg_cache_images', JSON.stringify(appData.images)); applyImages(); } });
 db.ref('branding').once('value').then(s=>{ if(s.exists()){ appData.branding={...appData.branding,...s.val()}; localStorage.setItem('pg_cache_branding', JSON.stringify(appData.branding)); applyBranding(); } });
 }
+
 function controllaRifiutiCliente(){
 try {
 const ordiniLocali = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
@@ -630,12 +604,13 @@ localStorage.setItem('bannerRifiutoChiuso_' + ultimo.orderId, 'mostrato');
 });
 } catch(e) { console.log('Errore:', e); }
 }
+
 function chiudiBannerRifiuto(){ document.getElementById('bannerRifiuto').style.display='none'; }
-function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
+function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(m){if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;}document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 function renderPromotionsBanner(){
 const b=document.getElementById('offersBanner'), t=document.getElementById('offerText'), a=getActivePromotion();
-if(a){ b.classList.add('show'); const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0); t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''} 🔥 Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca!`; b.onclick=()=>addPromoToCart(a.id); }
+if(a){ b.classList.add('show'); const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0); t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''}  Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca!`; b.onclick=()=>addPromoToCart(a.id); }
 else { b.classList.remove('show'); b.onclick=null; }
 }
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0],ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null;}
@@ -679,8 +654,8 @@ function showHome(){document.getElementById('mainMenu').style.display='block';do
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
 function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':'🔴 CHIUSO';}
-function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast(' No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
-function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast(' No ritiro');return;}orderType=t;openCart();}
+function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
+function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
 function changeProductQty(cat,i,delta){if(!appData.menu||!appData.menu[cat]||!appData.menu[cat][i]){showToast('⚠️ Errore');return;}const it=appData.menu[cat][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===cat);if(ex){ex.qty=(ex.qty||0)+delta;if(ex.qty<=0){const idx=cart.indexOf(ex);cart.splice(idx,1);}else if(delta>0)showToast(`🍕 ${it.name} ×${ex.qty}`);}else if(delta>0){cart.push({...it,cat,qty:1,isPromo:false});showToast(`🍕 ${it.name} aggiunta!`);}updateCartBadge();if(currentSearchCat===cat)renderProductList(cat,document.getElementById('productSearch')?.value||'');}
 
@@ -696,9 +671,8 @@ function updateCartBadge(){
 
 function clearCart(){if(!cart.length)return;if(confirm('Svuotare?')){cart=[];updateCartBadge();closeCart();showToast('🗑️ Svuotato');}}
 
-// Funzione per calcolare la distanza GPS
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Raggio della Terra in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -708,7 +682,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Funzione per calcolare il costo di consegna in base alla distanza
 async function calculateDeliveryFee() {
     const pizzeriaLat = appData.settings.pizzeriaLat;
     const pizzeriaLng = appData.settings.pizzeriaLng;
@@ -716,7 +689,6 @@ async function calculateDeliveryFee() {
     const customerLng = window.customerGPSLng;
     
     if (!pizzeriaLat || !pizzeriaLng || !customerLat || !customerLng) {
-        // Se non ci sono coordinate, usa il costo fisso
         const df = parseFloat(appData.settings.deliveryFee) || 2.00;
         updateDeliveryFeeDisplay(df, null);
         return;
@@ -771,12 +743,10 @@ function updateCartTotals(){
     cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});
     
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
-        // Se abbiamo le coordinate GPS del cliente, calcola automaticamente
         if (window.customerGPSLat && window.customerGPSLng) {
             calculateDeliveryFee();
             return;
         } else {
-            // Altrimenti usa il costo fisso
             const df = parseFloat(appData.settings.deliveryFee) || 0;
             const ft = t + df;
             document.getElementById('deliveryFeeRow').style.display = 'flex';
@@ -823,21 +793,17 @@ async function getGPSLocation(){
         const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
         const{latitude,longitude}=pos.coords;
         
-        // Salva le coordinate
         window.customerGPSLat = latitude;
         window.customerGPSLng = longitude;
         
-        // Ottieni l'indirizzo inverso
         const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
         const d=await r.json(),a=d.address; 
         
-        // Compila i campi indirizzo
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
         
-        showToast('📍 Posizione trovata!');
+        showToast(' Posizione trovata!');
         
-        // Ricalcola il costo di consegna
         if (orderType === 'delivery') {
             calculateDeliveryFee();
         }
@@ -865,11 +831,11 @@ selectTimeMode(timeMode);updateCartTotals();
 m.classList.add('active'); 
 }
 
-function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('🗑️ Rimossa');}}
+function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('️ Rimossa');}}
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(' Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
     if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
     if(document.getElementById('honeypot').value!=='')return; 
@@ -881,11 +847,10 @@ async function confirmAndSendOrder(){
     const nt=document.getElementById('customerNotes').value.trim(); 
     if(!n){showToast('⚠️ Nome');return;} 
     const ph=p.replace(/\D/g,''); 
-    if(!/^3[0-9]{9}$/.test(ph)){showToast('️ Telefono');return;} 
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} 
     
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
     
-    // Calcola il costo di consegna
     let df = 0;
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
         if (window.customerGPSLat && window.customerGPSLng) {
@@ -982,7 +947,7 @@ async function sendOrder(d){
         console.error(e); 
         cart=cartBackup;
         updateCartBadge(); 
-        showToast(' Errore invio'); 
+        showToast('❌ Errore invio'); 
     } finally{ 
         if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} 
     } 
@@ -992,7 +957,7 @@ function openReviewModal(){ document.getElementById('reviewModal').classList.add
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
 function updateStarsDisplay(){ document.querySelectorAll('#starsInput .star').forEach((s,i)=>{ s.classList.toggle('active', i<selectedStars); }); }
-function submitReview(){ const name = document.getElementById('reviewName').value.trim(); const text = document.getElementById('reviewText').value.trim(); const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); if(!selectedStars){ showToast('️ Seleziona le stelle'); return; } if(!name){ showToast('❌ Inserisci il nome'); return; } if(!text){ showToast('❌ Scrivi un commento'); return; } db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ if(pendingReviewOrderId) { let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); renderMyOrders(); } closeReviewModal(); showToast('⭐ Grazie per la recensione!'); }); }
+function submitReview(){ const name = document.getElementById('reviewName').value.trim(); const text = document.getElementById('reviewText').value.trim(); const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } if(!name){ showToast('❌ Inserisci il nome'); return; } if(!text){ showToast('❌ Scrivi un commento'); return; } db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ if(pendingReviewOrderId) { let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); renderMyOrders(); } closeReviewModal(); showToast('⭐ Grazie per la recensione!'); }); }
 function showMyOrders(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('reviewsPublicView').style.display='none'; document.getElementById('myOrdersView').style.display='block'; window.scrollTo(0,0); startOrderStatusTracking(); renderMyOrders(); }
 function cleanLocalHistory(){ try { let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); const now = Date.now(); const thirtyDays = 30 * 24 * 60 * 60 * 1000; orders = orders.filter(o => (now - o.date) < thirtyDays); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders)); } catch(e){} }
 function saveOrderToLocal(orderData){
@@ -1013,7 +978,7 @@ function clearLocalHistory(){
         orderStatusListeners = {};
         localStorage.removeItem('pizzeria_grasso_orders');
         renderMyOrders();
-        showToast('🗑️ Storico cancellato!');
+        showToast('️ Storico cancellato!');
     }
 }
 function getOrderProgress(status, orderType) {
@@ -1021,7 +986,7 @@ function getOrderProgress(status, orderType) {
         const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
         return pickupSteps[status] || pickupSteps['new'];
     }
-    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
     return deliverySteps[status] || deliverySteps['new'];
 }
 function renderOrderTracker(status, motivoRifiuto, orderType) {
@@ -1029,7 +994,7 @@ function renderOrderTracker(status, motivoRifiuto, orderType) {
     const progress = getOrderProgress(status, type);
     if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
     if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
@@ -1044,7 +1009,7 @@ function renderMyOrders(){
             const orderType = o.type || 'delivery';
             const tracker = renderOrderTracker(status, o.motivoRifiuto, orderType);
             const canReview = (status === 'delivered' || (orderType === 'pickup' && status === 'picked')) && !o.reviewed;
-            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : ' Consegna';
+            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
             return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' || (orderType === 'pickup' && status === 'picked') ? '#22c55e' : 'var(--gold-dark)'};">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${o.orderId}</span>
@@ -1063,7 +1028,7 @@ function renderMyOrders(){
 }
 function openReviewForOrder(orderId){ pendingReviewOrderId = orderId; document.getElementById('reviewOrderId').value = orderId; openReviewModal(); }
 function showReviewsPublic(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('myOrdersView').style.display='none'; document.getElementById('reviewsPublicView').style.display='block'; window.scrollTo(0,0); }
-function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! </div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
+function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! 🌟</div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();}
 </script>
