@@ -412,7 +412,6 @@ function requestNotificationPermission() {
   }).then((token) => {
     if (token) {
       console.log('Token FCM:', token);
-      // Salva il token nel database per poter inviare notifiche a questo dispositivo
       const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
       localStorage.setItem('device_id', deviceId);
       db.ref('fcm_tokens/' + deviceId).set({
