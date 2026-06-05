@@ -266,20 +266,51 @@ function loadOrders() {
   });
 }
 
+// ✅ MODIFICA: Notifica sonora/vibrazione quando un ordine assegnato diventa "Pronto"
 function setupRealtimeListeners() {
   db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
     const newOrdersData = {};
     snapshot.forEach(child => {
       newOrdersData[child.key] = { id: child.key, ...child.val() };
     });
-    const oldCount = Object.values(ordersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
-    const newCount = Object.values(newOrdersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
+
+    // 1. Notifica per nuovi ordini da accettare
+    const oldNewCount = Object.values(ordersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
+    const newNewCount = Object.values(newOrdersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
+
+    // 2. NUOVO: Controlla se un MIO ordine è appena diventato "Pronto"
+    let myOrderReady = false;
+    Object.values(newOrdersData).forEach(o => {
+      if (o.assignedDriver === currentDriver?.pin && o.status === 'ready') {
+        const oldOrder = ordersData[o.id];
+        if (!oldOrder || oldOrder.status !== 'ready') {
+          myOrderReady = true;
+        }
+      }
+    });
+
     ordersData = newOrdersData;
     renderOrders();
-    if (newCount > oldCount && newCount > 0) {
-      showNotification(newCount);
+
+    // Fa suonare per i nuovi ordini
+    if (newNewCount > oldNewCount && newNewCount > 0) {
+      showNotification(newNewCount);
+    } 
+    // Fa suonare se un mio ordine è pronto
+    else if (myOrderReady) {
+      playNotificationSound();
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      showToast('✅ Un tuo ordine è PRONTO per il ritiro!');
+
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🍕 Ordine Pronto!', {
+          body: 'Puoi andare a ritirare l\'ordine in pizzeria',
+          icon: 'https://i.imgur.com/nWLqs68.png'
+        });
+      }
     }
   });
+
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -433,7 +464,6 @@ function renderOrders() {
   }).join('');
 }
 
-// Cancella ordini completati dalla vista del fattorino
 function clearCompletedOrders() {
   if (!confirm('Cancellare gli ordini completati dalla vista? (Non vengono eliminati dal database)')) return;
   
