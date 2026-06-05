@@ -761,11 +761,14 @@ function loadSettings() {
   document.getElementById('pickupToggle').classList.toggle('on', appData.settings.pickupEnabled !== false);
   document.getElementById('hoursInput').value = appData.settings.hours || '';
   document.getElementById('specialClosures').value = appData.settings.specialClosures || '';
-  document.getElementById('pizzeriaLat').value = appData.settings.pizzeriaLat || '';
-  document.getElementById('pizzeriaLng').value = appData.settings.pizzeriaLng || '';
-  document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee || 2.00;
-  document.getElementById('deliveryPerKm').value = appData.settings.deliveryPerKm || 1.00;
-  document.getElementById('deliveryMaxRadius').value = appData.settings.deliveryMaxRadius || 10;
+  
+  // ✅ MODIFICA: Formattazione corretta delle coordinate GPS
+  document.getElementById('pizzeriaLat').value = appData.settings.pizzeriaLat ? Number(appData.settings.pizzeriaLat).toFixed(6) : '';
+  document.getElementById('pizzeriaLng').value = appData.settings.pizzeriaLng ? Number(appData.settings.pizzeriaLng).toFixed(6) : '';
+  document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee ? Number(appData.settings.deliveryBaseFee).toFixed(2) : '2.00';
+  document.getElementById('deliveryPerKm').value = appData.settings.deliveryPerKm ? Number(appData.settings.deliveryPerKm).toFixed(2) : '1.00';
+  document.getElementById('deliveryMaxRadius').value = appData.settings.deliveryMaxRadius ? Number(appData.settings.deliveryMaxRadius).toFixed(1) : '10';
+  
   const mst = document.getElementById('manualStatusToggle'), msl = document.getElementById('manualStatusLabel');
   mst.classList.remove('on', 'closed');
   if (appData.settings.manualStatus === 'open') { mst.classList.add('on'); msl.textContent = 'APERTO'; }
@@ -790,19 +793,36 @@ async function getPizzeriaGPS() {
   }
 }
 
+// ✅ MODIFICA: Salvataggio corretto delle coordinate GPS (gestisce virgole e punti)
 function saveDeliveryGPS() {
-  const lat = parseFloat(document.getElementById('pizzeriaLat').value);
-  const lng = parseFloat(document.getElementById('pizzeriaLng').value);
-  const baseFee = parseFloat(document.getElementById('deliveryBaseFee').value);
-  const perKm = parseFloat(document.getElementById('deliveryPerKm').value);
-  const maxRadius = parseFloat(document.getElementById('deliveryMaxRadius').value);
-  if (isNaN(lat) || isNaN(lng)) { showToast('Coordinate non valide'); return; }
+  // Converti virgole in punti per compatibilità
+  const latStr = document.getElementById('pizzeriaLat').value.replace(',', '.');
+  const lngStr = document.getElementById('pizzeriaLng').value.replace(',', '.');
+  const baseFeeStr = document.getElementById('deliveryBaseFee').value.replace(',', '.');
+  const perKmStr = document.getElementById('deliveryPerKm').value.replace(',', '.');
+  const maxRadiusStr = document.getElementById('deliveryMaxRadius').value.replace(',', '.');
+  
+  const lat = parseFloat(latStr);
+  const lng = parseFloat(lngStr);
+  const baseFee = parseFloat(baseFeeStr);
+  const perKm = parseFloat(perKmStr);
+  const maxRadius = parseFloat(maxRadiusStr);
+  
+  if (isNaN(lat) || isNaN(lng)) { 
+    showToast('Coordinate non valide. Usa il punto (.) come separatore'); 
+    return; 
+  }
+  
   db.ref('settings').update({
-    pizzeriaLat: lat, pizzeriaLng: lng,
+    pizzeriaLat: lat, 
+    pizzeriaLng: lng,
     deliveryBaseFee: isNaN(baseFee) ? 2.00 : baseFee,
     deliveryPerKm: isNaN(perKm) ? 1.00 : perKm,
     deliveryMaxRadius: isNaN(maxRadius) ? 10 : maxRadius
-  }).then(() => showToast('Impostazioni GPS salvate!')).catch(err => showToast('Errore: ' + err.message));
+  }).then(() => {
+    showToast('Impostazioni GPS salvate!');
+    console.log('GPS salvato:', lat, lng);
+  }).catch(err => showToast('Errore: ' + err.message));
 }
 
 function saveServices() {
