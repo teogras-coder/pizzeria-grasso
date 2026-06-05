@@ -17,6 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 <style>
 :root { --gold: #D48806; --gold-light: #FFB347; --gold-dark: #B8860B; --dark: #1a1a1a; --card: #2a2a2a; --card-light: #3a3a3a; --cream: #f5e6c8; --shadow: #0a0a0a; --success: #4ade80; --warning: #fbbf24; --danger: #f87171; }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -161,6 +162,38 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ✅ NUOVO: Inizializza Firebase Messaging
+const messaging = firebase.messaging();
+const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
+
+function requestNotificationPermission() {
+  messaging.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Permesso notifiche concesso');
+      return messaging.getToken({ vapidKey: vapidKey });
+    }
+  }).then((token) => {
+    if (token) {
+      console.log('Token FCM:', token);
+      const deviceId = localStorage.getItem('device_id') || 'driver_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('device_id', deviceId);
+      db.ref('fcm_tokens/' + deviceId).set({
+        token: token,
+        type: 'driver',
+        lastSeen: Date.now()
+      });
+    }
+  }).catch((err) => {
+    console.log('Errore token FCM:', err);
+  });
+}
+
+messaging.onMessage((payload) => {
+  console.log('Notifica ricevuta in foreground:', payload);
+  showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+});
+
 let currentDriver = null;
 let currentTab = 'available';
 let driversData = {};
@@ -206,7 +239,7 @@ function playNotificationSound() {
   } catch(e) {}
 }
 
-async function requestNotificationPermission() {
+async function requestNotificationPermissionUI() {
   if ('Notification' in window) {
     if (Notification.permission === 'default') {
       const permission = await Notification.requestPermission();
@@ -240,6 +273,7 @@ function checkPin() {
       document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
       document.getElementById('logoutBtn').classList.add('show');
       initNotificationSound();
+      requestNotificationPermissionUI();
       requestNotificationPermission();
       loadPizzeriaSettings();
       loadOrders();
@@ -266,7 +300,6 @@ function loadOrders() {
   });
 }
 
-// ✅ MODIFICA: Notifica sonora/vibrazione quando un ordine assegnato diventa "Pronto"
 function setupRealtimeListeners() {
   db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
     const newOrdersData = {};
@@ -274,11 +307,9 @@ function setupRealtimeListeners() {
       newOrdersData[child.key] = { id: child.key, ...child.val() };
     });
 
-    // 1. Notifica per nuovi ordini da accettare
     const oldNewCount = Object.values(ordersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
     const newNewCount = Object.values(newOrdersData).filter(o => o.status === 'new' && !o.assignedDriver && o.type === 'delivery').length;
 
-    // 2. NUOVO: Controlla se un MIO ordine è appena diventato "Pronto"
     let myOrderReady = false;
     Object.values(newOrdersData).forEach(o => {
       if (o.assignedDriver === currentDriver?.pin && o.status === 'ready') {
@@ -292,11 +323,9 @@ function setupRealtimeListeners() {
     ordersData = newOrdersData;
     renderOrders();
 
-    // Fa suonare per i nuovi ordini
     if (newNewCount > oldNewCount && newNewCount > 0) {
       showNotification(newNewCount);
     } 
-    // Fa suonare se un mio ordine è pronto
     else if (myOrderReady) {
       playNotificationSound();
       if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
@@ -327,7 +356,7 @@ function showNotification(count) {
   }
   if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('🔔 Nuovo Ordine!', {
+    new Notification(' Nuovo Ordine!', {
       body: `${count} ordine${count > 1 ? 'i' : ''} disponibile${count > 1 ? 'i' : ''}`,
       icon: 'https://i.imgur.com/nWLqs68.png',
       tag: 'new-order',
@@ -381,7 +410,6 @@ function renderOrders() {
   availableCount.textContent = available.length;
   myOrdersCount.textContent = myOrders.length;
   
-  // Mostra/nascondi pulsante cancella
   if (currentTab === 'my' && completedCount > 0) {
     clearBtnContainer.classList.add('show');
   } else {
