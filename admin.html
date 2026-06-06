@@ -75,9 +75,6 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 
 .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 .order-card { background: var(--card-light); border-radius: 12px; padding: 15px; border: 1px solid rgba(212,168,75,0.2); border-left: 4px solid var(--gold); }
-@keyframes pulseNew { 0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); } 50% { box-shadow: 0 0 0 8px rgba(248,113,113,0); } }
-@keyframes pulseReady { 0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); } 50% { box-shadow: 0 0 0 8px rgba(74,222,128,0); } }
-@keyframes pulseDelivering { 0%,100% { box-shadow: 0 0 0 0 rgba(236,72,153,0.4); } 50% { box-shadow: 0 0 0 8px rgba(236,72,153,0); } }
 .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(212,168,75,0.15); flex-wrap: wrap; gap: 5px; }
 .order-id { color: var(--gold); font-weight: 700; font-size: 1rem; }
 .driver-badge { background: rgba(96,165,250,0.2); color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 8px; display: inline-block; }
@@ -248,6 +245,9 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <i class="fas fa-star"></i> Recensioni
         <span class="nav-badge" id="pendingReviewsBadge" style="display:none;">0</span>
       </div>
+      <div class="nav-item" onclick="showSection('notifications', this)" data-section="notifications">
+        <i class="fas fa-bell"></i> Notifiche
+      </div>
       <div class="nav-item" onclick="showSection('branding', this)" data-section="branding"><i class="fas fa-palette"></i> Brand</div>
       <div class="nav-item" onclick="showSection('promotions', this)" data-section="promotions"><i class="fas fa-gift"></i> Promozioni</div>
       <div class="nav-item" onclick="showSection('services', this)" data-section="services"><i class="fas fa-concierge-bell"></i> Servizi</div>
@@ -301,6 +301,61 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <button class="review-filter-tab" onclick="filterReviews('rejected')">Rifiutate</button>
       </div>
       <div id="reviewsList"></div>
+    </div>
+
+    <div class="section" id="section-notifications">
+      <div class="content-header">
+        <div>
+          <h1><i class="fas fa-bell"></i> Invia Notifiche</h1>
+          <div class="subtitle">Manda messaggi istantanei a clienti e fattorini (app aperta)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-paper-plane"></i> Nuova Notifica</div>
+        
+        <div class="form-group">
+          <label>A chi inviarla?</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;">
+            <div class="notif-dest-option selected" onclick="selectNotifDest('clients', this)" data-dest="clients" style="padding:15px;border-radius:10px;background:var(--card);border:2px solid var(--gold-dark);cursor:pointer;text-align:center;">
+              <i class="fas fa-users" style="font-size:1.5rem;display:block;margin-bottom:5px;color:var(--gold);"></i>
+              <div style="color:var(--cream);font-weight:700;">Clienti</div>
+              <div class="count" id="countClients" style="color:#8a7a5a;font-size:0.75rem;margin-top:3px;">0 registrati</div>
+            </div>
+            <div class="notif-dest-option" onclick="selectNotifDest('drivers', this)" data-dest="drivers" style="padding:15px;border-radius:10px;background:var(--card);border:2px solid var(--gold-dark);cursor:pointer;text-align:center;">
+              <i class="fas fa-motorcycle" style="font-size:1.5rem;display:block;margin-bottom:5px;color:var(--gold);"></i>
+              <div style="color:var(--cream);font-weight:700;">Fattorini</div>
+              <div class="count" id="countDrivers" style="color:#8a7a5a;font-size:0.75rem;margin-top:3px;">0 registrati</div>
+            </div>
+            <div class="notif-dest-option" onclick="selectNotifDest('all', this)" data-dest="all" style="padding:15px;border-radius:10px;background:var(--card);border:2px solid var(--gold-dark);cursor:pointer;text-align:center;">
+              <i class="fas fa-globe" style="font-size:1.5rem;display:block;margin-bottom:5px;color:var(--gold);"></i>
+              <div style="color:var(--cream);font-weight:700;">Tutti</div>
+              <div class="count" id="countAll" style="color:#8a7a5a;font-size:0.75rem;margin-top:3px;">0 totali</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Titolo notifica *</label>
+          <input type="text" class="form-input" id="notifTitle" placeholder="Es: 🍕 Nuova offerta speciale!">
+        </div>
+
+        <div class="form-group">
+          <label>Messaggio *</label>
+          <textarea class="form-input" id="notifBody" rows="3" placeholder="Es: Solo oggi 2x1 sulla Margherita! Ordina ora..."></textarea>
+        </div>
+
+        <button class="btn-primary" style="width:100%;padding:16px;font-size:1rem;" onclick="sendNotification()">
+          <i class="fas fa-paper-plane"></i> Invia Notifica
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-mobile-alt"></i> Dispositivi Registrati</div>
+        <div id="tokensList" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;max-height:200px;overflow-y:auto;">
+          <p style="color:#8a7a5a;text-align:center;padding:20px;">Caricamento...</p>
+        </div>
+      </div>
     </div>
 
     <div class="section" id="section-branding">
@@ -473,8 +528,9 @@ let currentReviewFilter = 'all';
 let openCategories = new Set();
 let driversList = {};
 let notificationSound = null;
+let selectedNotifDest = 'clients';
+let fcmTokensData = {};
 
-// ✅ MODIFICA 1: Sistema audio per notifiche
 function initNotificationSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -506,7 +562,6 @@ function toggleSidebar() {
   overlay.classList.toggle('active');
 }
 
-// ✅ MODIFICA 1: Login persistente con localStorage
 function checkPin() {
   const pin = document.getElementById('pinInput').value;
   db.ref('settings/adminPin').once('value').then(s => {
@@ -522,7 +577,6 @@ function checkPin() {
   });
 }
 
-// ✅ MODIFICA 1: Entra direttamente se già loggato
 function enterAdmin() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'grid';
@@ -530,7 +584,6 @@ function enterAdmin() {
   initApp();
 }
 
-// ✅ MODIFICA 1: Controlla se è già loggato all'apertura
 window.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = localStorage.getItem('admin_logged_in');
   if (isLoggedIn === 'true') {
@@ -556,6 +609,7 @@ function initApp() {
   loadAllData();
   setupListeners();
   renderPalettes();
+  loadTokensList();
 }
 
 function updateClock() {
@@ -576,7 +630,6 @@ function loadAllData() {
   db.ref('drivers').once('value').then(s => { driversList = s.val() || {}; renderDrivers(driversList); });
 }
 
-// ✅ MODIFICA 2: Notifiche sonore quando il fattorino cambia stato
 function setupListeners() {
   let previousOrders = {};
   
@@ -584,24 +637,19 @@ function setupListeners() {
     const orders = {};
     s.forEach(c => { orders[c.key] = { id: c.key, ...c.val() }; });
     
-    // Confronta con gli ordini precedenti per trovare cambiamenti
     Object.values(orders).forEach(order => {
       const prev = previousOrders[order.id];
       if (prev && prev.status !== order.status) {
-        // Il fattorino ha cambiato stato
         const driverName = order.assignedName || 'Fattorino';
         const orderId = order.orderId || order.id;
         
         if (order.status === 'preparing' && prev.status === 'new') {
-          // Fattorino ha accettato
           playAdminNotification();
           showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
         } else if (order.status === 'picked' && prev.status === 'ready') {
-          // Fattorino ha ritirato
           playAdminNotification();
-          showToast(` ${driverName} ha ritirato l'ordine ${orderId}`);
+          showToast(`📦 ${driverName} ha ritirato l'ordine ${orderId}`);
         } else if (order.status === 'delivered' && prev.status === 'delivering') {
-          // Fattorino ha consegnato
           playAdminNotification();
           showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
         }
@@ -614,6 +662,15 @@ function setupListeners() {
   
   db.ref('recensioni').on('value', s => loadReviews());
   db.ref('settings').on('value', s => { if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; loadSettings(); } });
+  
+  // ✅ Ascolta nuovi token FCM
+  db.ref('fcm_tokens').on('value', s => {
+    fcmTokensData = s.val() || {};
+    updateTokensCount();
+    if (document.getElementById('section-notifications').classList.contains('active')) {
+      loadTokensList();
+    }
+  });
 }
 
 function showSection(name, el) {
@@ -624,6 +681,10 @@ function showSection(name, el) {
   const navItem = document.querySelector(`.nav-item[data-section="${name}"]`);
   if (navItem) navItem.classList.add('active');
   if (window.innerWidth <= 768) toggleSidebar();
+  
+  if (name === 'notifications') {
+    loadTokensList();
+  }
 }
 
 async function compressImage(file) {
@@ -894,7 +955,6 @@ function saveDeliveryGPS() {
     deliveryMaxRadius: isNaN(maxRadius) ? 10 : maxRadius
   }).then(() => {
     showToast('Impostazioni GPS salvate!');
-    console.log('GPS salvato:', lat, lng);
   }).catch(err => showToast('Errore: ' + err.message));
 }
 
@@ -983,18 +1043,14 @@ async function uploadProductImage(cat, idx, input) {
   if (!file) return;
   showToast('Compressione...');
   const compressed = await compressImage(file);
-  
   const fileName = `products/${cat}_${idx}_${Date.now()}.webp`;
   const storageRef = storage.ref(fileName);
-  
   try {
     showToast('Caricamento...');
     const snapshot = await storageRef.put(compressed);
     const url = await snapshot.ref.getDownloadURL();
-    
     appData.menu[cat][idx].img = url;
     await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
-    
     showToast('Foto caricata!');
     renderMenu();
   } catch (err) {
@@ -1106,6 +1162,92 @@ function changePalette(name) {
   document.querySelectorAll('.palette-item').forEach(p => p.classList.remove('selected'));
   document.querySelector('[data-palette="' + name + '"]')?.classList.add('selected');
   showToast('Aggiornato!');
+}
+
+// ✅ FUNZIONI NOTIFICHE VIA DATABASE
+function selectNotifDest(dest, el) {
+  selectedNotifDest = dest;
+  document.querySelectorAll('.notif-dest-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function updateTokensCount() {
+  let clients = 0, drivers = 0;
+  Object.values(fcmTokensData).forEach(t => {
+    if (t.type === 'client') clients++;
+    else if (t.type === 'driver') drivers++;
+  });
+  const countClients = document.getElementById('countClients');
+  const countDrivers = document.getElementById('countDrivers');
+  const countAll = document.getElementById('countAll');
+  if (countClients) countClients.textContent = clients + ' registrati';
+  if (countDrivers) countDrivers.textContent = drivers + ' registrati';
+  if (countAll) countAll.textContent = (clients + drivers) + ' totali';
+}
+
+function loadTokensList() {
+  db.ref('fcm_tokens').once('value').then(s => {
+    fcmTokensData = s.val() || {};
+    updateTokensCount();
+    
+    const list = document.getElementById('tokensList');
+    const entries = Object.entries(fcmTokensData);
+    
+    if (entries.length === 0) {
+      list.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun dispositivo registrato.<br>I dispositivi appariranno qui dopo aver aperto l\'app.</p>';
+      return;
+    }
+    
+    let html = '';
+    entries.forEach(([id, t]) => {
+      const typeLabel = t.type === 'client' ? '👤 Cliente' : '🛵 Fattorino';
+      const lastSeen = t.lastSeen ? new Date(t.lastSeen).toLocaleString('it-IT', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Mai';
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(212,168,75,0.1);font-size:0.8rem;">
+        <span style="color:var(--gold);font-weight:700;">${typeLabel}</span>
+        <span style="color:#8a7a5a;font-size:0.7rem;">${lastSeen}</span>
+      </div>`;
+    });
+    
+    list.innerHTML = html;
+  });
+}
+
+async function sendNotification() {
+  const title = document.getElementById('notifTitle').value.trim();
+  const body = document.getElementById('notifBody').value.trim();
+  
+  if (!title) { showToast('⚠️ Inserisci un titolo'); return; }
+  if (!body) { showToast('⚠️ Inserisci un messaggio'); return; }
+  
+  let tokens = [];
+  Object.entries(fcmTokensData).forEach(([id, t]) => {
+    if (selectedNotifDest === 'clients' && t.type === 'client') tokens.push(id);
+    else if (selectedNotifDest === 'drivers' && t.type === 'driver') tokens.push(id);
+    else if (selectedNotifDest === 'all') tokens.push(id);
+  });
+  
+  if (tokens.length === 0) {
+    showToast('⚠️ Nessun dispositivo registrato per questa categoria');
+    return;
+  }
+  
+  if (!confirm(`Inviare la notifica a ${tokens.length} dispositivi?`)) return;
+  
+  showToast('Invio in corso...');
+  
+  const notifRef = db.ref('notifiche_push').push();
+  await notifRef.set({
+    title: title,
+    body: body,
+    destinatari: selectedNotifDest,
+    timestamp: Date.now(),
+    tokens: tokens,
+    letto: {}
+  });
+  
+  showToast(`✅ Notifica inviata a ${tokens.length} dispositivi!`);
+  document.getElementById('notifTitle').value = '';
+  document.getElementById('notifBody').value = '';
 }
 
 function showToast(msg) { 
