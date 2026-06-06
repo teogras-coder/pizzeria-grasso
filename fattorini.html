@@ -106,7 +106,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </div>
 <div class="app-container" id="mainApp">
   <div class="header">
-    <h1> Fattorini Grasso</h1>
+    <h1>🛵 Fattorini Grasso</h1>
     <p id="driverGreeting">Caricamento...</p>
     <div class="header-status">
       <i class="fas fa-info-circle"></i> Tieni l'app aperta per ricevere notifiche
@@ -148,7 +148,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ✅ NOTIFICHE PUSH (DOPO firebase.initializeApp)
+// ✅ NOTIFICHE PUSH
 const messaging = firebase.messaging();
 const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
 
@@ -190,7 +190,7 @@ messaging.onMessage((payload) => {
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 });
 
-// ✅ RESTO DEL CODICE
+// ✅ VARIABILI GLOBALI
 let currentDriver = null;
 let currentTab = 'available';
 let driversData = {};
@@ -198,6 +198,32 @@ let ordersData = {};
 let wakeLock = null;
 let notificationSound = null;
 let pizzeriaSettings = { lat: 41.6274, lng: 15.5514 };
+let notificationListener = null; // ✅ Listener delle notifiche
+
+// ✅ FUNZIONE SEPARATA PER IL LISTENER NOTIFICHE
+function setupNotificationListener() {
+  // Rimuovi listener precedente se esiste
+  if (notificationListener) {
+    db.ref('notifiche_push').off('child_added', notificationListener);
+  }
+  
+  // Crea nuovo listener
+  notificationListener = db.ref('notifiche_push').limitToLast(10).on('child_added', snapshot => {
+    const notif = snapshot.val();
+    const notifId = snapshot.key;
+    const deviceId = localStorage.getItem('device_id');
+    
+    if (!notif || !notif.tokens) return;
+    if (!deviceId || !notif.tokens.includes(deviceId)) return;
+    if (notif.letto && notif.letto[deviceId]) return;
+    
+    showToast('🔔 ' + notif.title + ': ' + notif.body);
+    playNotificationSound();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    
+    db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
+  });
+}
 
 function loadPizzeriaSettings() {
   db.ref('settings').once('value').then(s => {
@@ -215,7 +241,9 @@ function initNotificationSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     notificationSound = new AudioContext();
-  } catch(e) { console.log('Audio non supportato'); }
+  } catch(e) { 
+    console.log('Audio non supportato'); 
+  }
 }
 
 function playNotificationSound() {
@@ -255,7 +283,9 @@ async function requestWakeLock() {
         document.getElementById('wakeLockIndicator').classList.remove('show');
       });
     }
-  } catch (err) { console.log('Wake Lock non supportato'); }
+  } catch (err) { 
+    console.log('Wake Lock non supportato'); 
+  }
 }
 
 function checkPin() {
@@ -269,24 +299,14 @@ function checkPin() {
       document.getElementById('mainApp').style.display = 'block';
       document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
       document.getElementById('logoutBtn').classList.add('show');
+      
       initNotificationSound();
       requestNotificationPermissionUI();
-      requestNotificationPermission();// ✅ ASCOLTA NOTIFICHE DAL DATABASE
-db.ref('notifiche_push').limitToLast(1).on('child_added', snapshot => {
-  const notif = snapshot.val();
-  const notifId = snapshot.key;
-  const deviceId = localStorage.getItem('device_id');
-  
-  if (!notif || !notif.tokens) return;
-  if (!deviceId || !notif.tokens.includes(deviceId)) return;
-  if (notif.letto && notif.letto[deviceId]) return;
-  
-  showToast('🔔 ' + notif.title + ': ' + notif.body);
-  playNotificationSound();
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-  
-  db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
-});
+      requestNotificationPermission();
+      
+      // ✅ Setup listener notifiche DOPO il login
+      setupNotificationListener();
+      
       loadPizzeriaSettings();
       loadOrders();
       setupRealtimeListeners();
@@ -368,7 +388,7 @@ function showNotification(count) {
   }
   if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(' Nuovo Ordine!', {
+    new Notification('🆕 Nuovo Ordine!', {
       body: `${count} ordine${count > 1 ? 'i' : ''} disponibile${count > 1 ? 'i' : ''}`,
       icon: 'https://i.imgur.com/nWLqs68.png',
       tag: 'new-order',
@@ -453,7 +473,7 @@ function renderOrders() {
       const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${customerLng-bboxLng},${customerLat-bboxLat},${customerLng+bboxLng},${customerLat+bboxLat}&layer=mapnik&marker=${customerLat},${customerLng}`;
       const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${pizzeriaSettings.lat},${pizzeriaSettings.lng}&destination=${customerLat},${customerLng}&travelmode=driving`;
       mapHtml = `<div class="map-container"><iframe src="${mapUrl}" loading="lazy"></iframe><a href="${gmapsUrl}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
-      distanceHtml = `<div class="distance-info"><span class="label"> Distanza:</span><span class="distance">${distanceText} km</span></div>`;
+      distanceHtml = `<div class="distance-info"><span class="label">📍 Distanza:</span><span class="distance">${distanceText} km</span></div>`;
     } else if (order.address) {
       const encodedAddr = encodeURIComponent(order.address + ' Manfredonia');
       mapHtml = `<div class="map-container" style="padding: 15px; text-align: center;"><i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i><p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${order.address}</p><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
@@ -472,7 +492,7 @@ function renderOrders() {
       statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro!</div>`;
       actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
     } else if (order.status === 'picked') {
-      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">️ In Consegna</button>`;
+      actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">🏍️ In Consegna</button>`;
     } else if (order.status === 'delivering') {
       actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Consegnato</button>`;
     } else if (order.status === 'delivered') {
@@ -511,7 +531,7 @@ function clearCompletedOrders() {
     .map(o => o.id);
   completedIds.forEach(id => { delete ordersData[id]; });
   renderOrders();
-  showToast('️ Ordini completati rimossi dalla vista');
+  showToast('🗑️ Ordini completati rimossi dalla vista');
 }
 
 function acceptOrder(orderId) {
@@ -570,7 +590,18 @@ function showTab(tab) {
 
 function logout() {
   if (!confirm('Uscire dall\'app?')) return;
-  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+  
+  // ✅ Rimuovi listener notifiche
+  if (notificationListener) {
+    db.ref('notifiche_push').off('child_added', notificationListener);
+    notificationListener = null;
+  }
+  
+  if (wakeLock) { 
+    wakeLock.release(); 
+    wakeLock = null; 
+  }
+  
   currentDriver = null;
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
@@ -578,9 +609,11 @@ function logout() {
   document.getElementById('pinInput').value = '';
   document.getElementById('loginError').style.display = 'none';
   document.getElementById('wakeLockIndicator').classList.remove('show');
+  
   db.ref('ordini').off();
   db.ref('.info/connected').off();
-  showToast(' Arrivederci');
+  
+  showToast('👋 Arrivederci');
 }
 
 function showToast(msg) {
