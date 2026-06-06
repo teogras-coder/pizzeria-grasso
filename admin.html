@@ -1281,8 +1281,18 @@ function changePalette(name) {
 
 function selectNotifDest(dest, el) {
   selectedNotifDest = dest;
-  document.querySelectorAll('.notif-dest-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
+  
+  // Resetta tutti i bottoni allo stile "non selezionato"
+  document.querySelectorAll('.notif-dest-option').forEach(o => {
+    o.style.background = 'var(--card)';
+    o.style.color = 'var(--cream)';
+    o.style.borderColor = 'var(--gold-dark)';
+  });
+  
+  // Evidenzia quello selezionato
+  el.style.background = 'var(--gold)';
+  el.style.color = 'var(--dark)';
+  el.style.borderColor = 'var(--gold)';
 }
 
 function updateTokensCount() {
