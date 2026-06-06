@@ -440,7 +440,27 @@ if ('serviceWorker' in navigator) {
     console.log('Errore Service Worker:', err);
   });
 }
-
+// ✅ ASCOLTA NOTIFICHE DAL DATABASE
+db.ref('notifiche_push').limitToLast(1).on('child_added', snapshot => {
+  const notif = snapshot.val();
+  const notifId = snapshot.key;
+  const deviceId = localStorage.getItem('device_id');
+  
+  // Controlla se questa notifica è destinata a me
+  if (!notif || !notif.tokens) return;
+  if (!deviceId || !notif.tokens.includes(deviceId)) return;
+  
+  // Controlla se l'ho già letta
+  if (notif.letto && notif.letto[deviceId]) return;
+  
+  // Mostra la notifica
+  showToast('🔔 ' + notif.title + ': ' + notif.body);
+  playNotificationSound();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  
+  // Segna come letta
+  db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
+});
 messaging.onMessage((payload) => {
   console.log('Notifica ricevuta:', payload);
   if (window.showToast) {
