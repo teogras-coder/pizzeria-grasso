@@ -190,9 +190,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .gold-shimmer-bar { position: relative; width: 100%; height: 4px; margin: 0; background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%); box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5); border-radius: 0; overflow: hidden; }
 .shimmer-light { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%); animation: shimmerMove 3s ease-in-out infinite; }
 @keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
-.offers-banner { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; z-index: 9998; max-width: 90%; width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.4s; opacity: 0; }
-.offers-banner.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .offers-banner .close-offer { display: none !important; }
+.offers-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 15; max-width: 95%; width: 320px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.4s; opacity: 0; pointer-events: none; }
+.offers-banner.show { opacity: 1; pointer-events: auto; }
 </style>
 </head>
 <body>
@@ -224,12 +224,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
     <div id="statusBanner" class="status-banner status-closed">
         <span id="statusText">🔴 CHIUSO</span>
     </div>
+    <div id="offersBanner" class="offers-banner">
+      <span id="offerText"></span>
+    </div>
 </header>
-
-<div id="offersBanner" class="offers-banner">
-<span id="offerText"></span>
-<i class="fas fa-times close-offer" onclick="event.stopPropagation(); document.getElementById('offersBanner').classList.remove('show')"></i>
-</div>
 
 <div id="mainMenu">
 <div class="section-divider"><span>Il Nostro Menu</span></div>
@@ -553,7 +551,7 @@ function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
                 o.status = newStatus;
                 if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
                 if (document.getElementById('myOrdersView').style.display === 'block') {
-                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': '📦 Ritirato', 'delivering': '🛵 In consegna!', 'delivered': '🎉 Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
+                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': ' Ritirato', 'delivering': ' In consegna!', 'delivered': ' Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
                     if (statusNames[newStatus]) {
                         showToast(statusNames[newStatus]);
                         if (newStatus === 'delivering' || newStatus === 'rifiutato') {
@@ -630,7 +628,7 @@ if(a){
   b.classList.add('show'); 
   const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0); 
   const rimasti = (a.maxUses||0) - (a.currentUses||0);
-  t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''} 🔥 Rimasti ${rimasti} • Tocca per aggiungere!`; 
+  t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''}  Rimasti ${rimasti}`; 
   b.onclick=()=>addPromoToCart(a.id); 
 }
 else { b.classList.remove('show'); b.onclick=null; }
@@ -660,10 +658,8 @@ function addPromoToCart(pid){
   }
   if(!p.products || !p.products.length) return;
   
-  // Calcola prezzo totale
   let tp = p.products.reduce((s,x) => s + (x.price * x.qty), 0);
   
-  // Crea l'oggetto promo
   const promoItem = {
     promoId: pid,
     promoTitle: p.title,
@@ -672,7 +668,6 @@ function addPromoToCart(pid){
     isPromo: true
   };
   
-  // Controlla se già nel carrello
   const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === pid);
   
   if (existingIdx >= 0) {
@@ -685,9 +680,7 @@ function addPromoToCart(pid){
     cart.push(promoItem);
   }
   
-  // ✅ INCREMENTA AUTOMATICAMENTE currentUses
   db.ref('promotions/' + pid + '/currentUses').transaction(v => (v || 0) + 1).then(() => {
-    // Ricarica le promo per aggiornare il banner
     db.ref('promotions').once('value').then(s => {
       appData.promotions = s.val() || {};
       localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
@@ -698,7 +691,6 @@ function addPromoToCart(pid){
   updateCartBadge();
   showToast(`🎁 ${p.title} aggiunta al carrello!`);
   
-  // Nasconde il banner se esaurito
   setTimeout(() => {
     const remaining = p.maxUses - ((p.currentUses || 0) + 1);
     if (remaining <= 0) {
@@ -740,7 +732,7 @@ function filterProducts(term){ if(currentSearchCat) renderProductList(currentSea
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
-function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':'🔴 CHIUSO';}
+function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':' CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
@@ -889,7 +881,7 @@ async function getGPSLocation(){
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
         
-        showToast('📍 Posizione trovata!');
+        showToast(' Posizione trovata!');
         
         if (orderType === 'delivery') {
             calculateDeliveryFee();
@@ -920,7 +912,6 @@ m.classList.add('active');
 
 function removePromoFromCartAtIndex(i){
   if(cart[i] && cart[i].isPromo){
-    // ✅ DECREMENTA currentUses quando rimuovi dal carrello
     const pid = cart[i].promoId;
     db.ref('promotions/' + pid + '/currentUses').transaction(v => Math.max(0, (v || 0) - 1)).then(() => {
       db.ref('promotions').once('value').then(s => {
@@ -929,7 +920,6 @@ function removePromoFromCartAtIndex(i){
         renderPromotionsBanner();
       });
     });
-    
     cart.splice(i,1);
     updateCartBadge();
     openCart();
@@ -940,7 +930,7 @@ function removePromoFromCartAtIndex(i){
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(' Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
     if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
     if(document.getElementById('honeypot').value!=='')return; 
@@ -978,7 +968,7 @@ async function confirmAndSendOrder(){
     
     const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
     if(orderType==='delivery'){ 
-        if(!street||!number){showToast('⚠️ Completa indirizzo');return;} 
+        if(!street||!number){showToast('️ Completa indirizzo');return;} 
         if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} 
     } 
     
@@ -1089,15 +1079,15 @@ function getOrderProgress(status, orderType) {
         const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
         return pickupSteps[status] || pickupSteps['new'];
     }
-    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
     return deliverySteps[status] || deliverySteps['new'];
 }
 function renderOrderTracker(status, motivoRifiuto, orderType) {
     const type = orderType || 'delivery';
     const progress = getOrderProgress(status, type);
-    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
+    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span></span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
     if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '' }, { label: 'Fatto!', icon: '🎉' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
@@ -1112,7 +1102,7 @@ function renderMyOrders(){
             const orderType = o.type || 'delivery';
             const tracker = renderOrderTracker(status, o.motivoRifiuto, orderType);
             const canReview = (status === 'delivered' || (orderType === 'pickup' && status === 'picked')) && !o.reviewed;
-            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
+            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : ' Consegna';
             return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' || (orderType === 'pickup' && status === 'picked') ? '#22c55e' : 'var(--gold-dark)'};">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${o.orderId}</span>
