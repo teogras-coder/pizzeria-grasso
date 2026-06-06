@@ -271,7 +271,22 @@ function checkPin() {
       document.getElementById('logoutBtn').classList.add('show');
       initNotificationSound();
       requestNotificationPermissionUI();
-      requestNotificationPermission();
+      requestNotificationPermission();// ✅ ASCOLTA NOTIFICHE DAL DATABASE
+db.ref('notifiche_push').limitToLast(1).on('child_added', snapshot => {
+  const notif = snapshot.val();
+  const notifId = snapshot.key;
+  const deviceId = localStorage.getItem('device_id');
+  
+  if (!notif || !notif.tokens) return;
+  if (!deviceId || !notif.tokens.includes(deviceId)) return;
+  if (notif.letto && notif.letto[deviceId]) return;
+  
+  showToast('🔔 ' + notif.title + ': ' + notif.body);
+  playNotificationSound();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  
+  db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
+});
       loadPizzeriaSettings();
       loadOrders();
       setupRealtimeListeners();
