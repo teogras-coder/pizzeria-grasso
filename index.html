@@ -190,6 +190,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .gold-shimmer-bar { position: relative; width: 100%; height: 4px; margin: 0; background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%); box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5); border-radius: 0; overflow: hidden; }
 .shimmer-light { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%); animation: shimmerMove 3s ease-in-out infinite; }
 @keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
+.offers-banner { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; z-index: 9998; max-width: 90%; width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.4s; opacity: 0; }
+.offers-banner.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .offers-banner .close-offer { display: none !important; }
 </style>
 </head>
@@ -370,11 +372,11 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 <div class="privacy-text">
 <p><strong>Antica Pizzeria Grasso</strong> rispetta la tua privacy.</p>
-<h3> Quali dati raccogliamo</h3>
+<h3>📋 Quali dati raccogliamo</h3>
 <ul><li>Nome e cognome</li><li>Telefono</li><li>Indirizzo</li><li>Note ordine</li></ul>
-<h3> Sicurezza</h3>
+<h3>🔒 Sicurezza</h3>
 <p>Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3> Conservazione</h3>
+<h3>🕒 Conservazione</h3>
 <p>Conserviamo i dati per 24 mesi.</p>
 </div>
 </div>
@@ -393,7 +395,6 @@ const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ✅ DATI APP (PRIMA delle notifiche!)
 const CACHE_DURATION = 3600000;
 let appData = {
   categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍗 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
@@ -404,7 +405,6 @@ let appData = {
   images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{}}
 };
 
-// ✅ NOTIFICHE PUSH (DOPO appData)
 const messaging = firebase.messaging();
 const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
 
@@ -440,27 +440,23 @@ if ('serviceWorker' in navigator) {
     console.log('Errore Service Worker:', err);
   });
 }
-// ✅ ASCOLTA NOTIFICHE DAL DATABASE
-db.ref('notifiche_push').limitToLast(1).on('child_added', snapshot => {
+
+db.ref('notifiche_push').limitToLast(5).on('child_added', snapshot => {
   const notif = snapshot.val();
   const notifId = snapshot.key;
   const deviceId = localStorage.getItem('device_id');
   
-  // Controlla se questa notifica è destinata a me
   if (!notif || !notif.tokens) return;
   if (!deviceId || !notif.tokens.includes(deviceId)) return;
-  
-  // Controlla se l'ho già letta
   if (notif.letto && notif.letto[deviceId]) return;
   
-  // Mostra la notifica
   showToast('🔔 ' + notif.title + ': ' + notif.body);
   playNotificationSound();
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
   
-  // Segna come letta
   db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
 });
+
 messaging.onMessage((payload) => {
   console.log('Notifica ricevuta:', payload);
   if (window.showToast) {
@@ -469,7 +465,6 @@ messaging.onMessage((payload) => {
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 });
 
-// ✅ RESTO DEL CODICE ORIGINALE
 let cart=[], orderType='delivery', timeMode='asap', currentSearchCat='';
 let selectedStars = 0, pendingReviewOrderId = null;
 let orderStatusListeners = {};
@@ -558,7 +553,7 @@ function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
                 o.status = newStatus;
                 if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
                 if (document.getElementById('myOrdersView').style.display === 'block') {
-                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': ' Ritirato', 'delivering': ' In consegna!', 'delivered': ' Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
+                    const statusNames = { 'preparing': '🍕 In preparazione', 'ready': '✅ Pronto per il ritiro', 'picked': '📦 Ritirato', 'delivering': '🛵 In consegna!', 'delivered': '🎉 Consegnato!', 'rifiutato': '❌ Ordine rifiutato' };
                     if (statusNames[newStatus]) {
                         showToast(statusNames[newStatus]);
                         if (newStatus === 'delivering' || newStatus === 'rifiutato') {
@@ -628,18 +623,90 @@ localStorage.setItem('bannerRifiutoChiuso_' + ultimo.orderId, 'mostrato');
 function chiudiBannerRifiuto(){ document.getElementById('bannerRifiuto').style.display='none'; }
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(m){if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;}document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
+
 function renderPromotionsBanner(){
 const b=document.getElementById('offersBanner'), t=document.getElementById('offerText'), a=getActivePromotion();
-if(a){ b.classList.add('show'); const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0); t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''}  Rimasti ${a.maxUses-(a.currentUses||0)} • Tocca!`; b.onclick=()=>addPromoToCart(a.id); }
+if(a){ 
+  b.classList.add('show'); 
+  const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0); 
+  const rimasti = (a.maxUses||0) - (a.currentUses||0);
+  t.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''} 🔥 Rimasti ${rimasti} • Tocca per aggiungere!`; 
+  b.onclick=()=>addPromoToCart(a.id); 
+}
 else { b.classList.remove('show'); b.onclick=null; }
 }
-function getActivePromotion(){const td=new Date().toISOString().split('T')[0],ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null;}
-function addPromoToCart(pid){const p=appData.promotions[pid];if(!p)return;const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses)return;if(!p.products||!p.products.length)return;
-let tp=p.products.reduce((s,x)=>s+(x.price*x.qty),0);
-const e={promoId:pid,promoTitle:p.title,products:p.products.map(x=>({...x})),totalPrice:tp,isPromo:true};
-const idx=cart.findIndex(c=>c.isPromo&&c.promoId===pid);
-if(idx>=0){if(confirm('Aggiungerne un\'altra?'))cart.push(e);}else cart.push(e);
-updateCartBadge();showToast(`🎁 ${p.title} aggiunta!`);openCart();}
+
+function getActivePromotion(){
+  const td=new Date().toISOString().split('T')[0];
+  const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>
+    p.active && 
+    p.startDate<=td && 
+    p.endDate>=td && 
+    (p.currentUses||0)<p.maxUses && 
+    p.products && 
+    p.products.length>0
+  );
+  return ps.length?{id:ps[0][0],...ps[0][1]}:null;
+}
+
+function addPromoToCart(pid){
+  const p=appData.promotions[pid];
+  if(!p) return;
+  
+  const td=new Date().toISOString().split('T')[0];
+  if(!p.active || p.startDate>td || p.endDate<td || (p.currentUses||0)>=p.maxUses) {
+    showToast('❌ Promo non disponibile');
+    return;
+  }
+  if(!p.products || !p.products.length) return;
+  
+  // Calcola prezzo totale
+  let tp = p.products.reduce((s,x) => s + (x.price * x.qty), 0);
+  
+  // Crea l'oggetto promo
+  const promoItem = {
+    promoId: pid,
+    promoTitle: p.title,
+    products: p.products.map(x => ({...x})),
+    totalPrice: tp,
+    isPromo: true
+  };
+  
+  // Controlla se già nel carrello
+  const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === pid);
+  
+  if (existingIdx >= 0) {
+    if (confirm('Hai già questa promo nel carrello. Vuoi aggiungerne un\'altra?')) {
+      cart.push(promoItem);
+    } else {
+      return;
+    }
+  } else {
+    cart.push(promoItem);
+  }
+  
+  // ✅ INCREMENTA AUTOMATICAMENTE currentUses
+  db.ref('promotions/' + pid + '/currentUses').transaction(v => (v || 0) + 1).then(() => {
+    // Ricarica le promo per aggiornare il banner
+    db.ref('promotions').once('value').then(s => {
+      appData.promotions = s.val() || {};
+      localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
+      renderPromotionsBanner();
+    });
+  });
+  
+  updateCartBadge();
+  showToast(`🎁 ${p.title} aggiunta al carrello!`);
+  
+  // Nasconde il banner se esaurito
+  setTimeout(() => {
+    const remaining = p.maxUses - ((p.currentUses || 0) + 1);
+    if (remaining <= 0) {
+      document.getElementById('offersBanner').classList.remove('show');
+    }
+  }, 500);
+}
+
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
 function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.src='https://via.placeholder.com/400x200/3d2b1a/d4a84b?text=${encodeURIComponent(i.name)}';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');}
 function showCategory(c){
@@ -822,7 +889,7 @@ async function getGPSLocation(){
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
         
-        showToast(' Posizione trovata!');
+        showToast('📍 Posizione trovata!');
         
         if (orderType === 'delivery') {
             calculateDeliveryFee();
@@ -851,11 +918,29 @@ selectTimeMode(timeMode);updateCartTotals();
 m.classList.add('active'); 
 }
 
-function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){cart.splice(i,1);updateCartBadge();openCart();showToast('️ Rimossa');}}
+function removePromoFromCartAtIndex(i){
+  if(cart[i] && cart[i].isPromo){
+    // ✅ DECREMENTA currentUses quando rimuovi dal carrello
+    const pid = cart[i].promoId;
+    db.ref('promotions/' + pid + '/currentUses').transaction(v => Math.max(0, (v || 0) - 1)).then(() => {
+      db.ref('promotions').once('value').then(s => {
+        appData.promotions = s.val() || {};
+        localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
+        renderPromotionsBanner();
+      });
+    });
+    
+    cart.splice(i,1);
+    updateCartBadge();
+    openCart();
+    showToast('🗑️ Promo rimossa');
+  }
+}
+
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(' Attendi 1 minuto');return;} 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
     if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
     if(document.getElementById('honeypot').value!=='')return; 
@@ -945,8 +1030,6 @@ async function sendOrder(d){
         }); 
         localStorage.setItem('lastOrderTime',Date.now()); 
         saveOrderToLocal(d); 
-        const promos=cart.filter(i=>i.isPromo); 
-        promos.forEach(i=>{db.ref(`promotions/${i.promoId}/currentUses`).transaction(v=>(v||0)+1);}); 
         cart=[];
         updateCartBadge();
         closeCart(); 
@@ -998,7 +1081,7 @@ function clearLocalHistory(){
         orderStatusListeners = {};
         localStorage.removeItem('pizzeria_grasso_orders');
         renderMyOrders();
-        showToast('️ Storico cancellato!');
+        showToast('🗑️ Storico cancellato!');
     }
 }
 function getOrderProgress(status, orderType) {
@@ -1014,7 +1097,7 @@ function renderOrderTracker(status, motivoRifiuto, orderType) {
     const progress = getOrderProgress(status, type);
     if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
     if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '' }];
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
