@@ -1,25 +1,21 @@
 {
-  "name": "Antica Pizzeria Grasso",
-  "short_name": "Grasso",
-  "description": "Ordina la vera pizza a Manfredonia",
-  "start_url": "/",
-  "scope": "/",
+  "name": "Gestionale Grasso Admin",
+  "short_name": "Grasso Admin",
+  "description": "Gestionale Antica Pizzeria Grasso",
+  "start_url": "admin.html",  ← QUESTA RIGA DEVE ESSERE "admin.html"
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0a0704",
+  "background_color": "#1a1209",
   "theme_color": "#d4a84b",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512.copia.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
