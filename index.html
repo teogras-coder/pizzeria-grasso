@@ -398,7 +398,7 @@ let appData = {
   categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍗 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
   menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
   promotions:{},
-  settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15},
+  settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15,deliveryBaseFee:3.00,deliveryExtraFee:2.00,deliveryMaxRadius:4,deliveryExtraRadius:6},
   branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
   images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{}}
 };
@@ -732,7 +732,7 @@ function filterProducts(term){ if(currentSearchCat) renderProductList(currentSea
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
-function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':' CHIUSO';}
+function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':'🔴 CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
@@ -768,27 +768,28 @@ async function calculateDeliveryFee() {
     const customerLng = window.customerGPSLng;
     
     if (!pizzeriaLat || !pizzeriaLng || !customerLat || !customerLng) {
-        const df = parseFloat(appData.settings.deliveryFee) || 2.00;
+        const df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
         updateDeliveryFeeDisplay(df, null);
         return;
     }
     
     const distance = calculateDistance(pizzeriaLat, pizzeriaLng, customerLat, customerLng);
-    const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 2.00;
-    const perKm = parseFloat(appData.settings.deliveryPerKm) || 1.00;
-    const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 10;
+    const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
+    const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 4;
+    const extraRadius = parseFloat(appData.settings.deliveryExtraRadius) || 6;
+    const extraFee = parseFloat(appData.settings.deliveryExtraFee) || 2.00;
     
-    if (distance > maxRadius) {
-        showToast('❌ Indirizzo fuori dal raggio di consegna');
-        updateDeliveryFeeDisplay(0, distance, true);
-        return;
+    if (distance > extraRadius) {
+        updateDeliveryFeeDisplay(0, distance, true, false);
+    } else if (distance > maxRadius) {
+        const deliveryFee = baseFee + extraFee;
+        updateDeliveryFeeDisplay(deliveryFee, distance, false, true);
+    } else {
+        updateDeliveryFeeDisplay(baseFee, distance, false, false);
     }
-    
-    const deliveryFee = baseFee + (distance * perKm);
-    updateDeliveryFeeDisplay(deliveryFee, distance);
 }
 
-function updateDeliveryFeeDisplay(fee, distance, outOfRange = false) {
+function updateDeliveryFeeDisplay(fee, distance, outOfRange = false, withExtra = false) {
     const feeRow = document.getElementById('deliveryFeeRow');
     const feeValue = document.getElementById('deliveryFeeValue');
     const distanceInfo = document.getElementById('distanceInfo');
@@ -797,20 +798,20 @@ function updateDeliveryFeeDisplay(fee, distance, outOfRange = false) {
     if (outOfRange) {
         feeRow.style.display = 'none';
         distanceInfo.style.display = 'block';
-        distanceText.textContent = '📍 Fuori dal raggio di consegna';
+        distanceText.textContent = '📍 Fuori dal raggio di consegna massimo';
         distanceText.style.color = '#ef4444';
         document.getElementById('checkoutBtn').disabled = true;
-    } else if (distance !== null) {
+    } else {
         feeRow.style.display = 'flex';
         feeValue.textContent = '€' + fee.toFixed(2);
         distanceInfo.style.display = 'block';
-        distanceText.textContent = '📍 Distanza: ' + distance.toFixed(1) + ' km';
-        distanceText.style.color = '#3498db';
-        document.getElementById('checkoutBtn').disabled = false;
-    } else {
-        feeRow.style.display = fee > 0 ? 'flex' : 'none';
-        feeValue.textContent = '€' + fee.toFixed(2);
-        distanceInfo.style.display = 'none';
+        if (withExtra) {
+            distanceText.textContent = `📍 Distanza: ${distance.toFixed(1)} km (+supplemento zona)`;
+            distanceText.style.color = '#fbbf24';
+        } else {
+            distanceText.textContent = `📍 Distanza: ${distance.toFixed(1)} km`;
+            distanceText.style.color = '#3498db';
+        }
         document.getElementById('checkoutBtn').disabled = false;
     }
     
@@ -826,7 +827,7 @@ function updateCartTotals(){
             calculateDeliveryFee();
             return;
         } else {
-            const df = parseFloat(appData.settings.deliveryFee) || 0;
+            const df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
             const ft = t + df;
             document.getElementById('deliveryFeeRow').style.display = 'flex';
             document.getElementById('deliveryFeeValue').textContent = '€' + df.toFixed(2);
@@ -881,7 +882,7 @@ async function getGPSLocation(){
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
         
-        showToast(' Posizione trovata!');
+        showToast('📍 Posizione trovata!');
         
         if (orderType === 'delivery') {
             calculateDeliveryFee();
@@ -930,7 +931,7 @@ function removePromoFromCartAtIndex(i){
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(' Attendi 1 minuto');return;} 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
     if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
     if(document.getElementById('honeypot').value!=='')return; 
@@ -952,23 +953,27 @@ async function confirmAndSendOrder(){
             const pizzeriaLat = appData.settings.pizzeriaLat;
             const pizzeriaLng = appData.settings.pizzeriaLng;
             const distance = calculateDistance(pizzeriaLat, pizzeriaLng, window.customerGPSLat, window.customerGPSLng);
-            const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 2.00;
-            const perKm = parseFloat(appData.settings.deliveryPerKm) || 1.00;
-            const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 10;
+            const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
+            const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 4;
+            const extraRadius = parseFloat(appData.settings.deliveryExtraRadius) || 6;
+            const extraFee = parseFloat(appData.settings.deliveryExtraFee) || 2.00;
             
-            if (distance > maxRadius) {
+            if (distance > extraRadius) {
                 showToast('❌ Indirizzo fuori dal raggio di consegna');
                 return;
+            } else if (distance > maxRadius) {
+                df = baseFee + extraFee;
+            } else {
+                df = baseFee;
             }
-            df = baseFee + (distance * perKm);
         } else {
-            df = parseFloat(appData.settings.deliveryFee) || 0;
+            df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
         }
     }
     
     const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
     if(orderType==='delivery'){ 
-        if(!street||!number){showToast('️ Completa indirizzo');return;} 
+        if(!street||!number){showToast('⚠️ Completa indirizzo');return;} 
         if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} 
     } 
     
@@ -1079,15 +1084,15 @@ function getOrderProgress(status, orderType) {
         const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
         return pickupSteps[status] || pickupSteps['new'];
     }
-    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
     return deliverySteps[status] || deliverySteps['new'];
 }
 function renderOrderTracker(status, motivoRifiuto, orderType) {
     const type = orderType || 'delivery';
     const progress = getOrderProgress(status, type);
-    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span></span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
+    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
     if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '' }, { label: 'Fatto!', icon: '🎉' }];
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
@@ -1102,7 +1107,7 @@ function renderMyOrders(){
             const orderType = o.type || 'delivery';
             const tracker = renderOrderTracker(status, o.motivoRifiuto, orderType);
             const canReview = (status === 'delivered' || (orderType === 'pickup' && status === 'picked')) && !o.reviewed;
-            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : ' Consegna';
+            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
             return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' || (orderType === 'pickup' && status === 'picked') ? '#22c55e' : 'var(--gold-dark)'};">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${o.orderId}</span>
