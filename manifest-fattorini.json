@@ -1,23 +1,20 @@
 {
-  "name": "Grasso Delivery - Fattorini",
+  "name": "Fattorini Grasso",
   "short_name": "Fattorini",
-  "start_url": "/fattorini.html",
+  "start_url": "fattorini.html",
   "display": "standalone",
-  "background_color": "#1a1a1a",
+  "background_color": "#1a1209",
   "theme_color": "#D48806",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "/logofattorini192.png",
+      "src": "logofattorini192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/logofattorini512.png",
+      "src": "logofattorini512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
