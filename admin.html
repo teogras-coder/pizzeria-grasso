@@ -193,7 +193,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <h1>🔒 Gestionale</h1>
+    <h1> Gestionale</h1>
     <p>Antica Pizzeria Grasso</p>
     <input type="password" id="pinInput" placeholder="••••" maxlength="6" autofocus>
     <button onclick="checkPin()">Accedi</button>
@@ -207,7 +207,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 <div class="app-container" id="mainApp">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <h2>🍕 GRASSO</h2>
+      <h2> GRASSO</h2>
       <p>Gestionale</p>
     </div>
     <div class="sidebar-status">
@@ -405,10 +405,21 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="form-group"><label>Costo Base</label><input type="number" step="0.50" class="form-input" id="deliveryBaseFee" placeholder="2.00"></div>
-          <div class="form-group"><label>Costo per Km</label><input type="number" step="0.10" class="form-input" id="deliveryPerKm" placeholder="1.00"></div>
+          <div class="form-group"><label>Costo Base (entro raggio)</label><input type="number" step="0.50" class="form-input" id="deliveryBaseFee" placeholder="3.00"></div>
+          <div class="form-group"><label>Raggio Massimo Consegna (km)</label><input type="number" step="0.5" class="form-input" id="deliveryMaxRadius" placeholder="4"></div>
         </div>
-        <div class="form-group"><label>Raggio Massimo Consegna (km)</label><input type="number" step="0.5" class="form-input" id="deliveryMaxRadius" placeholder="10"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label>Raggio Supplemento (km)</label><input type="number" step="0.5" class="form-input" id="deliveryExtraRadius" placeholder="6"></div>
+          <div class="form-group"><label>Supplemento Zona Lontana (€)</label><input type="number" step="0.50" class="form-input" id="deliveryExtraFee" placeholder="2.00"></div>
+        </div>
+        <div style="background:rgba(212,168,75,0.1);padding:12px;border-radius:10px;margin:10px 0;border:1px solid rgba(212,168,75,0.3);">
+          <p style="color:var(--gold);font-size:0.8rem;margin-bottom:0;">
+            <strong>📌 Come funziona:</strong><br>
+            • Entro <strong id="infoMaxRadius">4</strong> km → Costo fisso <strong id="infoBaseFee">€3,00</strong><br>
+            • Tra <strong id="infoMaxRadius2">4</strong> e <strong id="infoExtraRadius">6</strong> km → <strong id="infoBaseFee2">€3,00</strong> + <strong id="infoExtraFee">€2,00</strong> supplemento = <strong id="infoTotal">€5,00</strong><br>
+            • Oltre <strong id="infoExtraRadius2">6</strong> km → Fuori zona consegna
+          </p>
+        </div>
         <button class="btn-primary" onclick="saveDeliveryGPS()"><i class="fas fa-save"></i> Salva Impostazioni GPS</button>
       </div>
       <div class="card">
@@ -514,7 +525,7 @@ const db = firebase.database(), storage = firebase.storage();
 
 let appData = {
   categories: {}, menu: {}, promotions: {},
-  settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15 },
+  settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15, deliveryBaseFee: 3.00, deliveryExtraFee: 2.00, deliveryMaxRadius: 4, deliveryExtraRadius: 6 },
   branding: { name: "Antica Pizzeria Grasso", subtitle: "Tradizione", city: "Manfredonia" },
   images: { hero: "", categories: {} }
 };
@@ -643,7 +654,7 @@ function setupListeners() {
           showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
         } else if (order.status === 'picked' && prev.status === 'ready') {
           playAdminNotification();
-          showToast(`📦 ${driverName} ha ritirato l'ordine ${orderId}`);
+          showToast(` ${driverName} ha ritirato l'ordine ${orderId}`);
         } else if (order.status === 'delivered' && prev.status === 'delivering') {
           playAdminNotification();
           showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
@@ -1013,9 +1024,13 @@ function loadSettings() {
   
   document.getElementById('pizzeriaLat').value = appData.settings.pizzeriaLat ? Number(appData.settings.pizzeriaLat).toFixed(6) : '';
   document.getElementById('pizzeriaLng').value = appData.settings.pizzeriaLng ? Number(appData.settings.pizzeriaLng).toFixed(6) : '';
-  document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee ? Number(appData.settings.deliveryBaseFee).toFixed(2) : '2.00';
-  document.getElementById('deliveryPerKm').value = appData.settings.deliveryPerKm ? Number(appData.settings.deliveryPerKm).toFixed(2) : '1.00';
-  document.getElementById('deliveryMaxRadius').value = appData.settings.deliveryMaxRadius ? Number(appData.settings.deliveryMaxRadius).toFixed(1) : '10';
+  document.getElementById('deliveryBaseFee').value = appData.settings.deliveryBaseFee ? Number(appData.settings.deliveryBaseFee).toFixed(2) : '3.00';
+  document.getElementById('deliveryMaxRadius').value = appData.settings.deliveryMaxRadius ? Number(appData.settings.deliveryMaxRadius).toFixed(1) : '4';
+  document.getElementById('deliveryExtraRadius').value = appData.settings.deliveryExtraRadius ? Number(appData.settings.deliveryExtraRadius).toFixed(1) : '6';
+  document.getElementById('deliveryExtraFee').value = appData.settings.deliveryExtraFee ? Number(appData.settings.deliveryExtraFee).toFixed(2) : '2.00';
+  
+  // Aggiorna info riepilogo
+  updateDeliveryInfo();
   
   const mst = document.getElementById('manualStatusToggle'), msl = document.getElementById('manualStatusLabel');
   mst.classList.remove('on', 'closed');
@@ -1024,6 +1039,23 @@ function loadSettings() {
   else msl.textContent = 'Auto';
   const od = appData.settings.openDays ? appData.settings.openDays.split(',') : [];
   document.querySelectorAll('.day-btn').forEach(el => el.classList.toggle('active', od.includes(el.dataset.day)));
+}
+
+function updateDeliveryInfo() {
+  const baseFee = parseFloat(document.getElementById('deliveryBaseFee').value) || 3.00;
+  const maxRadius = parseFloat(document.getElementById('deliveryMaxRadius').value) || 4;
+  const extraRadius = parseFloat(document.getElementById('deliveryExtraRadius').value) || 6;
+  const extraFee = parseFloat(document.getElementById('deliveryExtraFee').value) || 2.00;
+  const total = baseFee + extraFee;
+  
+  document.getElementById('infoMaxRadius').textContent = maxRadius;
+  document.getElementById('infoBaseFee').textContent = '€' + baseFee.toFixed(2);
+  document.getElementById('infoMaxRadius2').textContent = maxRadius;
+  document.getElementById('infoBaseFee2').textContent = '€' + baseFee.toFixed(2);
+  document.getElementById('infoExtraRadius').textContent = extraRadius;
+  document.getElementById('infoExtraFee').textContent = '€' + extraFee.toFixed(2);
+  document.getElementById('infoTotal').textContent = '€' + total.toFixed(2);
+  document.getElementById('infoExtraRadius2').textContent = extraRadius;
 }
 
 async function getPizzeriaGPS() {
@@ -1045,28 +1077,36 @@ function saveDeliveryGPS() {
   const latStr = document.getElementById('pizzeriaLat').value.replace(',', '.');
   const lngStr = document.getElementById('pizzeriaLng').value.replace(',', '.');
   const baseFeeStr = document.getElementById('deliveryBaseFee').value.replace(',', '.');
-  const perKmStr = document.getElementById('deliveryPerKm').value.replace(',', '.');
   const maxRadiusStr = document.getElementById('deliveryMaxRadius').value.replace(',', '.');
+  const extraRadiusStr = document.getElementById('deliveryExtraRadius').value.replace(',', '.');
+  const extraFeeStr = document.getElementById('deliveryExtraFee').value.replace(',', '.');
   
   const lat = parseFloat(latStr);
   const lng = parseFloat(lngStr);
   const baseFee = parseFloat(baseFeeStr);
-  const perKm = parseFloat(perKmStr);
   const maxRadius = parseFloat(maxRadiusStr);
+  const extraRadius = parseFloat(extraRadiusStr);
+  const extraFee = parseFloat(extraFeeStr);
   
   if (isNaN(lat) || isNaN(lng)) { 
     showToast('Coordinate non valide. Usa il punto (.) come separatore'); 
     return; 
   }
+  if (extraRadius <= maxRadius) {
+    showToast('Il raggio supplemento deve essere maggiore del raggio base');
+    return;
+  }
   
   db.ref('settings').update({
     pizzeriaLat: lat, 
     pizzeriaLng: lng,
-    deliveryBaseFee: isNaN(baseFee) ? 2.00 : baseFee,
-    deliveryPerKm: isNaN(perKm) ? 1.00 : perKm,
-    deliveryMaxRadius: isNaN(maxRadius) ? 10 : maxRadius
+    deliveryBaseFee: isNaN(baseFee) ? 3.00 : baseFee,
+    deliveryMaxRadius: isNaN(maxRadius) ? 4 : maxRadius,
+    deliveryExtraRadius: isNaN(extraRadius) ? 6 : extraRadius,
+    deliveryExtraFee: isNaN(extraFee) ? 2.00 : extraFee
   }).then(() => {
     showToast('Impostazioni GPS salvate!');
+    updateDeliveryInfo();
   }).catch(err => showToast('Errore: ' + err.message));
 }
 
@@ -1281,15 +1321,11 @@ function changePalette(name) {
 
 function selectNotifDest(dest, el) {
   selectedNotifDest = dest;
-  
-  // Resetta tutti i bottoni allo stile "non selezionato"
   document.querySelectorAll('.notif-dest-option').forEach(o => {
     o.style.background = 'var(--card)';
     o.style.color = 'var(--cream)';
     o.style.borderColor = 'var(--gold-dark)';
   });
-  
-  // Evidenzia quello selezionato
   el.style.background = 'var(--gold)';
   el.style.color = 'var(--dark)';
   el.style.borderColor = 'var(--gold)';
@@ -1324,7 +1360,7 @@ function loadTokensList() {
     
     let html = '';
     entries.forEach(([id, t]) => {
-      const typeLabel = t.type === 'client' ? '👤 Cliente' : '🛵 Fattorino';
+      const typeLabel = t.type === 'client' ? '👤 Cliente' : ' Fattorino';
       const lastSeen = t.lastSeen ? new Date(t.lastSeen).toLocaleString('it-IT', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Mai';
       html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(212,168,75,0.1);font-size:0.8rem;">
         <span style="color:var(--gold);font-weight:700;">${typeLabel}</span>
