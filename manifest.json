@@ -2,7 +2,7 @@
   "name": "Gestionale Grasso Admin",
   "short_name": "Grasso Admin",
   "description": "Gestionale Antica Pizzeria Grasso",
-  "start_url": "admin.html",  ← QUESTA RIGA DEVE ESSERE "admin.html"
+  "start_url": "admin.html",  
   "display": "standalone",
   "background_color": "#1a1209",
   "theme_color": "#d4a84b",
