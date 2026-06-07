@@ -1,9 +1,10 @@
 {
   "name": "Fattorini Grasso",
   "short_name": "Fattorini",
+  "description": "App Fattorini Antica Pizzeria Grasso",
   "start_url": "fattorini.html",
   "display": "standalone",
-  "background_color": "#1a1209",
+  "background_color": "#1a1a1a",
   "theme_color": "#D48806",
   "icons": [
     {
