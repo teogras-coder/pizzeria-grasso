@@ -1,0 +1,21 @@
+{
+  "name": "Antica Pizzeria Grasso - Ordina Online",
+  "short_name": "Grasso Pizza",
+  "description": "Ordina la tua pizza online da Antica Pizzeria Grasso",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1209",
+  "theme_color": "#d4a84b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.copia.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
