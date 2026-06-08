@@ -766,8 +766,17 @@ localStorage.setItem('bannerRifiutoChiuso_' + ultimo.orderId, 'mostrato');
 }
 
 function chiudiBannerRifiuto(){ document.getElementById('bannerRifiuto').style.display='none'; }
-function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso",m=document.getElementById('headerTitle');if(m){if(n.toLowerCase().includes('grasso'))m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;else m.textContent=n;}document.getElementById('headerSubtitle').textContent=appData.branding.subtitle||"Dal 1980 • Tradizione";}
-function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
+function applyBranding(){
+    const n=appData.branding.name||"Antica Pizzeria Grasso";
+    const m=document.getElementById('headerTitle');
+    if(m){
+        if(n.toLowerCase().includes('grasso'))
+            m.innerHTML=`${n.replace(/grasso/i,'').trim()}<span class="logo-grasso">GRASSO</span>`;
+        else m.textContent=n;
+    }
+    const s=document.getElementById('headerSubtitle');
+    if(s) s.textContent=appData.branding.subtitle||"Dal 2018 • Tradizione";
+}function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 
 function renderPromotionsBanner(){
 const b=document.getElementById('offersBanner'), t=document.getElementById('offerText'), a=getActivePromotion();
