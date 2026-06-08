@@ -508,7 +508,127 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <!-- Include il nostro script di autenticazione -->
-<script src="firebase-auth.js"></script>
+<script>
+// ========== AUTH + LINGUE (tutto inline) ==========
+let currentUser = null;
+let currentLang = 'it';
+let userType = 'none';
+
+async function loadTranslations(lang) {
+    try {
+        const response = await fetch('traduzioni.json');
+        const translations = await response.json();
+        currentLang = lang;
+        localStorage.setItem('grasso_lang', lang);
+        document.querySelectorAll('[data-trad]').forEach(el => {
+            const key = el.getAttribute('data-trad');
+            if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+    } catch (error) {
+        console.error('Errore traduzioni:', error);
+    }
+}
+
+function changeLanguage(lang) { loadTranslations(lang); }
+
+function showWelcomeScreen() {
+    document.getElementById('welcomeScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+}
+
+function hideWelcomeScreen() {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+}
+
+function enterAsGuest() {
+    userType = 'guest';
+    localStorage.setItem('grasso_user_type', 'guest');
+    hideWelcomeScreen();
+    showToast('👻 Modalità Ospite attivata');
+}
+
+function showRegisterModal() {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('authModal').classList.add('active');
+    showLoginForm();
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').classList.remove('active');
+    showWelcomeScreen();
+}
+
+function showLoginForm() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+}
+
+function showRegisterForm() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+}
+
+function registerUser() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    
+    if (!name || !email || !password) { showToast('⚠️ Compila tutti i campi'); return; }
+    if (password !== passwordConfirm) { showToast('❌ Le password non coincidono'); return; }
+    if (password.length < 6) { showToast('❌ Password troppo corta'); return; }
+    
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            userCredential.user.updateProfile({ displayName: name });
+            firebase.database().ref('users/' + userCredential.user.uid).set({
+                name: name, email: email, createdAt: Date.now()
+            });
+            showToast('✅ Registrazione completata!');
+            closeAuthModal();
+            hideWelcomeScreen();
+        })
+        .catch(error => showToast('❌ ' + error.message));
+}
+
+function loginWithEmail(email, password) {
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+            showToast('✅ Accesso effettuato!');
+            closeAuthModal();
+            hideWelcomeScreen();
+        })
+        .catch(error => showToast('❌ ' + error.message));
+}
+
+function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then(() => {
+            showToast('✅ Accesso con Google!');
+            closeAuthModal();
+            hideWelcomeScreen();
+        })
+        .catch(error => showToast('❌ ' + error.message));
+}
+
+function logout() {
+    firebase.auth().signOut();
+    userType = 'guest';
+    localStorage.setItem('grasso_user_type', 'guest');
+    showToast('👋 Arrivederci!');
+    location.reload();
+}
+
+// AVVIO: mostra sempre la schermata di benvenuto
+window.addEventListener('load', () => {
+    loadTranslations('it');
+    showWelcomeScreen();
+});
+</script>
 
 <script>
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
