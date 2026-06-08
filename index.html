@@ -624,9 +624,19 @@ function logout() {
 }
 
 // AVVIO: mostra sempre la schermata di benvenuto
+// AVVIO: FORZA sempre la schermata di benvenuto (per test)
 window.addEventListener('load', () => {
     loadTranslations('it');
-    showWelcomeScreen();
+    
+    // Cancella tutto e mostra benvenuto
+    localStorage.removeItem('grasso_user_type');
+    userType = 'none';
+    
+    // Mostra schermata benvenuto
+    document.getElementById('welcomeScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    
+    console.log('✅ Schermata benvenuto forzata!');
 });
 </script>
 
