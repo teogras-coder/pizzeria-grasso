@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Antica Pizzeria Grasso - Ordina Pizza Online a Manfredonia</title>
-<meta name="description" content="Ordina la vera pizza da Antica Pizzeria Grasso a Manfredonia.">
+<meta name="description" content="Ordina le specialità pugliesi da Antica Pizzeria Grasso a Manfredonia.">
 <link rel="manifest" href="manifest-clienti.json">
 <link rel="icon" type="image/png" href="icon-clienti-192.png">
 <link rel="apple-touch-icon" href="icon-clienti-192.png">
@@ -187,7 +187,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 #cookieBanner { position:fixed;bottom:0;left:0;right:0;background:var(--dark);padding:15px;text-align:center;border-top:1px solid var(--gold-dark);z-index:9999;display:none; }
 #cookieBanner p { color:var(--cream);font-size:0.8rem;margin:0 0 10px; }
 #cookieBanner button { background:var(--gold);color:var(--dark);border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer; }
-#bannerRifiuto { display:none; position:fixed; top:0; left:0; right:0; background:linear-gradient(90deg, #dc2626 0%, #991b1b 100%); color:white; padding:20px; text-align:center; z-index:99999; box-shadow:0 4px 20px rgba(220,38,38,0.5); animation:slideDown 0.4s ease; }
+#bannerRifiuto { display:none; position:fixed; top:0; left:0; right:0; background:linear-gradient(90deg, #dc2626 0%, #991b1b 100%); color:white; padding:20px; text-align:center; z-index:99999; box-shadow:0 4px 20px rgba(220,38,38,0.5); }
 #bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
 #bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
 #bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
@@ -197,120 +197,112 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 .offers-banner .close-offer { display: none !important; }
 .offers-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 15; max-width: 95%; width: 320px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.4s; opacity: 0; pointer-events: none; }
 .offers-banner.show { opacity: 1; pointer-events: auto; }
-
-/* User Menu Styles */
 .user-menu { position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(42,30,19,0.95); padding: 10px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); display: flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); }
 .user-menu span { color: var(--cream); font-size: 0.85rem; font-weight: 600; }
 .logout-btn { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.4); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
-.logout-btn:hover { background: rgba(231,76,60,0.3); }
-
-/* Welcome Screen Styles */
-.welcome-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1209 0%, #2d1f12 100%); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-.welcome-screen.active { display: flex; }
-.welcome-logo { max-width: 200px; margin-bottom: 20px; }
-.welcome-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2rem; margin: 10px 0; text-align: center; }
-.welcome-subtitle { color: #8a7a5a; font-size: 1rem; text-align: center; margin-bottom: 30px; }
-.lang-selector { margin-bottom: 30px; background: rgba(212,168,75,0.1); padding: 20px; border-radius: 15px; border: 1px solid rgba(212,168,75,0.3); width: 100%; max-width: 400px; }
-.lang-selector label { color: var(--gold); font-weight: 600; margin-bottom: 10px; display: block; }
-.lang-selector select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold); background: var(--brown); color: var(--cream); font-size: 1rem; }
-.welcome-buttons { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
-.btn-register { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
-.btn-guest { background: linear-gradient(180deg, var(--brown-light) 0%, var(--brown) 100%); color: var(--gold); border: 2px solid var(--gold); padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
-.welcome-copyright { color: #666; font-size: 0.8rem; margin-top: 30px; }
+.welcome-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1209 0%, #2d1f12 100%); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; padding: 20px; overflow-y: auto; }
+.welcome-logo { max-width: 180px; margin-bottom: 15px; }
+.welcome-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 10px 0; text-align: center; }
+.welcome-subtitle { color: #8a7a5a; font-size: 0.95rem; text-align: center; margin-bottom: 15px; }
+.home-instructions { background: rgba(212,168,75,0.1); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin: 10px 0; width: 100%; max-width: 380px; }
+.home-instructions h3 { color: var(--gold); margin-bottom: 10px; font-size: 1rem; text-align: center; }
+.home-instructions ol { color: var(--cream); text-align: left; padding-left: 20px; line-height: 1.6; font-size: 0.9rem; }
+.home-instructions li { margin-bottom: 6px; }
+.home-instructions strong { color: var(--gold-light); }
+.lang-selector { margin-bottom: 15px; background: rgba(212,168,75,0.1); padding: 15px; border-radius: 15px; border: 1px solid rgba(212,168,75,0.3); width: 100%; max-width: 380px; }
+.lang-selector label { color: var(--gold); font-weight: 600; margin-bottom: 8px; display: block; }
+.lang-selector select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--gold); background: var(--brown); color: var(--cream); font-size: 1rem; }
+.welcome-buttons { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
+.btn-register { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
+.btn-guest { background: linear-gradient(180deg, var(--brown-light) 0%, var(--brown) 100%); color: var(--gold); border: 2px solid var(--gold); padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+.welcome-copyright { color: #666; font-size: 0.75rem; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<!-- ========== SCHERMATA DI BENVENUTO ========== -->
 <div id="welcomeScreen" class="welcome-screen">
     <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
-    <h1 class="welcome-title" data-trad="welcome_title">🍕 Benvenuto da Grasso!</h1>
-    <p class="welcome-subtitle" data-trad="welcome_subtitle">La vera pizza napoletana a Manfredonia</p>
+    <h1 class="welcome-title">🍕 Benvenuto da Grasso!</h1>
+    <p class="welcome-subtitle">Le specialità pugliesi a Manfredonia</p>
+    
+    <div class="home-instructions">
+        <h3>📱 Salva l'app sulla Home!</h3>
+        <ol>
+            <li>Tocca il tasto <strong>Condividi</strong> (quadrato con freccia)</li>
+            <li>Scorri e tocca <strong>"Aggiungi a Home"</strong></li>
+            <li>Ordina con un tocco! 🚀</li>
+        </ol>
+    </div>
     
     <div class="lang-selector">
-        <label data-trad="language_label">🌍 Lingua</label>
+        <label>🌍 Lingua / Language</label>
         <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="it">🇮 Italiano</option>
-            <option value="en">🇬 English</option>
-            <option value="de">🇩 Deutsch</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
         </select>
     </div>
     
     <div class="welcome-buttons">
-        <button class="btn-register" onclick="showRegisterModal()" data-trad="register_btn">👤 Registrati</button>
-        <button class="btn-guest" onclick="enterAsGuest()" data-trad="guest_btn">👻 Continua come Ospite</button>
+        <button class="btn-register" onclick="showRegisterModal()">👤 Registrati</button>
+        <button class="btn-guest" onclick="enterAsGuest()">👻 Continua come Ospite</button>
     </div>
     
-    <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
+    <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso - Puglia</p>
 </div>
 
-<!-- ========== MODALE LOGIN/REGISTRAZIONE ========== -->
 <div id="authModal" class="modal-3d">
     <div class="modal-content-3d" style="max-width:500px;">
         <div class="modal-header">
-            <h2 id="authModalTitle" data-trad="login_title">Accedi al tuo account</h2>
+            <h2 id="authModalTitle">Accedi al tuo account</h2>
             <button class="close-btn-3d" onclick="closeAuthModal()">×</button>
         </div>
-        
-        <!-- LOGIN FORM -->
         <div id="loginForm">
             <div class="form-group">
-                <label data-trad="email_label">Email</label>
+                <label>Email</label>
                 <input type="email" id="loginEmail" placeholder="mario@email.it">
             </div>
             <div class="form-group">
-                <label data-trad="password_label">Password</label>
+                <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="••••••••">
             </div>
-            <button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d" data-trad="login_btn">
-                Accedi
-            </button>
-            
+            <button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d">Accedi</button>
             <div style="margin:20px 0; text-align:center; color:#8a7a5a;">oppure</div>
-            
             <button onclick="loginWithGoogle()" style="width:100%; padding:14px; border-radius:10px; border:1px solid #4285F4; background:#fff; color:#4285F4; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px;">
                 <img src="https://www.google.com/favicon.ico" width="20" alt="Google">
-                <span data-trad="login_with_google">Continua con Google</span>
+                Continua con Google
             </button>
-            
             <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                <span data-trad="no_account">Non hai un account?</span> 
+                Non hai un account? 
                 <a onclick="showRegisterForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;">Registrati</a>
             </p>
         </div>
-        
-        <!-- REGISTRAZIONE FORM -->
         <div id="registerForm" style="display:none;">
             <div class="form-group">
-                <label data-trad="name_label">Nome e Cognome</label>
+                <label>Nome e Cognome</label>
                 <input type="text" id="registerName" placeholder="Mario Rossi">
             </div>
             <div class="form-group">
-                <label data-trad="email_label">Email</label>
+                <label>Email</label>
                 <input type="email" id="registerEmail" placeholder="mario@email.it">
             </div>
             <div class="form-group">
-                <label data-trad="password_label">Password</label>
+                <label>Password</label>
                 <input type="password" id="registerPassword" placeholder="Minimo 6 caratteri">
             </div>
             <div class="form-group">
-                <label data-trad="confirm_password">Conferma Password</label>
+                <label>Conferma Password</label>
                 <input type="password" id="registerPasswordConfirm" placeholder="••••••••">
             </div>
-            
-            <button onclick="registerUser()" class="checkout-btn-3d" data-trad="register_btn">
-                Registrati
-            </button>
-            
+            <button onclick="registerUser()" class="checkout-btn-3d">Registrati</button>
             <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                <span data-trad="already_have_account">Hai già un account?</span> 
+                Hai già un account? 
                 <a onclick="showLoginForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;">Accedi</a>
             </p>
         </div>
     </div>
 </div>
 
-<!-- ========== MENU UTENTE (in alto a destra) ========== -->
 <div id="userMenu" class="user-menu" style="display:none;"></div>
 
 <div id="bannerRifiuto">
@@ -330,15 +322,16 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <header class="header">
     <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: 8px;">
         <img src="https://i.imgur.com/nWLqs68.png" alt="Antica Pizzeria Grasso" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.18); transform-origin: center center;">
+    </div>
     <div class="gold-shimmer-bar">
         <div class="shimmer-light"></div>
     </div>
-       <div class="hero-section">
+    <div class="hero-section">
         <img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
         <div class="hero-overlay"></div>
     </div>
     <div id="statusBanner" class="status-banner status-closed">
-        <span id="statusText" data-trad="closed">🔴 CHIUSO</span>
+        <span id="statusText">🔴 CHIUSO</span>
     </div>
     <div id="offersBanner" class="offers-banner">
       <span id="offerText"></span>
@@ -346,71 +339,71 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </header>
 
 <div id="mainMenu">
-<div class="section-divider"><span data-trad="menu_title">Il Nostro Menu</span></div>
+<div class="section-divider"><span>Il Nostro Menu</span></div>
 <div class="menu-list" id="categoriesList"></div>
-<div class="section-divider"><span data-trad="services_title">Servizi</span></div>
+<div class="section-divider"><span>Servizi</span></div>
 <div class="actions-section">
     <div class="quick-actions-row">
-        <button class="quick-btn-rect quick-btn-chiama" onclick="callPhone()"><i class="fas fa-phone"></i> <span data-trad="call_btn">Chiama</span></button>
-        <button class="quick-btn-rect quick-btn-carrello" onclick="openCart()"><i class="fas fa-shopping-cart"></i> <span data-trad="cart_btn">Carrello</span><div class="cart-badge" id="quickCartBadge" style="display:none;">0</div></button>
+        <button class="quick-btn-rect quick-btn-chiama" onclick="callPhone()"><i class="fas fa-phone"></i> Chiama</button>
+        <button class="quick-btn-rect quick-btn-carrello" onclick="openCart()"><i class="fas fa-shopping-cart"></i> Carrello<div class="cart-badge" id="quickCartBadge" style="display:none;">0</div></button>
     </div>
-    <button class="action-btn-3d btn-delivery" id="deliveryBtn" onclick="checkStatusBeforeOrder('delivery')"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_btn">Consegna a Domicilio</span></button>
-    <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> <span data-trad="pickup_btn">Ritiro in Pizzeria</span></button>
+    <button class="action-btn-3d btn-delivery" id="deliveryBtn" onclick="checkStatusBeforeOrder('delivery')"><i class="fas fa-motorcycle"></i> Consegna a Domicilio</button>
+    <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> Ritiro in Pizzeria</button>
 </div>
 </div>
 
 <div id="productsView" style="display:none;">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
 <h2 id="categoryTitle" class="category-title">Categoria</h2>
 <div class="search-bar-3d">
 <i class="fas fa-search"></i>
-<input type="text" id="productSearch" data-trad-placeholder="search_placeholder" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
+<input type="text" id="productSearch" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
 </div>
 <div id="productList"></div>
-<button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> <span data-trad="back_btn">Torna al Menu</span></button>
+<button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
 </div>
 
 <div id="myOrdersView">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-<h2 class="category-title" data-trad="my_orders">📦 I Miei Ordini</h2>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
+<h2 class="category-title">📦 I Miei Ordini</h2>
 <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
 <button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
 <div id="myOrdersList"></div>
 </div>
 
 <div id="reviewsPublicView">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-<h2 class="category-title" data-trad="reviews">⭐ Le Nostre Recensioni</h2>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
+<h2 class="category-title">⭐ Le Nostre Recensioni</h2>
 <div class="reviews-public-list" id="reviewsPublicList"></div>
 </div>
 
 <footer class="app-footer">
 <div class="footer-info" id="footerInfo">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
 <div class="footer-links">
-<a onclick="openPrivacyModal()" data-trad="privacy_policy">Privacy Policy</a>
-<a onclick="showReviewsPublic()" data-trad="reviews">⭐ Recensioni</a>
-<a onclick="showMyOrders()" data-trad="my_orders"> I Miei Ordini</a>
+<a onclick="openPrivacyModal()">Privacy Policy</a>
+<a onclick="showReviewsPublic()">⭐ Recensioni</a>
+<a onclick="showMyOrders()">I Miei Ordini</a>
 </div>
-<div class="copyright">© 2026 Antica Pizzeria Grasso</div>
+<div class="copyright">© 2026 Antica Pizzeria Grasso - Puglia</div>
 </footer>
 </div>
 
 <div class="modal-3d" id="cartModal">
 <div class="modal-content-3d">
 <div class="modal-header">
-<h2><i class="fas fa-shopping-cart"></i> <span data-trad="your_order">Il Tuo Ordine</span></h2>
+<h2><i class="fas fa-shopping-cart"></i> Il Tuo Ordine</h2>
 <button class="close-btn-3d" onclick="closeCart()">×</button>
 </div>
 <div id="cartItems"></div>
 <div class="delivery-fee-row" id="deliveryFeeRow" style="display:none;">
-<span class="delivery-fee-label" data-trad="delivery_fee"><i class="fas fa-motorcycle"></i> Costo consegna</span>
+<span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> Costo consegna</span>
 <span class="delivery-fee-value" id="deliveryFeeValue">€0.00</span>
 </div>
 <div class="distance-info" id="distanceInfo" style="display:none;">
 <div class="distance-info-text" id="distanceText">📍 Distanza: -- km</div>
 </div>
 <div class="cart-total-3d" id="cartTotalSection" style="display:none;">
-<span class="cart-total-label" data-trad="total">Totale</span>
+<span class="cart-total-label">Totale</span>
 <span class="cart-total-amount" id="totalAmount">€0.00</span>
 </div>
 <div class="order-type-toggle" id="orderTypeToggle" style="display:none;">
@@ -422,7 +415,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="form-group">
 <label><i class="fas fa-clock"></i> Orario <span id="timeTypeLabel">consegna</span></label>
 <div class="time-toggle">
-<div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')"> Subito</div>
+<div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')">Subito</div>
 <div class="time-option" id="timeScheduled" onclick="selectTimeMode('scheduled')">🕐 Scegli</div>
 </div>
 <div class="time-picker-wrap" id="timePickerWrap">
@@ -430,27 +423,27 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <input type="time" id="scheduledTime" step="300">
 </div>
 </div>
-<div class="form-group"><label data-trad="name_label">Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
-<div class="form-group"><label data-trad="phone_label">Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
+<div class="form-group"><label>Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
+<div class="form-group"><label>Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
 <div class="form-group" id="addressGroup" style="display:none;">
-<label data-trad="address_label">Indirizzo di Consegna *</label>
+<label>Indirizzo di Consegna *</label>
 <div style="display: flex; gap: 8px;">
 <input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex: 3;">
 <input type="text" id="customerNumber" placeholder="Civico" style="flex: 1;">
 </div>
 <button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> Usa GPS</button>
 </div>
-<div class="form-group"><label data-trad="notes_label">Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
+<div class="form-group"><label>Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
 <div style="display:none; position:absolute; left:-9999px;"><input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1"></div>
 <div class="form-group">
 <div class="privacy-checkbox">
 <input type="checkbox" id="privacyConsent" required>
-<label for="privacyConsent"><span data-trad="privacy_label">Ho letto e accetto la</span> <a onclick="openPrivacyModal()">Privacy Policy</a> *</label>
+<label for="privacyConsent">Ho letto e accetto la <a onclick="openPrivacyModal()">Privacy Policy</a> *</label>
 </div>
 </div>
 </div>
 <button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> <span data-trad="send_order">Invia Ordine</span></button>
+<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
 </div>
 </div>
 
@@ -490,7 +483,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <ul><li>Nome e cognome</li><li>Telefono</li><li>Indirizzo</li><li>Note ordine</li></ul>
 <h3>🔒 Sicurezza</h3>
 <p>Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3>🕒 Conservazione</h3>
+<h3> Conservazione</h3>
 <p>Conserviamo i dati per 24 mesi.</p>
 </div>
 </div>
@@ -502,156 +495,68 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <p>Utilizziamo cookie tecnici. <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;">Privacy Policy</a></p>
 <button onclick="acceptCookies()">Accetta</button>
 </div>
-</div>
-
-<!-- Include Firebase Auth -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
-<!-- Include il nostro script di autenticazione -->
-<script>
-// ========== AUTH + LINGUE (tutto inline) ==========
-let currentUser = null;
-let currentLang = 'it';
-let userType = 'none';
-
-async function loadTranslations(lang) {
-    try {
-        const response = await fetch('traduzioni.json');
-        const translations = await response.json();
-        currentLang = lang;
-        localStorage.setItem('grasso_lang', lang);
-        document.querySelectorAll('[data-trad]').forEach(el => {
-            const key = el.getAttribute('data-trad');
-            if (translations[lang] && translations[lang][key]) {
-                el.textContent = translations[lang][key];
-            }
-        });
-    } catch (error) {
-        console.error('Errore traduzioni:', error);
-    }
-}
-
-function changeLanguage(lang) { loadTranslations(lang); }
-
-function showWelcomeScreen() {
-    document.getElementById('welcomeScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-}
-
-function hideWelcomeScreen() {
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-}
-
-function enterAsGuest() {
-    userType = 'guest';
-    localStorage.setItem('grasso_user_type', 'guest');
-    hideWelcomeScreen();
-    showToast('👻 Modalità Ospite attivata');
-}
-
-function showRegisterModal() {
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('authModal').classList.add('active');
-    showLoginForm();
-}
-
-function closeAuthModal() {
-    document.getElementById('authModal').classList.remove('active');
-    showWelcomeScreen();
-}
-
-function showLoginForm() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('registerForm').style.display = 'none';
-}
-
-function showRegisterForm() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-}
-
-function registerUser() {
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-    
-    if (!name || !email || !password) { showToast('⚠️ Compila tutti i campi'); return; }
-    if (password !== passwordConfirm) { showToast('❌ Le password non coincidono'); return; }
-    if (password.length < 6) { showToast('❌ Password troppo corta'); return; }
-    
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            userCredential.user.updateProfile({ displayName: name });
-            firebase.database().ref('users/' + userCredential.user.uid).set({
-                name: name, email: email, createdAt: Date.now()
-            });
-            showToast('✅ Registrazione completata!');
-            closeAuthModal();
-            hideWelcomeScreen();
-        })
-        .catch(error => showToast('❌ ' + error.message));
-}
-
-function loginWithEmail(email, password) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => {
-            showToast('✅ Accesso effettuato!');
-            closeAuthModal();
-            hideWelcomeScreen();
-        })
-        .catch(error => showToast('❌ ' + error.message));
-}
-
-function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then(() => {
-            showToast('✅ Accesso con Google!');
-            closeAuthModal();
-            hideWelcomeScreen();
-        })
-        .catch(error => showToast('❌ ' + error.message));
-}
-
-function logout() {
-    firebase.auth().signOut();
-    userType = 'guest';
-    localStorage.setItem('grasso_user_type', 'guest');
-    showToast('👋 Arrivederci!');
-    location.reload();
-}
-
-// AVVIO: mostra sempre la schermata di benvenuto
-// AVVIO: FORZA sempre la schermata di benvenuto (per test)
-window.addEventListener('load', () => {
-    loadTranslations('it');
-    
-    // Cancella tutto e mostra benvenuto
-    localStorage.removeItem('grasso_user_type');
-    userType = 'none';
-    
-    // Mostra schermata benvenuto
-    document.getElementById('welcomeScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    
-    console.log('✅ Schermata benvenuto forzata!');
-});
-</script>
 
 <script>
 const firebaseConfig = { apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs", authDomain: "teogra-c8cf5.firebaseapp.com", databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app", projectId: "teogra-c8cf5", storageBucket: "teogra-c8cf5.firebasestorage.app", messagingSenderId: "686300112893", appId: "1:686300112893:web:e147b82f91374f12db1b94" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+let currentUser=null,currentLang='it',userType='none';
+
+async function loadTranslations(lang){
+    try{
+        const r=await fetch('traduzioni.json');
+        const t=await r.json();
+        currentLang=lang;
+        localStorage.setItem('grasso_lang',lang);
+        document.querySelectorAll('[data-trad]').forEach(el=>{
+            const k=el.getAttribute('data-trad');
+            if(t[lang]&&t[lang][k])el.textContent=t[lang][k];
+        });
+    }catch(e){console.error(e);}
+}
+function changeLanguage(lang){loadTranslations(lang);}
+function showWelcomeScreen(){document.getElementById('welcomeScreen').style.display='flex';document.getElementById('mainApp').style.display='none';}
+function hideWelcomeScreen(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('mainApp').style.display='block';}
+function enterAsGuest(){userType='guest';localStorage.setItem('grasso_user_type','guest');hideWelcomeScreen();showToast('👻 Modalità Ospite');}
+function showRegisterModal(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('authModal').classList.add('active');showLoginForm();}
+function closeAuthModal(){document.getElementById('authModal').classList.remove('active');showWelcomeScreen();}
+function showLoginForm(){document.getElementById('loginForm').style.display='block';document.getElementById('registerForm').style.display='none';}
+function showRegisterForm(){document.getElementById('loginForm').style.display='none';document.getElementById('registerForm').style.display='block';}
+function registerUser(){
+    const n=document.getElementById('registerName').value.trim();
+    const e=document.getElementById('registerEmail').value.trim();
+    const p=document.getElementById('registerPassword').value;
+    const pc=document.getElementById('registerPasswordConfirm').value;
+    if(!n||!e||!p){showToast('⚠️ Compila tutto');return;}
+    if(p!==pc){showToast('❌ Password diverse');return;}
+    if(p.length<6){showToast('❌ Minimo 6 caratteri');return;}
+    firebase.auth().createUserWithEmailAndPassword(e,p).then(u=>{
+        u.user.updateProfile({displayName:n});
+        firebase.database().ref('users/'+u.user.uid).set({name:n,email:e,createdAt:Date.now()});
+        showToast('✅ Registrato!');closeAuthModal();hideWelcomeScreen();
+    }).catch(er=>showToast('❌ '+er.message));
+}
+function loginWithEmail(e,p){
+    firebase.auth().signInWithEmailAndPassword(e,p).then(()=>{
+        showToast('✅ Accesso!');closeAuthModal();hideWelcomeScreen();
+    }).catch(er=>showToast('❌ '+er.message));
+}
+function loginWithGoogle(){
+    const pr=new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(pr).then(()=>{
+        showToast('✅ Google!');closeAuthModal();hideWelcomeScreen();
+    }).catch(er=>showToast('❌ '+er.message));
+}
+function logout(){firebase.auth().signOut();userType='guest';localStorage.setItem('grasso_user_type','guest');showToast('👋 Arrivederci!');location.reload();}
+
 const CACHE_DURATION = 3600000;
 let appData = {
-  categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:"🍕 Pizza Napoli",icon:"fa-pizza-slice"}, frittura:{name:"🍗 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
+  categories: { focacce:{name:"🥖 Focacce",icon:"fa-bread-slice"}, pizze:{name:" Specialità Pugliesi",icon:"fa-pizza-slice"}, frittura:{name:"🍗 Frittura",icon:"fa-drumstick-bite"}, bibite:{name:"🥤 Bibite",icon:"fa-glass-martini-alt"} },
   menu: { pizze:[], focacce:[], frittura:[], bibite:[{name:"Coca Cola",price:2.00,desc:"33cl"},{name:"Sprite",price:2.00,desc:"33cl"},{name:"Fanta",price:2.00,desc:"33cl"},{name:"Acqua Naturale",price:1.00,desc:"50cl"},{name:"Acqua Frizzante",price:1.00,desc:"50cl"},{name:"Peroni 33cl",price:2.00,desc:"Birra"}] },
   promotions:{},
   settings:{visiblePhone:"0884660377",manualStatus:"auto",openDays:"lun,mar,mer,gio,ven,sab,dom",hours:"11:00-15:00,18:00-23:00",deliveryEnabled:true,pickupEnabled:true,deliveryFee:2.00,minDeliveryOrder:15,deliveryBaseFee:3.00,deliveryExtraFee:2.00,deliveryMaxRadius:4,deliveryExtraRadius:6},
-  branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione",city:"Manfredonia"},
+  branding:{name:"Antica Pizzeria Grasso",subtitle:"Tradizione Pugliese",city:"Manfredonia"},
   images:{hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",categories:{}}
 };
 
@@ -662,23 +567,15 @@ function requestNotificationPermission() {
   if ('Notification' in window) {
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
-        console.log('Permesso notifiche concesso');
         return messaging.getToken({ vapidKey: vapidKey });
       }
     }).then((token) => {
       if (token) {
-        console.log('Token FCM:', token);
         const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('device_id', deviceId);
-        db.ref('fcm_tokens/' + deviceId).set({
-          token: token,
-          type: 'client',
-          lastSeen: Date.now()
-        });
+        db.ref('fcm_tokens/' + deviceId).set({ token: token, type: 'client', lastSeen: Date.now() });
       }
-    }).catch((err) => {
-      console.log('Errore token FCM:', err);
-    });
+    }).catch((err) => { console.log('Errore token FCM:', err); });
   }
 }
 
@@ -686,24 +583,19 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('firebase-messaging-sw.js').then(() => {
     console.log('Service Worker registrato');
     requestNotificationPermission();
-  }).catch((err) => {
-    console.log('Errore Service Worker:', err);
-  });
+  }).catch((err) => { console.log('Errore Service Worker:', err); });
 }
 
 db.ref('notifiche_push').limitToLast(5).on('child_added', snapshot => {
   const notif = snapshot.val();
   const notifId = snapshot.key;
   const deviceId = localStorage.getItem('device_id');
-  
   if (!notif || !notif.tokens) return;
   if (!deviceId || !notif.tokens.includes(deviceId)) return;
   if (notif.letto && notif.letto[deviceId]) return;
-  
   showToast('🔔 ' + notif.title + ': ' + notif.body);
   playNotificationSound();
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-  
   db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
 });
 
@@ -740,31 +632,6 @@ function openPrivacyModal(){ document.getElementById('privacyModal').classList.a
 function closePrivacyModal(){ document.getElementById('privacyModal').classList.remove('active'); }
 function sanitizeWA(t){ return String(t).replace(/[*_~`]/g, '\\$&'); }
 function callPhone(){ window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`; }
-
-// Funzione per registrare utente
-function registerUser() {
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-    
-    if (!name || !email || !password) {
-        showToast('⚠️ Compila tutti i campi');
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        showToast('❌ Le password non coincidono');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showToast('❌ Password troppo corta (minimo 6 caratteri)');
-        return;
-    }
-    
-    registerWithEmail(email, password, name);
-}
 
 window.onload=function(){ 
 if(!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display='block'; 
@@ -905,8 +772,9 @@ function applyBranding(){
         else m.textContent=n;
     }
     const s=document.getElementById('headerSubtitle');
-    if(s) s.textContent=appData.branding.subtitle||"Dal 2018 • Tradizione";
-}function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
+    if(s) s.textContent=appData.branding.subtitle||"Tradizione Pugliese";
+}
+function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`;}
 
 function renderPromotionsBanner(){
 const b=document.getElementById('offersBanner'), t=document.getElementById('offerText'), a=getActivePromotion();
@@ -923,12 +791,7 @@ else { b.classList.remove('show'); b.onclick=null; }
 function getActivePromotion(){
   const td=new Date().toISOString().split('T')[0];
   const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>
-    p.active && 
-    p.startDate<=td && 
-    p.endDate>=td && 
-    (p.currentUses||0)<p.maxUses && 
-    p.products && 
-    p.products.length>0
+    p.active && p.startDate<=td && p.endDate>=td && (p.currentUses||0)<p.maxUses && p.products && p.products.length>0
   );
   return ps.length?{id:ps[0][0],...ps[0][1]}:null;
 }
@@ -936,36 +799,20 @@ function getActivePromotion(){
 function addPromoToCart(pid){
   const p=appData.promotions[pid];
   if(!p) return;
-  
   const td=new Date().toISOString().split('T')[0];
   if(!p.active || p.startDate>td || p.endDate<td || (p.currentUses||0)>=p.maxUses) {
     showToast('❌ Promo non disponibile');
     return;
   }
   if(!p.products || !p.products.length) return;
-  
   let tp = p.products.reduce((s,x) => s + (x.price * x.qty), 0);
-  
-  const promoItem = {
-    promoId: pid,
-    promoTitle: p.title,
-    products: p.products.map(x => ({...x})),
-    totalPrice: tp,
-    isPromo: true
-  };
-  
+  const promoItem = { promoId: pid, promoTitle: p.title, products: p.products.map(x => ({...x})), totalPrice: tp, isPromo: true };
   const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === pid);
-  
   if (existingIdx >= 0) {
     if (confirm('Hai già questa promo nel carrello. Vuoi aggiungerne un\'altra?')) {
       cart.push(promoItem);
-    } else {
-      return;
-    }
-  } else {
-    cart.push(promoItem);
-  }
-  
+    } else { return; }
+  } else { cart.push(promoItem); }
   db.ref('promotions/' + pid + '/currentUses').transaction(v => (v || 0) + 1).then(() => {
     db.ref('promotions').once('value').then(s => {
       appData.promotions = s.val() || {};
@@ -973,20 +820,22 @@ function addPromoToCart(pid){
       renderPromotionsBanner();
     });
   });
-  
   updateCartBadge();
   showToast(`🎁 ${p.title} aggiunta al carrello!`);
-  
   setTimeout(() => {
     const remaining = p.maxUses - ((p.currentUses || 0) + 1);
-    if (remaining <= 0) {
-      document.getElementById('offersBanner').classList.remove('show');
-    }
+    if (remaining <= 0) { document.getElementById('offersBanner').classList.remove('show'); }
   }, 500);
 }
 
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k;}
-function renderCategories(){const l=document.getElementById('categoriesList');l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;}).join('');}
+function renderCategories(){
+const l=document.getElementById('categoriesList');
+l.innerHTML=Object.keys(appData.categories).map(c=>{
+    const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';
+    return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;
+}).join('');
+}
 function showCategory(c){
 if(!c || !appData.menu || !appData.menu[c]){showToast('⚠️ Non disponibile');return;}
 currentSearchCat=c;
@@ -1018,9 +867,9 @@ function filterProducts(term){ if(currentSearchCat) renderProductList(currentSea
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
-function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o? (currentLang === 'it' ? '🟢 APERTO' : currentLang === 'en' ? '🟢 OPEN' : '🟢 GEÖFFNET') : (currentLang === 'it' ? '🔴 CHIUSO' : currentLang === 'en' ? '🔴 CLOSED' : '🔴 GESCHLOSSEN');}
+function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':' CHIUSO';}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
-function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast(currentLang === 'it' ? '⚠️ Chiuso' : currentLang === 'en' ? '⚠️ Closed' : '⚠️ Geschlossen');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
+function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
 function changeProductQty(cat,i,delta){if(!appData.menu||!appData.menu[cat]||!appData.menu[cat][i]){showToast('⚠️ Errore');return;}const it=appData.menu[cat][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===cat);if(ex){ex.qty=(ex.qty||0)+delta;if(ex.qty<=0){const idx=cart.indexOf(ex);cart.splice(idx,1);}else if(delta>0)showToast(`🍕 ${it.name} ×${ex.qty}`);}else if(delta>0){cart.push({...it,cat,qty:1,isPromo:false});showToast(`🍕 ${it.name} aggiunta!`);}updateCartBadge();if(currentSearchCat===cat)renderProductList(cat,document.getElementById('productSearch')?.value||'');}
 
@@ -1052,19 +901,16 @@ async function calculateDeliveryFee() {
     const pizzeriaLng = appData.settings.pizzeriaLng;
     const customerLat = window.customerGPSLat;
     const customerLng = window.customerGPSLng;
-    
     if (!pizzeriaLat || !pizzeriaLng || !customerLat || !customerLng) {
         const df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
         updateDeliveryFeeDisplay(df, null);
         return;
     }
-    
     const distance = calculateDistance(pizzeriaLat, pizzeriaLng, customerLat, customerLng);
     const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
     const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 4;
     const extraRadius = parseFloat(appData.settings.deliveryExtraRadius) || 6;
     const extraFee = parseFloat(appData.settings.deliveryExtraFee) || 2.00;
-    
     if (distance > extraRadius) {
         updateDeliveryFeeDisplay(0, distance, true, false);
     } else if (distance > maxRadius) {
@@ -1080,11 +926,10 @@ function updateDeliveryFeeDisplay(fee, distance, outOfRange = false, withExtra =
     const feeValue = document.getElementById('deliveryFeeValue');
     const distanceInfo = document.getElementById('distanceInfo');
     const distanceText = document.getElementById('distanceText');
-    
     if (outOfRange) {
         feeRow.style.display = 'none';
         distanceInfo.style.display = 'block';
-        distanceText.textContent = currentLang === 'it' ? '📍 Fuori dal raggio di consegna massimo' : currentLang === 'en' ? '📍 Out of maximum delivery range' : '📍 Außerhalb des maximalen Lieferbereichs';
+        distanceText.textContent = '📍 Fuori dal raggio di consegna massimo';
         distanceText.style.color = '#ef4444';
         document.getElementById('checkoutBtn').disabled = true;
     } else {
@@ -1092,7 +937,7 @@ function updateDeliveryFeeDisplay(fee, distance, outOfRange = false, withExtra =
         feeValue.textContent = '€' + fee.toFixed(2);
         distanceInfo.style.display = 'block';
         if (withExtra) {
-            distanceText.textContent = `📍 Distanza: ${distance.toFixed(1)} km (${currentLang === 'it' ? '+supplemento zona' : currentLang === 'en' ? '+zone surcharge' : '+Zuschlag'})`;
+            distanceText.textContent = `📍 Distanza: ${distance.toFixed(1)} km (+supplemento zona)`;
             distanceText.style.color = '#fbbf24';
         } else {
             distanceText.textContent = `📍 Distanza: ${distance.toFixed(1)} km`;
@@ -1100,14 +945,12 @@ function updateDeliveryFeeDisplay(fee, distance, outOfRange = false, withExtra =
         }
         document.getElementById('checkoutBtn').disabled = false;
     }
-    
     updateCartTotals();
 }
 
 function updateCartTotals(){
     let t=0;
     cart.forEach(i=>{if(i.isPromo)t+=i.totalPrice;else t+=(i.price*i.qty);});
-    
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
         if (window.customerGPSLat && window.customerGPSLng) {
             calculateDeliveryFee();
@@ -1148,42 +991,27 @@ function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new D
 
 async function getGPSLocation(){ 
     const b=document.getElementById('gpsBtn');
-    if(!navigator.geolocation){
-        showToast('GPS non disponibile');
-        return;
-    }
-    
+    if(!navigator.geolocation){showToast('GPS non disponibile');return;}
     b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';
-    
     try{ 
         const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000})); 
         const{latitude,longitude}=pos.coords;
-        
         window.customerGPSLat = latitude;
         window.customerGPSLng = longitude;
-        
         const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`); 
         const d=await r.json(),a=d.address; 
-        
         document.getElementById('customerStreet').value = a.road || a.pedestrian || ''; 
         document.getElementById('customerNumber').value = a.house_number || ''; 
-        
-        showToast(currentLang === 'it' ? '📍 Posizione trovata!' : currentLang === 'en' ? '📍 Location found!' : '📍 Standort gefunden!');
-        
-        if (orderType === 'delivery') {
-            calculateDeliveryFee();
-        }
-    } catch(e){
-        showToast(currentLang === 'it' ? '❌ Impossibile ottenere posizione' : currentLang === 'en' ? '❌ Unable to get location' : '❌ Standort nicht verfügbar');
-    } finally{
-        b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';
-    } 
+        showToast('📍 Posizione trovata!');
+        if (orderType === 'delivery') { calculateDeliveryFee(); }
+    } catch(e){showToast('❌ Impossibile ottenere posizione');} 
+    finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> Usa GPS';} 
 }
 
 function openCart(){ 
-if(!checkIfOpen()){showToast(currentLang === 'it' ? '⚠️ Chiuso' : currentLang === 'en' ? '⚠️ Closed' : '⚠️ Geschlossen');return;} 
+if(!checkIfOpen()){showToast('️ Chiuso');return;} 
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); 
-if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">' + (currentLang === 'it' ? 'Vuoto' : currentLang === 'en' ? 'Empty' : 'Leer') + '</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';} 
+if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';} 
 else { 
 let h=''; 
 cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button><div style="font-size:0.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;}); 
@@ -1217,9 +1045,9 @@ function removePromoFromCartAtIndex(i){
 function closeCart(){ document.getElementById('cartModal').classList.remove('active'); }
 
 async function confirmAndSendOrder(){ 
-    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(currentLang === 'it' ? '⏳ Attendi 1 minuto' : currentLang === 'en' ? '⏳ Wait 1 minute' : '⏳ Warte 1 Minute');return;} 
+    if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast('⏳ Attendi 1 minuto');return;} 
     const pc=document.getElementById('privacyConsent'); 
-    if(!pc||!pc.checked){showToast(currentLang === 'it' ? '⚠️ Accetta Privacy' : currentLang === 'en' ? '⚠️ Accept Privacy' : '⚠️ Datenschutz akzeptieren');return;} 
+    if(!pc||!pc.checked){showToast('⚠️ Accetta Privacy');return;} 
     if(document.getElementById('honeypot').value!=='')return; 
     const n=document.getElementById('customerName').value.trim(); 
     const p=document.getElementById('customerPhone').value.trim(); 
@@ -1227,12 +1055,10 @@ async function confirmAndSendOrder(){
     const number=document.getElementById('customerNumber').value.trim(); 
     const address = `${street} ${number}`; 
     const nt=document.getElementById('customerNotes').value.trim(); 
-    if(!n){showToast(currentLang === 'it' ? '⚠️ Nome' : currentLang === 'en' ? '⚠️ Name' : '⚠️ Name');return;} 
+    if(!n){showToast('⚠️ Nome');return;} 
     const ph=p.replace(/\D/g,''); 
-    if(!/^3[0-9]{9}$/.test(ph)){showToast(currentLang === 'it' ? '❌ Telefono' : currentLang === 'en' ? '❌ Phone' : '❌ Telefon');return;} 
-    
+    if(!/^3[0-9]{9}$/.test(ph)){showToast(' Telefono');return;} 
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
-    
     let df = 0;
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
         if (window.customerGPSLat && window.customerGPSLng) {
@@ -1243,44 +1069,19 @@ async function confirmAndSendOrder(){
             const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 4;
             const extraRadius = parseFloat(appData.settings.deliveryExtraRadius) || 6;
             const extraFee = parseFloat(appData.settings.deliveryExtraFee) || 2.00;
-            
-            if (distance > extraRadius) {
-                showToast(currentLang === 'it' ? '❌ Indirizzo fuori dal raggio di consegna' : currentLang === 'en' ? '❌ Address out of delivery range' : '❌ Adresse außerhalb des Lieferbereichs');
-                return;
-            } else if (distance > maxRadius) {
-                df = baseFee + extraFee;
-            } else {
-                df = baseFee;
-            }
-        } else {
-            df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
-        }
+            if (distance > extraRadius) { showToast('❌ Indirizzo fuori dal raggio di consegna'); return; } 
+            else if (distance > maxRadius) { df = baseFee + extraFee; } 
+            else { df = baseFee; }
+        } else { df = parseFloat(appData.settings.deliveryBaseFee) || 3.00; }
     }
-    
     const minO=parseFloat(appData.settings.minDeliveryOrder)||0; 
     if(orderType==='delivery'){ 
-        if(!street||!number){showToast(currentLang === 'it' ? '⚠️ Completa indirizzo' : currentLang === 'en' ? '⚠️ Complete address' : '⚠️ Adresse vervollständigen');return;} 
-        if(pt+df<minO){showToast(`${currentLang === 'it' ? '⚠️ Minimo' : currentLang === 'en' ? '⚠️ Minimum' : '⚠️ Minimum'}: €${minO}`);return;} 
+        if(!street||!number){showToast('⚠️ Completa indirizzo');return;} 
+        if(pt+df<minO){showToast(`⚠️ Minimo: €${minO}`);return;} 
     } 
-    
     const ft=pt+df,st=timeMode==='asap'?'Subito':(document.getElementById('scheduledTime').value||'Subito'),oi=[]; 
     cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat});}); 
-    
-    const oc={
-        name:n,
-        phone:p,
-        address:orderType==='delivery'?sanitizeWA(address):'',
-        notes:sanitizeWA(nt),
-        type:orderType,
-        scheduledTime:st,
-        productsTotal:pt,
-        deliveryFee:df,
-        finalTotal:ft,
-        items:oi,
-        customerLat: window.customerGPSLat || null,
-        customerLng: window.customerGPSLng || null
-    }; 
-    
+    const oc={name:n,phone:p,address:orderType==='delivery'?sanitizeWA(address):'',notes:sanitizeWA(nt),type:orderType,scheduledTime:st,productsTotal:pt,deliveryFee:df,finalTotal:ft,items:oi,customerLat: window.customerGPSLat || null,customerLng: window.customerGPSLng || null}; 
     await sendOrder(oc); 
 }
 
@@ -1293,27 +1094,11 @@ async function sendOrder(d){
         const orderId='ORD-'+ref.key.slice(-6).toUpperCase(); 
         d.orderId=orderId; 
         await ref.set({
-            orderId,
-            customerName:sanitizeWA(d.name),
-            customerPhone:sanitizeWA(d.phone),
-            address:d.type==='delivery'?sanitizeWA(d.address):'',
-            notes:sanitizeWA(d.notes),
-            type:d.type,
-            scheduledTime:d.scheduledTime,
-            items:d.items,
-            productsTotal:d.productsTotal,
-            deliveryFee:d.deliveryFee,
-            finalTotal:d.finalTotal,
-            customerLat: d.customerLat,
-            customerLng: d.customerLng,
-            status:'new',
-            timestamp:Date.now()
+            orderId,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,scheduledTime:d.scheduledTime,items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,customerLat: d.customerLat,customerLng: d.customerLng,status:'new',timestamp:Date.now()
         }); 
         localStorage.setItem('lastOrderTime',Date.now()); 
         saveOrderToLocal(d); 
-        cart=[];
-        updateCartBadge();
-        closeCart(); 
+        cart=[];updateCartBadge();closeCart(); 
         document.getElementById('customerName').value=''; 
         document.getElementById('customerPhone').value=''; 
         document.getElementById('customerStreet').value=''; 
@@ -1321,19 +1106,17 @@ async function sendOrder(d){
         document.getElementById('customerNotes').value=''; 
         document.getElementById('scheduledTime').value=''; 
         document.getElementById('privacyConsent').checked=false;
-        window.customerGPSLat = null;
-        window.customerGPSLng = null;
+        window.customerGPSLat = null;window.customerGPSLng = null;
         selectTimeMode('asap');
-        showToast(currentLang === 'it' ? '✅ Ordine inviato!' : currentLang === 'en' ? '✅ Order sent!' : '✅ Bestellung gesendet!');
+        showToast('✅ Ordine inviato!');
         showHome(); 
         setTimeout(() => startOrderStatusTracking(), 1000); 
     } catch(e){ 
         console.error(e); 
-        cart=cartBackup;
-        updateCartBadge(); 
-        showToast(currentLang === 'it' ? '❌ Errore invio' : currentLang === 'en' ? '❌ Order error' : '❌ Bestellfehler'); 
+        cart=cartBackup;updateCartBadge(); 
+        showToast('❌ Errore invio'); 
     } finally{ 
-        if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> ' + (currentLang === 'it' ? 'Invia Ordine' : currentLang === 'en' ? 'Send Order' : 'Bestellung senden');} 
+        if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Invia Ordine';} 
     } 
 }
 
@@ -1341,7 +1124,24 @@ function openReviewModal(){ document.getElementById('reviewModal').classList.add
 function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); selectedStars=0; updateStarsDisplay(); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.getElementById('reviewOrderId').value=''; pendingReviewOrderId=null; }
 function selectStar(n){ selectedStars=n; updateStarsDisplay(); }
 function updateStarsDisplay(){ document.querySelectorAll('#starsInput .star').forEach((s,i)=>{ s.classList.toggle('active', i<selectedStars); }); }
-function submitReview(){ const name = document.getElementById('reviewName').value.trim(); const text = document.getElementById('reviewText').value.trim(); const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } if(!name){ showToast(currentLang === 'it' ? '❌ Inserisci il nome' : currentLang === 'en' ? '❌ Enter name' : '❌ Name eingeben'); return; } if(!text){ showToast(currentLang === 'it' ? '❌ Scrivi un commento' : currentLang === 'en' ? '❌ Write a comment' : '❌ Kommentar schreiben'); return; } db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ if(pendingReviewOrderId) { let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); renderMyOrders(); } closeReviewModal(); showToast(currentLang === 'it' ? '⭐ Grazie per la recensione!' : currentLang === 'en' ? '⭐ Thank you for your review!' : '⭐ Danke für Ihre Bewertung!'); }); }
+function submitReview(){ 
+    const name = document.getElementById('reviewName').value.trim(); 
+    const text = document.getElementById('reviewText').value.trim(); 
+    const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); 
+    if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } 
+    if(!name){ showToast(' Inserisci il nome'); return; } 
+    if(!text){ showToast('❌ Scrivi un commento'); return; } 
+    db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ 
+        if(pendingReviewOrderId) { 
+            let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); 
+            localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o); 
+            localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders)); 
+            renderMyOrders(); 
+        } 
+        closeReviewModal(); 
+        showToast('⭐ Grazie per la recensione!'); 
+    }); 
+}
 function showMyOrders(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('reviewsPublicView').style.display='none'; document.getElementById('myOrdersView').style.display='block'; window.scrollTo(0,0); startOrderStatusTracking(); renderMyOrders(); }
 function cleanLocalHistory(){ try { let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); const now = Date.now(); const thirtyDays = 30 * 24 * 60 * 60 * 1000; orders = orders.filter(o => (now - o.date) < thirtyDays); localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders)); } catch(e){} }
 function saveOrderToLocal(orderData){
@@ -1357,12 +1157,12 @@ function saveOrderToLocal(orderData){
     } catch(e){ console.error('❌ Errore localStorage:', e); }
 }
 function clearLocalHistory(){
-    if(confirm(currentLang === 'it' ? 'Cancellare tutto lo storico ordini locale?' : currentLang === 'en' ? 'Delete all local order history?' : 'Gesamte lokale Bestellhistorie löschen?')){
+    if(confirm('Cancellare tutto lo storico ordini locale?')){
         Object.keys(orderStatusListeners).forEach(orderId => { try { orderStatusListeners[orderId].off('value'); } catch(e){} });
         orderStatusListeners = {};
         localStorage.removeItem('pizzeria_grasso_orders');
         renderMyOrders();
-        showToast('🗑️ ' + (currentLang === 'it' ? 'Storico cancellato!' : currentLang === 'en' ? 'History deleted!' : 'Historie gelöscht!'));
+        showToast('🗑️ Storico cancellato!');
     }
 }
 function getOrderProgress(status, orderType) {
@@ -1370,15 +1170,15 @@ function getOrderProgress(status, orderType) {
         const pickupSteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 35, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 70, step: 2, label: 'Pronto per il ritiro', icon: '✅', class: 'status-ready' }, 'picked': { percent: 100, step: 3, label: 'Ritirato da te', icon: '🎉', class: 'status-picked' }, 'delivered': { percent: 100, step: 3, label: 'Ritirato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
         return pickupSteps[status] || pickupSteps['new'];
     }
-    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '📦', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
+    const deliverySteps = { 'new': { percent: 10, step: 0, label: 'Ricevuto', icon: '📥', class: 'status-new' }, 'preparing': { percent: 30, step: 1, label: 'In preparazione', icon: '🍕', class: 'status-preparing' }, 'ready': { percent: 55, step: 2, label: 'Pronto', icon: '✅', class: 'status-ready' }, 'picked': { percent: 70, step: 3, label: 'Ritirato dal fattorino', icon: '', class: 'status-picked' }, 'delivering': { percent: 85, step: 4, label: 'In consegna', icon: '🛵', class: 'status-delivering' }, 'delivered': { percent: 100, step: 5, label: 'Consegnato', icon: '🎉', class: 'status-delivered' }, 'rifiutato': { percent: 0, step: -1, label: 'Rifiutato', icon: '❌', class: 'status-rifiutato' } };
     return deliverySteps[status] || deliverySteps['new'];
 }
 function renderOrderTracker(status, motivoRifiuto, orderType) {
     const type = orderType || 'delivery';
     const progress = getOrderProgress(status, type);
-    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> ${currentLang === 'it' ? 'Ordine Rifiutato' : currentLang === 'en' ? 'Order Rejected' : 'Bestellung abgelehnt'}</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>${currentLang === 'it' ? 'Motivo' : currentLang === 'en' ? 'Reason' : 'Grund'}:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
-    if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? (currentLang === 'it' ? 'Ritirato da te ✓' : currentLang === 'en' ? 'Picked up by you ✓' : 'Von Ihnen abgeholt ✓') : (currentLang === 'it' ? 'Ordine Consegnato!' : currentLang === 'en' ? 'Order Delivered!' : 'Bestellung zugestellt!'); return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
-    const steps = type === 'pickup' ? [{ label: currentLang === 'it' ? 'Ricevuto' : currentLang === 'en' ? 'Received' : 'Erhalten', icon: '📥' }, { label: currentLang === 'it' ? 'Preparaz.' : currentLang === 'en' ? 'Prep.' : 'Vorb.', icon: '🍕' }, { label: currentLang === 'it' ? 'Pronto' : currentLang === 'en' ? 'Ready' : 'Fertig', icon: '✅' }, { label: currentLang === 'it' ? 'Ritirato ✓' : currentLang === 'en' ? 'Picked ✓' : 'Abgeholt ✓', icon: '🎉' }] : [{ label: currentLang === 'it' ? 'Ricevuto' : currentLang === 'en' ? 'Received' : 'Erhalten', icon: '📥' }, { label: currentLang === 'it' ? 'Preparaz.' : currentLang === 'en' ? 'Prep.' : 'Vorb.', icon: '🍕' }, { label: currentLang === 'it' ? 'Pronto' : currentLang === 'en' ? 'Ready' : 'Fertig', icon: '✅' }, { label: currentLang === 'it' ? 'Ritirato' : currentLang === 'en' ? 'Picked' : 'Abgeholt', icon: '📦' }, { label: currentLang === 'it' ? 'Consegna' : currentLang === 'en' ? 'Delivery' : 'Lieferung', icon: '🛵' }, { label: currentLang === 'it' ? 'Fatto!' : currentLang === 'en' ? 'Done!' : 'Fertig!', icon: '🎉' }];
+    if (status === 'rifiutato') { return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span></span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong>${motivoRifiuto}</div>` : ''}</div>`; }
+    if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) { const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!'; return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span></span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width: 100%;"></div></div></div>`; }
+    const steps = type === 'pickup' ? [{ label: 'Ricevuto', icon: '📥' }, { label: 'Preparaz.', icon: '' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato ✓', icon: '🎉' }] : [{ label: 'Ricevuto', icon: '' }, { label: 'Preparaz.', icon: '🍕' }, { label: 'Pronto', icon: '✅' }, { label: 'Ritirato', icon: '📦' }, { label: 'Consegna', icon: '🛵' }, { label: 'Fatto!', icon: '🎉' }];
     return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width: ${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
 }
 function renderMyOrders(){ 
@@ -1386,14 +1186,14 @@ function renderMyOrders(){
     if(!list) return; 
     try { 
         let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); 
-        if(orders.length === 0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">' + (currentLang === 'it' ? 'Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕' : currentLang === 'en' ? 'No recent orders.<br>Place your first order! 🍕' : 'Keine aktuellen Bestellungen.<br>Gib deine erste Bestellung auf! 🍕') + '</div>'; return; } 
+        if(orders.length === 0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; return; } 
         list.innerHTML = orders.map(o=>{ 
             const dateStr = new Date(o.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'}); 
             const status = o.status || 'new'; 
             const orderType = o.type || 'delivery';
             const tracker = renderOrderTracker(status, o.motivoRifiuto, orderType);
             const canReview = (status === 'delivered' || (orderType === 'pickup' && status === 'picked')) && !o.reviewed;
-            const typeLabel = orderType === 'pickup' ? (currentLang === 'it' ? '🏪 Ritiro' : currentLang === 'en' ? '🏪 Pickup' : '🏪 Abholung') : (currentLang === 'it' ? '🛵 Consegna' : currentLang === 'en' ? '🛵 Delivery' : '🛵 Lieferung');
+            const typeLabel = orderType === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
             return `<div class="my-order-card" style="border-left-color: ${status === 'rifiutato' ? '#ef4444' : status === 'delivered' || (orderType === 'pickup' && status === 'picked') ? '#22c55e' : 'var(--gold-dark)'};">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${o.orderId}</span>
@@ -1403,25 +1203,24 @@ function renderMyOrders(){
                 <div class="my-order-total">€${o.total.toFixed(2)}</div>
                 ${tracker}
                 <div class="my-order-actions" style="margin-top:8px;">
-                    ${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">${currentLang === 'it' ? '⭐ Recensisci' : currentLang === 'en' ? '⭐ Review' : '⭐ Bewerten'}</button>` : ''}
-                    ${o.reviewed ? '<span class="btn-reviewed">' + (currentLang === 'it' ? '✅ Già recensito' : currentLang === 'en' ? '✅ Already reviewed' : '✅ Bereits bewertet') + '</span>' : ''}
+                    ${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>` : ''}
+                    ${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : ''}
                 </div>
             </div>`;
         }).join(''); 
-    } catch(e){ list.innerHTML = '<p style="color:#f87171">' + (currentLang === 'it' ? 'Errore caricamento storico' : currentLang === 'en' ? 'Error loading history' : 'Fehler beim Laden der Historie') + '</p>'; } 
+    } catch(e){ list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; } 
 }
 function openReviewForOrder(orderId){ pendingReviewOrderId = orderId; document.getElementById('reviewOrderId').value = orderId; openReviewModal(); }
 function showReviewsPublic(){ document.getElementById('mainMenu').style.display='none'; document.getElementById('productsView').style.display='none'; document.getElementById('myOrdersView').style.display='none'; document.getElementById('reviewsPublicView').style.display='block'; window.scrollTo(0,0); }
-function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">' + (currentLang === 'it' ? 'Nessuna recensione ancora.<br>Sii il primo! 🌟' : currentLang === 'en' ? 'No reviews yet.<br>Be the first! 🌟' : 'Noch keine Bewertungen.<br>Sei der Erste! 🌟') + '</div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
+function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! 🌟</div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();if(e.target.id==='authModal')closeAuthModal();}
-</script>
-<script>
-// Forziamo la visualizzazione dell'app
-setTimeout(() => {
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-}, 1000);
+
+// AVVIO: mostra schermata benvenuto
+window.addEventListener('load', () => {
+    loadTranslations('it');
+    showWelcomeScreen();
+});
 </script>
 </body>
 </html>
