@@ -222,19 +222,19 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 
 <div id="welcomeScreen" class="welcome-screen">
     <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
-    <h1 class="welcome-title">🍕 Benvenuto da Grasso!</h1>
+    <h1 class="welcome-title" data-trad="welcome_title">🍕 Benvenuto da Grasso!</h1>
    
     <div class="home-instructions">
-        <h3>📱 Salva l'app sulla Home!</h3>
+        <h3 data-trad="save_home_title">📱 Salva l'app sulla Home!</h3>
         <ol>
-            <li>Tocca il tasto <strong>Condividi</strong> (quadrato con freccia)</li>
-            <li>Scorri e tocca <strong>"Aggiungi a Home"</strong></li>
-            <li>Ordina con un tocco! 🚀</li>
+            <li><span data-trad="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li>
+            <li><span data-trad="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li>
+            <li><span data-trad="save_home_step3">Ordina con un tocco! 🚀</span></li>
         </ol>
     </div>
     
    <div class="lang-selector">
-    <label>🌍 Lingua / Language</label>
+    <label data-trad="language_label">🌍 Lingua / Language</label>
     <select id="langSelect" onchange="changeLanguage(this.value)">
         <option value="it">🇮🇹 Italiano</option>
         <option value="en">🇬🇧 English</option>
@@ -243,60 +243,60 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
     
     <div class="welcome-buttons">
-        <button class="btn-register" onclick="showRegisterModal()">👤 Registrati</button>
-        <button class="btn-guest" onclick="enterAsGuest()">👻 Continua come Ospite</button>
+        <button class="btn-register" onclick="showRegisterModal()" data-trad="register_btn">👤 Registrati</button>
+        <button class="btn-guest" onclick="enterAsGuest()" data-trad="guest_btn">👻 Continua come Ospite</button>
     </div>
     
-    <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso - Puglia</p>
+    <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
 </div>
 
 <div id="authModal" class="modal-3d">
     <div class="modal-content-3d" style="max-width:500px;">
         <div class="modal-header">
-            <h2 id="authModalTitle">Accedi al tuo account</h2>
+            <h2 id="authModalTitle" data-trad="login_title">Accedi al tuo account</h2>
             <button class="close-btn-3d" onclick="closeAuthModal()">×</button>
         </div>
         <div id="loginForm">
             <div class="form-group">
-                <label>Email</label>
+                <label data-trad="email_label">Email</label>
                 <input type="email" id="loginEmail" placeholder="mario@email.it">
             </div>
             <div class="form-group">
-                <label>Password</label>
+                <label data-trad="password_label">Password</label>
                 <input type="password" id="loginPassword" placeholder="••••••••">
             </div>
-            <button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d">Accedi</button>
-            <div style="margin:20px 0; text-align:center; color:#8a7a5a;">oppure</div>
+            <button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d" data-trad="login_btn">Accedi</button>
+            <div style="margin:20px 0; text-align:center; color:#8a7a5a;" data-trad="or">oppure</div>
             <button onclick="loginWithGoogle()" style="width:100%; padding:14px; border-radius:10px; border:1px solid #4285F4; background:#fff; color:#4285F4; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px;">
                 <img src="https://www.google.com/favicon.ico" width="20" alt="Google">
-                Continua con Google
+                <span data-trad="login_with_google">Continua con Google</span>
             </button>
             <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                Non hai un account? 
-                <a onclick="showRegisterForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;">Registrati</a>
+                <span data-trad="no_account">Non hai un account?</span> 
+                <a onclick="showRegisterForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;" data-trad="register_here">Registrati</a>
             </p>
         </div>
         <div id="registerForm" style="display:none;">
             <div class="form-group">
-                <label>Nome e Cognome</label>
+                <label data-trad="name_label">Nome e Cognome</label>
                 <input type="text" id="registerName" placeholder="Mario Rossi">
             </div>
             <div class="form-group">
-                <label>Email</label>
+                <label data-trad="email_label">Email</label>
                 <input type="email" id="registerEmail" placeholder="mario@email.it">
             </div>
             <div class="form-group">
-                <label>Password</label>
+                <label data-trad="password_label">Password</label>
                 <input type="password" id="registerPassword" placeholder="Minimo 6 caratteri">
             </div>
             <div class="form-group">
-                <label>Conferma Password</label>
+                <label data-trad="confirm_password">Conferma Password</label>
                 <input type="password" id="registerPasswordConfirm" placeholder="••••••••">
             </div>
-            <button onclick="registerUser()" class="checkout-btn-3d">Registrati</button>
+            <button onclick="registerUser()" class="checkout-btn-3d" data-trad="register_btn">Registrati</button>
             <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                Hai già un account? 
-                <a onclick="showLoginForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;">Accedi</a>
+                <span data-trad="already_have_account">Hai già un account?</span> 
+                <a onclick="showLoginForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;" data-trad="login_here">Accedi</a>
             </p>
         </div>
     </div>
@@ -305,9 +305,9 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div id="userMenu" class="user-menu" style="display:none;"></div>
 
 <div id="bannerRifiuto">
-    <div class="banner-title">❌ Ordine Rifiutato</div>
-    <div class="banner-motivo" id="motivoRifiutoText">La pizzeria non può accettare il tuo ordine.</div>
-    <button class="banner-btn" onclick="chiudiBannerRifiuto()">Ho capito</button>
+    <div class="banner-title" data-trad="order_rejected">❌ Ordine Rifiutato</div>
+    <div class="banner-motivo" id="motivoRifiutoText" data-trad="reject_default_msg">La pizzeria non può accettare il tuo ordine.</div>
+    <button class="banner-btn" onclick="chiudiBannerRifiuto()" data-trad="understood">Ho capito</button>
 </div>
 
 <div class="ambient-lights">
@@ -315,7 +315,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </div>
 <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
 
-<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;">⚠️ Sei offline — riconnessione in corso...</div>
+<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-trad="offline_msg">⚠️ Sei offline — riconnessione in corso...</div>
 
 <div class="phone-frame" id="mainApp" style="display:none;">
 <header class="header">
@@ -330,7 +330,7 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
         <div class="hero-overlay"></div>
     </div>
     <div id="statusBanner" class="status-banner status-closed">
-        <span id="statusText">🔴 CHIUSO</span>
+        <span id="statusText" data-trad="closed">🔴 CHIUSO</span>
     </div>
     <div id="offersBanner" class="offers-banner">
       <span id="offerText"></span>
@@ -338,67 +338,58 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 </header>
 
 <div id="mainMenu">
-<div class="section-divider"><span>Il Nostro Menu</span></div>
+<div class="section-divider"><span data-trad="menu_title">Il Nostro Menu</span></div>
 <div class="menu-list" id="categoriesList"></div>
-<div class="section-divider"><span>Servizi</span></div>
+<div class="section-divider"><span data-trad="services_title">Servizi</span></div>
 <div class="actions-section">
     <div class="quick-actions-row">
-        <button class="quick-btn-rect quick-btn-chiama" onclick="callPhone()"><i class="fas fa-phone"></i> Chiama</button>
-        <button class="quick-btn-rect quick-btn-carrello" onclick="openCart()"><i class="fas fa-shopping-cart"></i> Carrello<div class="cart-badge" id="quickCartBadge" style="display:none;">0</div></button>
+        <button class="quick-btn-rect quick-btn-chiama" onclick="callPhone()"><i class="fas fa-phone"></i> <span data-trad="call_btn">Chiama</span></button>
+        <button class="quick-btn-rect quick-btn-carrello" onclick="openCart()"><i class="fas fa-shopping-cart"></i> <span data-trad="cart_btn">Carrello</span><div class="cart-badge" id="quickCartBadge" style="display:none;">0</div></button>
     </div>
-    <button class="action-btn-3d btn-delivery" id="deliveryBtn" onclick="checkStatusBeforeOrder('delivery')"><i class="fas fa-motorcycle"></i> Consegna a Domicilio</button>
-    <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> Ritiro in Pizzeria</button>
+    <button class="action-btn-3d btn-delivery" id="deliveryBtn" onclick="checkStatusBeforeOrder('delivery')"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_btn">Consegna a Domicilio</span></button>
+    <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> <span data-trad="pickup_btn">Ritiro in Pizzeria</span></button>
 </div>
 </div>
 
 <div id="productsView" style="display:none;">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
 <h2 id="categoryTitle" class="category-title">Categoria</h2>
 <div class="search-bar-3d">
 <i class="fas fa-search"></i>
-<input type="text" id="productSearch" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
+<input type="text" id="productSearch" data-trad-placeholder="search_placeholder" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
 </div>
 <div id="productList"></div>
-<button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
+<button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> <span data-trad="back_btn">Torna al Menu</span></button>
 </div>
 
 <div id="myOrdersView">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
-<h2 class="category-title">📦 I Miei Ordini</h2>
-<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
-<button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
+<h2 class="category-title" data-trad="my_orders">📦 I Miei Ordini</h2>
+<p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;" data-trad="orders_info">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
+<button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> <span data-trad="clear_history">Cancella Storico Locale</span></button>
 <div id="myOrdersList"></div>
 </div>
 
 <div id="reviewsPublicView">
-<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
-<h2 class="category-title">⭐ Le Nostre Recensioni</h2>
+<button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
+<h2 class="category-title" data-trad="reviews">⭐ Le Nostre Recensioni</h2>
 <div class="reviews-public-list" id="reviewsPublicList"></div>
 </div>
 
-<!-- FOOTER MODIFICATO E CENTRATO -->
 <footer class="app-footer" style="text-align:center;">
-    <!-- RIGA 1: Info -->
     <div class="footer-info" id="footerInfo" style="margin-bottom:12px;">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
-    
-    <!-- RIGA 2: Pulsante Esci + Link (tutto centrato) -->
     <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:15px; margin-bottom:12px;">
-        <!-- Pulsante Esci (visibile solo se loggato) -->
         <div id="footerLogout" style="display:none;">
             <button onclick="logout()" style="background:rgba(231,76,60,0.15); color:#e74c3c; border:1px solid rgba(231,76,60,0.4); padding:8px 18px; border-radius:8px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.8rem;">
-                <i class="fas fa-sign-out-alt"></i> Esci
+                <i class="fas fa-sign-out-alt"></i> <span data-trad="logout_btn">Esci</span>
             </button>
         </div>
-        
-        <!-- Link normali -->
         <div class="footer-links" style="margin:0; display:flex; gap:15px; justify-content:center;">
-            <a onclick="openPrivacyModal()">Privacy Policy</a>
-            <a onclick="showReviewsPublic()">⭐ Recensioni</a>
-            <a onclick="showMyOrders()">I Miei Ordini</a>
+            <a onclick="openPrivacyModal()" data-trad="privacy_policy">Privacy Policy</a>
+            <a onclick="showReviewsPublic()" data-trad="reviews">⭐ Recensioni</a>
+            <a onclick="showMyOrders()" data-trad="my_orders">I Miei Ordini</a>
         </div>
     </div>
-    
-    <!-- RIGA 3: Copyright -->
     <div class="copyright">© 2026 Antica Pizzeria Grasso</div>
 </footer>
 </div>
@@ -406,70 +397,70 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="modal-3d" id="cartModal">
 <div class="modal-content-3d">
 <div class="modal-header">
-<h2><i class="fas fa-shopping-cart"></i> Il Tuo Ordine</h2>
+<h2><i class="fas fa-shopping-cart"></i> <span data-trad="your_order">Il Tuo Ordine</span></h2>
 <button class="close-btn-3d" onclick="closeCart()">×</button>
 </div>
 <div id="cartItems"></div>
 <div class="delivery-fee-row" id="deliveryFeeRow" style="display:none;">
-<span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> Costo consegna</span>
+<span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_fee">Costo consegna</span></span>
 <span class="delivery-fee-value" id="deliveryFeeValue">€0.00</span>
 </div>
 <div class="distance-info" id="distanceInfo" style="display:none;">
 <div class="distance-info-text" id="distanceText">📍 Distanza: -- km</div>
 </div>
 <div class="cart-total-3d" id="cartTotalSection" style="display:none;">
-<span class="cart-total-label">Totale</span>
+<span class="cart-total-label" data-trad="total">Totale</span>
 <span class="cart-total-amount" id="totalAmount">€0.00</span>
 </div>
 <div class="order-type-toggle" id="orderTypeToggle" style="display:none;">
-<div class="type-option active" id="typeDelivery" onclick="selectOrderType('delivery')"><i class="fas fa-motorcycle"></i> Consegna</div>
-<div class="type-option" id="typePickup" onclick="selectOrderType('pickup')"><i class="fas fa-store"></i> Ritiro</div>
+<div class="type-option active" id="typeDelivery" onclick="selectOrderType('delivery')"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_short">Consegna</span></div>
+<div class="type-option" id="typePickup" onclick="selectOrderType('pickup')"><i class="fas fa-store"></i> <span data-trad="pickup_short">Ritiro</span></div>
 </div>
 <div class="customer-form" id="customerForm" style="display:none;">
-<h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-user"></i> I Tuoi Dati</h3>
+<h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-user"></i> <span data-trad="your_data">I Tuoi Dati</span></h3>
 <div class="form-group">
-<label><i class="fas fa-clock"></i> Orario <span id="timeTypeLabel">consegna</span></label>
+<label><i class="fas fa-clock"></i> <span data-trad="time_label">Orario</span> <span id="timeTypeLabel" data-trad="delivery_short">consegna</span></label>
 <div class="time-toggle">
-<div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')">Subito</div>
-<div class="time-option" id="timeScheduled" onclick="selectTimeMode('scheduled')">🕐 Scegli</div>
+<div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')" data-trad="asap">⚡ Subito</div>
+<div class="time-option" id="timeScheduled" onclick="selectTimeMode('scheduled')" data-trad="choose_time">🕐 Scegli</div>
 </div>
 <div class="time-picker-wrap" id="timePickerWrap">
-<label>Seleziona orario:</label>
+<label data-trad="select_time">Seleziona orario:</label>
 <input type="time" id="scheduledTime" step="300">
 </div>
 </div>
-<div class="form-group"><label>Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
-<div class="form-group"><label>Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
+<div class="form-group"><label data-trad="name_label">Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
+<div class="form-group"><label data-trad="phone_label">Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
 <div class="form-group" id="addressGroup" style="display:none;">
-<label>Indirizzo di Consegna *</label>
+<label data-trad="address_label">Indirizzo di Consegna *</label>
 <div style="display: flex; gap: 8px;">
 <input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex: 3;">
 <input type="text" id="customerNumber" placeholder="Civico" style="flex: 1;">
 </div>
-<button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> Usa GPS</button>
+<button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> <span data-trad="use_gps">Usa GPS</span></button>
 </div>
-<div class="form-group"><label>Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
+<div class="form-group"><label data-trad="notes_label">Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
 <div style="display:none; position:absolute; left:-9999px;"><input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1"></div>
 <div class="form-group">
 <div class="privacy-checkbox">
 <input type="checkbox" id="privacyConsent" required>
-<label for="privacyConsent">Ho letto e accetto la <a onclick="openPrivacyModal()">Privacy Policy</a> *</label>
+<label for="privacyConsent"><span data-trad="privacy_accept">Ho letto e accetto la</span> <a onclick="openPrivacyModal()" data-trad="privacy_policy">Privacy Policy</a> *</label>
 </div>
 </div>
 </div>
-<button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
+<button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> <span data-trad="clear_cart">Svuota Carrello</span></button>
+<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> <span data-trad="send_order">Invia Ordine</span></button>
 </div>
 </div>
 
 <div class="modal-3d" id="reviewModal">
 <div class="modal-content-3d">
 <div class="modal-header">
-<h2><i class="fas fa-star"></i> Lascia una Recensione</h2>
+<h2><i class="fas fa-star"></i> <span data-trad="leave_review">Lascia una Recensione</span></h2>
 <button class="close-btn-3d" onclick="closeReviewModal()">×</button>
 </div>
 <div class="form-group">
-<label>Quante stelle? ⭐</label>
+<label data-trad="how_many_stars">Quante stelle? ⭐</label>
 <div class="stars-input" id="starsInput">
 <span class="star" data-value="1" onclick="selectStar(1)">★</span>
 <span class="star" data-value="2" onclick="selectStar(2)">★</span>
@@ -478,10 +469,10 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <span class="star" data-value="5" onclick="selectStar(5)">★</span>
 </div>
 </div>
-<div class="form-group"><label>Il tuo nome</label><input type="text" id="reviewName" placeholder="Mario R."></div>
-<div class="form-group"><label>La tua opinione</label><textarea class="review-textarea" id="reviewText" placeholder="La pizza era fantastica..."></textarea></div>
-<div class="form-group"><label>Numero Ordine</label><input type="text" id="reviewOrderId" readonly style="opacity:0.7;"></div>
-<button class="review-submit-btn" onclick="submitReview()"><i class="fas fa-paper-plane"></i> Invia Recensione</button>
+<div class="form-group"><label data-trad="your_name">Il tuo nome</label><input type="text" id="reviewName" placeholder="Mario R."></div>
+<div class="form-group"><label data-trad="your_opinion">La tua opinione</label><textarea class="review-textarea" id="reviewText" placeholder="La pizza era fantastica..."></textarea></div>
+<div class="form-group"><label data-trad="order_number">Numero Ordine</label><input type="text" id="reviewOrderId" readonly style="opacity:0.7;"></div>
+<button class="review-submit-btn" onclick="submitReview()"><i class="fas fa-paper-plane"></i> <span data-trad="send_review">Invia Recensione</span></button>
 </div>
 </div>
 </div>
@@ -489,17 +480,17 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="modal-3d" id="privacyModal">
 <div class="modal-content-3d">
 <div class="modal-header">
-<h2><i class="fas fa-shield-alt"></i> Privacy Policy</h2>
+<h2><i class="fas fa-shield-alt"></i> <span data-trad="privacy_policy">Privacy Policy</span></h2>
 <button class="close-btn-3d" onclick="closePrivacyModal()">×</button>
 </div>
 <div class="privacy-text">
-<p><strong>Antica Pizzeria Grasso</strong> rispetta la tua privacy.</p>
-<h3>📋 Quali dati raccogliamo</h3>
-<ul><li>Nome e cognome</li><li>Telefono</li><li>Indirizzo</li><li>Note ordine</li></ul>
-<h3>🔒 Sicurezza</h3>
-<p>Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3> Conservazione</h3>
-<p>Conserviamo i dati per 24 mesi.</p>
+<p><strong>Antica Pizzeria Grasso</strong> <span data-trad="privacy_respect">rispetta la tua privacy.</span></p>
+<h3 data-trad="what_data">📋 Quali dati raccogliamo</h3>
+<ul><li data-trad="data_name">Nome e cognome</li><li data-trad="data_phone">Telefono</li><li data-trad="data_address">Indirizzo</li><li data-trad="data_notes">Note ordine</li></ul>
+<h3 data-trad="security">🔒 Sicurezza</h3>
+<p data-trad="security_text">Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
+<h3 data-trad="retention"> Conservazione</h3>
+<p data-trad="retention_text">Conserviamo i dati per 24 mesi.</p>
 </div>
 </div>
 </div>
@@ -507,8 +498,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="toast-3d" id="toast"></div>
 
 <div id="cookieBanner">
-<p>Utilizziamo cookie tecnici. <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;">Privacy Policy</a></p>
-<button onclick="acceptCookies()">Accetta</button>
+<p><span data-trad="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-trad="privacy_policy">Privacy Policy</a></p>
+<button onclick="acceptCookies()" data-trad="accept">Accetta</button>
 </div>
 
 <script>
@@ -524,11 +515,26 @@ async function loadTranslations(lang){
         const t=await r.json();
         currentLang=lang;
         localStorage.setItem('grasso_lang',lang);
+        // Traduci tutti gli elementi con data-trad
         document.querySelectorAll('[data-trad]').forEach(el=>{
             const k=el.getAttribute('data-trad');
-            if(t[lang]&&t[lang][k])el.textContent=t[lang][k];
+            if(t[lang]&&t[lang][k]){
+                // Se l'elemento ha figli (es. <strong>), usa innerHTML, altrimenti textContent
+                if(el.children.length > 0){
+                    el.innerHTML = t[lang][k];
+                } else {
+                    el.textContent = t[lang][k];
+                }
+            }
         });
-    }catch(e){console.error(e);}
+        // Traduci i placeholder
+        document.querySelectorAll('[data-trad-placeholder]').forEach(el=>{
+            const k=el.getAttribute('data-trad-placeholder');
+            if(t[lang]&&t[lang][k]) el.placeholder=t[lang][k];
+        });
+        // Aggiorna il select della lingua
+        document.getElementById('langSelect').value = lang;
+    }catch(e){console.error('Errore traduzioni:', e);}
 }
 function changeLanguage(lang){loadTranslations(lang);}
 function showWelcomeScreen(){document.getElementById('welcomeScreen').style.display='flex';document.getElementById('mainApp').style.display='none';}
@@ -565,9 +571,8 @@ function loginWithGoogle(){
 }
 function logout(){
     firebase.auth().signOut();
-    userType='guest';
-    localStorage.setItem('grasso_user_type','guest');
-    // Nascondi pulsante esci nel footer
+    userType='none';
+    localStorage.removeItem('grasso_user_type');
     const footerLogout = document.getElementById('footerLogout');
     if (footerLogout) footerLogout.style.display = 'none';
     showToast('👋 Arrivederci!');
@@ -576,25 +581,29 @@ function logout(){
 
 // AVVIO: controlla se utente è già loggato
 window.addEventListener('load', () => {
-    loadTranslations('it');
+    // Carica lingua salvata o default
+    const savedLang = localStorage.getItem('grasso_lang') || 'it';
+    loadTranslations(savedLang);
     
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
-            // Utente già loggato → salta benvenuto
             currentUser = user;
             userType = 'registered';
             localStorage.setItem('grasso_user_type', 'registered');
             hideWelcomeScreen();
             updateUIForLoggedInUser(user);
         } else {
-            // Non loggato → mostra SEMPRE il benvenuto
-            showWelcomeScreen();
+            const savedType = localStorage.getItem('grasso_user_type');
+            if (savedType === 'guest') {
+                hideWelcomeScreen();
+            } else {
+                showWelcomeScreen();
+            }
         }
     });
 });
 
 function updateUIForLoggedInUser(user) {
-    // Mostra pulsante esci nel footer
     const footerLogout = document.getElementById('footerLogout');
     if (footerLogout) {
         footerLogout.style.display = 'block';
@@ -918,7 +927,11 @@ function filterProducts(term){ if(currentSearchCat) renderProductList(currentSea
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories();}
 function checkIfOpen(){ const s=appData.settings; if(s.manualStatus==='open')return true; if(s.manualStatus==='closed')return false; const days=['dom','lun','mar','mer','gio','ven','sab']; const today=days[new Date().getDay()]; if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false; const dateStr=new Date().toISOString().split('T')[0]; if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(dateStr))return false; const hoursStr=s.hours||"11:00-15:00,18:00-23:00"; const ranges=hoursStr.split(',').map(r=>r.trim()).filter(Boolean); const currentMins=new Date().getHours()*60+new Date().getMinutes(); for(let range of ranges){const parts=range.split('-');if(parts.length!==2)continue;const[sh,sm]=parts[0].split(':').map(Number);const[eh,em]=parts[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(currentMins>=sh*60+sm&&currentMins<eh*60+em)return true;} return false; }
-function updateStatusBanner(){const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); b.className=`status-banner ${o?'status-open':'status-closed'}`;t.textContent=o?'🟢 APERTO':' CHIUSO';}
+function updateStatusBanner(){
+    const b=document.getElementById('statusBanner'),t=document.getElementById('statusText'),o=checkIfOpen(); 
+    b.className=`status-banner ${o?'status-open':'status-closed'}`;
+    t.textContent=o?'🟢 APERTO':'🔴 CHIUSO';
+}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast('🚫 No delivery');}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery');}}
 function checkStatusBeforeOrder(t){if(!checkIfOpen()){showToast('⚠️ Chiuso');return;}if(t==='delivery'&&appData.settings.deliveryEnabled===false){showToast('🚫 No delivery');return;}if(t==='pickup'&&appData.settings.pickupEnabled===false){showToast('🚫 No ritiro');return;}orderType=t;openCart();}
 function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
@@ -1060,7 +1073,7 @@ async function getGPSLocation(){
 }
 
 function openCart(){ 
-if(!checkIfOpen()){showToast('️ Chiuso');return;} 
+if(!checkIfOpen()){showToast('⚠️ Chiuso');return;} 
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle'); 
 if(!cart.length){it.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';} 
 else { 
@@ -1108,7 +1121,7 @@ async function confirmAndSendOrder(){
     const nt=document.getElementById('customerNotes').value.trim(); 
     if(!n){showToast('⚠️ Nome');return;} 
     const ph=p.replace(/\D/g,''); 
-    if(!/^3[0-9]{9}$/.test(ph)){showToast(' Telefono');return;} 
+    if(!/^3[0-9]{9}$/.test(ph)){showToast('❌ Telefono');return;} 
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty);});
     let df = 0;
     if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
@@ -1180,7 +1193,7 @@ function submitReview(){
     const text = document.getElementById('reviewText').value.trim(); 
     const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim(); 
     if(!selectedStars){ showToast('⚠️ Seleziona le stelle'); return; } 
-    if(!name){ showToast(' Inserisci il nome'); return; } 
+    if(!name){ showToast('❌ Inserisci il nome'); return; } 
     if(!text){ showToast('❌ Scrivi un commento'); return; } 
     db.ref('recensioni').push({ name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars, orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending' }).then(()=>{ 
         if(pendingReviewOrderId) { 
