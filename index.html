@@ -588,13 +588,8 @@ window.addEventListener('load', () => {
             hideWelcomeScreen();
             updateUIForLoggedInUser(user);
         } else {
-            // Non loggato → mostra benvenuto
-            const savedType = localStorage.getItem('grasso_user_type');
-            if (savedType === 'guest') {
-                hideWelcomeScreen();
-            } else {
-                showWelcomeScreen();
-            }
+            // Non loggato → mostra SEMPRE il benvenuto
+            showWelcomeScreen();
         }
     });
 });
