@@ -579,7 +579,7 @@ function logout(){
     location.reload();
 }
 
-// AVVIO: controlla se utente è già loggato
+// AVVIO: mostra sempre benvenuto se non loggato
 window.addEventListener('load', () => {
     // Carica lingua salvata o default
     const savedLang = localStorage.getItem('grasso_lang') || 'it';
@@ -587,18 +587,15 @@ window.addEventListener('load', () => {
     
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
+            // Utente loggato → entra direttamente
             currentUser = user;
             userType = 'registered';
             localStorage.setItem('grasso_user_type', 'registered');
             hideWelcomeScreen();
             updateUIForLoggedInUser(user);
         } else {
-            const savedType = localStorage.getItem('grasso_user_type');
-            if (savedType === 'guest') {
-                hideWelcomeScreen();
-            } else {
-                showWelcomeScreen();
-            }
+            // NON loggato → mostra SEMPRE benvenuto
+            showWelcomeScreen();
         }
     });
 });
