@@ -237,8 +237,8 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
     <div class="lang-selector">
         <label>🌍 Lingua / Language</label>
         <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="it">🇮🇹 Italiano</option>
-            <option value="en">🇬🇧 English</option>
+            <option value="it">🇮 Italiano</option>
+            <option value="en">🇬 English</option>
             <option value="de">🇩🇪 Deutsch</option>
         </select>
     </div>
@@ -377,14 +377,30 @@ body { display: flex; justify-content: center; font-family: 'Montserrat', sans-s
 <div class="reviews-public-list" id="reviewsPublicList"></div>
 </div>
 
-<footer class="app-footer">
-<div class="footer-info" id="footerInfo">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
-<div class="footer-links">
-<a onclick="openPrivacyModal()">Privacy Policy</a>
-<a onclick="showReviewsPublic()">⭐ Recensioni</a>
-<a onclick="showMyOrders()">I Miei Ordini</a>
-</div>
-<div class="copyright">© 2026 Antica Pizzeria Grasso - Puglia</div>
+<!-- FOOTER MODIFICATO E CENTRATO -->
+<footer class="app-footer" style="text-align:center;">
+    <!-- RIGA 1: Info -->
+    <div class="footer-info" id="footerInfo" style="margin-bottom:12px;">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
+    
+    <!-- RIGA 2: Pulsante Esci + Link (tutto centrato) -->
+    <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:15px; margin-bottom:12px;">
+        <!-- Pulsante Esci (visibile solo se loggato) -->
+        <div id="footerLogout" style="display:none;">
+            <button onclick="logout()" style="background:rgba(231,76,60,0.15); color:#e74c3c; border:1px solid rgba(231,76,60,0.4); padding:8px 18px; border-radius:8px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.8rem;">
+                <i class="fas fa-sign-out-alt"></i> Esci
+            </button>
+        </div>
+        
+        <!-- Link normali -->
+        <div class="footer-links" style="margin:0; display:flex; gap:15px; justify-content:center;">
+            <a onclick="openPrivacyModal()">Privacy Policy</a>
+            <a onclick="showReviewsPublic()">⭐ Recensioni</a>
+            <a onclick="showMyOrders()">I Miei Ordini</a>
+        </div>
+    </div>
+    
+    <!-- RIGA 3: Copyright -->
+    <div class="copyright">© 2026 Antica Pizzeria Grasso</div>
 </footer>
 </div>
 
@@ -548,7 +564,48 @@ function loginWithGoogle(){
         showToast('✅ Google!');closeAuthModal();hideWelcomeScreen();
     }).catch(er=>showToast('❌ '+er.message));
 }
-function logout(){firebase.auth().signOut();userType='guest';localStorage.setItem('grasso_user_type','guest');showToast('👋 Arrivederci!');location.reload();}
+function logout(){
+    firebase.auth().signOut();
+    userType='guest';
+    localStorage.setItem('grasso_user_type','guest');
+    // Nascondi pulsante esci nel footer
+    const footerLogout = document.getElementById('footerLogout');
+    if (footerLogout) footerLogout.style.display = 'none';
+    showToast('👋 Arrivederci!');
+    location.reload();
+}
+
+// AVVIO: controlla se utente è già loggato
+window.addEventListener('load', () => {
+    loadTranslations('it');
+    
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // Utente già loggato → salta benvenuto
+            currentUser = user;
+            userType = 'registered';
+            localStorage.setItem('grasso_user_type', 'registered');
+            hideWelcomeScreen();
+            updateUIForLoggedInUser(user);
+        } else {
+            // Non loggato → mostra benvenuto
+            const savedType = localStorage.getItem('grasso_user_type');
+            if (savedType === 'guest') {
+                hideWelcomeScreen();
+            } else {
+                showWelcomeScreen();
+            }
+        }
+    });
+});
+
+function updateUIForLoggedInUser(user) {
+    // Mostra pulsante esci nel footer
+    const footerLogout = document.getElementById('footerLogout');
+    if (footerLogout) {
+        footerLogout.style.display = 'block';
+    }
+}
 
 const CACHE_DURATION = 3600000;
 let appData = {
@@ -1215,41 +1272,6 @@ function showReviewsPublic(){ document.getElementById('mainMenu').style.display=
 function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').once('value', s=>{ const reviews = []; s.forEach(c=>{ const r=c.val(); if(r.status==='approved') reviews.push({id:c.key,...r}); }); reviews.sort((a,b)=>b.timestamp-a.timestamp); const list = document.getElementById('reviewsPublicList'); if(!list) return; if(reviews.length===0){ list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! 🌟</div>'; return; } list.innerHTML = reviews.map(r=>{ const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'numeric'}); return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join(''); }); }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();if(e.target.id==='authModal')closeAuthModal();}
-
-// AVVIO: controlla se utente è già loggato
-window.addEventListener('load', () => {
-    loadTranslations('it');
-    
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // Utente già loggato → salta benvenuto
-            currentUser = user;
-            userType = 'registered';
-            localStorage.setItem('grasso_user_type', 'registered');
-            hideWelcomeScreen();
-            updateUIForLoggedInUser(user);
-        } else {
-            // Non loggato → mostra benvenuto
-            const savedType = localStorage.getItem('grasso_user_type');
-            if (savedType === 'guest') {
-                hideWelcomeScreen();
-            } else {
-                showWelcomeScreen();
-            }
-        }
-    });
-});
-
-function updateUIForLoggedInUser(user) {
-    const userMenu = document.getElementById('userMenu');
-    if (userMenu) {
-        userMenu.style.display = 'flex';
-        userMenu.innerHTML = `
-            <span>👤 ${user.displayName || user.email}</span>
-            <button onclick="logout()" class="logout-btn">Esci</button>
-        `;
-    }
-}
 </script>
 </body>
 </html>
