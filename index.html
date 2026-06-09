@@ -1216,11 +1216,40 @@ function loadReviewsPublic(){ db.ref('recensioni').orderByChild('timestamp').onc
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();if(e.target.id==='authModal')closeAuthModal();}
 
-// AVVIO: mostra schermata benvenuto
+// AVVIO: controlla se utente è già loggato
 window.addEventListener('load', () => {
     loadTranslations('it');
-    showWelcomeScreen();
+    
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // Utente già loggato → salta benvenuto
+            currentUser = user;
+            userType = 'registered';
+            localStorage.setItem('grasso_user_type', 'registered');
+            hideWelcomeScreen();
+            updateUIForLoggedInUser(user);
+        } else {
+            // Non loggato → mostra benvenuto
+            const savedType = localStorage.getItem('grasso_user_type');
+            if (savedType === 'guest') {
+                hideWelcomeScreen();
+            } else {
+                showWelcomeScreen();
+            }
+        }
+    });
 });
+
+function updateUIForLoggedInUser(user) {
+    const userMenu = document.getElementById('userMenu');
+    if (userMenu) {
+        userMenu.style.display = 'flex';
+        userMenu.innerHTML = `
+            <span>👤 ${user.displayName || user.email}</span>
+            <button onclick="logout()" class="logout-btn">Esci</button>
+        `;
+    }
+}
 </script>
 </body>
 </html>
