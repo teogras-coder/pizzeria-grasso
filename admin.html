@@ -194,7 +194,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .promo-product-item:last-child { border-bottom: none; }
 .promo-product-remove { background: #f87171; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; }
 
-/* MODALI CUSTOM (sostituiscono confirm/prompt nativi) */
+/* MODALI CUSTOM */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10001; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
 .modal-overlay.active { display: flex; }
 .modal-box { background: linear-gradient(145deg, var(--card-light), var(--card)); padding: 28px 24px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid rgba(212,168,75,0.25); }
@@ -389,7 +389,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         </div>
         <div class="form-group">
           <label>Titolo notifica *</label>
-          <input type="text" class="form-input" id="notifTitle" placeholder="Es: 🍕 Nuova offerta speciale!">
+          <input type="text" class="form-input" id="notifTitle" placeholder="Es:  Nuova offerta speciale!">
         </div>
         <div class="form-group">
           <label>Messaggio *</label>
@@ -619,9 +619,9 @@ const firebaseConfig = {
   appId: "1:686300112893:web:e147b82f91374f12db1b94"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database(), storage = firebase.storage();
+const db = firebase.database();
 
-// ─── STATO GLOBALE ────────────────────────────────────────────────────────────
+// ─── STATO GLOBALE ───────────────────────────────────────────────────────────
 let appData = {
   categories: {}, menu: {}, promotions: {},
   settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15, deliveryBaseFee: 3.00, deliveryExtraFee: 2.00, deliveryMaxRadius: 4, deliveryExtraRadius: 6 },
@@ -635,8 +635,9 @@ let notificationSound = null;
 let selectedNotifDest = 'clients';
 let fcmTokensData = {};
 let tempPromoProducts = [];
+let isFirstLoad = true; // FIX #2: Flag per evitare notifiche al primo caricamento
 
-// ─── MODALI CUSTOM (sostituiscono confirm/prompt nativi) ─────────────────────
+// ─── MODALI CUSTOM ─────────────────────────────────────────────────────────────
 function showConfirm(title, message, isDanger = true) {
   return new Promise(resolve => {
     const overlay = document.getElementById('confirmModal');
@@ -807,24 +808,29 @@ function setupListeners() {
     const orders = {};
     s.forEach(c => { orders[c.key] = { id: c.key, ...c.val() }; });
     
-    Object.values(orders).forEach(order => {
-      const prev = previousOrders[order.id];
-      if (prev && prev.status !== order.status) {
-        const driverName = order.assignedName || 'Fattorino';
-        const orderId = order.orderId || order.id;
-        
-        if (order.status === 'preparing' && prev.status === 'new') {
-          playAdminNotification();
-          showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
-        } else if (order.status === 'picked' && prev.status === 'ready') {
-          playAdminNotification();
-          showToast(`📦 ${driverName} ha ritirato l'ordine ${orderId}`);
-        } else if (order.status === 'delivered' && prev.status === 'delivering') {
-          playAdminNotification();
-          showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
+    // FIX #2: Non notificare al primo caricamento
+    if (!isFirstLoad) {
+      Object.values(orders).forEach(order => {
+        const prev = previousOrders[order.id];
+        if (prev && prev.status !== order.status) {
+          const driverName = order.assignedName || 'Fattorino';
+          const orderId = order.orderId || order.id;
+          
+          if (order.status === 'preparing' && prev.status === 'new') {
+            playAdminNotification();
+            showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
+          } else if (order.status === 'picked' && prev.status === 'ready') {
+            playAdminNotification();
+            showToast(`📦 ${driverName} ha ritirato l'ordine ${orderId}`);
+          } else if (order.status === 'delivered' && prev.status === 'delivering') {
+            playAdminNotification();
+            showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
+          }
         }
-      }
-    });
+      });
+    } else {
+      isFirstLoad = false;
+    }
     
     previousOrders = orders;
     renderOrders(orders);
@@ -1160,7 +1166,7 @@ function createPromotion() {
   if (!t || !s || !e || !mx) { showToast('⚠️ Compila tutti i campi obbligatori'); return; }
   if (s > e) { showToast('⚠️ Date errate'); return; }
   if (tempPromoProducts.length === 0) { showToast('⚠️ Aggiungi almeno un prodotto alla promo'); return; }
-  if (mx < 1) { showToast('⚠️ Max utilizzi non valido'); return; }
+  if (mx < 1) { showToast('️ Max utilizzi non valido'); return; }
   
   const today = new Date().toISOString().split('T')[0];
   if (s < today) {
@@ -1250,7 +1256,7 @@ function updateDeliveryInfo() {
 
 async function getPizzeriaGPS() {
   if (!navigator.geolocation) { showToast('❌ GPS non disponibile'); return; }
-  showToast('📍 Ottenendo posizione...');
+  showToast(' Ottenendo posizione...');
   try {
     const pos = await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 });
@@ -1341,7 +1347,7 @@ async function addCategory() {
   const key = sanitizeKey(k);
   
   if (!key || !/^[a-z][a-z0-9_]*$/.test(key)) { 
-    showToast('❌ Chiave non valida (solo lettere minuscole)'); 
+    showToast(' Chiave non valida (solo lettere minuscole)'); 
     return; 
   }
   if (appData.categories[key]) { 
@@ -1431,17 +1437,19 @@ async function deleteProduct(c, i) {
   if (!ok) return;
   appData.menu[c].splice(i, 1); 
   db.ref('menu').set(appData.menu); 
-  showToast('🗑️ Eliminato'); 
+  showToast('️ Eliminato'); 
   renderMenu(); 
   populatePromoProductSelect(); 
 }
 
+// FIX #8: Salva SOLO il prodotto modificato, non tutto il menu
 function updateProduct(c, i, f, v) { 
   if (f === 'price') {
     if (isNaN(v) || v < 0) { showToast('❌ Prezzo non valido'); return; }
   }
   appData.menu[c][i][f] = f === 'price' ? v : sanitize(v); 
-  db.ref('menu').set(appData.menu); 
+  // Salva solo questo campo specifico
+  db.ref(`menu/${c}/${i}/${f}`).set(appData.menu[c][i][f]);
 }
 
 async function compressImage(file) {
@@ -1566,17 +1574,20 @@ function addDriverRow() {
   list.appendChild(r);
 }
 
+// FIX #4: Valida che il PIN driver non coincida con PIN admin
 function saveDrivers() {
   const dl = {}; 
   let err = false;
   const pins = new Set();
+  const adminPin = appData.settings.adminPin || "1234";
   
   document.querySelectorAll('.driver-row').forEach(r => {
     const n = sanitize(r.querySelector('.driver-name').value);
     const p = r.querySelector('.driver-pin').value.trim();
     if (!n || !p) { showToast('⚠️ Compila nome e PIN'); err = true; return; }
     if (!/^\d{4,6}$/.test(p)) { showToast('⚠️ PIN deve essere 4-6 cifre'); err = true; return; }
-    if (pins.has(p)) { showToast('⚠️ PIN duplicato: ' + p); err = true; return; }
+    if (pins.has(p)) { showToast('⚠️ PIN duplicato tra fattorini: ' + p); err = true; return; }
+    if (p === adminPin) { showToast('⚠️ PIN duplicato con admin'); err = true; return; }
     pins.add(p);
     dl[p] = n;
   });
@@ -1591,23 +1602,39 @@ function saveDrivers() {
 }
 
 // ─── SICUREZZA ────────────────────────────────────────────────────────────────
-function changePin() {
+// FIX #5: Check PIN sempre su Firebase, mai in memoria locale
+async function changePin() {
   const cp = document.getElementById('currentPin').value;
   const np = document.getElementById('newPin').value.trim();
   const cf = document.getElementById('confirmPin').value;
   
-  if (cp !== (appData.settings.adminPin || "1234")) { showToast("❌ PIN attuale errato"); return; }
-  if (!/^\d{4,}$/.test(np)) { showToast("⚠️ Minimo 4 cifre"); return; }
-  if (np === cf === false) { showToast("❌ Non coincidono"); return; }
-  if (np !== cf) { showToast("❌ I PIN non coincidono"); return; }
+  if (!cp) { showToast("⚠️ Inserisci PIN attuale"); return; }
+  if (!np) { showToast("⚠️ Inserisci nuovo PIN"); return; }
+  if (!cf) { showToast("⚠️ Conferma nuovo PIN"); return; }
   
-  appData.settings.adminPin = np;
-  db.ref('settings/adminPin').set(np).then(() => { 
+  // FIX #1: Rimossa la riga errata "if (np === cf === false)"
+  if (np !== cf) { showToast("❌ I PIN non coincidono"); return; }
+  if (!/^\d{4,}$/.test(np)) { showToast("⚠️ Minimo 4 cifre"); return; }
+  
+  try {
+    // Check SU FIREBASE, non in appData.settings
+    const snapshot = await db.ref('settings/adminPin').once('value');
+    const currentPin = snapshot.val() || "1234";
+    
+    if (cp !== currentPin) { 
+      showToast(" PIN attuale errato"); 
+      return; 
+    }
+    
+    await db.ref('settings/adminPin').set(np);
+    appData.settings.adminPin = np; // Aggiorna solo dopo successo
     showToast("✅ PIN cambiato"); 
     document.getElementById('currentPin').value = ''; 
     document.getElementById('newPin').value = ''; 
     document.getElementById('confirmPin').value = ''; 
-  }).catch(err => showToast('❌ Errore: ' + err.message));
+  } catch(err) {
+    showToast('❌ Errore: ' + err.message);
+  }
 }
 
 // ─── COLORI / PALETTE ─────────────────────────────────────────────────────────
@@ -1755,7 +1782,7 @@ async function sendNotification() {
   const ok = await showConfirm('Inviare Notifica?', `La notifica verrà inviata a ${tokens.length} dispositivi.`);
   if (!ok) return;
   
-  showToast('📤 Invio in corso...');
+  showToast(' Invio in corso...');
   
   try {
     const notifRef = db.ref('notifiche_push').push();
