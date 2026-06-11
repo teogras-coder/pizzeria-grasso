@@ -211,6 +211,11 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 15px 25px; border-radius: 12px; font-weight: 600; z-index: 9999; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.3); max-width: 90%; text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Stili WhatsApp per fattorini */
+.btn-whatsapp { background: #25D366; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.3s; }
+.btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); }
+.btn-whatsapp:active { transform: translateY(0); }
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
@@ -424,7 +429,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <div id="promotionsList"></div>
       <div class="card" style="border:2px dashed var(--gold-dark);">
         <div class="card-title">Nuova Promozione</div>
-        <div class="form-group"><label>Titolo *</label><input type="text" class="form-input" id="newPromoTitle" placeholder="Es: 🍕 Pizza Margherita Scontata"></div>
+        <div class="form-group"><label>Titolo *</label><input type="text" class="form-input" id="newPromoTitle" placeholder="Es:  Pizza Margherita Scontata"></div>
         <div class="form-group"><label>Messaggio</label><textarea class="form-input" id="newPromoMessage" placeholder="Es: Solo oggi!"></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
           <div class="form-group"><label>Inizio *</label><input type="date" class="form-input" id="newPromoStart"></div>
@@ -620,7 +625,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const storage = firebase.storage();  
+const storage = firebase.storage();
 
 // ─── STATO GLOBALE ───────────────────────────────────────────────────────────
 let appData = {
@@ -636,7 +641,7 @@ let notificationSound = null;
 let selectedNotifDest = 'clients';
 let fcmTokensData = {};
 let tempPromoProducts = [];
-let isFirstLoad = true; // FIX #2: Flag per evitare notifiche al primo caricamento
+let isFirstLoad = true;
 
 // ─── MODALI CUSTOM ─────────────────────────────────────────────────────────────
 function showConfirm(title, message, isDanger = true) {
@@ -706,7 +711,7 @@ function playAdminNotification() {
   } catch(e) {}
 }
 
-// ─── SIDEBAR MOBILE ───────────────────────────────────────────────────────────
+// ─── SIDEBAR MOBILE ──────────────────────────────────────────────────────────
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -758,7 +763,7 @@ async function logout() {
   document.getElementById('loginError').style.display = 'none';
 }
 
-// ─── INIT APP ─────────────────────────────────────────────────────────────────
+// ── INIT APP ─────────────────────────────────────────────────────────────────
 function initApp() {
   updateClock();
   setInterval(updateClock, 1000);
@@ -809,7 +814,6 @@ function setupListeners() {
     const orders = {};
     s.forEach(c => { orders[c.key] = { id: c.key, ...c.val() }; });
     
-    // FIX #2: Non notificare al primo caricamento
     if (!isFirstLoad) {
       Object.values(orders).forEach(order => {
         const prev = previousOrders[order.id];
@@ -973,7 +977,7 @@ async function clearOldOrders() {
   db.ref('ordini').orderByChild('timestamp').endAt(cutoff).once('value', snap => {
     let count = 0;
     snap.forEach(c => { if (c.val().status === 'delivered') { c.ref.remove(); count++; } });
-    showToast('🗑️ Puliti ' + count + ' ordini');
+    showToast('️ Puliti ' + count + ' ordini');
   });
 }
 
@@ -1020,7 +1024,7 @@ async function deleteReview(id) {
   const ok = await showConfirm('Eliminare Recensione?', 'Questa azione non può essere annullata.');
   if (!ok) return;
   db.ref('recensioni/' + id).remove(); 
-  showToast('🗑️ Eliminata'); 
+  showToast('️ Eliminata'); 
   loadReviews(); 
 }
 
@@ -1102,7 +1106,7 @@ function addProductToPromo() {
   const price = parseFloat(document.getElementById('promoProductPrice').value);
   
   if (!select.value) { showToast('⚠️ Seleziona un prodotto'); return; }
-  if (!qty || qty < 1) { showToast('⚠️ Quantità non valida'); return; }
+  if (!qty || qty < 1) { showToast('️ Quantità non valida'); return; }
   if (isNaN(price) || price < 0) { showToast('⚠️ Prezzo non valido'); return; }
   
   const [catKey, idx] = select.value.split('|');
@@ -1164,7 +1168,7 @@ function createPromotion() {
   const e = document.getElementById('newPromoEnd').value;
   const mx = parseInt(document.getElementById('newPromoMaxUses').value);
   
-  if (!t || !s || !e || !mx) { showToast('⚠️ Compila tutti i campi obbligatori'); return; }
+  if (!t || !s || !e || !mx) { showToast('️ Compila tutti i campi obbligatori'); return; }
   if (s > e) { showToast('⚠️ Date errate'); return; }
   if (tempPromoProducts.length === 0) { showToast('⚠️ Aggiungi almeno un prodotto alla promo'); return; }
   if (mx < 1) { showToast('️ Max utilizzi non valido'); return; }
@@ -1256,7 +1260,7 @@ function updateDeliveryInfo() {
 }
 
 async function getPizzeriaGPS() {
-  if (!navigator.geolocation) { showToast('❌ GPS non disponibile'); return; }
+  if (!navigator.geolocation) { showToast(' GPS non disponibile'); return; }
   showToast(' Ottenendo posizione...');
   try {
     const pos = await new Promise((resolve, reject) => {
@@ -1443,13 +1447,11 @@ async function deleteProduct(c, i) {
   populatePromoProductSelect(); 
 }
 
-// FIX #8: Salva SOLO il prodotto modificato, non tutto il menu
 function updateProduct(c, i, f, v) { 
   if (f === 'price') {
     if (isNaN(v) || v < 0) { showToast('❌ Prezzo non valido'); return; }
   }
   appData.menu[c][i][f] = f === 'price' ? v : sanitize(v); 
-  // Salva solo questo campo specifico
   db.ref(`menu/${c}/${i}/${f}`).set(appData.menu[c][i][f]);
 }
 
@@ -1564,18 +1566,62 @@ function saveHours() {
 function renderDrivers(data) {
   driversList = data;
   const list = document.getElementById('driversList');
-  list.innerHTML = Object.entries(data).map(([p, n]) => '<div class="driver-row" data-pin="' + p + '"><input type="text" class="driver-name" value="' + sanitize(n) + '" placeholder="Nome"><input type="text" class="driver-pin" value="' + p + '" placeholder="PIN" maxlength="6"><button class="btn-delete" onclick="this.parentElement.remove()">Elimina</button></div>').join('');
+  list.innerHTML = Object.entries(data).map(([p, n]) => {
+    const phone = data[p + '_phone'] || '';
+    return `<div class="driver-row" data-pin="${p}" style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <input type="text" class="driver-name" value="${sanitize(n)}" placeholder="Nome" style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);">
+      <input type="text" class="driver-pin" value="${p}" placeholder="PIN" maxlength="6" style="flex:1; min-width:80px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);">
+      <input type="tel" class="driver-phone" placeholder="📱 +39 333..." style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);" value="${phone}">
+      <button class="btn-whatsapp" onclick="sendWhatsAppToDriver('${p}')" style="background:#25D366; color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </button>
+      <button class="btn-delete" onclick="this.parentElement.remove()" style="background:#f87171; color:white; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>`;
+  }).join('');
 }
 
 function addDriverRow() {
   const list = document.getElementById('driversList');
   const r = document.createElement('div');
   r.className = 'driver-row';
-  r.innerHTML = '<input type="text" class="driver-name" placeholder="Nome"><input type="text" class="driver-pin" placeholder="PIN" maxlength="6"><button class="btn-delete" onclick="this.parentElement.remove()">Elimina</button>';
+  r.style.cssText = 'background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;';
+  r.innerHTML = '<input type="text" class="driver-name" placeholder="Nome" style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><input type="text" class="driver-pin" placeholder="PIN" maxlength="6" style="flex:1; min-width:80px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><input type="tel" class="driver-phone" placeholder="📱 +39 333..." style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><button class="btn-whatsapp" onclick="sendWhatsAppToDriver(this.parentElement.dataset.pin)" style="background:#25D366; color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;"><i class="fab fa-whatsapp"></i> WhatsApp</button><button class="btn-delete" onclick="this.parentElement.remove()" style="background:#f87171; color:white; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>';
   list.appendChild(r);
 }
 
-// FIX #4: Valida che il PIN driver non coincida con PIN admin
+function sendWhatsAppToDriver(pin) {
+  const driverRow = document.querySelector(`.driver-row[data-pin="${pin}"]`);
+  const phoneInput = driverRow.querySelector('.driver-phone');
+  const nameInput = driverRow.querySelector('.driver-name');
+  
+  const phone = phoneInput.value.trim().replace(/\D/g, '');
+  const name = nameInput.value.trim();
+  
+  if (!phone) {
+    showToast('⚠️ Inserisci il numero di telefono');
+    phoneInput.focus();
+    return;
+  }
+  
+  if (phone.length < 10) {
+    showToast('⚠️ Numero di telefono non valido');
+    return;
+  }
+  
+  const message = `🍕 *Antica Pizzeria Grasso*\n\nCiao ${name || 'Fattorino'}!\nC'è un nuovo ordine disponibile.\n\nApri l'app per accettare! 🛵`;
+  
+  const formattedPhone = phone.startsWith('39') ? phone : '39' + phone;
+  const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+  
+  db.ref('drivers/' + pin + '_phone').set(phone);
+  
+  window.open(whatsappUrl, '_blank');
+  
+  showToast('📱 Apertura WhatsApp...');
+}
+
 function saveDrivers() {
   const dl = {}; 
   let err = false;
@@ -1585,25 +1631,27 @@ function saveDrivers() {
   document.querySelectorAll('.driver-row').forEach(r => {
     const n = sanitize(r.querySelector('.driver-name').value);
     const p = r.querySelector('.driver-pin').value.trim();
+    const phone = r.querySelector('.driver-phone').value.trim();
+    
     if (!n || !p) { showToast('⚠️ Compila nome e PIN'); err = true; return; }
     if (!/^\d{4,6}$/.test(p)) { showToast('⚠️ PIN deve essere 4-6 cifre'); err = true; return; }
-    if (pins.has(p)) { showToast('⚠️ PIN duplicato tra fattorini: ' + p); err = true; return; }
-    if (p === adminPin) { showToast('⚠️ PIN duplicato con admin'); err = true; return; }
+    if (pins.has(p)) { showToast('️ PIN duplicato tra fattorini: ' + p); err = true; return; }
+    if (p === adminPin) { showToast('️ PIN duplicato con admin'); err = true; return; }
     pins.add(p);
     dl[p] = n;
+    if (phone) dl[p + '_phone'] = phone;
   });
   
   if (err) return;
-  if (!Object.keys(dl).length) { showToast('⚠️ Aggiungi almeno 1 fattorino'); return; }
+  if (!Object.keys(dl).length) { showToast('️ Aggiungi almeno 1 fattorino'); return; }
   
   db.ref('drivers').set(dl).then(() => { 
     showToast('✅ Fattorini salvati'); 
     driversList = dl; 
-  }).catch(err => showToast('❌ Errore: ' + err.message));
+  }).catch(err => showToast(' Errore: ' + err.message));
 }
 
 // ─── SICUREZZA ────────────────────────────────────────────────────────────────
-// FIX #5: Check PIN sempre su Firebase, mai in memoria locale
 async function changePin() {
   const cp = document.getElementById('currentPin').value;
   const np = document.getElementById('newPin').value.trim();
@@ -1613,12 +1661,10 @@ async function changePin() {
   if (!np) { showToast("⚠️ Inserisci nuovo PIN"); return; }
   if (!cf) { showToast("⚠️ Conferma nuovo PIN"); return; }
   
-  // FIX #1: Rimossa la riga errata "if (np === cf === false)"
   if (np !== cf) { showToast("❌ I PIN non coincidono"); return; }
   if (!/^\d{4,}$/.test(np)) { showToast("⚠️ Minimo 4 cifre"); return; }
   
   try {
-    // Check SU FIREBASE, non in appData.settings
     const snapshot = await db.ref('settings/adminPin').once('value');
     const currentPin = snapshot.val() || "1234";
     
@@ -1628,7 +1674,7 @@ async function changePin() {
     }
     
     await db.ref('settings/adminPin').set(np);
-    appData.settings.adminPin = np; // Aggiorna solo dopo successo
+    appData.settings.adminPin = np;
     showToast("✅ PIN cambiato"); 
     document.getElementById('currentPin').value = ''; 
     document.getElementById('newPin').value = ''; 
@@ -1749,7 +1795,7 @@ function loadTokensList() {
     
     let html = '';
     entries.forEach(([id, t]) => {
-      const typeLabel = t.type === 'client' ? '👤 Cliente' : '🛵 Fattorino';
+      const typeLabel = t.type === 'client' ? ' Cliente' : '🛵 Fattorino';
       const lastSeen = t.lastSeen ? new Date(t.lastSeen).toLocaleString('it-IT', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Mai';
       html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(212,168,75,0.1);font-size:0.8rem;">
         <span style="color:var(--gold);font-weight:700;">${typeLabel}</span>
