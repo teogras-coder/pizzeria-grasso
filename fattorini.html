@@ -73,6 +73,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .order-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .order-actions button { flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
 .order-actions button:active { transform: scale(0.95); }
+.order-actions button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-accept { background: linear-gradient(180deg, var(--success) 0%, #22c55e 100%); color: white; }
 .btn-pick { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
@@ -162,6 +163,12 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
   <div style="font-size: 1.2rem; margin-bottom: 5px;">🔔 NUOVO ORDINE!</div>
   <div id="notificationText">1 ordine disponibile</div>
   <button onclick="viewNewOrders()">👁️ VEDI ORDINI</button>
+  <button onclick="document.getElementById('notificationBanner').classList.remove('show')"
+    style="margin-left:10px; background:rgba(0,0,0,0.3);
+    color:white; border:none; border-radius:50%;
+    width:28px; height:28px; cursor:pointer; font-size:1rem;">
+    ×
+  </button>
 </div>
 
 <div class="login-screen" id="loginScreen">
@@ -268,7 +275,10 @@ let ordersData = {};
 let wakeLock = null;
 let notificationSound = null;
 let pizzeriaSettings = { lat: 41.6274, lng: 15.5514 };
-let notificationListener = null;
+let hiddenOrderIds = new Set();
+let firstLoad = true;
+let notificationRef = null;
+let notificationCallback = null;
 
 // ─── MODALI CUSTOM ────────────────────────────────────────────────────────────
 function showConfirm(title, message, isDanger = false) {
@@ -329,25 +339,27 @@ function sanitize(text) {
   return text.replace(/[<>]/g, '').trim();
 }
 
-// ─── LISTENER NOTIFICHE ───────────────────────────────────────────────────────
+// ─── LISTENER NOTIFICHE (FIX 1) ───────────────────────────────────────────────
 function setupNotificationListener() {
-  if (notificationListener) {
-    db.ref('notifiche_push').off('child_added', notificationListener);
+  if (notificationRef && notificationCallback) {
+    notificationRef.off('child_added', notificationCallback);
   }
-  
-  notificationListener = db.ref('notifiche_push').limitToLast(10).on('child_added', snapshot => {
+
+  notificationRef = db.ref('notifiche_push').limitToLast(10);
+
+  notificationCallback = notificationRef.on('child_added', snapshot => {
     const notif = snapshot.val();
     const notifId = snapshot.key;
     const deviceId = localStorage.getItem('device_id');
-    
+
     if (!notif || !notif.tokens) return;
     if (!deviceId || !notif.tokens.includes(deviceId)) return;
     if (notif.letto && notif.letto[deviceId]) return;
-    
+
     showToast('🔔 ' + notif.title + ': ' + notif.body);
     playNotificationSound();
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    
+
     db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
   });
 }
@@ -431,6 +443,7 @@ async function checkPin() {
     
     if (driverEntry) {
       currentDriver = { pin, name: driverEntry[1] };
+      driversData = {}; // FIX 5: svuota subito dopo aver trovato il driver
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'block';
       document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
@@ -497,10 +510,11 @@ function setupRealtimeListeners() {
     ordersData = newOrdersData;
     renderOrders();
 
-    if (newNewCount > oldNewCount && newNewCount > 0) {
+    // FIX 4: solo dopo il primo caricamento
+    if (!firstLoad && newNewCount > oldNewCount && newNewCount > 0) {
       showNotification(newNewCount);
     } 
-    else if (myOrderReady) {
+    else if (!firstLoad && myOrderReady) {
       playNotificationSound();
       if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
       showToast('✅ Un tuo ordine è PRONTO per il ritiro!');
@@ -512,6 +526,8 @@ function setupRealtimeListeners() {
         });
       }
     }
+
+    firstLoad = false;
   }, err => {
     showToast('❌ Errore listener ordini');
   });
@@ -539,7 +555,7 @@ function showNotification(count) {
       requireInteraction: true
     });
   }
-  setTimeout(() => banner.classList.remove('show'), 8000);
+  // FIX 8: rimosso setTimeout, il banner resta visibile finché non viene chiuso manualmente
 }
 
 function viewNewOrders() {
@@ -570,11 +586,20 @@ function renderOrders() {
   let completedCount = 0;
   
   Object.values(ordersData).forEach(order => {
-    if (order.type !== 'delivery') return;
-    if (order.status === 'new' && !order.assignedDriver) {
+    // Scheda "disponibili": solo delivery non assegnati
+    if (
+      order.status === 'new' &&
+      !order.assignedDriver &&
+      order.type === 'delivery'
+    ) {
       available.push(order);
-    } else if (order.assignedDriver === currentDriver?.pin && 
-               ['new', 'preparing', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)) {
+    }
+    // Scheda "le mie": tutti i tipi assegnati a me (FIX 2 + FIX 3)
+    else if (
+      order.assignedDriver === currentDriver?.pin &&
+      !hiddenOrderIds.has(order.id) &&
+      ['new','preparing','ready','picked','delivering','delivered'].includes(order.status)
+    ) {
       myOrders.push(order);
       if (order.status === 'delivered') completedCount++;
     }
@@ -668,40 +693,48 @@ function renderOrders() {
   }).join('');
 }
 
-// ─── AZIONI ORDINI (con transaction Firebase per evitare race condition) ──────
+// ─── AZIONI ORDINI ────────────────────────────────────────────────────────────
+// FIX 2: clearCompletedOrders con hiddenOrderIds
 async function clearCompletedOrders() {
-  const ok = await showConfirm('Cancellare ordini completati?', 'Gli ordini verranno rimossi dalla vista ma non dal database.');
+  const ok = await showConfirm(
+    'Cancellare ordini completati?',
+    'Gli ordini verranno nascosti dalla vista.'
+  );
   if (!ok) return;
-  
-  const completedIds = Object.values(ordersData)
-    .filter(o => o.status === 'delivered' && o.assignedDriver === currentDriver?.pin)
-    .map(o => o.id);
-  completedIds.forEach(id => { delete ordersData[id]; });
+
+  Object.values(ordersData)
+    .filter(o => o.status === 'delivered' &&
+                 o.assignedDriver === currentDriver?.pin)
+    .forEach(o => hiddenOrderIds.add(o.id));
+
   renderOrders();
-  showToast('🗑️ Ordini completati rimossi dalla vista');
+  showToast('🗑️ Ordini completati nascosti');
 }
 
+// FIX 7: acceptOrder con feedback durante attesa
 async function acceptOrder(orderId) {
-  const ok = await showConfirm('Accettare ordine?', 'Sei sicuro di voler accettare questo ordine?');
+  const ok = await showConfirm(
+    'Accettare ordine?',
+    'Sei sicuro di voler accettare questo ordine?'
+  );
   if (!ok) return;
-  
-  const orderRef = db.ref(`ordini/${orderId}`);
-  
+
+  // Disabilita il bottone e mostra feedback
+  const btn = document.querySelector(`[onclick="acceptOrder('${orderId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Accettazione...'; }
+
+  const orderRef = db.ref('ordini/' + orderId);
+
   try {
-    // Transaction per evitare race condition
     await orderRef.transaction(order => {
       if (!order) return order;
-      if (order.assignedDriver) {
-        // Ordine già accettato da un altro fattorino
-        return order;
-      }
+      if (order.assignedDriver) return order;
       order.assignedDriver = currentDriver.pin;
       order.assignedName = currentDriver.name;
       order.acceptedAt = Date.now();
       return order;
     });
-    
-    // Verifica se l'ordine è stato accettato da noi
+
     const snapshot = await orderRef.once('value');
     const order = snapshot.val();
     if (order && order.assignedDriver === currentDriver.pin) {
@@ -712,6 +745,8 @@ async function acceptOrder(orderId) {
     }
   } catch(e) {
     showToast('❌ Errore accettazione ordine');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Accetta'; }
   }
 }
 
@@ -777,9 +812,11 @@ async function logout() {
   const ok = await showConfirm('Uscire dall\'app?', 'Dovrai reinserire il PIN per accedere.');
   if (!ok) return;
   
-  if (notificationListener) {
-    db.ref('notifiche_push').off('child_added', notificationListener);
-    notificationListener = null;
+  // FIX 1: rimozione corretta listener notifiche
+  if (notificationRef && notificationCallback) {
+    notificationRef.off('child_added', notificationCallback);
+    notificationRef = null;
+    notificationCallback = null;
   }
   
   if (wakeLock) { 
@@ -789,6 +826,9 @@ async function logout() {
   
   currentDriver = null;
   ordersData = {};
+  hiddenOrderIds = new Set(); // FIX 2: reset
+  firstLoad = true; // FIX 4: reset
+  
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('logoutBtn').classList.remove('show');
@@ -798,6 +838,7 @@ async function logout() {
   
   db.ref('ordini').off();
   db.ref('.info/connected').off();
+  db.ref('settings').off(); // FIX 6: rimozione listener settings
   
   showToast('👋 Arrivederci');
 }
