@@ -1617,7 +1617,14 @@ function sendWhatsAppToDriver(pin) {
   
   db.ref('drivers/' + pin + '_phone').set(phone);
   
-  window.open(whatsappUrl, '_blank');
+  // Trucco per iOS: crea un link temporaneo per non bloccare la pagina
+const link = document.createElement('a');
+link.href = whatsappUrl;
+link.target = '_blank';
+link.rel = 'noopener noreferrer';
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
   
   showToast('📱 Apertura WhatsApp...');
 }
@@ -1857,6 +1864,18 @@ function showToast(msg) {
   t.classList.add('show'); 
   setTimeout(() => t.classList.remove('show'), 2500); 
 }
+
+// FIX iOS: Se tornando da WhatsApp la pagina è bianca, ricarica
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    setTimeout(() => {
+      if (!document.body || document.body.innerHTML.trim() === '') {
+        window.location.reload();
+      }
+    }, 500);
+  }
+});
+
 </script>
 </body>
 </html>
