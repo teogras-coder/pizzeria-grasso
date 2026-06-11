@@ -675,13 +675,17 @@ function updateUIForLoggedInUser(user) {
 // Tutto parte da DOMContentLoaded per evitare doppio init e conflitti con Firebase
 document.addEventListener('DOMContentLoaded', () => {
   // Cookie banner
-  if (!localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').style.display = 'block';
+  if (!localStorage.getItem('cookies_accepted')) 
+    document.getElementById('cookieBanner').style.display = 'block';
 
   // Lingua salvata
   const savedLang = localStorage.getItem('grasso_lang') || 'it';
   loadTranslations(savedLang);
 
-  // Auth state: unico punto di ingresso
+  // initApp UNA VOLTA SOLA, subito
+  initApp();
+
+  // onAuthStateChanged: SOLO per mostrare/nascondere UI
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
       currentUser = user;
@@ -692,11 +696,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       showWelcomeScreen();
     }
-    // Inizializzazione app dopo auth check
-    initApp();
   });
 });
-
 function initApp() {
   cleanLocalHistory();
   // Carica carrello salvato
