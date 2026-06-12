@@ -194,6 +194,29 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .promo-product-item:last-child { border-bottom: none; }
 .promo-product-remove { background: #f87171; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; }
 
+/* Pulsante Aggiungi Prodotto nell'header */
+.btn-add-product {
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--dark);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 8px;
+  box-shadow: 0 2px 0 var(--gold-dark);
+  transition: all 0.3s;
+}
+.btn-add-product:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--gold-dark) !important;
+}
+.btn-add-product:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--gold-dark) !important;
+}
+
 /* MODALI CUSTOM */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10001; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
 .modal-overlay.active { display: flex; }
@@ -522,9 +545,22 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <button class="btn-primary" onclick="addCategory()"><i class="fas fa-plus"></i> Aggiungi</button>
     </div>
 
-    <!-- MENU -->
+    <!-- MENU - MODIFICATO CON BARRA DI RICERCA -->
     <div class="section" id="section-menu">
-      <div class="content-header"><h1><i class="fas fa-utensils"></i> Menu</h1></div>
+      <div class="content-header">
+        <h1><i class="fas fa-utensils"></i> Menu</h1>
+      </div>
+      
+      <!-- BARRA DI RICERCA -->
+      <div class="card" style="padding:15px;">
+        <div style="position:relative;">
+          <i class="fas fa-search" style="position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gold);"></i>
+          <input type="text" id="menuSearch" placeholder="🔍 Cerca prodotto..." 
+                 style="width:100%;padding:12px 15px 12px 45px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:1rem;"
+                 oninput="renderMenu()">
+        </div>
+      </div>
+      
       <div id="menuAccordion"></div>
     </div>
 
@@ -1396,12 +1432,53 @@ async function deleteCategory(k) {
 // ─── MENU ─────────────────────────────────────────────────────────────────────
 function renderMenu() {
   const container = document.getElementById('menuAccordion');
+  const searchTerm = (document.getElementById('menuSearch')?.value || '').toLowerCase();
   let h = '';
+  
   Object.keys(appData.categories).forEach(c => {
     const ci = appData.categories[c], cn = ci.name, ic = ci.icon || 'fa-utensils', pr = appData.menu[c] || [], op = openCategories.has(c);
-    h += '<div class="admin-category-accordion ' + (op ? 'open' : '') + '" id="accordion-' + c + '"><div class="admin-category-header" onclick="toggleCategoryAccordion(\''+c+'\')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ' + ic + '"></i></div><span class="admin-category-header-title">' + sanitize(cn) + '</span></div><span class="admin-category-header-count">' + pr.length + '</span></div><div class="admin-category-body">' + pr.map((p, i) => '<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">' + sanitize(p.name) + '</span><button class="delete-product-btn" onclick="deleteProduct(\''+c+'\','+i+')"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="' + sanitize(p.name) + '" onchange="updateProduct(\''+c+'\','+i+',\'name\',this.value)" placeholder="Nome"><input type="text" value="' + sanitize(p.desc || '') + '" onchange="updateProduct(\''+c+'\','+i+',\'desc\',this.value)" placeholder="Descrizione"><input type="number" step="0.50" min="0" value="' + p.price + '" onchange="updateProduct(\''+c+'\','+i+',\'price\',parseFloat(this.value))" placeholder="Prezzo"><div class="admin-product-img-wrapper">' + (p.img ? '<img src="' + p.img + '" class="admin-product-img-preview" onclick="removeProductImage(\''+c+'\','+i+')" title="Clicca per rimuovere">' : '') + '<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ' + (p.img ? 'Cambia Foto' : 'Aggiungi Foto') + '<input type="file" accept="image/*" onchange="uploadProductImage(\''+c+'\','+i+',this)"></label></div></div></div>').join('') + '<button class="btn-primary" style="margin-top:10px;" onclick="addProduct(\''+c+'\')">Aggiungi Prodotto</button></div></div>';
+    
+    // Filtra prodotti in base alla ricerca
+    const filteredProducts = pr.filter(p => 
+      p.name.toLowerCase().includes(searchTerm) || 
+      (p.desc || '').toLowerCase().includes(searchTerm)
+    );
+    
+    // Se c'è ricerca e nessun prodotto corrisponde, salta la categoria
+    if (searchTerm && filteredProducts.length === 0) return;
+    
+    h += '<div class="admin-category-accordion ' + (op ? 'open' : '') + '" id="accordion-' + c + '">';
+    
+    // HEADER con pulsante Aggiungi
+    h += '<div class="admin-category-header" onclick="toggleCategoryAccordion(\''+c+'\')">';
+    h += '<div class="admin-category-header-left">';
+    h += '<div class="admin-category-header-icon"><i class="fas ' + ic + '"></i></div>';
+    h += '<span class="admin-category-header-title">' + sanitize(cn) + '</span>';
+    h += '</div>';
+    h += '<span class="admin-category-header-count">' + pr.length + '</span>';
+    // Pulsante Aggiungi nell'header
+    h += '<button class="btn-add-product" onclick="event.stopPropagation();addProduct(\''+c+'\')" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:6px 12px;border-radius:8px;font-weight:700;font-size:0.8rem;cursor:pointer;margin-left:8px;box-shadow:0 2px 0 var(--gold-dark);"><i class="fas fa-plus"></i></button>';
+    h += '</div>';
+    
+    // BODY con prodotti
+    h += '<div class="admin-category-body">';
+    
+    const productsToShow = searchTerm ? filteredProducts : pr;
+    
+    h += productsToShow.map((p, i) => {
+      const originalIndex = pr.indexOf(p);
+      return '<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">' + sanitize(p.name) + '</span><button class="delete-product-btn" onclick="deleteProduct(\''+c+'\','+originalIndex+')"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="' + sanitize(p.name) + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'name\',this.value)" placeholder="Nome"><input type="text" value="' + sanitize(p.desc || '') + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'desc\',this.value)" placeholder="Descrizione"><input type="number" step="0.50" min="0" value="' + p.price + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'price\',parseFloat(this.value))" placeholder="Prezzo"><div class="admin-product-img-wrapper">' + (p.img ? '<img src="' + p.img + '" class="admin-product-img-preview" onclick="removeProductImage(\''+c+'\','+originalIndex+')" title="Clicca per rimuovere">' : '') + '<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ' + (p.img ? 'Cambia Foto' : 'Aggiungi Foto') + '<input type="file" accept="image/*" onchange="uploadProductImage(\''+c+'\','+originalIndex+',this)"></label></div></div></div>';
+    }).join('');
+    
+    // Pulsante aggiungi anche in fondo (per comodità)
+    if (!searchTerm) {
+      h += '<button class="btn-primary" style="margin-top:10px;" onclick="addProduct(\''+c+'\')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>';
+    }
+    
+    h += '</div></div>';
   });
-  container.innerHTML = h;
+  
+  container.innerHTML = h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto trovato</p>';
 }
 
 function toggleCategoryAccordion(c) { 
