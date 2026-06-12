@@ -1569,5 +1569,102 @@ window.onclick = e => {
   if (e.target.id === 'authModal')    closeAuthModal();
 };
 </script>
+<!-- Modal Rifiuto Ordine -->
+<div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;">
+  <div class="modal-rifiuto-content">
+    <div class="modal-rifiuto-icon">❌</div>
+    <h2>Ordine Rifiutato</h2>
+    <p id="motivoRifiuto">Troppi ordini in coda</p>
+    <button class="btn-ho-capito" onclick="chiudiModalRifiuto()">Ho capito</button>
+  </div>
+</div>
+
+<style>
+.modal-rifiuto {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.modal-rifiuto-content {
+  background: linear-gradient(145deg, #1a1209 0%, #2d1f12 100%);
+  border: 3px solid #f87171;
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(248, 113, 113, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-rifiuto-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.modal-rifiuto-content h2 {
+  color: #f87171;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.modal-rifiuto-content p {
+  color: #f5e6c8;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.btn-ho-capito {
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #991b1b;
+}
+
+.btn-ho-capito:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #991b1b;
+}
+
+/* Safe area per iPhone */
+@media (max-width: 768px) {
+  .modal-rifiuto-content {
+    padding: 30px 20px;
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+}
+</style>
+
+<script>
+function chiudiModalRifiuto() {
+  document.getElementById('modalRifiutoOrdine').style.display = 'none';
+}
+</script>
 </body>
 </html>
