@@ -1445,7 +1445,13 @@ async function sendOrder(d) {
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...'; }
   try {
     const ref = db.ref('ordini').push();
-    const orderId = 'ORD-' + ref.key.slice(-6).toUpperCase();
+    // Contatore progressivo salvato su Firebase
+const counterRef = db.ref('counter/ordini');
+const snapshot = await counterRef.transaction(current => {
+  return (current || 0) + 1;
+});
+const numeroOrdine = snapshot.snapshot.val();
+const orderId = 'ORD-' + String(numeroOrdine).padStart(5, '0'); // Es: ORD-00001
     d.orderId = orderId;
     await ref.set({
       orderId, customerName: sanitizeWA(d.name), customerPhone: sanitizeWA(d.phone),
