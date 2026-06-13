@@ -2031,7 +2031,17 @@ function showToast(msg) {
   t.classList.add('show'); 
   setTimeout(() => t.classList.remove('show'), 2500); 
 }
-
+async function resetOrderCounter() {
+    const ok = await showConfirm('⚠️ SEI SICURO?\n\nIl contatore ordini verrà azzerato.\nIl prossimo ordine sarà ORD-00001.');
+    if (!ok) return;
+    
+    try {
+        await db.ref('counter/ordini').set(0);
+        showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001');
+    } catch(e) {
+        showToast('❌ Errore: ' + e.message);
+    }
+}
 // FIX iOS: Se tornando da WhatsApp la pagina è bianca, ricarica
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
