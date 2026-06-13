@@ -1007,13 +1007,90 @@ async function deleteOrder(id) {
 }
 
 async function clearOldOrders() {
-  const ok = await showConfirm('Pulisci Vecchi Ordini?', 'Verranno eliminati gli ordini consegnati più vecchi di 60 giorni.');
-  if (!ok) return;
-  const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
-  db.ref('ordini').orderByChild('timestamp').endAt(cutoff).once('value', snap => {
+  const scelta = await showPuliziaOrdini();
+  if (!scelta) return;
+  
+  showToast(' Pulizia in corso...');
+  
+  try {
+    const snap = await db.ref('ordini').once('value');
     let count = 0;
-    snap.forEach(c => { if (c.val().status === 'delivered') { c.ref.remove(); count++; } });
-    showToast('️ Puliti ' + count + ' ordini');
+    
+    snap.forEach(child => {
+      const order = child.val();
+      let elimina = false;
+      
+      if (scelta === 'tutti') {
+        elimina = true;
+      } else if (scelta === 'rifiutati') {
+        elimina = order.status === 'rifiutato';
+      } else if (scelta === 'consegnati') {
+        elimina = order.status === 'delivered';
+      } else if (scelta === 'vecchi') {
+        const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
+        elimina = (order.timestamp || 0) < cutoff;
+      } else if (scelta === 'completati') {
+        elimina = ['delivered', 'rifiutato'].includes(order.status);
+      }
+      
+      if (elimina) {
+        child.ref.remove();
+        count++;
+      }
+    });
+    
+    showToast(`🗑️ Eliminatti ${count} ordini`);
+  } catch(e) {
+    showToast('❌ Errore: ' + e.message);
+  }
+}
+
+// Nuova funzione per scegliere cosa eliminare
+function showPuliziaOrdini() {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px);';
+    
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(145deg,#3d2b1a,#2a1e13);padding:28px 24px;border-radius:20px;width:100%;max-width:450px;border:1px solid rgba(212,168,75,0.25);">
+        <h3 style="color:#d4a84b;font-family:'Playfair Display',serif;margin-bottom:15px;font-size:1.3rem;"> Pulizia Ordini</h3>
+        <p style="color:#f5e6c8;margin-bottom:20px;line-height:1.5;">Cosa vuoi eliminare?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-pulizia" data-opzione="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;font-size:0.9rem;">
+            ✅ Completati (consegnati + rifiutati)
+          </button>
+          <button class="btn-pulizia" data-opzione="rifiutati" style="padding:12px;border-radius:10px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#f87171;font-weight:600;cursor:pointer;font-size:0.9rem;">
+            ❌ Solo Rifiutati
+          </button>
+          <button class="btn-pulizia" data-opzione="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;font-size:0.9rem;">
+             Solo Consegnati
+          </button>
+          <button class="btn-pulizia" data-opzione="vecchi" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">
+            📅 Più vecchi di 60 giorni (tutti gli stati)
+          </button>
+          <button class="btn-pulizia" data-opzione="tutti" style="padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.2);color:#ef4444;font-weight:700;cursor:pointer;font-size:0.9rem;">
+            ⚠️ TUTTI GLI ORDINI (pericoloso!)
+          </button>
+          <button id="btnAnnullaPulizia" style="padding:12px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card-light);color:var(--cream);font-weight:600;cursor:pointer;font-size:0.9rem;margin-top:10px;">
+            Annulla
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    overlay.querySelectorAll('.btn-pulizia').forEach(btn => {
+      btn.onclick = () => {
+        document.body.removeChild(overlay);
+        resolve(btn.dataset.opzione);
+      };
+    });
+    
+    document.getElementById('btnAnnullaPulizia').onclick = () => {
+      document.body.removeChild(overlay);
+      resolve(null);
+    };
   });
 }
 
