@@ -16,8 +16,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
-<!-- GEMINI SDK – opzionale per la traduzione automatica -->
-<script src="https://cdn.jsdelivr.net/npm/@google/genai@2.8.0/dist/browser.js"></script>
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -174,7 +172,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .admin-category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 14px; }
 .admin-category-accordion.open .admin-category-body { max-height: 5000px; padding: 14px; border-top: 1px solid rgba(212,168,75,0.1); }
 
-.admin-product-item { background: rgba(0,0,0,0.15); padding: 12px; border-radius: 10px; margin-bottom: 10px; }
+.admin-product-item { background: rgba(0,0,0,0.15); padding: 12px; border-radius: 10px; margin-bottom: 10px; overflow: visible; }
 .admin-product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .admin-product-name { color: var(--gold-light); font-weight: 600; }
 .delete-product-btn { background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; }
@@ -185,14 +183,13 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .admin-product-img-upload { font-size: 0.75rem; color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 4px; }
 .admin-product-img-upload input { display: none; }
 
-/* Traduzioni – area espansa */
 .translations-area { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(212,168,75,0.2); }
 .translations-area h4 { color: var(--gold); font-size: 0.85rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-.translations-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.translations-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
 .translations-row input { padding: 6px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.8rem; }
 .translations-row label { font-size: 0.7rem; color: #8a7a5a; font-weight: 700; text-transform: uppercase; }
 
-.btn-translate { background: var(--gold); color: var(--dark); border: none; padding: 6px 14px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
+.btn-translate { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: block; width: 100%; margin-top: 12px; }
 .btn-translate:hover { background: var(--gold-light); }
 .btn-translate:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -1534,7 +1531,6 @@ function renderMenu() {
     h += '<span class="admin-category-header-title">' + sanitize(cn) + '</span>';
     h += '</div>';
     h += '<span class="admin-category-header-count">' + pr.length + '</span>';
-    // Pulsante Aggiungi nell'header
     h += '<button class="btn-add-product" onclick="event.stopPropagation();addProduct(\''+c+'\')" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:6px 12px;border-radius:8px;font-weight:700;font-size:0.8rem;cursor:pointer;margin-left:8px;box-shadow:0 2px 0 var(--gold-dark);"><i class="fas fa-plus"></i></button>';
     h += '</div>';
     
@@ -1543,10 +1539,56 @@ function renderMenu() {
     
     const productsToShow = searchTerm ? filteredProducts : pr;
     
-    h += productsToShow.map((p, i) => {
+    productsToShow.forEach((p, i) => {
       const originalIndex = pr.indexOf(p);
-      return '<div class="admin-product-item"><div class="admin-product-header"><span class="admin-product-name">' + sanitize(p.name) + '</span><button class="delete-product-btn" onclick="deleteProduct(\''+c+'\','+originalIndex+')"><i class="fas fa-times"></i></button></div><div class="admin-product-inputs"><input type="text" value="' + sanitize(p.name) + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'name\',this.value)" placeholder="Nome"><input type="text" value="' + sanitize(p.desc || '') + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'desc\',this.value)" placeholder="Descrizione"><input type="number" step="0.50" min="0" value="' + p.price + '" onchange="updateProduct(\''+c+'\','+originalIndex+',\'price\',parseFloat(this.value))" placeholder="Prezzo"><div class="admin-product-img-wrapper">' + (p.img ? '<img src="' + p.img + '" class="admin-product-img-preview" onclick="removeProductImage(\''+c+'\','+originalIndex+')" title="Clicca per rimuovere">' : '') + '<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ' + (p.img ? 'Cambia Foto' : 'Aggiungi Foto') + '<input type="file" accept="image/*" onchange="uploadProductImage(\''+c+'\','+originalIndex+',this)"></label></div></div></div>';
-    }).join('');
+      const translations = p.translations || {};
+      const itName = p.name || '';
+      const itDesc = p.desc || '';
+      const enName = translations.en?.name || '';
+      const enDesc = translations.en?.desc || '';
+      const deName = translations.de?.name || '';
+      const deDesc = translations.de?.desc || '';
+      
+      h += `
+        <div class="admin-product-item">
+          <div class="admin-product-header">
+            <span class="admin-product-name">${sanitize(itName)}</span>
+            <button class="delete-product-btn" onclick="deleteProduct('${c}',${originalIndex})"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="admin-product-inputs">
+            <input type="text" value="${sanitize(itName)}" onchange="updateProduct('${c}',${originalIndex},'name',this.value)" placeholder="Nome (IT)">
+            <input type="text" value="${sanitize(itDesc)}" onchange="updateProduct('${c}',${originalIndex},'desc',this.value)" placeholder="Descrizione (IT)">
+            <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${c}',${originalIndex},'price',parseFloat(this.value))" placeholder="Prezzo">
+            <div class="admin-product-img-wrapper">
+              ${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${originalIndex})" title="Clicca per rimuovere">` : ''}
+              <label class="admin-product-img-upload"><i class="fas fa-camera"></i> ${p.img ? 'Cambia Foto' : 'Aggiungi Foto'}
+                <input type="file" accept="image/*" onchange="uploadProductImage('${c}',${originalIndex},this)">
+              </label>
+            </div>
+            <div class="translations-area">
+              <h4><i class="fas fa-language"></i> Traduzioni</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+                <div>
+                  <div class="translations-row">
+                    <div><label>EN Nome</label><input type="text" class="translation-en-name" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(enName)}" onchange="updateProductTranslation('${c}',${originalIndex},'en','name',this.value)"></div>
+                    <div><label>EN Desc</label><input type="text" class="translation-en-desc" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(enDesc)}" onchange="updateProductTranslation('${c}',${originalIndex},'en','desc',this.value)"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="translations-row">
+                    <div><label>DE Nome</label><input type="text" class="translation-de-name" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(deName)}" onchange="updateProductTranslation('${c}',${originalIndex},'de','name',this.value)"></div>
+                    <div><label>DE Desc</label><input type="text" class="translation-de-desc" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(deDesc)}" onchange="updateProductTranslation('${c}',${originalIndex},'de','desc',this.value)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-translate" onclick="translateProductWithGemini('${c}',${originalIndex})">
+              <i class="fas fa-language"></i> Traduci automaticamente (IT → EN, DE)
+            </button>
+          </div>
+        </div>
+      `;
+    });
     
     // Pulsante aggiungi anche in fondo (per comodità)
     if (!searchTerm) {
@@ -1560,9 +1602,25 @@ function renderMenu() {
 }
 
 function toggleCategoryAccordion(c) { 
-  if (openCategories.has(c)) openCategories.delete(c); else openCategories.add(c); 
-  const e = document.getElementById('accordion-' + c); 
-  if (e) e.classList.toggle('open'); 
+  // Se è già aperta, la chiudiamo
+  if (openCategories.has(c)) {
+    openCategories.delete(c);
+    const el = document.getElementById('accordion-' + c);
+    if (el) el.classList.remove('open');
+    return;
+  }
+
+  // Altrimenti chiudi tutte le altre
+  openCategories.forEach(cat => {
+    const other = document.getElementById('accordion-' + cat);
+    if (other) other.classList.remove('open');
+  });
+  openCategories.clear();
+
+  // Apri questa
+  openCategories.add(c);
+  const current = document.getElementById('accordion-' + c);
+  if (current) current.classList.add('open');
 }
 
 async function addProduct(c) {
@@ -1619,217 +1677,92 @@ function updateProduct(c, i, f, v) {
   db.ref(`menu/${c}/${i}/${f}`).set(appData.menu[c][i][f]);
 }
 
-// ─── TRADUZIONI PRODOTTI ──────────────────────────────────────────────────────
-
+// ─── TRADUZIONI PRODOTTI (con MyMemory) ──────────────────────────────────────
 async function updateProductTranslation(c, i, lang, field, value) {
   const sanitized = sanitize(value);
   if (!appData.menu[c][i].translations) appData.menu[c][i].translations = {};
   if (!appData.menu[c][i].translations[lang]) appData.menu[c][i].translations[lang] = {};
   appData.menu[c][i].translations[lang][field] = sanitized;
   await db.ref(`menu/${c}/${i}/translations/${lang}/${field}`).set(sanitized);
-  // Non serve aggiornare la UI, il campo input ha già il valore
 }
 
 async function translateProductWithGemini(c, i) {
   const product = appData.menu[c][i];
   if (!product) return;
-  
-  // Prendi nome e descrizione in italiano
+
   const italianName = product.name || '';
   const italianDesc = product.desc || '';
-  
   if (!italianName) {
     showToast('⚠️ Nome prodotto in italiano obbligatorio');
     return;
   }
-  
-  // Se non c'è una chiave Gemini, fallback
-  const geminiKey = localStorage.getItem('gemini_api_key');
-  if (!geminiKey) {
-    showToast('❌ Chiave Gemini non configurata. Vedi istruzioni.');
-    return;
-  }
-  
+
   const btn = document.querySelector(`.btn-translate[data-index="${i}"][data-cat="${c}"]`);
-  if (btn) { btn.disabled = true; btn.textContent = '⏳...'; }
-  
-  try {
-    // Chiamata alla Gemini API (modalità generativa)
-    const prompt = `
-      Traduci i seguenti nomi e descrizioni di prodotti dal italiano all'inglese e al tedesco.
-      
-      Prodotto: "${italianName}"
-      Descrizione: "${italianDesc}"
-      
-      Restituisci solo un JSON valido senza spiegazioni extra:
-      {
-        "en": { "name": "...", "desc": "..." },
-        "de": { "name": "...", "desc": "..." }
+  if (!btn) {
+    // Potrebbe essere il nuovo bottone sotto la scheda prodotto
+    const allBtns = document.querySelectorAll('.btn-translate');
+    allBtns.forEach(b => {
+      if (b.onclick && b.onclick.toString().includes(`'${c}',${i}`)) {
+        b.disabled = true;
+        b.textContent = '⏳ Traduzione...';
       }
-    `;
-    
-    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=' + geminiKey, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      })
     });
-    
-    const data = await response.json();
-    let translated = { en: { name: italianName, desc: italianDesc }, de: { name: italianName, desc: italianDesc } };
-    
-    try {
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.en && parsed.de) translated = parsed;
+  } else {
+    btn.disabled = true;
+    btn.textContent = '⏳ Traduzione...';
+  }
+
+  try {
+    async function translateText(text, targetLang) {
+      if (!text || text.trim() === '') return '';
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=it|${targetLang}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.responseData && data.responseData.translatedText) {
+        return data.responseData.translatedText;
+      } else {
+        return text;
       }
-    } catch(e) { /* fallback */ }
-    
-    // Salva in Firebase
+    }
+
+    const enName = await translateText(italianName, 'en');
+    const enDesc = await translateText(italianDesc, 'en');
+    const deName = await translateText(italianName, 'de');
+    const deDesc = await translateText(italianDesc, 'de');
+
     if (!appData.menu[c][i].translations) appData.menu[c][i].translations = {};
-    appData.menu[c][i].translations.en = { name: translated.en.name, desc: translated.en.desc };
-    appData.menu[c][i].translations.de = { name: translated.de.name, desc: translated.de.desc };
-    
+    appData.menu[c][i].translations.en = { name: enName, desc: enDesc };
+    appData.menu[c][i].translations.de = { name: deName, desc: deDesc };
+
     await db.ref(`menu/${c}/${i}/translations`).set(appData.menu[c][i].translations);
-    
-    // Aggiorna la UI
+
+    // Aggiorna input
     const enNameInput = document.querySelector(`.translation-en-name[data-index="${i}"][data-cat="${c}"]`);
     const enDescInput = document.querySelector(`.translation-en-desc[data-index="${i}"][data-cat="${c}"]`);
     const deNameInput = document.querySelector(`.translation-de-name[data-index="${i}"][data-cat="${c}"]`);
     const deDescInput = document.querySelector(`.translation-de-desc[data-index="${i}"][data-cat="${c}"]`);
-    if (enNameInput) enNameInput.value = translated.en.name;
-    if (enDescInput) enDescInput.value = translated.en.desc;
-    if (deNameInput) deNameInput.value = translated.de.name;
-    if (deDescInput) deDescInput.value = translated.de.desc;
-    
-    showToast('✅ Traduzione completata!');
-  } catch(e) {
+    if (enNameInput) enNameInput.value = enName;
+    if (enDescInput) enDescInput.value = enDesc;
+    if (deNameInput) deNameInput.value = deName;
+    if (deDescInput) deDescInput.value = deDesc;
+
+    showToast('✅ Traduzione completata (MyMemory)');
+  } catch (e) {
+    console.error('Errore durante la traduzione:', e);
     showToast('❌ Errore traduzione: ' + e.message);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Traduci'; }
-  }
-}
-
-// Override di renderMenu per includere traduzioni
-const originalRenderMenu = renderMenu;
-renderMenu = function() {
-  const container = document.getElementById('menuAccordion');
-  const searchTerm = (document.getElementById('menuSearch')?.value || '').toLowerCase();
-  let h = '';
-  
-  Object.keys(appData.categories).forEach(c => {
-    const ci = appData.categories[c], cn = ci.name, ic = ci.icon || 'fa-utensils', pr = appData.menu[c] || [], op = openCategories.has(c);
-    
-    // Filtra prodotti in base alla ricerca
-    const filteredProducts = pr.filter(p => 
-      p.name.toLowerCase().includes(searchTerm) || 
-      (p.desc || '').toLowerCase().includes(searchTerm)
-    );
-    
-    // Se c'è ricerca e nessun prodotto corrisponde, salta la categoria
-    if (searchTerm && filteredProducts.length === 0) return;
-    
-    h += '<div class="admin-category-accordion ' + (op ? 'open' : '') + '" id="accordion-' + c + '">';
-    
-    // HEADER con pulsante Aggiungi
-    h += '<div class="admin-category-header" onclick="toggleCategoryAccordion(\''+c+'\')">';
-    h += '<div class="admin-category-header-left">';
-    h += '<div class="admin-category-header-icon"><i class="fas ' + ic + '"></i></div>';
-    h += '<span class="admin-category-header-title">' + sanitize(cn) + '</span>';
-    h += '</div>';
-    h += '<span class="admin-category-header-count">' + pr.length + '</span>';
-    h += '<button class="btn-add-product" onclick="event.stopPropagation();addProduct(\''+c+'\')" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:6px 12px;border-radius:8px;font-weight:700;font-size:0.8rem;cursor:pointer;margin-left:8px;box-shadow:0 2px 0 var(--gold-dark);"><i class="fas fa-plus"></i></button>';
-    h += '</div>';
-    
-    // BODY con prodotti
-    h += '<div class="admin-category-body">';
-    
-    const productsToShow = searchTerm ? filteredProducts : pr;
-    
-    productsToShow.forEach((p, i) => {
-      const originalIndex = pr.indexOf(p);
-      const translations = p.translations || {};
-      const itName = p.name || '';
-      const itDesc = p.desc || '';
-      const enName = translations.en?.name || '';
-      const enDesc = translations.en?.desc || '';
-      const deName = translations.de?.name || '';
-      const deDesc = translations.de?.desc || '';
-      
-      h += `
-        <div class="admin-product-item">
-          <div class="admin-product-header">
-            <span class="admin-product-name">${sanitize(itName)}</span>
-            <button class="delete-product-btn" onclick="deleteProduct('${c}',${originalIndex})"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="admin-product-inputs">
-            <input type="text" value="${sanitize(itName)}" onchange="updateProduct('${c}',${originalIndex},'name',this.value)" placeholder="Nome (IT)">
-            <input type="text" value="${sanitize(itDesc)}" onchange="updateProduct('${c}',${originalIndex},'desc',this.value)" placeholder="Descrizione (IT)">
-            <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${c}',${originalIndex},'price',parseFloat(this.value))" placeholder="Prezzo">
-            <div class="admin-product-img-wrapper">
-              ${p.img ? `<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${c}',${originalIndex})" title="Clicca per rimuovere">` : ''}
-              <label class="admin-product-img-upload"><i class="fas fa-camera"></i> ${p.img ? 'Cambia Foto' : 'Aggiungi Foto'}
-                <input type="file" accept="image/*" onchange="uploadProductImage('${c}',${originalIndex},this)">
-              </label>
-            </div>
-            <div class="translations-area">
-              <h4><i class="fas fa-language"></i> Traduzioni <button class="btn-translate" data-cat="${c}" data-index="${originalIndex}" onclick="translateProductWithGemini('${c}',${originalIndex})">Traduci automaticamente</button></h4>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
-                <div>
-                  <div class="translations-row">
-                    <div><label>EN Nome</label><input type="text" class="translation-en-name" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(enName)}" onchange="updateProductTranslation('${c}',${originalIndex},'en','name',this.value)"></div>
-                    <div><label>EN Desc</label><input type="text" class="translation-en-desc" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(enDesc)}" onchange="updateProductTranslation('${c}',${originalIndex},'en','desc',this.value)"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="translations-row">
-                    <div><label>DE Nome</label><input type="text" class="translation-de-name" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(deName)}" onchange="updateProductTranslation('${c}',${originalIndex},'de','name',this.value)"></div>
-                    <div><label>DE Desc</label><input type="text" class="translation-de-desc" data-cat="${c}" data-index="${originalIndex}" value="${sanitize(deDesc)}" onchange="updateProductTranslation('${c}',${originalIndex},'de','desc',this.value)"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-    
-    // Pulsante aggiungi anche in fondo (per comodità)
-    if (!searchTerm) {
-      h += '<button class="btn-primary" style="margin-top:10px;" onclick="addProduct(\''+c+'\')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>';
-    }
-    
-    h += '</div></div>';
-  });
-  
-  container.innerHTML = h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto trovato</p>';
-};
-
-// Aggiungi funzione per configurare la chiave Gemini (da localStorage)
-function setGeminiKey() {
-  const key = prompt('Inserisci la tua chiave Gemini API:');
-  if (key && key.trim()) {
-    localStorage.setItem('gemini_api_key', key.trim());
-    showToast('✅ Chiave salvata!');
-  }
-}
-
-// Chiamata per impostare chiave se non presente (al caricamento)
-document.addEventListener('DOMContentLoaded', function() {
-  if (!localStorage.getItem('gemini_api_key')) {
-    const key = prompt('Per la traduzione automatica, inserisci la tua chiave Gemini API:', '');
-    if (key && key.trim()) {
-      localStorage.setItem('gemini_api_key', key.trim());
-    } else {
-      showToast('⚠️ Funzione di traduzione non disponibile. Puoi inserire la chiave in "Sicurezza" o digitare manualmente.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Traduci automaticamente (IT → EN, DE)'; }
+    else {
+      const allBtns = document.querySelectorAll('.btn-translate');
+      allBtns.forEach(b => {
+        if (b.onclick && b.onclick.toString().includes(`'${c}',${i}`)) {
+          b.disabled = false;
+          b.textContent = 'Traduci automaticamente (IT → EN, DE)';
+        }
+      });
     }
   }
-});
+}
 
 // ─── FOTO ──────────────────────────────────────────────────────────────────────
 async function compressImage(file) {
@@ -2263,7 +2196,6 @@ document.addEventListener('visibilitychange', () => {
     }, 500);
   }
 });
-
 </script>
 </body>
 </html>
