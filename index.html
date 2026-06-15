@@ -115,20 +115,18 @@
         }
 
         .logo-tint-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--gold);
-    /* Cambiato da 'multiply' o 'color' a 'normal' per applicare il colore puro */
-    mix-blend-mode: normal; 
-    pointer-events: none;
-    z-index: 2;
-    /* Regola questo valore: 0.3 è delicato, 0.5 è molto evidente. 0.4 è un buon equilibrio */
-    opacity: 0.4; 
-    transition: background 0.8s ease;
-}
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            mix-blend-mode: multiply;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.45;
+            transition: background 0.8s ease;
+        }
 
         .logo-area img {
             width: 100%;
@@ -237,7 +235,7 @@
         @keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { aspect-ratio: 1/1; border-radius: 16px; }
 
-        .tab-content { display: none; padding: 20px 15px calc(80px + env(safe-area-inset-bottom, 10px)); animation: fadeIn 0.3s; }
+        .tab-content { display: none; padding: 20px 15px calc(85px + env(safe-area-inset-bottom, 0px)); animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -345,37 +343,26 @@
         .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 
         .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
-    background: rgba(26, 18, 9, 0.85) !important;
-    backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
-    border-top: 1px solid rgba(212, 168, 75, 0.2) !important;
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4) !important;
-    display: flex; 
-    justify-content: space-around; 
-    align-items: flex-end; /* Spinge tutto il contenuto verso il basso */
-    padding: 0 0 calc(10px + env(safe-area-inset-bottom, 12px)); /* Padding solo sotto, con spazio per la barra del telefono */
-    width: 100%;
-    margin: 0;
-    height: 65px; /* Leggermente più alta per dare respiro */
-    box-sizing: border-box;
-}
-.bottom-nav .nav-btn { 
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-end; /* Assicura che icone e testo stiano in basso */
-    gap: 4px; 
-    padding: 12px 4px 4px; /* Più spazio sopra (12px), meno sotto (4px) per farle scendere */
-    background: none; 
-    border: none; 
-    color: var(--cream); 
-    opacity: 0.6; 
-    cursor: pointer; 
-    transition: all 0.3s; 
-    position: relative; 
-}
-        .bottom-nav .nav-btn.active { color: var(--gold); }
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(26, 18, 9, 0.95) !important;
+            backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+            border-top: 1px solid rgba(212, 168, 75, 0.2) !important;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4) !important;
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+            width: 100%; margin: 0;
+            min-height: 60px;
+            box-sizing: border-box;
+        }
+        .bottom-nav .nav-btn { 
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 4px; padding: 4px;
+            background: none; border: none; color: var(--cream); opacity: 0.6;
+            cursor: pointer; transition: all 0.3s; position: relative; 
+        }
+        .bottom-nav .nav-btn.active { 
+            color: var(--gold); opacity: 1; 
+        }
         .bottom-nav .nav-btn i { font-size: 22px; }
         .bottom-nav .nav-btn span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .bottom-nav .nav-btn .badge { position: absolute; top: 2px; right: calc(50% - 14px); background: #e74c3c; color: white; font-size: 8px; font-weight: 900; font-family: monospace; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--dark); }
@@ -406,15 +393,14 @@
         .lang-option i { font-size: 1.5rem; }
 
         @media (max-width: 360px) {
-    .bottom-nav { 
-        height: 60px; 
-        padding: 0 0 calc(8px + env(safe-area-inset-bottom, 10px)); 
-    }
-    .bottom-nav .nav-btn { padding: 10px 4px 4px; }
-    .bottom-nav .nav-btn i { font-size: 18px; }
-    .bottom-nav .nav-btn span { font-size: 8px; }
-    .tab-content { padding-bottom: calc(75px + env(safe-area-inset-bottom, 10px)); }
-}
+            .bottom-nav { 
+                min-height: 55px; 
+                padding: 6px 0 calc(10px + env(safe-area-inset-bottom, 0px)); 
+            }
+            .bottom-nav .nav-btn i { font-size: 18px; }
+            .bottom-nav .nav-btn span { font-size: 8px; }
+            .tab-content { padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
+        }
     </style>
 </head>
 <body>
@@ -430,16 +416,16 @@
 <div class="modal-overlay" id="langModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h2>🌐 Scegli la lingua</h2>
+            <h2> Scegli la lingua</h2>
         </div>
         <div class="lang-option" onclick="setLanguage('it')">
-            <i>🇮🇹</i> Italiano
+            <i>🇹</i> Italiano
         </div>
         <div class="lang-option" onclick="setLanguage('en')">
-            <i>🇬🇧</i> English
+            <i>🇧</i> English
         </div>
         <div class="lang-option" onclick="setLanguage('de')">
-            <i>🇩🇪</i> Deutsch
+            <i>🇪</i> Deutsch
         </div>
     </div>
 </div>
@@ -620,7 +606,7 @@
             history_cleared: 'Storico cancellato!', thanks_review: 'Grazie per la recensione!', welcome_back: 'Bentornato',
         },
         en: {
-            our_menu: 'Our Menu', search_title: '🔍 Search Menu', search_placeholder: 'Search...',
+            our_menu: 'Our Menu', search_title: ' Search Menu', search_placeholder: 'Search...',
             my_orders: '📦 My Orders', last_orders: 'You see only the last 5 recent orders.',
             clear_history: 'Clear Local History', our_reviews: '⭐ Our Reviews',
             leave_review: 'Leave a Review', catalog: 'Catalog', search: 'Search', cart: 'Cart',
@@ -647,7 +633,7 @@
             orders: 'Bestellungen', feedback: 'Feedback', call: 'Anruf', navigate: 'Navigieren',
             empty_cart: 'Ihr Warenkorb ist leer.\nStöbern Sie im Menü!',
             no_orders: 'Keine aktuellen Bestellungen.\nGeben Sie Ihre erste Bestellung auf! 🍕',
-            no_reviews: 'Noch keine Bewertungen.\nSeien Sie der Erste! 🌟',
+            no_reviews: 'Noch keine Bewertungen.\nSeien Sie der Erste! ',
             back_to_menu: 'Zurück zum Menü', add_product: 'hinzugefügt!', delivery: 'Lieferung', pickup: 'Abholung',
             asap: 'Sofort', scheduled: 'Wählen', name_placeholder: 'Max Mustermann',
             phone_placeholder: '+49 123 456789', address_placeholder: 'Straße',
@@ -801,7 +787,7 @@
         if(!appData.menu||!appData.menu[cat]||!appData.menu[cat][i]){showToast('⚠️ Errore');return;}
         const it=appData.menu[cat][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===cat);
         if(ex){ex.qty=(ex.qty||0)+delta;if(ex.qty<=0)cart.splice(cart.indexOf(ex),1);}
-        else if(delta>0){cart.push({...it,cat,qty:1,isPromo:false});showToast(`🍕 ${it.name} ${t('add_product')}`);}
+        else if(delta>0){cart.push({...it,cat,qty:1,isPromo:false});showToast(` ${it.name} ${t('add_product')}`);}
         updateCartBadge(); if(currentSearchCat===cat)renderProductList(cat,document.getElementById('productSearch')?.value||'');
     }
 
@@ -864,24 +850,24 @@
 
     async function getCustomerLocation(){
         if(!navigator.geolocation){showToast('GPS non disponibile');return;}
-        const btn=document.getElementById('gpsBtn');btn.textContent=`⏳ ${t('gps_loading')}`;
-        try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));customerGPSLat=pos.coords.latitude;customerGPSLng=pos.coords.longitude;const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerGPSLat}&lon=${customerGPSLng}&zoom=18&addressdetails=1`);const data=await response.json();document.getElementById('customerStreet').value=data.address?.road||data.address?.pedestrian||'';document.getElementById('customerNumber').value=data.address?.house_number||'';showToast(`📍 ${t('gps_ok')}`);}catch(e){showToast(`❌ ${t('gps_fail')}`);}finally{btn.textContent='📍 Usa GPS';}
+        const btn=document.getElementById('gpsBtn');btn.textContent=` ${t('gps_loading')}`;
+        try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));customerGPSLat=pos.coords.latitude;customerGPSLng=pos.coords.longitude;const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerGPSLat}&lon=${customerGPSLng}&zoom=18&addressdetails=1`);const data=await response.json();document.getElementById('customerStreet').value=data.address?.road||data.address?.pedestrian||'';document.getElementById('customerNumber').value=data.address?.house_number||'';showToast(` ${t('gps_ok')}`);}catch(e){showToast(`❌ ${t('gps_fail')}`);}finally{btn.textContent='📍 Usa GPS';}
     }
 
     async function sendOrder(){
         if(!document.getElementById('privacyConsent').checked){showToast('⚠️ Accetta la Privacy Policy per procedere');return;}
         const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim();
         if(!name||!phone){showToast('⚠️ Compila Nome e Telefono');return;}
-        const cleanPhone=phone.replace(/[\s\-().+]/g,'');if(!/^(\+?39)?3[0-9]{9}$/.test(cleanPhone)&&!/^0[0-9]{6,9}$/.test(cleanPhone)){showToast('❌ Numero di telefono non valido');return;}
+        const cleanPhone=phone.replace(/[\s\-().+]/g,'');if(!/^(\+?39)?3[0-9]{9}$/.test(cleanPhone)&&!/^0[0-9]{6,9}$/.test(cleanPhone)){showToast(' Numero di telefono non valido');return;}
         if(orderType==='delivery'){const street=document.getElementById('customerStreet').value.trim(),number=document.getElementById('customerNumber').value.trim();if(!street||!number){showToast('⚠️ Completa l\'indirizzo per la consegna');return;}}
         let total=0;cart.forEach(i=>{if(i.isPromo)total+=i.totalPrice;else total+=(i.price*i.qty);});
-        const orderData={orderId:'ORD-'+Date.now().toString().slice(-6),customerName:name,customerPhone:phone,type:orderType,scheduledTime:timeMode==='asap'?'Subito':document.getElementById('scheduledTime').value,notes:document.getElementById('customerNotes').value.trim(),items:cart.map(i=>i.isPromo?{name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice}:{name:i.name,qty:i.qty,price:i.price}),totalPrice:total,status:'new',timestamp:Date.now()};
+        const orderData={orderId:'ORD-'+Date.now().toString().slice(-6),customerName:name,customerPhone:phone,type:orderType,scheduledTime:timeMode==='asap'?'Subito':document.getElementById('scheduledTime').value,notes:document.getElementById('customerNotes').value.trim(),items:cart.map(i=>i.isPromo?{name:` ${i.promoTitle}`,qty:1,price:i.totalPrice}:{name:i.name,qty:i.qty,price:i.price}),totalPrice:total,status:'new',timestamp:Date.now()};
         if(orderType==='delivery'){orderData.address=`${document.getElementById('customerStreet').value.trim()} ${document.getElementById('customerNumber').value.trim()}`;if(customerGPSLat&&customerGPSLng){orderData.customerLat=customerGPSLat;orderData.customerLng=customerGPSLng;}}
         const btn=document.getElementById('placeOrderBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...';
         try{await db.ref('ordini').push().set(orderData);const localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders.unshift({orderId:orderData.orderId,date:Date.now(),total:total,items:orderData.items.map(i=>i.name).join(', '),status:'new',type:orderType});if(localOrders.length>5)localOrders.length=5;localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));localStorage.setItem('checkout_name',name);localStorage.setItem('checkout_phone',phone);localStorage.setItem('checkout_street',document.getElementById('customerStreet').value.trim());localStorage.setItem('checkout_number',document.getElementById('customerNumber').value.trim());cart=[];updateCartBadge();renderCartTab();showToast(`🎉 ${t('order_sent')}`);switchTab('catalog');}catch(e){console.error(e);showToast(`❌ ${t('order_error')}`);}finally{btn.disabled=false;btn.innerHTML=`<i class="fas fa-paper-plane"></i> ${t('send_order')}`;}
     }
 
-    function renderMyOrders(){const list=document.getElementById('myOrdersList');try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!orders.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;return;}list.innerHTML=orders.map(o=>{const dateStr=new Date(o.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}),status=o.status||'new',typeLabel=o.type==='pickup'?'🏪 Ritiro':'🛵 Consegna',borderColor=status==='rifiutato'?'#ef4444':(status==='delivered'||(o.type==='pickup'&&status==='picked'))?'#22c55e':'var(--gold-dark)';return`<div class="my-order-card" style="border-left-color:${borderColor};"><div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div><div class="my-order-items">${o.items}</div><div class="my-order-total">€${o.total.toFixed(2)}</div><div style="font-size:0.8rem;color:#8a7a5a;margin-top:4px;">Stato: <strong>${status}</strong></div>${o.motivoRifiuto?`<div style="color:#f87171;font-size:0.8rem;margin-top:4px;">❌ ${o.motivoRifiuto}</div>`:''}</div>`;}).join('');}catch(e){list.innerHTML='<p style="color:#f87171">Errore</p>';}}
+    function renderMyOrders(){const list=document.getElementById('myOrdersList');try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!orders.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;return;}list.innerHTML=orders.map(o=>{const dateStr=new Date(o.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}),status=o.status||'new',typeLabel=o.type==='pickup'?'🏪 Ritiro':' Consegna',borderColor=status==='rifiutato'?'#ef4444':(status==='delivered'||(o.type==='pickup'&&status==='picked'))?'#22c55e':'var(--gold-dark)';return`<div class="my-order-card" style="border-left-color:${borderColor};"><div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div><div class="my-order-items">${o.items}</div><div class="my-order-total">€${o.total.toFixed(2)}</div><div style="font-size:0.8rem;color:#8a7a5a;margin-top:4px;">Stato: <strong>${status}</strong></div>${o.motivoRifiuto?`<div style="color:#f87171;font-size:0.8rem;margin-top:4px;">❌ ${o.motivoRifiuto}</div>`:''}</div>`;}).join('');}catch(e){list.innerHTML='<p style="color:#f87171">Errore</p>';}}
     function clearLocalHistory(){localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();showToast(`🗑️ ${t('history_cleared')}`);}
 
     function loadReviewsPublic(){db.ref('recensioni').orderByChild('timestamp').once('value',s=>{const reviews=[];s.forEach(c=>{const r=c.val();if(r.status==='approved')reviews.push({id:c.key,...r});});reviews.sort((a,b)=>b.timestamp-a.timestamp);const list=document.getElementById('reviewsPublicList');if(!reviews.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}list.innerHTML=reviews.map(r=>{const dateStr=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join('');});}
@@ -889,7 +875,7 @@
     function closeReviewModal(){document.getElementById('reviewModal').classList.remove('active');}
     function selectStar(n){selectedStars=n;updateStarsDisplay();}
     function updateStarsDisplay(){document.querySelectorAll('#starsInput .star').forEach((s,i)=>s.classList.toggle('active',i<selectedStars));}
-    function submitReview(){const name=document.getElementById('reviewName').value.trim(),text=document.getElementById('reviewText').value.trim();if(!selectedStars){showToast('⚠️ Seleziona le stelle');return;}if(!name){showToast('❌ Inserisci il nome');return;}if(!text){showToast('❌ Scrivi un commento');return;}db.ref('recensioni').push({name:sanitizeWA(name),text:sanitizeWA(text),stars:selectedStars,orderId:'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{closeReviewModal();showToast(`⭐ ${t('thanks_review')}`);});}
+    function submitReview(){const name=document.getElementById('reviewName').value.trim(),text=document.getElementById('reviewText').value.trim();if(!selectedStars){showToast('⚠️ Seleziona le stelle');return;}if(!name){showToast(' Inserisci il nome');return;}if(!text){showToast('❌ Scrivi un commento');return;}db.ref('recensioni').push({name:sanitizeWA(name),text:sanitizeWA(text),stars:selectedStars,orderId:'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{closeReviewModal();showToast(`⭐ ${t('thanks_review')}`);});}
 
     function globalSearch(){const query=document.getElementById('globalSearch').value,results=document.getElementById('globalSearchResults');if(query.length<2){results.innerHTML='';return;}const lowerQuery=query.toLowerCase(),items=[];Object.keys(appData.menu).forEach(catKey=>{const catName=appData.categories[catKey]?.name||catKey;(appData.menu[catKey]||[]).forEach(product=>{const trans=product.translations?.[currentLang]||{},searchName=trans.name||product.name,searchDesc=trans.desc||product.desc||'';if(searchName.toLowerCase().includes(lowerQuery)||searchDesc.toLowerCase().includes(lowerQuery))items.push({catKey,catName,product});});});if(items.length===0){results.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato</p>';return;}results.innerHTML=items.map(item=>{const qty=getCartQty(item.catKey,item.product.name),trans=item.product.translations?.[currentLang]||{},displayName=trans.name||item.product.name,displayDesc=trans.desc||item.product.desc||'',imgHtml=item.product.img?`<img src="${item.product.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'',actionsHtml=qty>0?`<div class="qty-counter"><button class="qty-btn minus" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},-1)">−</button><span class="qty-value">${qty}</span><button class="qty-btn" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+</button></div>`:`<button class="add-btn-3d" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+ Aggiungi</button>`;return`<div class="product-card-3d">${imgHtml}<div class="product-info"><div style="font-size:0.75rem;color:var(--gold);margin-bottom:4px;">${item.catName}</div><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${item.product.price.toFixed(2)}</div></div>${actionsHtml}</div>`;}).join('');}
 
