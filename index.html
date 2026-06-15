@@ -121,13 +121,14 @@
     width: 100%;
     height: 100%;
     background: var(--gold);
-    mix-blend-mode: color;
+    /* Cambiato da 'multiply' o 'color' a 'normal' per applicare il colore puro */
+    mix-blend-mode: normal; 
     pointer-events: none;
     z-index: 2;
-    opacity: 0.4;
+    /* Regola questo valore: 0.3 è delicato, 0.5 è molto evidente. 0.4 è un buon equilibrio */
+    opacity: 0.4; 
     transition: background 0.8s ease;
 }
-
         .logo-area img {
             width: 100%;
             height: auto;
