@@ -344,14 +344,24 @@
         .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 
         .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     background: rgba(26, 18, 9, 0.85) !important;
-    backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     border-top: 1px solid rgba(212, 168, 75, 0.2) !important;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4) !important;
-    display: flex; justify-content: space-around; align-items: center;
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-    width: 100%; margin: 0; height: auto; min-height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 env(safe-area-inset-bottom, 8px);  /* ← cambiato qui */
+    width: 100%;
+    margin: 0;
+    height: auto;
+    min-height: 55px;
 }
         .bottom-nav .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; background: none; border: none; color: #6b5b4f; cursor: pointer; transition: all 0.3s; position: relative; }
         .bottom-nav .nav-btn.active { color: var(--gold); }
@@ -392,6 +402,14 @@
     .bottom-nav .nav-btn i { font-size: 18px; }
     .bottom-nav .nav-btn span { font-size: 8px; }
     .tab-content { padding-bottom: 80px; }
+}
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .bottom-nav {
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    .tab-content {
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
 }
     </style>
 </head>
