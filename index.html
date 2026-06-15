@@ -226,7 +226,7 @@
 
         .tab-content { 
     display: none; 
-    padding: 20px 15px calc(60px + env(safe-area-inset-bottom, 0px)); 
+    padding: 20px 15px 120px; 
     animation: fadeIn 0.3s; 
 }
         .tab-content.active { display: block; }
@@ -338,61 +338,96 @@
         /* BOTTOM NAV STILE TIKTOK - ICONE INCOLLATE AL FONDO */
         .bottom-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1000;
-    background: rgba(26, 18, 9, 0.97) !important;
+    background: rgba(26, 18, 9, 0.95) !important;
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
-    border-top: 1px solid rgba(212, 168, 75, 0.25) !important;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(212, 168, 75, 0.3) !important;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
     
-    /* Solo safe area, niente pixel extra */
-    padding: 6px 0 env(safe-area-inset-bottom, 0px);
+    padding: 10px 8px 8px;
+    width: 95%;
+    max-width: 420px;
+    box-sizing: border-box;
     
-    display: flex;
+    /* Layout orizzontale forzato */
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     justify-content: space-around;
     align-items: center;
-    width: 100%;
-    margin: 0;
-    height: 50px; /* Altezza fissa e compatta */
-    box-sizing: border-box;
+    
+    /* Per il drag */
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.bottom-nav:active {
+    cursor: grabbing;
+}
+
+/* Handle per il drag (la barretta in alto) */
+.bottom-nav::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(212, 168, 75, 0.4);
+    border-radius: 2px;
+    pointer-events: none;
 }
 
 .bottom-nav .nav-btn {
-    flex: 1;
+    flex: 1 1 0 !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2px;
-    padding: 0;
+    padding: 4px 2px;
     background: none;
     border: none;
     color: var(--cream);
     opacity: 0.55;
     cursor: pointer;
     transition: all 0.2s;
-    position: relative;
+    border-radius: 10px;
+    min-width: 0;
+}
+
+.bottom-nav .nav-btn:hover {
+    background: rgba(212, 168, 75, 0.1);
 }
 
 .bottom-nav .nav-btn.active {
     color: var(--gold);
     opacity: 1;
+    background: rgba(212, 168, 75, 0.15);
 }
 
 .bottom-nav .nav-btn i {
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1;
 }
 
 .bottom-nav .nav-btn span {
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
         .bottom-nav .nav-btn .badge {
             position: absolute;
@@ -939,6 +974,70 @@
     function startOrderStatusTracking(){try{const localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!localOrders.length)return;localOrders.forEach(order=>{if(!order.orderId)return;const query=db.ref('ordini').orderByChild('orderId').equalTo(order.orderId);orderStatusListeners[order.orderId]=query;query.on('value',snapshot=>{snapshot.forEach(child=>{const data=child.val();if(data)updateLocalOrderStatus(order.orderId,data.status,data.motivoRifiuto);});});});}catch(e){console.log('Errore tracking:',e);}}
     function updateLocalOrderStatus(orderId,newStatus,motivoRifiuto){try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let changed=false;orders=orders.map(o=>{if(o.orderId===orderId&&o.status!==newStatus){changed=true;o.status=newStatus;if(newStatus==='rifiutato'&&motivoRifiuto)o.motivoRifiuto=motivoRifiuto;}return o;});if(changed){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(orders));renderMyOrders();playOrderStatusSound();const statiLeggibili={preparing:'In preparazione',ready:'Pronto',picked:'Ritirato',delivering:'In consegna',delivered:'Consegnato',rifiutato:'Rifiutato'};showToast(`📦 Ordine ${orderId}: ${statiLeggibili[newStatus]||newStatus}`);}}catch(e){console.log('Errore aggiornamento stato:',e);}}
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
+    document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
+
+// Bottom Nav Draggable
+const bottomNav = document.querySelector('.bottom-nav');
+let isDragging = false;
+let startY, startX, startBottom, startLeft;
+
+// Mouse events
+bottomNav.addEventListener('mousedown', startDrag);
+document.addEventListener('mousemove', drag);
+document.addEventListener('mouseup', endDrag);
+
+// Touch events
+bottomNav.addEventListener('touchstart', startDrag, {passive: false});
+document.addEventListener('touchmove', drag, {passive: false});
+document.addEventListener('touchend', endDrag);
+
+function startDrag(e) {
+    if (e.target.closest('.nav-btn')) return;
+    
+    isDragging = true;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    
+    startY = clientY;
+    startX = clientX;
+    
+    const rect = bottomNav.getBoundingClientRect();
+    startBottom = window.innerHeight - rect.bottom;
+    startLeft = rect.left;
+    
+    bottomNav.style.cursor = 'grabbing';
+    e.preventDefault();
+}
+
+function drag(e) {
+    if (!isDragging) return;
+    
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    
+    const deltaY = clientY - startY;
+    const deltaX = clientX - startX;
+    
+    const newBottom = startBottom - deltaY;
+    const newLeft = startLeft + deltaX;
+    
+    const maxBottom = window.innerHeight - 80;
+    const minBottom = 80;
+    const maxLeft = window.innerWidth - bottomNav.offsetWidth - 20;
+    const minLeft = 20;
+    
+    bottomNav.style.bottom = `${Math.max(minBottom, Math.min(maxBottom, newBottom))}px`;
+    bottomNav.style.left = `${Math.max(minLeft, Math.min(maxLeft, newLeft))}px`;
+    bottomNav.style.transform = 'none';
+    
+    e.preventDefault();
+}
+
+function endDrag() {
+    isDragging = false;
+    bottomNav.style.cursor = 'grab';
+}
+
 </script>
 </body>
 </html>
