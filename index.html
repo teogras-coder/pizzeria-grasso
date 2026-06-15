@@ -1021,10 +1021,14 @@ function drag(e) {
     const newBottom = startBottom - deltaY;
     const newLeft = startLeft + deltaX;
     
-    const maxBottom = window.innerHeight - 80;
-    const minBottom = 80;
-    const maxLeft = window.innerWidth - bottomNav.offsetWidth - 20;
-    const minLeft = 20;
+    // Limiti corretti:
+    // maxBottom = può salire fino a 150px dal fondo (non oltre)
+    const maxBottom = 150;
+    // minBottom = può scendere fino a 10px dal fondo
+    const minBottom = 10;
+    // Limiti laterali
+    const maxLeft = window.innerWidth - bottomNav.offsetWidth - 10;
+    const minLeft = 10;
     
     bottomNav.style.bottom = `${Math.max(minBottom, Math.min(maxBottom, newBottom))}px`;
     bottomNav.style.left = `${Math.max(minLeft, Math.min(maxLeft, newLeft))}px`;
@@ -1032,7 +1036,6 @@ function drag(e) {
     
     e.preventDefault();
 }
-
 function endDrag() {
     isDragging = false;
     bottomNav.style.cursor = 'grab';
