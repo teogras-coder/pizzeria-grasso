@@ -361,12 +361,31 @@
     width: 100%;
     margin: 0;
     height: 55px;
-    box-sizing: border-box;
 }
-        .bottom-nav .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; background: none; border: none; color: #6b5b4f; cursor: pointer; transition: all 0.3s; position: relative; }
+.bottom-nav .nav-btn {flex: 1;display: flex;flex-direction: column;align-items: center;justify-content: center;   /* ← centra verticalmente */gap: 2px;
+    padding: 0;                /* ← togli padding */
+    background: none;
+    border: none;
+    color: #6b5b4f;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    height: 100%;              /* ← occupa tutta l'altezza */
+}
         .bottom-nav .nav-btn.active { color: var(--gold); }
-        .bottom-nav .nav-btn i { font-size: 20px; }
-        .bottom-nav .nav-btn span { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bottom-nav .nav-btn i {
+    font-size: 20px;
+    line-height: 1;            /* ← aggiungi questa */
+    margin-top: 2px;           /* ← piccolo spazio dall'alto */
+}
+.bottom-nav .nav-btn span {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;            /* ← aggiungi questa */
+    margin-bottom: 2px;        /* ← piccolo spazio dal basso */
+}
         .bottom-nav .nav-btn .badge { position: absolute; top: 2px; right: calc(50% - 14px); background: #e74c3c; color: white; font-size: 8px; font-weight: 900; font-family: monospace; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--dark); }
         .bottom-nav .nav-btn .live-dot { position: absolute; top: 4px; right: calc(50% - 12px); width: 6px; height: 6px; background: #e74c3c; border-radius: 50%; border: 1px solid var(--dark); animation: pulse 1.5s infinite; }
         .bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
