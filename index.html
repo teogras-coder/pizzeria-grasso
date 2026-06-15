@@ -357,11 +357,11 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 8px 0 env(safe-area-inset-bottom, 8px);  /* ← cambiato qui */
+    padding: 6px 0 6px;
     width: 100%;
     margin: 0;
-    height: auto;
-    min-height: 55px;
+    height: 55px;
+    box-sizing: border-box;
 }
         .bottom-nav .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; background: none; border: none; color: #6b5b4f; cursor: pointer; transition: all 0.3s; position: relative; }
         .bottom-nav .nav-btn.active { color: var(--gold); }
