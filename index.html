@@ -1,1658 +1,1662 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Antica Pizzeria Grasso - Ordina Pizza Online a Manfredonia</title>
-<meta name="description" content="Ordina le specialità pugliesi da Antica Pizzeria Grasso a Manfredonia.">
-<link rel="manifest" href="manifest-clienti.json">
-<link rel="icon" type="image/png" href="icon-clienti-192.png">
-<link rel="apple-touch-icon" href="icon-clienti-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#d4a84b">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<style>
-:root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; background: var(--dark); }
-body { display: flex; justify-content: center; font-family: 'Montserrat', sans-serif; position: relative; }
-.ambient-lights { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-.light-orb { position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.3; animation: float 8s ease-in-out infinite; }
-.light-orb:nth-child(1) { width: 200px; height: 200px; background: var(--gold); top: 10%; left: 10%; }
-.light-orb:nth-child(2) { width: 150px; height: 150px; background: var(--gold-light); top: 60%; right: 15%; animation-delay: 2s; }
-.light-orb:nth-child(3) { width: 180px; height: 180px; background: var(--gold-dark); bottom: 20%; left: 30%; animation-delay: 4s; }
-@keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; } 50% { transform: translate(30px, -30px) scale(1.1); opacity: 0.5; } }
-.particle { position: fixed; width: 4px; height: 4px; background: var(--gold-light); border-radius: 50%; pointer-events: none; z-index: 2; box-shadow: 0 0 10px var(--gold); animation: particleFloat 15s linear infinite; opacity: 0; }
-.particle:nth-child(5) { left: 15%; }
-.particle:nth-child(6) { left: 35%; animation-delay: 3s; }
-.particle:nth-child(7) { left: 55%; animation-delay: 6s; }
-.particle:nth-child(8) { left: 75%; animation-delay: 9s; }
-@keyframes particleFloat { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
-.ripple { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(240, 215, 140, 0.6) 0%, transparent 70%); transform: scale(0); animation: rippleEffect 0.6s ease-out; pointer-events: none; z-index: 9999; }
-@keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
-.phone-frame { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%); position: relative; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; z-index: 10; }
-.header { background: transparent; padding: 0; text-align: center; position: relative; z-index: 20; flex-shrink: 0; overflow: hidden; }
-.hero-section { position: relative; height: 130px; overflow: hidden; flex-shrink: 0; margin-bottom: 0; }
-.hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(26,18,9,0.95) 100%); z-index: 2; pointer-events: none; }
-.status-banner { position: relative; bottom: auto; right: auto; margin: 8px auto 4px !important; padding: 6px 16px !important; z-index: 10; font-weight: 700; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; background: rgba(26, 18, 9, 0.85) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(212, 168, 75, 0.4); border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-.status-open { color: #f0d78c !important; text-shadow: 0 0 8px rgba(212, 168, 75, 0.8) !important; }
-.status-closed { color: #f87171 !important; text-shadow: 0 0 8px rgba(248, 113, 113, 0.6) !important; }
-.section-divider { display: flex; align-items: center; padding: 12px 25px 10px; }
-.section-divider span { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); text-shadow: 0 0 10px var(--gold); }
-.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark), transparent); margin: 0 15px; }
-.menu-list { padding: 10px 20px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.menu-btn-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 50%, var(--brown) 100%); border-radius: 16px; overflow: hidden; cursor: pointer; color: white; position: relative; transition: all 0.3s ease; box-shadow: 0 6px 0 var(--shadow), 0 8px 15px rgba(0,0,0,0.6); border: 1px solid rgba(212,168,75,0.15); aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.category-img-container { width: 100%; height: 70px; overflow: hidden; position: relative; flex-shrink: 0; }
-.category-img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(0.85); }
-.category-img-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(42,30,19,0.8) 100%); }
-.menu-btn-content { padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
-.menu-btn-3d .icon-circle { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--dark); box-shadow: 0 4px 0 var(--gold-dark); }
-.menu-btn-3d .btn-content h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold-light); margin-bottom: 4px; }
-.menu-btn-3d .btn-content p { font-size: 0.75rem; color: #a08b6d; }
-.menu-btn-3d .arrow { margin-left: auto; width: 30px; height: 30px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.7rem; }
-.skeleton { background: linear-gradient(90deg, var(--card) 25%, var(--card-light) 50%, var(--card) 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite; border-radius: 16px; }
-@keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-.skeleton-card { aspect-ratio: 1/1; border-radius: 16px; }
-.quick-actions-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; padding: 5px 0 0 0; }
-.quick-btn-rect { flex: 1; max-width: calc(50% - 4px); height: 52px; border-radius: 14px; border: none; color: white; font-size: 0.95rem; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; box-shadow: 0 6px 0 var(--shadow), 0 8px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; position: relative; letter-spacing: 0.5px; }
-.quick-btn-rect:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow), 0 4px 8px rgba(0,0,0,0.4); }
-.quick-btn-rect i { font-size: 1.1rem; }
-.quick-btn-rect .cart-badge { position: absolute; top: -6px; right: -6px; background: #e74c3c; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 0 10px #e74c3c; }
-.quick-btn-chiama { background: linear-gradient(180deg, #5a9e4b 0%, #2d5a22 100%); color: #e8f5e3; }
-.quick-btn-carrello { background: linear-gradient(180deg, #8b1a1a 0%, #4a0e0e 100%); color: #fde8e8; }
-.actions-section { padding: 10px 20px 30px; display: flex; flex-direction: column; gap: 14px; }
-.action-btn-3d { width: 100%; padding: 18px 20px; border-radius: 14px; border: none; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 6px 0 var(--shadow); }
-.action-btn-3d:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow); }
-.action-btn-3d.disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-delivery { background: linear-gradient(180deg, #d4733a 0%, #8c4218 100%); color: #fff5e6; }
-.btn-pickup { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 6px 0 var(--gold-dark), 0 8px 15px rgba(0,0,0,0.6); }
-#productsView, #myOrdersView, #reviewsPublicView { display: none; padding: 0 20px 100px; }
-.back-btn-3d { background: var(--card-light); border: none; color: var(--gold); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 20px 0; box-shadow: 0 4px 0 var(--shadow); }
-.category-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 20px; text-shadow: 0 0 10px rgba(212, 168, 75, 0.3); }
-.search-bar-3d { position: relative; margin-bottom: 20px; }
-.search-bar-3d input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 14px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 1rem; outline: none; box-shadow: 0 4px 0 var(--shadow); }
-.search-bar-3d input:focus { border-color: var(--gold); }
-.search-bar-3d i { position: absolute; left: 15px; top: 14px; color: var(--gold); z-index: 2; }
-.product-card-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--brown) 100%); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 0 var(--shadow); border: 1px solid rgba(212,168,75,0.1); }
-.product-img-square { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 12px; border: 1px solid rgba(212,168,75,0.3); flex-shrink: 0; background: var(--card); }
-.product-info { flex: 1; }
-.product-info h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream); margin-bottom: 4px; }
-.product-info p { font-size: 0.75rem; color: #8a7a5a; margin-bottom: 6px; }
-.product-price { font-size: 1.15rem; font-weight: 700; color: var(--gold); }
-.add-btn-3d { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); flex-shrink: 0; }
-.qty-counter { display: flex; align-items: center; gap: 6px; background: var(--card); border-radius: 12px; padding: 4px; border: 1px solid var(--gold-dark); flex-shrink: 0; }
-.qty-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 var(--gold-dark); }
-.qty-btn.minus { background: var(--card-light); color: var(--gold); box-shadow: none; border: 1px solid var(--gold-dark); }
-.qty-value { min-width: 28px; text-align: center; font-weight: 700; color: var(--cream); font-size: 1rem; }
-.modal-3d { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
-.modal-3d.active { display: flex; }
-.modal-content-3d { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(212,168,75,0.2); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-header h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.3rem; }
-.close-btn-3d { width: 35px; height: 35px; border-radius: 50%; background: var(--card); border: none; color: var(--gold); font-size: 1.2rem; cursor: pointer; }
-.confirm-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
-.confirm-modal-overlay.active { display: flex; }
-.confirm-modal-box { background: linear-gradient(145deg, var(--card-light), var(--card)); padding: 28px 24px; border-radius: 20px; width: 100%; max-width: 340px; border: 1px solid rgba(212,168,75,0.25); text-align: center; }
-.confirm-modal-box p { color: var(--cream); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; }
-.confirm-modal-actions { display: flex; gap: 10px; }
-.confirm-modal-actions button { flex: 1; padding: 13px; border-radius: 12px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
-.confirm-btn-yes { background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 4px 0 #922b21; }
-.confirm-btn-no { background: var(--card-light); color: var(--gold); border: 1px solid var(--gold-dark) !important; }
-.cart-item-3d { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(212,168,75,0.1); }
-.cart-item-name { color: var(--cream); font-weight: 600; }
-.cart-item-price { color: var(--gold); font-weight: 700; }
-.promo-card-item { background: linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(238,90,36,0.1) 100%); border: 1px solid rgba(255,107,107,0.4); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-.promo-card-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.promo-card-item-title { color: #ff6b6b; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
-.promo-badge { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; }
-.delivery-fee-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-top: 8px; border-top: 1px dashed rgba(212,168,75,0.3); }
-.delivery-fee-label { color: #a08b6d; font-size: 0.85rem; font-weight: 600; }
-.delivery-fee-value { color: var(--gold); font-weight: 700; }
-.distance-info { background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 8px; padding: 10px; margin-top: 10px; }
-.distance-info-text { color: #3498db; font-size: 0.85rem; font-weight: 600; text-align: center; }
-.cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
-.cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
-.cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
-.clear-cart-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.3); background: transparent; color: #f87171; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.order-type-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-.type-option { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-.type-option i { display: block; font-size: 1.3rem; margin-bottom: 6px; color: var(--gold); }
-.type-option.active { background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border-color: var(--gold-light); }
-.type-option.active i { color: var(--dark); }
-.type-option.disabled { opacity: 0.4; cursor: not-allowed; }
-.customer-form { margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(212,168,75,0.3); }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
-.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; }
-.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--gold-light); }
-.privacy-checkbox { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; padding: 10px; background: rgba(212,168,75,0.1); border-radius: 8px; border: 1px solid rgba(212,168,75,0.2); }
-.privacy-checkbox input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--gold); }
-.privacy-checkbox label { font-size: 0.8rem; color: var(--cream); line-height: 1.4; }
-.privacy-checkbox a { color: var(--gold); text-decoration: underline; }
-.gps-btn { background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; width: 100%; }
-.time-toggle { display: flex; gap: 10px; margin-bottom: 10px; }
-.time-option { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
-.time-option.active { background: var(--gold-dark); color: var(--dark); }
-.time-picker-wrap { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; display: none; }
-.time-picker-wrap.show { display: block; }
-.checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
-.checkout-btn-3d:disabled { opacity: 0.5; cursor: not-allowed; }
-.stars-input { display: flex; gap: 4px; margin-bottom: 12px; }
-.stars-input .star { font-size: 2rem; cursor: pointer; color: #555; }
-.stars-input .star.active { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
-.review-textarea { width: 100%; min-height: 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; resize: vertical; font-family: inherit; }
-.review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
-.reviews-public-list { padding: 10px 20px 20px; }
-.review-public-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.15); }
-.review-public-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.review-public-name { color: var(--cream); font-weight: 700; font-size: 0.95rem; }
-.review-public-date { color: #8a7a5a; font-size: 0.75rem; }
-.review-public-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 6px; }
-.review-public-text { color: var(--cream); font-size: 0.85rem; line-height: 1.5; }
-.my-order-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--gold-dark); display: flex; flex-direction: column; gap: 8px; }
-.my-order-header { display: flex; justify-content: space-between; align-items: center; }
-.my-order-id { color: var(--gold); font-weight: 700; }
-.my-order-date { color: #8a7a5a; font-size: 0.75rem; }
-.my-order-items { color: var(--cream); font-size: 0.85rem; }
-.my-order-total { color: var(--gold); font-weight: 700; text-align: right; }
-.btn-review-order { background: var(--gold); color: var(--dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-.btn-reviewed { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
-.btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; width: 100%; margin-bottom: 15px; }
-.order-status-tracker { margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; }
-.order-status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; }
-.status-new { background: rgba(156,163,175,0.2); color: #9ca3af; border: 1px solid rgba(156,163,175,0.4); }
-.status-preparing { background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); animation: statusPulse 2s infinite; }
-.status-ready { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.4); animation: statusPulse 2s infinite; }
-.status-picked { background: rgba(139,92,246,0.2); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.4); }
-.status-delivering { background: rgba(96,165,250,0.2); color: #60a5fa; border: 1px solid rgba(96,165,250,0.4); animation: statusPulse 2s infinite; }
-.status-delivered { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.4); }
-.status-rifiutato { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
-@keyframes statusPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
-.order-progress-bar { position: relative; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin: 8px 0; }
-.order-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%); border-radius: 3px; transition: width 0.5s ease; box-shadow: 0 0 10px var(--gold); }
-.order-progress-steps { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.65rem; color: #8a7a5a; }
-.order-progress-steps span { text-align: center; flex: 1; }
-.order-progress-steps span.active { color: var(--gold); font-weight: 700; }
-.order-reject-message { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 10px; margin-top: 8px; color: #fca5a5; font-size: 0.8rem; }
-.order-reject-message strong { color: #ef4444; display: block; margin-bottom: 4px; }
-.order-live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #4ade80; margin-left: 8px; }
-.order-live-indicator::before { content: ''; width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: liveBlink 1.5s infinite; }
-@keyframes liveBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-.toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
-.toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Antica Pizzeria Grasso - Ordina Pizza Online a Manfredonia</title>
+    <link rel="manifest" href="manifest-clienti.json">
+    <link rel="icon" type="image/png" href="icon-clienti-192.png">
+    <link rel="apple-touch-icon" href="icon-clienti-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#d4a84b">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --gold: #d4a84b;
+            --gold-light: #f0d78c;
+            --gold-dark: #b8860b;
+            --dark: #1a1209;
+            --brown: #2d1f12;
+            --brown-light: #4a3728;
+            --card: #2a1e13;
+            --card-light: #3d2b1a;
+            --cream: #f5e6c8;
+            --shadow: #0a0704;
+        }
 
-/* MODAL RIFIUTO ORDINE */
-.modal-rifiuto {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  backdrop-filter: blur(5px);
-}
-.modal-rifiuto-content {
-  background: linear-gradient(145deg, #1a1209 0%, #2d1f12 100%);
-  border: 3px solid #f87171;
-  border-radius: 20px;
-  padding: 40px 30px;
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(248, 113, 113, 0.5);
-  animation: slideUpRifiuto 0.3s ease;
-}
-@keyframes slideUpRifiuto {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.modal-rifiuto-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  animation: shakeRifiuto 0.5s ease;
-}
-@keyframes shakeRifiuto {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-10deg); }
-  75% { transform: rotate(10deg); }
-}
-.modal-rifiuto-content h2 {
-  color: #f87171;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-}
-.modal-rifiuto-content p {
-  color: #f5e6c8;
-  font-size: 1.1rem;
-  margin-bottom: 30px;
-  line-height: 1.5;
-}
-.btn-ho-capito {
-  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 4px 0 #991b1b;
-}
-.btn-ho-capito:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 #991b1b;
-}
-@media (max-width: 768px) {
-  .modal-rifiuto-content {
-    padding: 30px 20px;
-    margin-bottom: env(safe-area-inset-bottom);
-  }
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-.app-footer { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); padding: 20px; text-align: center; border-top: 2px solid var(--gold-dark); }
-.footer-info { color: #8a7a5a; font-size: 0.75rem; }
-.footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
-.footer-links a { color: var(--gold); text-decoration: none; font-size: 0.75rem; cursor: pointer; }
-.copyright { margin-top: 8px; font-size: 0.7rem; color: #666; }
-.privacy-text { font-size: 0.85rem; line-height: 1.6; color: var(--cream); }
-.privacy-text h3 { color: var(--gold); margin: 15px 0 8px; font-size: 1.1rem; }
-.privacy-text ul { margin-left: 20px; margin-bottom: 10px; }
-#cookieBanner { position:fixed;bottom:0;left:0;right:0;background:var(--dark);padding:15px;text-align:center;border-top:1px solid var(--gold-dark);z-index:9999;display:none; }
-#cookieBanner p { color:var(--cream);font-size:0.8rem;margin:0 0 10px; }
-#cookieBanner button { background:var(--gold);color:var(--dark);border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer; }
-#bannerRifiuto { display:none; position:fixed; top:0; left:0; right:0; background:linear-gradient(90deg, #dc2626 0%, #991b1b 100%); color:white; padding:20px; text-align:center; z-index:99999; box-shadow:0 4px 20px rgba(220,38,38,0.5); }
-#bannerRifiuto .banner-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:10px; }
-#bannerRifiuto .banner-motivo { font-size:1rem; margin-bottom:15px; opacity:0.95; }
-#bannerRifiuto .banner-btn { background:white; color:#dc2626; border:none; padding:12px 30px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-.gold-shimmer-bar { position: relative; width: 100%; height: 4px; margin: 0; background: linear-gradient(180deg, #f0d78c 0%, #d4a84b 40%, #b8860b 60%, #8b6914 80%, #d4a84b 100%); box-shadow: 0 2px 5px rgba(0,0,0,0.6), 0 0 12px rgba(212, 168, 75, 0.5); border-radius: 0; overflow: hidden; }
-.shimmer-light { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 70%, transparent 100%); animation: shimmerMove 3s ease-in-out infinite; }
-@keyframes shimmerMove { 0% { left: -100%; } 100% { left: 100%; } }
-.offers-banner .close-offer { display: none !important; }
-.offers-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 15; max-width: 95%; width: 320px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.4s; opacity: 0; pointer-events: none; }
-.offers-banner.show { opacity: 1; pointer-events: auto; }
-.user-menu { position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(42,30,19,0.95); padding: 10px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); display: flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); }
-.user-menu span { color: var(--cream); font-size: 0.85rem; font-weight: 600; }
-.logout-btn { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.4); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
-.welcome-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1209 0%, #2d1f12 100%); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; padding: 20px; overflow-y: auto; }
-.welcome-logo { max-width: 180px; margin-bottom: 15px; }
-.welcome-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 10px 0; text-align: center; }
-.welcome-subtitle { color: #8a7a5a; font-size: 0.95rem; text-align: center; margin-bottom: 15px; }
-.home-instructions { background: rgba(212,168,75,0.1); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin: 10px 0; width: 100%; max-width: 380px; }
-.home-instructions h3 { color: var(--gold); margin-bottom: 10px; font-size: 1rem; text-align: center; }
-.home-instructions ol { color: var(--cream); text-align: left; padding-left: 20px; line-height: 1.6; font-size: 0.9rem; }
-.home-instructions li { margin-bottom: 6px; }
-.home-instructions strong { color: var(--gold-light); }
-.lang-selector { margin-bottom: 15px; background: rgba(212,168,75,0.1); padding: 15px; border-radius: 15px; border: 1px solid rgba(212,168,75,0.3); width: 100%; max-width: 380px; }
-.lang-selector label { color: var(--gold); font-weight: 600; margin-bottom: 8px; display: block; }
-.lang-selector select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--gold); background: var(--brown); color: var(--cream); font-size: 1rem; }
-.welcome-buttons { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
-.btn-register { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
-.btn-guest { background: linear-gradient(180deg, var(--brown-light) 0%, var(--brown) 100%); color: var(--gold); border: 2px solid var(--gold); padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; }
-.welcome-copyright { color: #666; font-size: 0.75rem; margin-top: 20px; }
-</style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--dark);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+        }
+
+        .ambient-lights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .light-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .light-orb:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: var(--gold);
+            top: 10%;
+            left: 10%;
+        }
+
+        .light-orb:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: var(--gold-light);
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .light-orb:nth-child(3) {
+            width: 180px;
+            height: 180px;
+            background: var(--gold-dark);
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            height: 100dvh;
+            background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            z-index: 10;
+        }
+
+        .header {
+            background: transparent;
+            padding: 0;
+            text-align: center;
+            position: relative;
+            z-index: 20;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        /* Logo Area con overlay colorato */
+        .logo-area {
+            width: 100%;
+            position: relative;          /* per contenere l'overlay */
+            overflow: hidden;            /* taglia l'overlay ai bordi */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: 2px;
+            box-shadow: 0 3px 0 0 rgba(240, 215, 140, 0.85);
+            margin-bottom: 2px;
+            transition: box-shadow 0.8s ease;
+            background: transparent;
+        }
+
+        .logo-tint-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);         /* usa il colore della palette */
+            mix-blend-mode: color;           /* tinge l'immagine mantenendo la luminosità */
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.6;                    /* regolabile: 0.4 più leggero, 0.8 più intenso */
+            transition: background 0.8s ease;
+        }
+
+        .logo-area img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 220px;
+            transform: scaleX(1.18);
+            transform-origin: center center;
+            position: relative;
+            z-index: 1;                      /* sta sotto l'overlay */
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            height: 130px;
+            overflow: hidden;
+            flex-shrink: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            border-top: none;
+            border-bottom: 1px solid rgba(212, 168, 75, 0.4);
+            box-shadow: none;
+            animation: none;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background-color: var(--brown);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(26, 18, 9, 0.95) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Barra stato + Azioni */
+        .status-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 14px;
+            margin: 4px auto 8px;
+            width: 95%;
+            max-width: 460px;
+            background: rgba(26, 18, 9, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 168, 75, 0.2);
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 10;
+        }
+
+        .status-badge-small {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px 4px 6px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #f87171;
+        }
+
+        .status-badge-small .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #f87171;
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge-small.open {
+            color: #4ade80;
+        }
+
+        .status-badge-small.open .status-dot {
+            background: #4ade80;
+        }
+
+        .action-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--cream);
+            font-weight: 600;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .action-pill:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-pill:active {
+            transform: translateY(0);
+        }
+
+        .action-pill i {
+            font-size: 0.8rem;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Banner offerte */
+        .offers-banner {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            max-width: 95%;
+            width: 320px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: all 0.4s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .offers-banner.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Skeletons */
+        .skeleton {
+            background: linear-gradient(90deg, var(--card) 25%, var(--card-light) 50%, var(--card) 75%);
+            background-size: 200% 100%;
+            animation: skeletonShimmer 1.5s infinite;
+            border-radius: 16px;
+        }
+
+        @keyframes skeletonShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-card {
+            aspect-ratio: 1/1;
+            border-radius: 16px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 20px 15px 100px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Catalog */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            padding: 12px 0 10px;
+        }
+
+        .section-divider span {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+            margin: 0 15px;
+        }
+
+        .menu-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Card Categorie */
+        .menu-btn-3d {
+            background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 50%, var(--brown) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow:
+                0 6px 0 var(--shadow),
+                0 8px 15px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(212, 168, 75, 0.3);
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .menu-btn-3d:hover {
+            border-color: rgba(212, 168, 75, 0.5);
+        }
+
+        .category-img-container {
+            width: 100%;
+            height: 70px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .category-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85);
+        }
+
+        .category-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(42, 30, 19, 0.8) 100%);
+        }
+
+        .menu-btn-content {
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .menu-btn-3d .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--dark);
+            box-shadow: 0 4px 0 var(--gold-dark);
+        }
+
+        .menu-btn-3d .btn-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--gold-light);
+        }
+
+        .menu-btn-3d .btn-content p {
+            font-size: 0.75rem;
+            color: #a08b6d;
+        }
+
+        .menu-btn-3d .arrow {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            background: var(--card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 0.7rem;
+        }
+
+        /* Prodotti */
+        .product-card-3d {
+            background: linear-gradient(145deg, var(--card-light) 0%, var(--brown) 100%);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 6px 0 var(--shadow);
+            border: 1px solid rgba(212, 168, 75, 0.1);
+        }
+
+        .product-img-square {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(212, 168, 75, 0.3);
+            flex-shrink: 0;
+            background: var(--card);
+        }
+
+        .product-info {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .product-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--cream);
+            margin-bottom: 4px;
+        }
+
+        .product-info p {
+            font-size: 0.75rem;
+            color: #8a7a5a;
+            margin-bottom: 6px;
+        }
+
+        .product-price {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .add-btn-3d {
+            background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border: none;
+            color: var(--dark);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--gold-dark);
+        }
+
+        .qty-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--gold-dark);
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: var(--dark);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 var(--gold-dark);
+        }
+
+        .qty-btn.minus {
+            background: var(--card-light);
+            color: var(--gold);
+            box-shadow: none;
+            border: 1px solid var(--gold-dark);
+        }
+
+        .qty-value {
+            min-width: 28px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--cream);
+            font-size: 1rem;
+        }
+
+        .category-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .search-bar-3d {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-bar-3d input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border-radius: 14px;
+            border: 1px solid var(--gold-dark);
+            background: var(--card);
+            color: var(--cream);
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 4px 0 var(--shadow);
+        }
+
+        .search-bar-3d input:focus {
+            border-color: var(--gold);
+        }
+
+        .search-bar-3d i {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            color: var(--gold);
+            z-index: 2;
+        }
+
+        .back-btn-3d {
+            background: var(--card-light);
+            border: none;
+            color: var(--gold);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 0 var(--shadow);
+            margin: 20px 0;
+        }
+
+        /* Cart, Orders, Reviews, Bottom Nav */
+        .cart-item-3d { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(212,168,75,0.1); }
+        .cart-item-name { color: var(--cream); font-weight: 600; }
+        .cart-item-price { color: var(--gold); font-weight: 700; }
+        .promo-card-item { background: linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(238,90,36,0.1) 100%); border: 1px solid rgba(255,107,107,0.4); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .cart-total-3d { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--gold-dark); display: flex; justify-content: space-between; align-items: center; }
+        .cart-total-label { color: var(--cream); font-size: 1.1rem; font-weight: 700; }
+        .cart-total-amount { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
+        .clear-cart-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.3); background: transparent; color: #f87171; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .cart-service-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--gold-dark); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
+        .cart-service-section input, .cart-service-section textarea, .cart-service-section select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; }
+        .order-type-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+        .type-option { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .type-option i { display: block; font-size: 1.3rem; margin-bottom: 6px; color: var(--gold); }
+        .type-option.active { background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border-color: var(--gold-light); }
+        .type-option.active i { color: var(--dark); }
+        .time-toggle { display: flex; gap: 10px; margin-bottom: 10px; }
+        .time-option { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+        .time-option.active { background: var(--gold-dark); color: var(--dark); }
+        .time-picker-wrap { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; display: none; }
+        .time-picker-wrap.show { display: block; }
+        .gps-btn { background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; width: 100%; }
+        .privacy-checkbox { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; padding: 10px; background: rgba(212,168,75,0.1); border-radius: 8px; border: 1px solid rgba(212,168,75,0.2); }
+        .privacy-checkbox input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--gold); }
+        .privacy-checkbox label { font-size: 0.8rem; color: var(--cream); line-height: 1.4; }
+        .checkout-btn-3d { width: 100%; margin-top: 15px; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 0 var(--gold-dark); }
+        .checkout-btn-3d:disabled { opacity: 0.5; cursor: not-allowed; }
+        .my-order-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--gold-dark); display: flex; flex-direction: column; gap: 8px; }
+        .my-order-header { display: flex; justify-content: space-between; align-items: center; }
+        .my-order-id { color: var(--gold); font-weight: 700; }
+        .my-order-date { color: #8a7a5a; font-size: 0.75rem; }
+        .my-order-items { color: var(--cream); font-size: 0.85rem; }
+        .my-order-total { color: var(--gold); font-weight: 700; text-align: right; }
+        .btn-clear-history { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; width: 100%; margin-bottom: 15px; }
+        .order-live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #4ade80; margin-left: 8px; }
+        .review-public-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(212,168,75,0.15); }
+        .review-public-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .review-public-name { color: var(--cream); font-weight: 700; font-size: 0.95rem; }
+        .review-public-date { color: #8a7a5a; font-size: 0.75rem; }
+        .review-public-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 6px; }
+        .review-public-text { color: var(--cream); font-size: 0.85rem; line-height: 1.5; }
+        .stars-input { display: flex; gap: 4px; margin-bottom: 12px; }
+        .stars-input .star { font-size: 2rem; cursor: pointer; color: #555; }
+        .stars-input .star.active { color: var(--gold); }
+        .review-textarea { width: 100%; min-height: 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; resize: vertical; font-family: inherit; }
+        .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(26,18,9,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(212,168,75,0.2); box-shadow: 0 -4px 15px rgba(0,0,0,0.4); display: flex; justify-content: space-around; align-items: center; padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); max-width: 480px; margin: 0 auto; }
+        .bottom-nav .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; background: none; border: none; color: #6b5b4f; cursor: pointer; transition: all 0.3s; position: relative; }
+        .bottom-nav .nav-btn.active { color: var(--gold); }
+        .bottom-nav .nav-btn i { font-size: 16px; }
+        .bottom-nav .nav-btn span { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bottom-nav .nav-btn .badge { position: absolute; top: 2px; right: calc(50% - 14px); background: #e74c3c; color: white; font-size: 8px; font-weight: 900; font-family: monospace; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--dark); }
+        .bottom-nav .nav-btn .live-dot { position: absolute; top: 4px; right: calc(50% - 12px); width: 6px; height: 6px; background: #e74c3c; border-radius: 50%; border: 1px solid var(--dark); animation: pulse 1.5s infinite; }
+        .bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
+        .bottom-nav .admin-btn.active { background: rgba(245,158,11,0.2); }
+        .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
+        .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(212,168,75,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.3rem; }
+        .close-btn { width: 35px; height: 35px; border-radius: 50%; background: var(--card); border: none; color: var(--gold); font-size: 1.2rem; cursor: pointer; }
+        #offlineBanner { display: none; position: fixed; top: 0; left: 0; right: 0; background: #dc2626; color: #fff; text-align: center; padding: 10px; font-weight: 700; z-index: 99998; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+    </style>
 </head>
 <body>
 
-<!-- CONFIRM MODAL CUSTOM -->
-<div class="confirm-modal-overlay" id="confirmModal">
-  <div class="confirm-modal-box">
-    <p id="confirmModalText"></p>
-    <div class="confirm-modal-actions">
-      <button class="confirm-btn-no" id="confirmBtnNo">Annulla</button>
-      <button class="confirm-btn-yes" id="confirmBtnYes">Conferma</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL RIFIUTO ORDINE -->
-<div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;">
-  <div class="modal-rifiuto-content">
-    <div class="modal-rifiuto-icon">❌</div>
-    <h2>Ordine Rifiutato</h2>
-    <p id="motivoRifiutoModal">La pizzeria non può accettare il tuo ordine.</p>
-    <button class="btn-ho-capito" onclick="chiudiModalRifiuto()">Ho capito</button>
-  </div>
-</div>
-
-<div id="welcomeScreen" class="welcome-screen">
-    <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
-    <h1 class="welcome-title" data-trad="welcome_title">🍕 Benvenuto da Grasso!</h1>
-    <div class="home-instructions">
-        <h3 data-trad="save_home_title">📱 Salva l'app sulla Home!</h3>
-        <ol>
-            <li><span data-trad="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li>
-            <li><span data-trad="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li>
-            <li><span data-trad="save_home_step3">Ordina con un tocco! 🚀</span></li>
-        </ol>
-    </div>
-    <div class="lang-selector">
-        <label data-trad="language_label">🌍 Lingua / Language</label>
-        <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="it">🇮🇹 Italiano</option>
-            <option value="en">🇬🇧 English</option>
-            <option value="de">🇩🇪 Deutsch</option>
-        </select>
-    </div>
-    <div class="welcome-buttons">
-        <button class="btn-register" onclick="showRegisterModal()" data-trad="register_btn">👤 Registrati</button>
-        <button class="btn-guest" onclick="enterAsGuest()" data-trad="guest_btn">👻 Continua come Ospite</button>
-    </div>
-    <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
-</div>
-
-<div id="authModal" class="modal-3d">
-    <div class="modal-content-3d" style="max-width:500px;">
-        <div class="modal-header">
-            <h2 id="authModalTitle" data-trad="login_title">Accedi al tuo account</h2>
-            <button class="close-btn-3d" onclick="closeAuthModal()">×</button>
-        </div>
-        <div id="loginForm">
-            <div class="form-group">
-                <label data-trad="email_label">Email</label>
-                <input type="email" id="loginEmail" placeholder="mario@email.it">
-            </div>
-            <div class="form-group">
-                <label data-trad="password_label">Password</label>
-                <input type="password" id="loginPassword" placeholder="••••••••">
-            </div>
-            <button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d" data-trad="login_btn">Accedi</button>
-            <div style="margin:20px 0; text-align:center; color:#8a7a5a;" data-trad="or">oppure</div>
-            <button onclick="loginWithGoogle()" style="width:100%; padding:14px; border-radius:10px; border:1px solid #4285F4; background:#fff; color:#4285F4; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px;">
-                <img src="https://www.google.com/favicon.ico" width="20" alt="Google">
-                <span data-trad="login_with_google">Continua con Google</span>
-            </button>
-            <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                <span data-trad="no_account">Non hai un account?</span>
-                <a onclick="showRegisterForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;" data-trad="register_here">Registrati</a>
-            </p>
-        </div>
-        <div id="registerForm" style="display:none;">
-            <div class="form-group">
-                <label data-trad="name_label">Nome e Cognome</label>
-                <input type="text" id="registerName" placeholder="Mario Rossi">
-            </div>
-            <div class="form-group">
-                <label data-trad="email_label">Email</label>
-                <input type="email" id="registerEmail" placeholder="mario@email.it">
-            </div>
-            <div class="form-group">
-                <label data-trad="password_label">Password</label>
-                <input type="password" id="registerPassword" placeholder="Minimo 6 caratteri">
-            </div>
-            <div class="form-group">
-                <label data-trad="confirm_password">Conferma Password</label>
-                <input type="password" id="registerPasswordConfirm" placeholder="••••••••">
-            </div>
-            <button onclick="registerUser()" class="checkout-btn-3d" data-trad="register_btn">Registrati</button>
-            <p style="text-align:center; color:#8a7a5a; margin-top:15px;">
-                <span data-trad="already_have_account">Hai già un account?</span>
-                <a onclick="showLoginForm()" style="color:var(--gold); cursor:pointer; text-decoration:underline;" data-trad="login_here">Accedi</a>
-            </p>
-        </div>
-    </div>
-</div>
-
-<div id="userMenu" class="user-menu" style="display:none;"></div>
-
-<div id="bannerRifiuto">
-    <div class="banner-title" data-trad="order_rejected">❌ Ordine Rifiutato</div>
-    <div class="banner-motivo" id="motivoRifiutoText" data-trad="reject_default_msg">La pizzeria non può accettare il tuo ordine.</div>
-    <button class="banner-btn" onclick="chiudiBannerRifiuto()" data-trad="understood">Ho capito</button>
-</div>
-
 <div class="ambient-lights">
-    <div class="light-orb"></div><div class="light-orb"></div><div class="light-orb"></div>
+    <div class="light-orb"></div>
+    <div class="light-orb"></div>
+    <div class="light-orb"></div>
 </div>
-<div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
 
-<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-trad="offline_msg">⚠️ Sei offline — riconnessione in corso...</div>
+<div id="offlineBanner">⚠️ Sei offline — riconnessione in corso...</div>
 
-<div class="phone-frame" id="mainApp" style="display:none;">
-<header class="header">
-    <div style="position: relative; width: 100%; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: 8px;">
-        <img src="https://i.imgur.com/nWLqs68.png" alt="Antica Pizzeria Grasso" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.18); transform-origin: center center;">
-    </div>
-    <div class="gold-shimmer-bar"><div class="shimmer-light"></div></div>
-    <div class="hero-section">
-        <img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color: #2d1f12;">
-        <div class="hero-overlay"></div>
-    </div>
-    <div id="statusBanner" class="status-banner status-closed">
-        <span id="statusText" data-trad="closed">🔴 CHIUSO</span>
-    </div>
-    <div id="offersBanner" class="offers-banner">
-        <span id="offerText"></span>
-    </div>
-</header>
-
-<div id="mainMenu">
-    <div class="section-divider"><span data-trad="menu_title">Il Nostro Menu</span></div>
-    <div class="menu-list" id="categoriesSkeletons">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-    </div>
-    <div class="menu-list" id="categoriesList" style="display:none;"></div>
-    <div class="section-divider"><span data-trad="services_title">Servizi</span></div>
-    <div class="actions-section">
-        <div class="quick-actions-row">
-            <button class="quick-btn-rect quick-btn-chiama" onclick="callPhone()"><i class="fas fa-phone"></i> <span data-trad="call_btn">Chiama</span></button>
-            <button class="quick-btn-rect quick-btn-carrello" onclick="openCart()"><i class="fas fa-shopping-cart"></i> <span data-trad="cart_btn">Carrello</span><div class="cart-badge" id="quickCartBadge" style="display:none;">0</div></button>
+<div class="phone-frame" id="mainApp">
+    <header class="header">
+        <div class="logo-area">
+            <!-- Overlay colorato per tingere il logo con il colore della palette -->
+            <div class="logo-tint-overlay" id="logoTint"></div>
+            <img src="https://i.imgur.com/nWLqs68.png" alt="Antica Pizzeria Grasso" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 220px; transform: scaleX(1.18); transform-origin: center center;">
         </div>
-        <button class="action-btn-3d btn-delivery" id="deliveryBtn" onclick="checkStatusBeforeOrder('delivery')"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_btn">Consegna a Domicilio</span></button>
-        <button class="action-btn-3d btn-pickup" onclick="checkStatusBeforeOrder('pickup')"><i class="fas fa-store"></i> <span data-trad="pickup_btn">Ritiro in Pizzeria</span></button>
-    </div>
-</div>
+        <div class="hero-section">
+            <img id="heroImg" class="hero-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pizza" style="background-color: #2d1f12;">
+            <div class="hero-overlay"></div>
+        </div>
 
-<div id="productsView" style="display:none;">
-    <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-    <h2 id="categoryTitle" class="category-title">Categoria</h2>
-    <div class="search-bar-3d">
-        <i class="fas fa-search"></i>
-        <input type="text" id="productSearch" data-trad-placeholder="search_placeholder" placeholder="Cerca nel menu..." oninput="filterProducts(this.value)">
-    </div>
-    <div id="productList"></div>
-    <button class="back-btn-3d" onclick="showHome()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-</div>
-
-<div id="myOrdersView">
-    <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-    <h2 class="category-title" data-trad="my_orders">📦 I Miei Ordini</h2>
-    <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;" data-trad="orders_info">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
-    <button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> <span data-trad="clear_history">Cancella Storico Locale</span></button>
-    <div id="myOrdersList"></div>
-</div>
-
-<div id="reviewsPublicView">
-    <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-trad="back_btn">Torna al Menu</span></button>
-    <h2 class="category-title" data-trad="reviews">⭐ Le Nostre Recensioni</h2>
-    <div class="reviews-public-list" id="reviewsPublicList"></div>
-</div>
-
-<footer class="app-footer" style="text-align:center;">
-    <div class="footer-info" id="footerInfo" style="margin-bottom:12px;">Manfredonia • Tel. <span id="footerPhone">0884 660377</span></div>
-    <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:15px; margin-bottom:12px;">
-        <div id="footerLogout" style="display:none;">
-            <button onclick="logout()" style="background:rgba(231,76,60,0.15); color:#e74c3c; border:1px solid rgba(231,76,60,0.4); padding:8px 18px; border-radius:8px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.8rem;">
-                <i class="fas fa-sign-out-alt"></i> <span data-trad="logout_btn">Esci</span>
+        <div class="status-actions-bar">
+            <div id="statusBadge" class="status-badge-small">
+                <span class="status-dot"></span>
+                <span id="statusText">CHIUSO</span>
+            </div>
+            <button class="action-pill" onclick="callPizzeria()" title="Chiama la pizzeria">
+                <i class="fas fa-phone" style="color:#4ade80;"></i>
+                <span>Chiama</span>
+            </button>
+            <button class="action-pill" onclick="openPizzeriaMaps()" title="Vai alla pizzeria">
+                <i class="fas fa-map-marker-alt" style="color:#60a5fa;"></i>
+                <span>Naviga</span>
             </button>
         </div>
-        <div class="footer-links" style="margin:0; display:flex; gap:15px; justify-content:center;">
-            <a onclick="openPrivacyModal()" data-trad="privacy_policy">Privacy Policy</a>
-            <a onclick="showReviewsPublic()" data-trad="reviews">⭐ Recensioni</a>
-            <a onclick="showMyOrders()" data-trad="my_orders">I Miei Ordini</a>
+
+        <div id="offersBanner" class="offers-banner">
+            <span id="offerText"></span>
         </div>
+    </header>
+
+    <!-- TABs -->
+    <div class="tab-content active" id="tab-catalog">
+        <div class="section-divider"><span>Il Nostro Menu</span></div>
+        <div class="menu-list" id="categoriesSkeletons">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+        <div class="menu-list" id="categoriesList" style="display:none;"></div>
     </div>
-    <div class="copyright">© 2026 Antica Pizzeria Grasso</div>
-</footer>
+
+    <div class="tab-content" id="tab-search">
+        <h2 class="category-title">🔍 Cerca nel Menù</h2>
+        <div class="search-bar-3d">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearch" placeholder="Cerca..." oninput="globalSearch()">
+        </div>
+        <div id="globalSearchResults"></div>
+    </div>
+
+    <div class="tab-content" id="tab-cart">
+        <div id="cartContent"></div>
+    </div>
+
+    <div class="tab-content" id="tab-orders">
+        <h2 class="category-title">📦 I Miei Ordini</h2>
+        <p style="color:#8a7a5a; font-size:0.8rem; margin-bottom:15px;">Visualizzi solo gli ultimi 5 ordini recenti. <span class="order-live-indicator">LIVE</span></p>
+        <button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> Cancella Storico Locale</button>
+        <div id="myOrdersList"></div>
+    </div>
+
+    <div class="tab-content" id="tab-reviews">
+        <h2 class="category-title">⭐ Le Nostre Recensioni</h2>
+        <button class="btn-register" style="margin-bottom:15px; width:100%;" onclick="openReviewModal()">Lascia una Recensione</button>
+        <div class="reviews-public-list" id="reviewsPublicList"></div>
+    </div>
+
+    <div class="tab-content" id="tab-admin">
+        <h2 class="category-title">🔐 Gestione</h2>
+        <p style="color:#8a7a5a;">Accesso amministratore.</p>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-tab="catalog" onclick="switchTab('catalog')">
+            <i class="fas fa-pizza-slice"></i>
+            <span>Catalogo</span>
+        </button>
+        <button class="nav-btn" data-tab="search" onclick="switchTab('search')">
+            <i class="fas fa-search"></i>
+            <span>Cerca</span>
+        </button>
+        <button class="nav-btn" data-tab="cart" onclick="switchTab('cart')">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Carrello</span>
+            <span class="badge" id="cartBadge" style="display:none;">0</span>
+        </button>
+        <button class="nav-btn" data-tab="orders" onclick="switchTab('orders')">
+            <i class="fas fa-history"></i>
+            <span>Ordini</span>
+            <span class="live-dot" id="liveDot" style="display:none;"></span>
+        </button>
+        <button class="nav-btn" data-tab="reviews" onclick="switchTab('reviews')">
+            <i class="fas fa-star"></i>
+            <span>Feedback</span>
+        </button>
+        <button class="nav-btn admin-btn" data-tab="admin" id="adminNavBtn" onclick="switchTab('admin')" style="display:none;">
+            <i class="fas fa-lock"></i>
+            <span>Gestione</span>
+        </button>
+    </nav>
 </div>
 
-<!-- CART MODAL -->
-<div class="modal-3d" id="cartModal">
-<div class="modal-content-3d">
-<div class="modal-header">
-<h2><i class="fas fa-shopping-cart"></i> <span data-trad="your_order">Il Tuo Ordine</span></h2>
-<button class="close-btn-3d" onclick="closeCart()">×</button>
-</div>
-<div id="cartItems"></div>
-<div class="delivery-fee-row" id="deliveryFeeRow" style="display:none;">
-<span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_fee">Costo consegna</span></span>
-<span class="delivery-fee-value" id="deliveryFeeValue">€0.00</span>
-</div>
-<div class="distance-info" id="distanceInfo" style="display:none;">
-<div class="distance-info-text" id="distanceText">📍 Distanza: -- km</div>
-</div>
-<div class="cart-total-3d" id="cartTotalSection" style="display:none;">
-<span class="cart-total-label" data-trad="total">Totale</span>
-<span class="cart-total-amount" id="totalAmount">€0.00</span>
-</div>
-<div class="order-type-toggle" id="orderTypeToggle" style="display:none;">
-<div class="type-option active" id="typeDelivery" onclick="selectOrderType('delivery')"><i class="fas fa-motorcycle"></i> <span data-trad="delivery_short">Consegna</span></div>
-<div class="type-option" id="typePickup" onclick="selectOrderType('pickup')"><i class="fas fa-store"></i> <span data-trad="pickup_short">Ritiro</span></div>
-</div>
-<div class="customer-form" id="customerForm" style="display:none;">
-<h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-user"></i> <span data-trad="your_data">I Tuoi Dati</span></h3>
-<div class="form-group">
-<label><i class="fas fa-clock"></i> <span data-trad="time_label">Orario</span> <span id="timeTypeLabel" data-trad="delivery_short">consegna</span></label>
-<div class="time-toggle">
-<div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')" data-trad="asap">⚡ Subito</div>
-<div class="time-option" id="timeScheduled" onclick="selectTimeMode('scheduled')" data-trad="choose_time">🕐 Scegli</div>
-</div>
-<div class="time-picker-wrap" id="timePickerWrap">
-<label data-trad="select_time">Seleziona orario:</label>
-<input type="time" id="scheduledTime" step="300">
-</div>
-</div>
-<div class="form-group"><label data-trad="name_label">Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div>
-<div class="form-group"><label data-trad="phone_label">Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div>
-<div class="form-group" id="addressGroup" style="display:none;">
-<label data-trad="address_label">Indirizzo di Consegna *</label>
-<div style="display: flex; gap: 8px;">
-<input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex: 3;">
-<input type="text" id="customerNumber" placeholder="Civico" style="flex: 1;">
-</div>
-<button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> <span data-trad="use_gps">Usa GPS</span></button>
-</div>
-<div class="form-group"><label data-trad="notes_label">Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div>
-<div aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9999px;top:-9999px;">
-  <input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1">
-</div>
-<div class="form-group">
-<div class="privacy-checkbox">
-<input type="checkbox" id="privacyConsent" required>
-<label for="privacyConsent"><span data-trad="privacy_accept">Ho letto e accetto la</span> <a onclick="openPrivacyModal()" data-trad="privacy_policy">Privacy Policy</a> *</label>
-</div>
-</div>
-</div>
-<button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> <span data-trad="clear_cart">Svuota Carrello</span></button>
-<button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> <span data-trad="send_order">Invia Ordine</span></button>
-</div>
-</div>
-
-<!-- REVIEW MODAL -->
-<div class="modal-3d" id="reviewModal">
-<div class="modal-content-3d">
-<div class="modal-header">
-<h2><i class="fas fa-star"></i> <span data-trad="leave_review">Lascia una Recensione</span></h2>
-<button class="close-btn-3d" onclick="closeReviewModal()">×</button>
-</div>
-<div class="form-group">
-<label data-trad="how_many_stars">Quante stelle? ⭐</label>
-<div class="stars-input" id="starsInput">
-<span class="star" data-value="1" onclick="selectStar(1)">★</span>
-<span class="star" data-value="2" onclick="selectStar(2)">★</span>
-<span class="star" data-value="3" onclick="selectStar(3)">★</span>
-<span class="star" data-value="4" onclick="selectStar(4)">★</span>
-<span class="star" data-value="5" onclick="selectStar(5)">★</span>
-</div>
-</div>
-<div class="form-group"><label data-trad="your_name">Il tuo nome</label><input type="text" id="reviewName" placeholder="Mario R."></div>
-<div class="form-group"><label data-trad="your_opinion">La tua opinione</label><textarea class="review-textarea" id="reviewText" placeholder="La pizza era fantastica..."></textarea></div>
-<div class="form-group"><label data-trad="order_number">Numero Ordine</label><input type="text" id="reviewOrderId" readonly style="opacity:0.7;"></div>
-<button class="review-submit-btn" onclick="submitReview()"><i class="fas fa-paper-plane"></i> <span data-trad="send_review">Invia Recensione</span></button>
-</div>
-</div>
-
-<!-- PRIVACY MODAL -->
-<div class="modal-3d" id="privacyModal">
-<div class="modal-content-3d">
-<div class="modal-header">
-<h2><i class="fas fa-shield-alt"></i> <span data-trad="privacy_policy">Privacy Policy</span></h2>
-<button class="close-btn-3d" onclick="closePrivacyModal()">×</button>
-</div>
-<div class="privacy-text">
-<p><strong>Antica Pizzeria Grasso</strong> <span data-trad="privacy_respect">rispetta la tua privacy.</span></p>
-<h3 data-trad="what_data">📋 Quali dati raccogliamo</h3>
-<ul><li data-trad="data_name">Nome e cognome</li><li data-trad="data_phone">Telefono</li><li data-trad="data_address">Indirizzo</li><li data-trad="data_notes">Note ordine</li></ul>
-<h3 data-trad="security">🔒 Sicurezza</h3>
-<p data-trad="security_text">Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p>
-<h3 data-trad="retention">Conservazione</h3>
-<p data-trad="retention_text">Conserviamo i dati per 24 mesi.</p>
-</div>
-</div>
+<!-- Review Modal -->
+<div class="modal-overlay" id="reviewModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>⭐ Lascia una Recensione</h2>
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+        </div>
+        <div class="form-group">
+            <label>Quante stelle?</label>
+            <div class="stars-input" id="starsInput">
+                <span class="star" data-value="1" onclick="selectStar(1)">★</span>
+                <span class="star" data-value="2" onclick="selectStar(2)">★</span>
+                <span class="star" data-value="3" onclick="selectStar(3)">★</span>
+                <span class="star" data-value="4" onclick="selectStar(4)">★</span>
+                <span class="star" data-value="5" onclick="selectStar(5)">★</span>
+            </div>
+        </div>
+        <div class="form-group"><label>Il tuo nome</label><input type="text" id="reviewName" placeholder="Mario R."></div>
+        <div class="form-group"><label>La tua opinione</label><textarea class="review-textarea" id="reviewText" placeholder="La pizza era fantastica..."></textarea></div>
+        <button class="review-submit-btn" onclick="submitReview()">Invia Recensione</button>
+    </div>
 </div>
 
 <div class="toast-3d" id="toast"></div>
 
-<div id="cookieBanner">
-<p><span data-trad="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-trad="privacy_policy">Privacy Policy</a></p>
-<button onclick="acceptCookies()" data-trad="accept">Accetta</button>
-</div>
-
 <script>
-// ─── FIREBASE ────────────────────────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
-  authDomain: "teogra-c8cf5.firebaseapp.com",
-  databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "teogra-c8cf5",
-  storageBucket: "teogra-c8cf5.firebasestorage.app",
-  messagingSenderId: "686300112893",
-  appId: "1:686300112893:web:e147b82f91374f12db1b94"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// ─── STATO GLOBALE ────────────────────────────────────────────────────────────
-let currentUser = null, currentLang = 'it', userType = 'none';
-let cart = [], orderType = 'delivery', timeMode = 'asap', currentSearchCat = '';
-let selectedStars = 0, pendingReviewOrderId = null;
-let orderStatusListeners = {};
-let appDataLoaded = false;
-
-const CACHE_DURATION = 3600000;
-
-let appData = {
-  categories: {
-    focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
-    pizze:   { name: "🍕 Specialità Pugliesi", icon: "fa-pizza-slice" },
-    frittura:{ name: "🍗 Frittura", icon: "fa-drumstick-bite" },
-    bibite:  { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
-  },
-  menu: {
-    pizze: [], focacce: [], frittura: [],
-    bibite: [
-      { name:"Coca Cola", price:2.00, desc:"33cl" },
-      { name:"Sprite", price:2.00, desc:"33cl" },
-      { name:"Fanta", price:2.00, desc:"33cl" },
-      { name:"Acqua Naturale", price:1.00, desc:"50cl" },
-      { name:"Acqua Frizzante", price:1.00, desc:"50cl" },
-      { name:"Peroni 33cl", price:2.00, desc:"Birra" }
-    ]
-  },
-  promotions: {},
-  settings: {
-    visiblePhone:"0884660377", manualStatus:"auto",
-    openDays:"lun,mar,mer,gio,ven,sab,dom",
-    hours:"11:00-15:00,18:00-23:00",
-    deliveryEnabled:true, pickupEnabled:true,
-    deliveryFee:2.00, minDeliveryOrder:15,
-    deliveryBaseFee:3.00, deliveryExtraFee:2.00,
-    deliveryMaxRadius:4, deliveryExtraRadius:6
-  },
-  branding: { name:"Antica Pizzeria Grasso", subtitle:"Tradizione Pugliese", city:"Manfredonia" },
-  images: { hero:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80", categories:{} }
-};
-
-// ─── CONFIRM MODAL CUSTOM ─────────────────
-function showConfirm(message) {
-  return new Promise(resolve => {
-    const overlay = document.getElementById('confirmModal');
-    document.getElementById('confirmModalText').textContent = message;
-    overlay.classList.add('active');
-    const yes = document.getElementById('confirmBtnYes');
-    const no  = document.getElementById('confirmBtnNo');
-    const cleanup = () => { overlay.classList.remove('active'); yes.onclick = null; no.onclick = null; };
-    yes.onclick = () => { cleanup(); resolve(true); };
-    no.onclick  = () => { cleanup(); resolve(false); };
-  });
-}
-
-// ─── TRADUZIONI ───────────────────────────────────────────────────────────────
-async function loadTranslations(lang) {
-  try {
-    const r = await fetch('traduzioni.json');
-    const t = await r.json();
-    currentLang = lang;
-    localStorage.setItem('grasso_lang', lang);
-    document.querySelectorAll('[data-trad]').forEach(el => {
-      const k = el.getAttribute('data-trad');
-      if (t[lang] && t[lang][k]) {
-        el.children.length > 0 ? (el.innerHTML = t[lang][k]) : (el.textContent = t[lang][k]);
-      }
-    });
-    document.querySelectorAll('[data-trad-placeholder]').forEach(el => {
-      const k = el.getAttribute('data-trad-placeholder');
-      if (t[lang] && t[lang][k]) el.placeholder = t[lang][k];
-    });
-    document.getElementById('langSelect').value = lang;
-  } catch(e) { console.error('Errore traduzioni:', e); }
-}
-function changeLanguage(lang) { loadTranslations(lang); }
-
-// ─── AUTH ─────────────────────────────────────────────────────────────────────
-function showWelcomeScreen() { document.getElementById('welcomeScreen').style.display = 'flex'; document.getElementById('mainApp').style.display = 'none'; }
-function hideWelcomeScreen() { document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; }
-function enterAsGuest() { userType = 'guest'; localStorage.setItem('grasso_user_type','guest'); hideWelcomeScreen(); showToast('👻 Modalità Ospite'); }
-function showRegisterModal() { document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('authModal').classList.add('active'); showLoginForm(); }
-function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); showWelcomeScreen(); }
-function showLoginForm() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; }
-function showRegisterForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
-
-function registerUser() {
-  const n = document.getElementById('registerName').value.trim();
-  const e = document.getElementById('registerEmail').value.trim();
-  const p = document.getElementById('registerPassword').value;
-  const pc = document.getElementById('registerPasswordConfirm').value;
-  if (!n || !e || !p) { showToast('⚠️ Compila tutto'); return; }
-  if (p !== pc) { showToast('❌ Password diverse'); return; }
-  if (p.length < 6) { showToast('❌ Minimo 6 caratteri'); return; }
-  firebase.auth().createUserWithEmailAndPassword(e, p).then(u => {
-    u.user.updateProfile({ displayName: n });
-    firebase.database().ref('users/' + u.user.uid).set({ name: n, email: e, createdAt: Date.now() });
-    showToast('✅ Registrato!'); closeAuthModal(); hideWelcomeScreen();
-  }).catch(er => showToast('❌ ' + er.message));
-}
-function loginWithEmail(e, p) {
-  firebase.auth().signInWithEmailAndPassword(e, p).then(() => {
-    showToast('✅ Accesso!'); closeAuthModal(); hideWelcomeScreen();
-  }).catch(er => showToast('❌ ' + er.message));
-}
-function loginWithGoogle() {
-  const pr = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(pr).then(() => {
-    showToast('✅ Google!'); closeAuthModal(); hideWelcomeScreen();
-  }).catch(er => showToast('❌ ' + er.message));
-}
-function logout() {
-  firebase.auth().signOut();
-  userType = 'none';
-  localStorage.removeItem('grasso_user_type');
-  const fl = document.getElementById('footerLogout');
-  if (fl) fl.style.display = 'none';
-  showToast('👋 Arrivederci!');
-  location.reload();
-}
-function updateUIForLoggedInUser(user) {
-  const fl = document.getElementById('footerLogout');
-  if (fl) fl.style.display = 'block';
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  if (!localStorage.getItem('cookies_accepted')) 
-    document.getElementById('cookieBanner').style.display = 'block';
-
-  const savedLang = localStorage.getItem('grasso_lang') || 'it';
-  loadTranslations(savedLang);
-
-  initApp();
-
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      currentUser = user;
-      userType = 'registered';
-      localStorage.setItem('grasso_user_type', 'registered');
-      hideWelcomeScreen();
-      updateUIForLoggedInUser(user);
-    } else {
-      showWelcomeScreen();
-    }
-  });
-});
-
-function initApp() {
-  cleanLocalHistory();
-  try {
-    const s = localStorage.getItem('pizzeria_cart_v3');
-    if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } }
-  } catch(e) {}
-
-  loadFromFirebase();
-  setupRealtimeListeners();
-  loadReviewsPublic();
-  renderMyOrders();
-  startOrderStatusTracking();
-  controllaRifiutiCliente();
-
-  const pl = document.getElementById('productList');
-  if (pl) {
-    pl.addEventListener('click', e => {
-      const btn = e.target.closest('[data-cat][data-idx][data-delta]');
-      if (!btn) return;
-      e.preventDefault(); e.stopPropagation();
-      changeProductQty(btn.dataset.cat, parseInt(btn.dataset.idx, 10), parseInt(btn.dataset.delta, 10));
-    });
-  }
-}
-
-// ─── FCM / NOTIFICHE ──────────────────────────────────────────────────────────
-const messaging = firebase.messaging();
-const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
-
-function requestNotificationPermission() {
-  if (!('Notification' in window)) return;
-  Notification.requestPermission().then(permission => {
-    if (permission !== 'granted') return;
-    return messaging.getToken({ vapidKey });
-  }).then(token => {
-    if (!token) return;
-    const deviceId = localStorage.getItem('device_id') || 'client_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('device_id', deviceId);
-    db.ref('fcm_tokens/' + deviceId).set({ token, type: 'client', lastSeen: Date.now() });
-  }).catch(err => console.log('Errore token FCM:', err));
-}
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('firebase-messaging-sw.js').then(() => {
-    requestNotificationPermission();
-  }).catch(err => console.log('Errore Service Worker:', err));
-}
-
-db.ref('notifiche_push').limitToLast(5).on('child_added', snapshot => {
-  const notif = snapshot.val();
-  const notifId = snapshot.key;
-  const deviceId = localStorage.getItem('device_id');
-  if (!notif || !notif.tokens) return;
-  if (!deviceId || !notif.tokens.includes(deviceId)) return;
-  if (notif.letto && notif.letto[deviceId]) return;
-  showToast('🔔 ' + notif.title + ': ' + notif.body);
-  playNotificationSound();
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-  db.ref('notifiche_push/' + notifId + '/letto/' + deviceId).set(true);
-});
-
-messaging.onMessage(payload => {
-  showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-});
-
-// ─── RIPPLE ───────────────────────────────────────────────────────────────────
-document.addEventListener('click', function(e) {
-  const btn = e.target.closest('button, .menu-btn-3d, .action-btn-3d, .add-btn-3d, .checkout-btn-3d, .type-option, .time-option, .qty-btn, .quick-btn-rect');
-  if (!btn) return;
-  const ripple = document.createElement('span');
-  ripple.classList.add('ripple');
-  const rect = btn.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height);
-  ripple.style.width = ripple.style.height = size + 'px';
-  ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-  ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
-  btn.style.position = 'relative';
-  btn.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 600);
-});
-
-// ─── UTILITY ──────────────────────────────────────────────────────────────────
-function playNotificationSound() {
-  try {
-    const c = new (window.AudioContext || window.webkitAudioContext)();
-    const o = c.createOscillator(), g = c.createGain();
-    o.connect(g); g.connect(c.destination);
-    o.frequency.setValueAtTime(880, c.currentTime);
-    o.frequency.setValueAtTime(1100, c.currentTime + 0.1);
-    o.frequency.setValueAtTime(880, c.currentTime + 0.2);
-    g.gain.setValueAtTime(0.3, c.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.4);
-    o.start(c.currentTime); o.stop(c.currentTime + 0.4);
-  } catch(e) {}
-}
-function acceptCookies() { localStorage.setItem('cookies_accepted','true'); document.getElementById('cookieBanner').style.display = 'none'; }
-function openPrivacyModal()  { document.getElementById('privacyModal').classList.add('active'); }
-function closePrivacyModal() { document.getElementById('privacyModal').classList.remove('active'); }
-function sanitizeWA(t) { return String(t).replace(/[*_~`]/g, '\\$&'); }
-function callPhone() { window.location.href = `tel:${appData.settings.visiblePhone || "0884660377"}`; }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ─── MODAL RIFIUTO ORDINE ─────────────────────────────────────────────────────
-function mostraModalRifiuto(motivo) {
-  const modal = document.getElementById('modalRifiutoOrdine');
-  const motivoEl = document.getElementById('motivoRifiutoModal');
-  if (motivoEl) {
-    motivoEl.textContent = motivo || 'La pizzeria non può accettare il tuo ordine.';
-  }
-  if (modal) {
-    modal.style.display = 'flex';
-    playNotificationSound();
-    if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-  }
-}
-
-function chiudiModalRifiuto() {
-  const modal = document.getElementById('modalRifiutoOrdine');
-  if (modal) modal.style.display = 'none';
-}
-
-// ─── FIREBASE REALTIME LISTENERS ──────────────────────────────────────────────
-function setupRealtimeListeners() {
-  db.ref('settings').on('value', s => {
-    if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; updateStatusBanner(); updateFooter(); updateServicesUI(); }
-  });
-  db.ref('promotions').on('value', s => {
-    appData.promotions = s.exists() ? s.val() : {};
-    localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
-    renderPromotionsBanner();
-  });
-  db.ref('.info/connected').on('value', s => {
-    const el = document.getElementById('offlineBanner');
-    if (!el) return;
-    el.style.display = s.val() === false ? 'block' : 'none';
-  });
-}
-
-// ─── ORDER STATUS TRACKING ────────────────────────────────────────────────────
-function startOrderStatusTracking() {
-  try {
-    Object.keys(orderStatusListeners).forEach(id => { try { orderStatusListeners[id].off('value'); } catch(e){} });
-    orderStatusListeners = {};
-    const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    if (!localOrders.length) return;
-    localOrders.forEach(order => {
-      if (!order.orderId) return;
-      const query = db.ref('ordini').orderByChild('orderId').equalTo(order.orderId);
-      orderStatusListeners[order.orderId] = query;
-      query.on('value', snapshot => {
-        snapshot.forEach(child => {
-          const data = child.val();
-          if (data) updateLocalOrderStatus(order.orderId, data.status, data.motivoRifiuto);
-        });
-      });
-    });
-  } catch(e) { console.log('Errore tracking:', e); }
-}
-
-function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
-  try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    let changed = false;
-    orders = orders.map(o => {
-      if (o.orderId === orderId && o.status !== newStatus) {
-        changed = true;
-        o.status = newStatus;
-        if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
-        const statusNames = { preparing:'🍕 In preparazione', ready:'✅ Pronto per il ritiro', picked:'📦 Ritirato', delivering:'🛵 In consegna!', delivered:'🎉 Consegnato!', rifiutato:'❌ Ordine rifiutato' };
-        if (statusNames[newStatus]) {
-          showToast(statusNames[newStatus]);
-          if (newStatus === 'delivering') {
-            playNotificationSound();
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-          }
-          // MOSTRA MODAL GRANDE QUANDO ORDINE RIFIUTATO
-          if (newStatus === 'rifiutato') {
-            mostraModalRifiuto(motivoRifiuto);
-          }
-        }
-      }
-      return o;
-    });
-    if (changed) { localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders)); renderMyOrders(); }
-  } catch(e) { console.log('Errore aggiornamento stato:', e); }
-}
-
-// ─── FIREBASE LOAD / CACHE ────────────────────────────────────────────────────
-function loadFromFirebase() {
-  const now = Date.now();
-  const cacheTimestamp = localStorage.getItem('pg_cache_timestamp');
-  const cacheValid = cacheTimestamp && (now - parseInt(cacheTimestamp)) < CACHE_DURATION;
-
-  if (cacheValid) {
-    try {
-      const cm = localStorage.getItem('pg_cache_menu');
-      const cc = localStorage.getItem('pg_cache_categories');
-      const ci = localStorage.getItem('pg_cache_images');
-      const cb = localStorage.getItem('pg_cache_branding');
-      const cp = localStorage.getItem('pg_cache_promotions');
-      if (cm) appData.menu = JSON.parse(cm);
-      if (cc) appData.categories = JSON.parse(cc);
-      if (ci) appData.images = JSON.parse(ci);
-      if (cb) appData.branding = JSON.parse(cb);
-      if (cp) appData.promotions = JSON.parse(cp);
-      showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); updateStatusBanner();
-    } catch(e) { console.log('Cache corrotta, ricarico da Firebase'); }
-  }
-
-  db.ref('categories').once('value').then(s => { if (s.exists()) { appData.categories = s.val(); localStorage.setItem('pg_cache_categories', JSON.stringify(appData.categories)); showCategories(); } });
-  db.ref('menu').once('value').then(s => { if (s.exists()) { appData.menu = s.val(); localStorage.setItem('pg_cache_menu', JSON.stringify(appData.menu)); localStorage.setItem('pg_cache_timestamp', Date.now().toString()); showCategories(); } });
-  db.ref('images').once('value').then(s => { if (s.exists()) { appData.images = s.val(); localStorage.setItem('pg_cache_images', JSON.stringify(appData.images)); applyImages(); } });
-  db.ref('branding').once('value').then(s => { if (s.exists()) { appData.branding = { ...appData.branding, ...s.val() }; localStorage.setItem('pg_cache_branding', JSON.stringify(appData.branding)); applyBranding(); } });
-}
-
-function showCategories() {
-  renderCategories();
-  document.getElementById('categoriesSkeletons').style.display = 'none';
-  document.getElementById('categoriesList').style.display = 'grid';
-}
-
-// ─── RIFIUTO ORDINE (al caricamento pagina) ───────────────────────────────────
-function controllaRifiutiCliente() {
-  try {
-    const ordiniLocali = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    if (!ordiniLocali.length) return;
-    const ultimo = ordiniLocali[0];
-    if (Date.now() - ultimo.date > 24 * 3600 * 1000) return;
-    db.ref('ordini').orderByChild('orderId').equalTo(ultimo.orderId).on('value', snapshot => {
-      snapshot.forEach(child => {
-        const dati = child.val();
-        if (dati && dati.status === 'rifiutato') {
-          const giaChiuso = localStorage.getItem('modalRifiutoMostrato_' + ultimo.orderId);
-          if (!giaChiuso) {
-            mostraModalRifiuto(dati.motivoRifiuto || 'Il tuo ordine è stato rifiutato.');
-            localStorage.setItem('modalRifiutoMostrato_' + ultimo.orderId, 'mostrato');
-          }
-        }
-      });
-    });
-  } catch(e) { console.log('Errore:', e); }
-}
-function chiudiBannerRifiuto() { document.getElementById('bannerRifiuto').style.display = 'none'; }
-
-// ─── BRANDING / UI ────────────────────────────────────────────────────────────
-function applyBranding() {
-  const n = appData.branding.name || "Antica Pizzeria Grasso";
-  const m = document.getElementById('headerTitle');
-  if (m) m.textContent = n;
-  const s = document.getElementById('headerSubtitle');
-  if (s) s.textContent = appData.branding.subtitle || "Tradizione Pugliese";
-}
-function updateFooter() {
-  document.getElementById('footerInfo').innerHTML = `${appData.branding.city || "Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone || "0884660377"}</span>`;
-}
-
-// ─── PROMOZIONI ───────────────────────────────────────────────────────────────
-function renderPromotionsBanner() {
-  const b = document.getElementById('offersBanner'), t = document.getElementById('offerText'), a = getActivePromotion();
-  if (a) {
-    b.classList.add('show');
-    const tp = (a.products || []).reduce((s, p) => s + (p.price * p.qty), 0);
-    const rimasti = (a.maxUses || 0) - (a.currentUses || 0);
-    t.innerHTML = `<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message ? ' - ' + a.message : ''}  Rimasti ${rimasti}`;
-    b.onclick = () => addPromoToCart(a.id);
-  } else {
-    b.classList.remove('show'); b.onclick = null;
-  }
-}
-function getActivePromotion() {
-  const td = new Date().toISOString().split('T')[0];
-  const ps = Object.entries(appData.promotions || {}).filter(([i, p]) =>
-    p.active && p.startDate <= td && p.endDate >= td && (p.currentUses || 0) < p.maxUses && p.products && p.products.length > 0
-  );
-  return ps.length ? { id: ps[0][0], ...ps[0][1] } : null;
-}
-
-async function addPromoToCart(pid) {
-  const p = appData.promotions[pid];
-  if (!p) return;
-  const td = new Date().toISOString().split('T')[0];
-  if (!p.active || p.startDate > td || p.endDate < td || (p.currentUses || 0) >= p.maxUses) {
-    showToast('❌ Promo non disponibile'); return;
-  }
-  if (!p.products || !p.products.length) return;
-  const tp = p.products.reduce((s, x) => s + (x.price * x.qty), 0);
-  const promoItem = { promoId: pid, promoTitle: p.title, products: p.products.map(x => ({...x})), totalPrice: tp, isPromo: true };
-  const existingIdx = cart.findIndex(c => c.isPromo && c.promoId === pid);
-  if (existingIdx >= 0) {
-    const ok = await showConfirm('Hai già questa promo nel carrello. Vuoi aggiungerne un\'altra?');
-    if (!ok) return;
-  }
-  cart.push(promoItem);
-  db.ref('promotions/' + pid + '/currentUses').transaction(v => {
-    const current = v || 0;
-    if (current >= p.maxUses) return;
-    return current + 1;
-  }).then(result => {
-    if (!result.committed) { showToast('❌ Promo esaurita'); cart.pop(); updateCartBadge(); return; }
-    db.ref('promotions').once('value').then(s => {
-      appData.promotions = s.val() || {};
-      localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
-      renderPromotionsBanner();
-    });
-  });
-  updateCartBadge();
-  showToast(`🎁 ${p.title} aggiunta al carrello!`);
-}
-
-// ─── CATEGORIE / MENU ─────────────────────────────────────────────────────────
-function getCategoryDisplayName(k) { return (appData.categories[k] && appData.categories[k].name) || k; }
-function renderCategories() {
-  const l = document.getElementById('categoriesList');
-  if (!l) return;
-  l.innerHTML = Object.keys(appData.categories).map(c => {
-    const p = appData.menu[c] || [], i = appData.categories[c], s = (appData.images.categories && appData.images.categories[c]) || '';
-    return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon || 'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;
-  }).join('');
-}
-function showCategory(c) {
-  if (!c || !appData.menu || !appData.menu[c]) { showToast('⚠️ Non disponibile'); return; }
-  currentSearchCat = c;
-  document.getElementById('productSearch').value = '';
-  document.getElementById('mainMenu').style.display = 'none';
-  document.getElementById('productsView').style.display = 'block';
-  document.getElementById('categoryTitle').textContent = getCategoryDisplayName(c);
-  renderProductList(c);
-  window.scrollTo(0, 0);
-}
-function renderProductList(cat, filterTerm) {
-  if (!cat || !appData.menu || !appData.menu[cat]) return;
-  const term = (filterTerm || '').toLowerCase();
-  const list = document.getElementById('productList');
-  if (!list) return;
-  const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
-  if (!filtered.length) { list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
-  list.innerHTML = filtered.map(p => {
-    const idx = appData.menu[cat].indexOf(p);
-    const qty = getCartQty(cat, p.name);
-    const imgHtml = p.img ? `<img src="${p.img}" class="product-img-square" alt="${p.name}" onerror="this.style.display='none'">` : '';
-    const qtyUi = qty > 0
-      ? `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${idx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${idx}" data-delta="1">+</button></div>`
-      : `<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${idx}" data-delta="1">+ Aggiungi</button>`;
-    return `<div class="product-card-3d">${imgHtml}<div class="product-info" style="flex:1;"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${qtyUi}</div>`;
-  }).join('');
-}
-function filterProducts(term) { if (currentSearchCat) renderProductList(currentSearchCat, term || ''); }
-function showHome() {
-  document.getElementById('mainMenu').style.display = 'block';
-  document.getElementById('productsView').style.display = 'none';
-  document.getElementById('reviewsPublicView').style.display = 'none';
-  document.getElementById('myOrdersView').style.display = 'none';
-  currentSearchCat = '';
-}
-function applyImages() {
-  if (appData.images.hero) document.getElementById('heroImg').src = appData.images.hero;
-  renderCategories();
-}
-
-// ─── STATO PIZZERIA ───────────────────────────────────────────────────────────
-function checkIfOpen() {
-  const s = appData.settings;
-  if (s.manualStatus === 'open') return true;
-  if (s.manualStatus === 'closed') return false;
-  const days = ['dom','lun','mar','mer','gio','ven','sab'];
-  const today = days[new Date().getDay()];
-  if (s.openDays && s.openDays.length > 0 && !s.openDays.includes(today)) return false;
-  const dateStr = new Date().toISOString().split('T')[0];
-  if (s.specialClosures && s.specialClosures.split(',').map(d => d.trim()).includes(dateStr)) return false;
-  const hoursStr = s.hours || "11:00-15:00,18:00-23:00";
-  const ranges = hoursStr.split(',').map(r => r.trim()).filter(Boolean);
-  const currentMins = new Date().getHours() * 60 + new Date().getMinutes();
-  for (let range of ranges) {
-    const parts = range.split('-');
-    if (parts.length !== 2) continue;
-    const [sh, sm] = parts[0].split(':').map(Number);
-    const [eh, em] = parts[1].split(':').map(Number);
-    if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue;
-    if (currentMins >= sh * 60 + sm && currentMins < eh * 60 + em) return true;
-  }
-  return false;
-}
-function updateStatusBanner() {
-  const b = document.getElementById('statusBanner'), t = document.getElementById('statusText'), o = checkIfOpen();
-  b.className = `status-banner ${o ? 'status-open' : 'status-closed'}`;
-  t.textContent = o ? '🟢 APERTO' : '🔴 CHIUSO';
-}
-function updateServicesUI() {
-  const b = document.getElementById('deliveryBtn');
-  if (appData.settings.deliveryEnabled === false) {
-    b.classList.add('disabled'); b.onclick = () => showToast('🚫 No delivery');
-  } else {
-    b.classList.remove('disabled'); b.onclick = () => checkStatusBeforeOrder('delivery');
-  }
-}
-function checkStatusBeforeOrder(t) {
-  if (!checkIfOpen()) { showToast('⚠️ Chiuso'); return; }
-  if (t === 'delivery' && appData.settings.deliveryEnabled === false) { showToast('🚫 No delivery'); return; }
-  if (t === 'pickup'   && appData.settings.pickupEnabled   === false) { showToast('🚫 No ritiro');  return; }
-  orderType = t; openCart();
-}
-
-// ─── CARRELLO ─────────────────────────────────────────────────────────────────
-function getCartQty(cat, name) { const ex = cart.find(x => !x.isPromo && x.cat === cat && x.name === name); return ex ? (ex.qty || 0) : 0; }
-function changeProductQty(cat, i, delta) {
-  if (!appData.menu || !appData.menu[cat] || !appData.menu[cat][i]) { showToast('⚠️ Errore'); return; }
-  const it = appData.menu[cat][i];
-  const ex = cart.find(x => !x.isPromo && x.name === it.name && x.cat === cat);
-  if (ex) {
-    ex.qty = (ex.qty || 0) + delta;
-    if (ex.qty <= 0) { cart.splice(cart.indexOf(ex), 1); }
-    else if (delta > 0) showToast(`🍕 ${it.name} ×${ex.qty}`);
-  } else if (delta > 0) {
-    cart.push({ ...it, cat, qty: 1, isPromo: false });
-    showToast(`🍕 ${it.name} aggiunta!`);
-  }
-  updateCartBadge();
-  if (currentSearchCat === cat) renderProductList(cat, document.getElementById('productSearch')?.value || '');
-  if (document.getElementById('cartModal').classList.contains('active')) openCart();
-}
-function updateCartBadge() {
-  let n = 0;
-  cart.forEach(i => { if (i.isPromo) n += 1; else n += (i.qty || 0); });
-  const qb = document.getElementById('quickCartBadge');
-  if (qb) { qb.textContent = n; qb.style.display = n > 0 ? 'flex' : 'none'; }
-  try { localStorage.setItem('pizzeria_cart_v3', JSON.stringify(cart)); } catch(e) {}
-}
-async function clearCart() {
-  if (!cart.length) return;
-  const ok = await showConfirm('Vuoi svuotare il carrello?');
-  if (!ok) return;
-  cart = []; updateCartBadge(); closeCart(); showToast('🗑️ Svuotato');
-}
-
-// ─── CALCOLO DISTANZA E CONSEGNA ─────────────────────────────────────────────
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function computeDeliveryFee(distance) {
-  const baseFee    = parseFloat(appData.settings.deliveryBaseFee)   || 3.00;
-  const maxRadius  = parseFloat(appData.settings.deliveryMaxRadius) || 4;
-  const extraRadius= parseFloat(appData.settings.deliveryExtraRadius)||6;
-  const extraFee   = parseFloat(appData.settings.deliveryExtraFee)  || 2.00;
-  if (distance === null) return { fee: baseFee, outOfRange: false, withExtra: false };
-  if (distance > extraRadius) return { fee: 0, outOfRange: true,  withExtra: false };
-  if (distance > maxRadius)   return { fee: baseFee + extraFee, outOfRange: false, withExtra: true };
-  return { fee: baseFee, outOfRange: false, withExtra: false };
-}
-
-function updateDeliveryFeeDisplay(fee, distance, outOfRange, withExtra) {
-  const feeRow      = document.getElementById('deliveryFeeRow');
-  const feeValue    = document.getElementById('deliveryFeeValue');
-  const distInfo    = document.getElementById('distanceInfo');
-  const distText    = document.getElementById('distanceText');
-  const checkoutBtn = document.getElementById('checkoutBtn');
-  if (outOfRange) {
-    feeRow.style.display = 'none';
-    distInfo.style.display = 'block';
-    distText.textContent = '📍 Fuori dal raggio di consegna massimo';
-    distText.style.color = '#ef4444';
-    if (checkoutBtn) checkoutBtn.disabled = true;
-  } else {
-    feeRow.style.display = 'flex';
-    feeValue.textContent = '€' + fee.toFixed(2);
-    distInfo.style.display = distance !== null ? 'block' : 'none';
-    if (distance !== null) {
-      distText.textContent = withExtra
-        ? `📍 Distanza: ${distance.toFixed(1)} km (+supplemento zona)`
-        : `📍 Distanza: ${distance.toFixed(1)} km`;
-      distText.style.color = withExtra ? '#fbbf24' : '#3498db';
-    }
-    if (checkoutBtn) checkoutBtn.disabled = false;
-  }
-  let t = 0;
-  cart.forEach(i => { if (i.isPromo) t += i.totalPrice; else t += (i.price * i.qty); });
-  document.getElementById('totalAmount').textContent = '€' + (outOfRange ? t : t + fee).toFixed(2);
-}
-
-function updateCartTotals() {
-  let t = 0;
-  cart.forEach(i => { if (i.isPromo) t += i.totalPrice; else t += (i.price * i.qty); });
-  if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
-    if (window.customerGPSLat && window.customerGPSLng && appData.settings.pizzeriaLat && appData.settings.pizzeriaLng) {
-      const dist = calculateDistance(appData.settings.pizzeriaLat, appData.settings.pizzeriaLng, window.customerGPSLat, window.customerGPSLng);
-      const { fee, outOfRange, withExtra } = computeDeliveryFee(dist);
-      updateDeliveryFeeDisplay(fee, dist, outOfRange, withExtra);
-    } else {
-      const { fee } = computeDeliveryFee(null);
-      updateDeliveryFeeDisplay(fee, null, false, false);
-    }
-  } else {
-    document.getElementById('deliveryFeeRow').style.display = 'none';
-    document.getElementById('distanceInfo').style.display = 'none';
-    document.getElementById('totalAmount').textContent = '€' + t.toFixed(2);
-  }
-}
-
-function selectOrderType(t) {
-  orderType = t;
-  document.getElementById('typeDelivery').classList.toggle('active', t === 'delivery');
-  document.getElementById('typePickup').classList.toggle('active', t === 'pickup');
-  document.getElementById('timeTypeLabel').textContent = t === 'delivery' ? 'consegna' : 'ritiro';
-  if (t === 'delivery') {
-    document.getElementById('addressGroup').style.display = 'block';
-  } else {
-    document.getElementById('addressGroup').style.display = 'none';
-    document.getElementById('customerStreet').value = '';
-    document.getElementById('customerNumber').value = '';
-    window.customerGPSLat = null; window.customerGPSLng = null;
-  }
-  updateCartTotals();
-}
-function selectTimeMode(m) {
-  timeMode = m;
-  document.getElementById('timeAsap').classList.toggle('active', m === 'asap');
-  document.getElementById('timeScheduled').classList.toggle('active', m === 'scheduled');
-  document.getElementById('timePickerWrap').classList.toggle('show', m === 'scheduled');
-  if (m === 'scheduled') setupMinTime();
-}
-function setupMinTime() {
-  const i = document.getElementById('scheduledTime'), n = new Date();
-  n.setMinutes(Math.ceil(n.getMinutes() / 5) * 5, 0, 0);
-  if (!i.value) i.value = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
-}
-
-async function getGPSLocation() {
-  const b = document.getElementById('gpsBtn');
-  if (!navigator.geolocation) { showToast('GPS non disponibile'); return; }
-  b.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
-  try {
-    const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 }));
-    const { latitude, longitude } = pos.coords;
-    window.customerGPSLat = latitude; window.customerGPSLng = longitude;
-    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
-    const d = await r.json(), a = d.address;
-    document.getElementById('customerStreet').value = a.road || a.pedestrian || '';
-    document.getElementById('customerNumber').value = a.house_number || '';
-    showToast('📍 Posizione trovata!');
-    if (orderType === 'delivery') updateCartTotals();
-  } catch(e) { showToast('❌ Impossibile ottenere posizione'); }
-  finally { b.innerHTML = '<i class="fas fa-location-crosshairs"></i> Usa GPS'; }
-}
-
-function openCart() {
-  if (!checkIfOpen()) { showToast('⚠️ Chiuso'); return; }
-  const m = document.getElementById('cartModal');
-  const it = document.getElementById('cartItems');
-  const ts = document.getElementById('cartTotalSection');
-  const cb = document.getElementById('checkoutBtn');
-  const cl = document.getElementById('clearCartBtn');
-  const cf = document.getElementById('customerForm');
-  const tt = document.getElementById('orderTypeToggle');
-  if (!cart.length) {
-    it.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px 0;">Vuoto</p>';
-    ts.style.display = 'none'; cb.style.display = 'none'; cl.style.display = 'none';
-    cf.style.display = 'none'; tt.style.display = 'none';
-    document.getElementById('deliveryFeeRow').style.display = 'none';
-    document.getElementById('distanceInfo').style.display = 'none';
-  } else {
-    let h = '';
-    cart.forEach((x, i) => {
-      if (x.isPromo) h += `<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:0.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;
-    });
-    cart.forEach((x) => {
-      if (!x.isPromo) h += `<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price * x.qty).toFixed(2)}</span></div>`;
-    });
-    it.innerHTML = h;
-    ts.style.display = 'flex'; cb.style.display = 'block'; cl.style.display = 'flex'; cf.style.display = 'block'; tt.style.display = 'flex';
-    const de = appData.settings.deliveryEnabled !== false;
-    const pe = appData.settings.pickupEnabled !== false;
-    document.getElementById('typeDelivery').classList.toggle('disabled', !de);
-    document.getElementById('typePickup').classList.toggle('disabled', !pe);
-    if (!de && pe) selectOrderType('pickup');
-    else if (de && !pe) selectOrderType('delivery');
-    else selectOrderType(orderType);
-    selectTimeMode(timeMode);
-    updateCartTotals();
-  }
-  m.classList.add('active');
-}
-
-async function removePromoFromCartAtIndex(i) {
-  if (cart[i] && cart[i].isPromo) {
-    const pid = cart[i].promoId;
-    db.ref('promotions/' + pid + '/currentUses').transaction(v => Math.max(0, (v || 0) - 1)).then(() => {
-      db.ref('promotions').once('value').then(s => {
-        appData.promotions = s.val() || {};
-        localStorage.setItem('pg_cache_promotions', JSON.stringify(appData.promotions));
-        renderPromotionsBanner();
-      });
-    });
-    cart.splice(i, 1);
-    updateCartBadge();
-    openCart();
-    showToast('🗑️ Promo rimossa');
-  }
-}
-function closeCart() { document.getElementById('cartModal').classList.remove('active'); }
-
-// ─── INVIO ORDINE ─────────────────────────────────────────────────────────────
-async function confirmAndSendOrder() {
-  if (Date.now() - (parseInt(localStorage.getItem('lastOrderTime')) || 0) < 60000) { showToast('⏳ Attendi 1 minuto'); return; }
-  const pc = document.getElementById('privacyConsent');
-  if (!pc || !pc.checked) { showToast('⚠️ Accetta Privacy'); return; }
-  const hp = document.getElementById('honeypot');
-  if (hp && hp.value !== '') return;
-
-  const n      = document.getElementById('customerName').value.trim();
-  const p      = document.getElementById('customerPhone').value.trim();
-  const street = document.getElementById('customerStreet').value.trim();
-  const number = document.getElementById('customerNumber').value.trim();
-  const address = `${street} ${number}`.trim();
-  const nt     = document.getElementById('customerNotes').value.trim();
-
-  if (!n) { showToast('⚠️ Nome'); return; }
-
-  const ph = p.replace(/[\s\-().+]/g, '');
-  const phoneValid = /^(\+?39)?3[0-9]{9}$/.test(ph) || /^0[0-9]{6,9}$/.test(ph);
-  if (!phoneValid) { showToast('❌ Numero telefono non valido'); return; }
-
-  let pt = 0;
-  cart.forEach(i => { if (i.isPromo) pt += i.totalPrice; else pt += (i.price * i.qty); });
-
-  let df = 0;
-  if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false) {
-    if (window.customerGPSLat && window.customerGPSLng && appData.settings.pizzeriaLat && appData.settings.pizzeriaLng) {
-      const distance = calculateDistance(appData.settings.pizzeriaLat, appData.settings.pizzeriaLng, window.customerGPSLat, window.customerGPSLng);
-      const { fee, outOfRange } = computeDeliveryFee(distance);
-      if (outOfRange) { showToast('❌ Indirizzo fuori dal raggio di consegna'); return; }
-      df = fee;
-    } else {
-      df = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
-    }
-  }
-
-  const minO = parseFloat(appData.settings.minDeliveryOrder) || 0;
-  if (orderType === 'delivery') {
-    if (!street || !number) { showToast('⚠️ Completa indirizzo'); return; }
-    if (pt + df < minO) { showToast(`⚠️ Minimo: €${minO}`); return; }
-  }
-
-  const ft = pt + df;
-  const st = timeMode === 'asap' ? 'Subito' : (document.getElementById('scheduledTime').value || 'Subito');
-  const oi = [];
-  cart.forEach(i => {
-    if (i.isPromo) oi.push({ name: `🎁 ${i.promoTitle}`, qty: 1, price: i.totalPrice, isPromo: true });
-    else oi.push({ name: i.name, qty: i.qty, price: i.price, cat: i.cat });
-  });
-
-  const oc = {
-    name: n, phone: p,
-    address: orderType === 'delivery' ? sanitizeWA(address) : '',
-    notes: sanitizeWA(nt), type: orderType, scheduledTime: st,
-    productsTotal: pt, deliveryFee: df, finalTotal: ft, items: oi,
-    customerLat: window.customerGPSLat || null, customerLng: window.customerGPSLng || null
-  };
-  await sendOrder(oc);
-}
-
-async function sendOrder(d) {
-  const btn = document.getElementById('checkoutBtn');
-  const cartBackup = [...cart];
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...'; }
-  try {
-    const ref = db.ref('ordini').push();
-    // Contatore progressivo salvato su Firebase
-const counterRef = db.ref('counter/ordini');
-const snapshot = await counterRef.transaction(current => {
-  return (current || 0) + 1;
-});
-const numeroOrdine = snapshot.snapshot.val();
-const orderId = 'ORD-' + String(numeroOrdine).padStart(5, '0'); // Es: ORD-00001
-    d.orderId = orderId;
-    await ref.set({
-      orderId, customerName: sanitizeWA(d.name), customerPhone: sanitizeWA(d.phone),
-      address: d.type === 'delivery' ? sanitizeWA(d.address) : '',
-      notes: sanitizeWA(d.notes), type: d.type, scheduledTime: d.scheduledTime,
-      items: d.items, productsTotal: d.productsTotal, deliveryFee: d.deliveryFee,
-      finalTotal: d.finalTotal, customerLat: d.customerLat, customerLng: d.customerLng,
-      status: 'new', timestamp: Date.now()
-    });
-    localStorage.setItem('lastOrderTime', Date.now());
-    saveOrderToLocal(d);
-    cart = []; updateCartBadge(); closeCart();
-    ['customerName','customerPhone','customerStreet','customerNumber','customerNotes','scheduledTime'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
-    });
-    const pcb = document.getElementById('privacyConsent'); if (pcb) pcb.checked = false;
-    window.customerGPSLat = null; window.customerGPSLng = null;
-    selectTimeMode('asap');
-    showToast('✅ Ordine inviato!');
-    showHome();
-    setTimeout(() => startOrderStatusTracking(), 1000);
-  } catch(e) {
-    console.error(e);
-    cart = cartBackup; updateCartBadge();
-    showToast('❌ Errore invio');
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invia Ordine'; }
-  }
-}
-
-// ─── RECENSIONI ───────────────────────────────────────────────────────────────
-function openReviewModal() { document.getElementById('reviewModal').classList.add('active'); }
-function closeReviewModal() {
-  document.getElementById('reviewModal').classList.remove('active');
-  selectedStars = 0; updateStarsDisplay();
-  document.getElementById('reviewName').value = '';
-  document.getElementById('reviewText').value = '';
-  document.getElementById('reviewOrderId').value = '';
-  pendingReviewOrderId = null;
-}
-function selectStar(n) { selectedStars = n; updateStarsDisplay(); }
-function updateStarsDisplay() {
-  document.querySelectorAll('#starsInput .star').forEach((s, i) => { s.classList.toggle('active', i < selectedStars); });
-}
-function submitReview() {
-  const name = document.getElementById('reviewName').value.trim();
-  const text = document.getElementById('reviewText').value.trim();
-  const orderId = pendingReviewOrderId || document.getElementById('reviewOrderId').value.trim();
-  if (!selectedStars) { showToast('⚠️ Seleziona le stelle'); return; }
-  if (!name) { showToast('❌ Inserisci il nome'); return; }
-  if (!text) { showToast('❌ Scrivi un commento'); return; }
-  db.ref('recensioni').push({
-    name: sanitizeWA(name), text: sanitizeWA(text), stars: selectedStars,
-    orderId: orderId || 'Anonimo', timestamp: Date.now(), status: 'pending'
-  }).then(() => {
-    if (pendingReviewOrderId) {
-      let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-      localOrders = localOrders.map(o => o.orderId === pendingReviewOrderId ? {...o, reviewed: true} : o);
-      localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
-      renderMyOrders();
-    }
-    closeReviewModal();
-    showToast('⭐ Grazie per la recensione!');
-  });
-}
-
-// ─── I MIEI ORDINI ────────────────────────────────────────────────────────────
-function showMyOrders() {
-  document.getElementById('mainMenu').style.display = 'none';
-  document.getElementById('productsView').style.display = 'none';
-  document.getElementById('reviewsPublicView').style.display = 'none';
-  document.getElementById('myOrdersView').style.display = 'block';
-  window.scrollTo(0, 0); startOrderStatusTracking(); renderMyOrders();
-}
-function cleanLocalHistory() {
-  try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    orders = orders.filter(o => (Date.now() - o.date) < 30 * 24 * 3600 * 1000);
-    localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
-  } catch(e) {}
-}
-function saveOrderToLocal(orderData) {
-  try {
-    let orders = [];
-    try { orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]'); } catch(e) { orders = []; }
-    if (orders.find(o => o.orderId === orderData.orderId)) return;
-    orders.unshift({
-      orderId: orderData.orderId, date: Date.now(), total: orderData.finalTotal,
-      items: orderData.items.map(i => i.name).join(', '),
-      reviewed: false, status: 'new', type: orderData.type || 'delivery'
-    });
-    if (orders.length > 5) orders = orders.slice(0, 5);
-    localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
-    renderMyOrders();
-  } catch(e) { console.error('❌ Errore localStorage:', e); }
-}
-async function clearLocalHistory() {
-  const ok = await showConfirm('Cancellare tutto lo storico ordini locale?');
-  if (!ok) return;
-  Object.keys(orderStatusListeners).forEach(id => { try { orderStatusListeners[id].off('value'); } catch(e){} });
-  orderStatusListeners = {};
-  localStorage.removeItem('pizzeria_grasso_orders');
-  renderMyOrders();
-  showToast('🗑️ Storico cancellato!');
-}
-
-function getOrderProgress(status, orderType) {
-  if (orderType === 'pickup') {
-    const pickupSteps = {
-      'new':      { percent:10,  step:0, label:'Ricevuto',           icon:'📥', class:'status-new' },
-      'preparing':{ percent:35,  step:1, label:'In preparazione',    icon:'🍕', class:'status-preparing' },
-      'ready':    { percent:70,  step:2, label:'Pronto per il ritiro',icon:'✅', class:'status-ready' },
-      'picked':   { percent:100, step:3, label:'Ritirato da te',     icon:'🎉', class:'status-picked' },
-      'delivered':{ percent:100, step:3, label:'Ritirato',           icon:'🎉', class:'status-delivered' },
-      'rifiutato':{ percent:0,   step:-1,label:'Rifiutato',          icon:'❌', class:'status-rifiutato' }
+    // ─── FIREBASE ────────────────────────────────────────────────────────────────
+    const firebaseConfig = {
+        apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
+        authDomain: "teogra-c8cf5.firebaseapp.com",
+        databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "teogra-c8cf5",
+        storageBucket: "teogra-c8cf5.firebasestorage.app",
+        messagingSenderId: "686300112893",
+        appId: "1:686300112893:web:e147b82f91374f12db1b94"
     };
-    return pickupSteps[status] || pickupSteps['new'];
-  }
-  const deliverySteps = {
-    'new':       { percent:10,  step:0, label:'Ricevuto',            icon:'📥', class:'status-new' },
-    'preparing': { percent:30,  step:1, label:'In preparazione',     icon:'🍕', class:'status-preparing' },
-    'ready':     { percent:55,  step:2, label:'Pronto',              icon:'✅', class:'status-ready' },
-    'picked':    { percent:70,  step:3, label:'Ritirato dal fattorino',icon:'📦',class:'status-picked' },
-    'delivering':{ percent:85,  step:4, label:'In consegna',         icon:'🛵', class:'status-delivering' },
-    'delivered': { percent:100, step:5, label:'Consegnato',          icon:'🎉', class:'status-delivered' },
-    'rifiutato': { percent:0,   step:-1,label:'Rifiutato',           icon:'❌', class:'status-rifiutato' }
-  };
-  return deliverySteps[status] || deliverySteps['new'];
-}
-function renderOrderTracker(status, motivoRifiuto, orderType) {
-  const type = orderType || 'delivery';
-  const progress = getOrderProgress(status, type);
-  if (status === 'rifiutato') return `<div class="order-status-tracker"><div class="order-status-badge status-rifiutato"><span>❌</span> Ordine Rifiutato</div>${motivoRifiuto ? `<div class="order-reject-message"><strong>Motivo:</strong> ${motivoRifiuto}</div>` : ''}</div>`;
-  if (status === 'delivered' || (type === 'pickup' && (status === 'picked' || status === 'delivered'))) {
-    const label = type === 'pickup' ? 'Ritirato da te ✓' : 'Ordine Consegnato!';
-    return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${label}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%;"></div></div></div>`;
-  }
-  const steps = type === 'pickup'
-    ? [{ label:'Ricevuto',icon:'📥' },{ label:'Preparaz.',icon:'🍕' },{ label:'Pronto',icon:'✅' },{ label:'Ritirato',icon:'🎉' }]
-    : [{ label:'Ricevuto',icon:'📥' },{ label:'Preparaz.',icon:'🍕' },{ label:'Pronto',icon:'✅' },{ label:'Ritirato',icon:'📦' },{ label:'Consegna',icon:'🛵' },{ label:'Fatto!',icon:'🎉' }];
-  return `<div class="order-status-tracker"><div class="order-status-badge ${progress.class}"><span>${progress.icon}</span> ${progress.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${progress.percent}%;"></div></div><div class="order-progress-steps">${steps.map((s, i) => `<span class="${i <= progress.step ? 'active' : ''}">${s.icon}<br>${s.label}</span>`).join('')}</div></div>`;
-}
-function renderMyOrders() {
-  const list = document.getElementById('myOrdersList');
-  if (!list) return;
-  try {
-    let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-    if (!orders.length) { list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; return; }
-    list.innerHTML = orders.map(o => {
-      const dateStr  = new Date(o.date).toLocaleDateString('it-IT', { day:'2-digit', month:'short' });
-      const status   = o.status || 'new';
-      const oType    = o.type || 'delivery';
-      const tracker  = renderOrderTracker(status, o.motivoRifiuto, oType);
-      const canReview= (status === 'delivered' || (oType === 'pickup' && status === 'picked')) && !o.reviewed;
-      const typeLabel= oType === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
-      const borderColor = status === 'rifiutato' ? '#ef4444' : (status === 'delivered' || (oType === 'pickup' && status === 'picked')) ? '#22c55e' : 'var(--gold-dark)';
-      return `<div class="my-order-card" style="border-left-color:${borderColor};">
-        <div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div>
-        <div class="my-order-items">${o.items}</div>
-        <div class="my-order-total">€${o.total.toFixed(2)}</div>
-        ${tracker}
-        <div class="my-order-actions" style="margin-top:8px;">
-          ${canReview ? `<button class="btn-review-order" onclick="openReviewForOrder('${o.orderId}')">⭐ Recensisci</button>` : ''}
-          ${o.reviewed ? '<span class="btn-reviewed">✅ Già recensito</span>' : ''}
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) { list.innerHTML = '<p style="color:#f87171">Errore caricamento storico</p>'; }
-}
-function openReviewForOrder(orderId) { pendingReviewOrderId = orderId; document.getElementById('reviewOrderId').value = orderId; openReviewModal(); }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-// ─── RECENSIONI PUBBLICHE ─────────────────────────────────────────────────────
-function showReviewsPublic() {
-  document.getElementById('mainMenu').style.display = 'none';
-  document.getElementById('productsView').style.display = 'none';
-  document.getElementById('myOrdersView').style.display = 'none';
-  document.getElementById('reviewsPublicView').style.display = 'block';
-  window.scrollTo(0, 0);
-}
-function loadReviewsPublic() {
-  db.ref('recensioni').orderByChild('timestamp').once('value', s => {
-    const reviews = [];
-    s.forEach(c => { const r = c.val(); if (r.status === 'approved') reviews.push({ id: c.key, ...r }); });
-    reviews.sort((a, b) => b.timestamp - a.timestamp);
-    const list = document.getElementById('reviewsPublicList');
-    if (!list) return;
-    if (!reviews.length) { list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! 🌟</div>'; return; }
-    list.innerHTML = reviews.map(r => {
-      const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'numeric' });
-      return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;
-    }).join('');
-  });
-}
+    // ─── STATO ────────────────────────────────────────────────────────────────────
+    let cart = [];
+    let currentUser = null;
+    let userType = 'none';
+    let currentSearchCat = '';
+    let selectedStars = 0;
+    let pendingReviewOrderId = null;
+    let orderStatusListeners = {};
+    let customerGPSLat = null;
+    let customerGPSLng = null;
+    let orderType = 'delivery';
+    let timeMode = 'asap';
+    let scheduledTime = '';
 
-// ─── CHIUSURA MODALI CON CLICK SFONDO ─────────────────────────────────────────
-window.onclick = e => {
-  if (e.target.id === 'cartModal')    closeCart();
-  if (e.target.id === 'privacyModal') closePrivacyModal();
-  if (e.target.id === 'reviewModal')  closeReviewModal();
-  if (e.target.id === 'authModal')    closeAuthModal();
-};
+    const appData = {
+        categories: {
+            focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
+            pizze: { name: "🍕 Specialità Pugliesi", icon: "fa-pizza-slice" },
+            frittura: { name: "🍗 Frittura", icon: "fa-drumstick-bite" },
+            bibite: { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
+        },
+        menu: { pizze: [], focacce: [], frittura: [], bibite: [] },
+        settings: {
+            visiblePhone: "0884660377",
+            manualStatus: "auto",
+            openDays: "lun,mar,mer,gio,ven,sab,dom",
+            hours: "11:00-15:00,18:00-23:00",
+            deliveryEnabled: true,
+            pickupEnabled: true,
+            deliveryBaseFee: 3.00,
+            deliveryExtraFee: 2.00,
+            deliveryMaxRadius: 4,
+            deliveryExtraRadius: 6,
+            pizzeriaLat: 41.6288,
+            pizzeriaLng: 15.9189
+        },
+        branding: { name: "Antica Pizzeria Grasso", subtitle: "Tradizione Pugliese", city: "Manfredonia" },
+        images: { hero: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80", categories: {} }
+    };
+
+    // ─── PALETTE COLORI ─────────────────────────────────────────────────────────
+    const palettes = {
+        autunno: { colors: { gold: '#d4a84b', goldLight: '#f0d78c', goldDark: '#b8860b', dark: '#1a1209', brown: '#2d1f12', brownLight: '#4a3728', card: '#2a1e13', cardLight: '#3d2b1a', cream: '#f5e6c8' } },
+        inverno: { colors: { gold: '#a8c3d4', goldLight: '#c8d8e4', goldDark: '#7a99b0', dark: '#1a2530', brown: '#253545', brownLight: '#354555', card: '#203040', cardLight: '#304050', cream: '#e8f0f5' } },
+        primavera: { colors: { gold: '#8cd4a8', goldLight: '#b0e8c8', goldDark: '#60b080', dark: '#1a2d1f', brown: '#254030', brownLight: '#355040', card: '#1e3828', cardLight: '#2e4838', cream: '#e8f5ec' } },
+        estate: { colors: { gold: '#e8a84b', goldLight: '#f0c878', goldDark: '#c08030', dark: '#2d1f10', brown: '#3d2510', brownLight: '#4d3520', card: '#352010', cardLight: '#453020', cream: '#f5e8d0' } },
+        natale: { colors: { gold: '#c41e3a', goldLight: '#e84860', goldDark: '#901020', dark: '#0f2018', brown: '#1f3028', brownLight: '#2f4038', card: '#152820', cardLight: '#253830', cream: '#f5e8e8' } },
+        san_valentino: { colors: { gold: '#ff4d6d', goldLight: '#ff8098', goldDark: '#d02040', dark: '#1a0a0f', brown: '#2a1520', brownLight: '#3a2530', card: '#201018', cardLight: '#302028', cream: '#f5e8ec' } },
+        notte: { colors: { gold: '#7209b7', goldLight: '#a040d0', goldDark: '#5005a0', dark: '#050510', brown: '#101025', brownLight: '#202035', card: '#0a0a1a', cardLight: '#1a1a2a', cream: '#e8e0f5' } }
+    };
+
+    function applyPalette(name) {
+        const palette = palettes[name] || palettes['autunno'];
+        const c = palette.colors;
+        const root = document.documentElement;
+        root.style.setProperty('--gold', c.gold);
+        root.style.setProperty('--gold-light', c.goldLight);
+        root.style.setProperty('--gold-dark', c.goldDark);
+        root.style.setProperty('--dark', c.dark);
+        root.style.setProperty('--brown', c.brown);
+        root.style.setProperty('--brown-light', c.brownLight);
+        root.style.setProperty('--card', c.card);
+        root.style.setProperty('--card-light', c.cardLight);
+        root.style.setProperty('--cream', c.cream);
+
+        // Aggiorna l'overlay del logo con il colore della palette
+        const tint = document.getElementById('logoTint');
+        if (tint) {
+            tint.style.background = c.gold;
+        }
+    }
+
+    // ─── SUONI NOTIFICA ─────────────────────────────────────────────────────────
+    let audioCtx = null;
+    let canPlaySound = false;
+
+    function initSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            document.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                canPlaySound = true;
+            }, { once: true });
+        } catch(e) {
+            console.log('Audio non supportato');
+        }
+    }
+
+    function playOrderStatusSound() {
+        if (!audioCtx || !canPlaySound || audioCtx.state !== 'running') return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {}
+    }
+
+    // ─── BANNER OFFERTE ─────────────────────────────────────────────────────────
+    function updateOffersBanner(promos) {
+        const banner = document.getElementById('offersBanner');
+        const offerText = document.getElementById('offerText');
+        if (!promos || !Object.keys(promos).length) {
+            banner.classList.remove('show');
+            return;
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const activePromos = Object.entries(promos).filter(([id, p]) => {
+            return p.active === true &&
+                   p.startDate <= today &&
+                   p.endDate >= today &&
+                   (p.currentUses || 0) < (p.maxUses || 1);
+        });
+        if (activePromos.length > 0) {
+            const promo = activePromos[0][1];
+            offerText.textContent = `🎁 ${promo.title} - Scopri l'offerta!`;
+            banner.classList.add('show');
+            banner.onclick = () => {
+                let msg = `${promo.title}\n${promo.message || ''}`;
+                if (promo.products && promo.products.length) {
+                    msg += '\nProdotti inclusi:\n' + promo.products.map(p => `${p.name} ×${p.qty} - €${p.price.toFixed(2)}`).join('\n');
+                }
+                alert(msg);
+            };
+        } else {
+            banner.classList.remove('show');
+        }
+    }
+
+    // ─── TABS ─────────────────────────────────────────────────────────────────────
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+        });
+
+        if (tab === 'cart') renderCartTab();
+        if (tab === 'orders') renderMyOrders();
+        if (tab === 'reviews') loadReviewsPublic();
+        if (tab === 'search') globalSearch();
+    }
+
+    // ─── TOAST ────────────────────────────────────────────────────────────────────
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ─── UTILITÀ ──────────────────────────────────────────────────────────────────
+    function getCartQty(cat, name) {
+        const ex = cart.find(x => !x.isPromo && x.cat === cat && x.name === name);
+        return ex ? (ex.qty || 0) : 0;
+    }
+
+    function updateCartBadge() {
+        let n = 0;
+        cart.forEach(i => { if (i.isPromo) n += 1; else n += (i.qty || 0); });
+        const qb = document.getElementById('cartBadge');
+        if (qb) { qb.textContent = n; qb.style.display = n > 0 ? 'flex' : 'none'; }
+        try { localStorage.setItem('pizzeria_cart_v3', JSON.stringify(cart)); } catch (e) {}
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371,
+            dLat = (lat2 - lat1) * Math.PI / 180,
+            dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function computeDeliveryFee(distance) {
+        const baseFee = parseFloat(appData.settings.deliveryBaseFee) || 3.00;
+        const maxRadius = parseFloat(appData.settings.deliveryMaxRadius) || 4;
+        const extraRadius = parseFloat(appData.settings.deliveryExtraRadius) || 6;
+        const extraFee = parseFloat(appData.settings.deliveryExtraFee) || 2.00;
+        if (distance === null) return { fee: baseFee, outOfRange: false, withExtra: false };
+        if (distance > extraRadius) return { fee: 0, outOfRange: true, withExtra: false };
+        if (distance > maxRadius) return { fee: baseFee + extraFee, outOfRange: false, withExtra: true };
+        return { fee: baseFee, outOfRange: false, withExtra: false };
+    }
+
+    function sanitizeWA(t) { return String(t).replace(/[*_~`]/g, '\\$&'); }
+
+    // ─── CHIAMA E NAVIGA ────────────────────────────────────────────────────────
+    function callPizzeria() {
+        const phone = appData.settings.visiblePhone || "0884660377";
+        window.location.href = `tel:${phone}`;
+    }
+
+    function openPizzeriaMaps() {
+        const address = encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG");
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+        window.open(url, '_blank');
+    }
+
+    // ─── INIT ────────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        initApp();
+    });
+
+    function initApp() {
+        try {
+            const s = localStorage.getItem('pizzeria_cart_v3');
+            if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p;
+                    updateCartBadge(); } }
+        } catch (e) {}
+        initSound();
+        loadFromFirebase();
+        setupRealtimeListeners();
+        renderMyOrders();
+        loadReviewsPublic();
+        startOrderStatusTracking();
+    }
+
+    // ─── FIREBASE LOAD ────────────────────────────────────────────────────────────
+    function loadFromFirebase() {
+        db.ref('categories').once('value').then(s => {
+            if (s.exists()) { appData.categories = s.val();
+                showCategories(); }
+        });
+        db.ref('menu').once('value').then(s => {
+            if (s.exists()) { appData.menu = s.val();
+                showCategories(); }
+        });
+        db.ref('images').once('value').then(s => {
+            if (s.exists()) { appData.images = s.val();
+                applyImages(); }
+        });
+        db.ref('settings').once('value').then(s => {
+            if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() };
+                updateStatus(); }
+        });
+
+        // Palette colori
+        db.ref('settings/colorPalette').once('value').then(s => {
+            applyPalette(s.val() || 'autunno');
+        });
+        db.ref('settings/colorPalette').on('value', s => {
+            applyPalette(s.val() || 'autunno');
+        });
+
+        // Promozioni
+        db.ref('promotions').once('value').then(s => {
+            if (s.exists()) updateOffersBanner(s.val());
+        });
+        db.ref('promotions').on('value', s => {
+            if (s.exists()) updateOffersBanner(s.val());
+            else updateOffersBanner(null);
+        });
+    }
+
+    function showCategories() {
+        const l = document.getElementById('categoriesList');
+        if (!l) return;
+        document.getElementById('categoriesSkeletons').style.display = 'none';
+        l.style.display = 'grid';
+        l.innerHTML = Object.keys(appData.categories).map(c => {
+            const p = appData.menu[c] || [];
+            const i = appData.categories[c];
+            const s = (appData.images.categories && appData.images.categories[c]) || '';
+            return `<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon || 'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`;
+        }).join('');
+    }
+
+    function showCategory(c) {
+        if (!c || !appData.menu[c]) { showToast('⚠️ Non disponibile'); return; }
+        currentSearchCat = c;
+        document.getElementById('tab-catalog').innerHTML = `
+            <button class="back-btn-3d" onclick="backToCategories()"><i class="fas fa-arrow-left"></i> Torna al Menu</button>
+            <h2 class="category-title">${appData.categories[c].name}</h2>
+            <div class="search-bar-3d">
+                <i class="fas fa-search"></i>
+                <input type="text" id="productSearch" placeholder="Cerca..." oninput="filterProducts(this.value)">
+            </div>
+            <div id="productList"></div>
+            <button class="back-btn-3d" onclick="backToCategories()" style="margin-top:20px; width:100%; justify-content:center;"><i class="fas fa-arrow-up"></i> Torna al Menu</button>
+        `;
+        renderProductList(c);
+    }
+
+    function renderProductList(cat, filterTerm) {
+        const list = document.getElementById('productList');
+        const term = (filterTerm || '').toLowerCase();
+        const filtered = appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
+        if (!filtered.length) { list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>'; return; }
+        list.innerHTML = filtered.map(p => {
+            const idx = appData.menu[cat].indexOf(p);
+            const qty = getCartQty(cat, p.name);
+            const imgHtml = p.img ? `<img src="${p.img}" class="product-img-square" alt="${p.name}" onerror="this.style.display='none'">` : '';
+            const qtyUi = qty > 0 ?
+                `<div class="qty-counter"><button class="qty-btn minus" onclick="changeProductQty('${cat}',${idx},-1)">−</button><span class="qty-value">${qty}</span><button class="qty-btn" onclick="changeProductQty('${cat}',${idx},1)">+</button></div>` :
+                `<button class="add-btn-3d" onclick="changeProductQty('${cat}',${idx},1)">+ Aggiungi</button>`;
+            return `<div class="product-card-3d">${imgHtml}<div class="product-info"><h4>${p.name}</h4><p>${p.desc || ''}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${qtyUi}</div>`;
+        }).join('');
+    }
+
+    function filterProducts(term) {
+        if (currentSearchCat) renderProductList(currentSearchCat, term || '');
+    }
+
+    function backToCategories() {
+        currentSearchCat = '';
+        document.getElementById('tab-catalog').innerHTML = `
+            <div class="section-divider"><span>Il Nostro Menu</span></div>
+            <div class="menu-list" id="categoriesSkeletons">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+            <div class="menu-list" id="categoriesList" style="display:none;"></div>
+        `;
+        showCategories();
+    }
+
+    function changeProductQty(cat, i, delta) {
+        if (!appData.menu || !appData.menu[cat] || !appData.menu[cat][i]) { showToast('⚠️ Errore'); return; }
+        const it = appData.menu[cat][i];
+        const ex = cart.find(x => !x.isPromo && x.name === it.name && x.cat === cat);
+        if (ex) {
+            ex.qty = (ex.qty || 0) + delta;
+            if (ex.qty <= 0) { cart.splice(cart.indexOf(ex), 1); }
+        } else if (delta > 0) {
+            cart.push({ ...it, cat, qty: 1, isPromo: false });
+            showToast(`🍕 ${it.name} aggiunta!`);
+        }
+        updateCartBadge();
+        if (currentSearchCat === cat) renderProductList(cat, document.getElementById('productSearch')?.value || '');
+    }
+
+    function applyImages() {
+        if (appData.images.hero) document.getElementById('heroImg').src = appData.images.hero;
+        showCategories();
+    }
+
+    function updateStatus() {
+        const isOpen = checkIfOpen();
+        const badge = document.getElementById('statusBadge');
+        const text = document.getElementById('statusText');
+
+        if (isOpen) {
+            badge.className = 'status-badge-small open';
+            text.textContent = 'APERTO';
+        } else {
+            badge.className = 'status-badge-small';
+            text.textContent = 'CHIUSO';
+        }
+    }
+
+    function checkIfOpen() {
+        const s = appData.settings;
+        if (s.manualStatus === 'open') return true;
+        if (s.manualStatus === 'closed') return false;
+        const days = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+        const today = days[new Date().getDay()];
+        if (s.openDays && !s.openDays.includes(today)) return false;
+        const hoursStr = s.hours || "11:00-15:00,18:00-23:00";
+        const ranges = hoursStr.split(',').map(r => r.trim()).filter(Boolean);
+        const currentMins = new Date().getHours() * 60 + new Date().getMinutes();
+        for (let range of ranges) {
+            const parts = range.split('-');
+            if (parts.length !== 2) continue;
+            const [sh, sm] = parts[0].split(':').map(Number);
+            const [eh, em] = parts[1].split(':').map(Number);
+            if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue;
+            if (currentMins >= sh * 60 + sm && currentMins < eh * 60 + em) return true;
+        }
+        return false;
+    }
+
+    // ─── FIREBASE LISTENERS ──────────────────────────────────────────────────────
+    function setupRealtimeListeners() {
+        db.ref('settings').on('value', s => {
+            if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() };
+                updateStatus(); }
+        });
+        db.ref('.info/connected').on('value', s => {
+            document.getElementById('offlineBanner').style.display = s.val() === false ? 'block' : 'none';
+        });
+    }
+
+    // ─── CART TAB ────────────────────────────────────────────────────────────────
+    function renderCartTab() {
+        const content = document.getElementById('cartContent');
+        if (!cart.length) {
+            content.innerHTML = `<div class="cart-empty-card"><p style="text-align:center;color:#8a7a5a;padding:30px 0;">Il tuo carrello è vuoto.<br>Sfoglia il menu e aggiungi qualcosa!</p></div>`;
+            return;
+        }
+        let html = '';
+        let total = 0;
+        cart.forEach((x, i) => {
+            if (x.isPromo) {
+                html += `<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCart(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:0.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;
+                total += x.totalPrice;
+            } else {
+                const qtyOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map(q => `<option value="${q}" ${q === x.qty ? 'selected' : ''}>${q === 0 ? 'Rimuovi' : q + ' pz'}</option>`).join('');
+                html += `<div class="cart-item-3d"><div><span class="cart-item-name">${x.name}</span><div style="color:#8a7a5a;font-size:0.8rem;">€${x.price.toFixed(2)} ciascuno</div></div><select style="background:var(--card);border:1px solid var(--gold-dark);border-radius:6px;color:var(--gold);padding:4px 8px;font-weight:700;" onchange="setProductQtyDirectly('${x.cat || ''}','${x.name.replace(/'/g, "\\'")}',parseInt(this.value))">${qtyOptions}</select></div>`;
+                total += (x.price * x.qty);
+            }
+        });
+
+        html += `<div class="cart-total-3d"><span class="cart-total-label">Totale</span><span class="cart-total-amount">€${total.toFixed(2)}</span></div>`;
+        html += `<button class="clear-cart-btn" onclick="clearCart()"><i class="fas fa-trash-alt"></i> Svuota Carrello</button>`;
+
+        html += `
+            <div class="cart-service-section">
+                <div class="form-group">
+                    <label>🛵 Tipo di servizio</label>
+                    <div class="order-type-toggle">
+                        <div class="type-option active" id="optDelivery" onclick="selectServiceType('delivery')">
+                            <i class="fas fa-motorcycle"></i> Consegna
+                        </div>
+                        <div class="type-option" id="optPickup" onclick="selectServiceType('pickup')">
+                            <i class="fas fa-store"></i> Ritiro
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>⏰ Orario</label>
+                    <div class="time-toggle">
+                        <div class="time-option active" id="timeAsap" onclick="selectTime('asap')">⚡ Subito</div>
+                        <div class="time-option" id="timeScheduled" onclick="selectTime('scheduled')">🕐 Scegli</div>
+                    </div>
+                    <div class="time-picker-wrap" id="timePickerWrap">
+                        <input type="time" id="scheduledTime" step="300" value="${scheduledTime}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>👤 Nome e Cognome *</label>
+                    <input type="text" id="customerName" placeholder="Es. Mario Rossi">
+                </div>
+                <div class="form-group">
+                    <label>📞 Telefono *</label>
+                    <input type="tel" id="customerPhone" placeholder="+39 333 1234567">
+                </div>
+
+                <div class="form-group" id="addressGroup" style="display:none;">
+                    <label>📍 Indirizzo di Consegna *</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex:3;">
+                        <input type="text" id="customerNumber" placeholder="Civico" style="flex:1;">
+                    </div>
+                    <button class="gps-btn" id="gpsBtn" onclick="getCustomerLocation()"><i class="fas fa-location-crosshairs"></i> 📍 Usa GPS</button>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Note (opzionale)</label>
+                    <textarea id="customerNotes" rows="2" placeholder="Citofono, piano, istruzioni speciali..."></textarea>
+                </div>
+
+                <div class="privacy-checkbox">
+                    <input type="checkbox" id="privacyConsent">
+                    <label for="privacyConsent">Acconsento al trattamento dei dati personali per la consegna. *</label>
+                </div>
+
+                <button class="checkout-btn-3d" id="placeOrderBtn" onclick="sendOrder()">
+                    <i class="fas fa-paper-plane"></i> Invia Ordine
+                </button>
+            </div>
+        `;
+
+        content.innerHTML = html;
+
+        if (orderType === 'delivery') {
+            document.getElementById('optDelivery').classList.add('active');
+            document.getElementById('optPickup').classList.remove('active');
+            document.getElementById('addressGroup').style.display = 'block';
+        } else {
+            document.getElementById('optPickup').classList.add('active');
+            document.getElementById('optDelivery').classList.remove('active');
+            document.getElementById('addressGroup').style.display = 'none';
+        }
+        if (timeMode === 'scheduled') {
+            document.getElementById('timeScheduled').classList.add('active');
+            document.getElementById('timeAsap').classList.remove('active');
+            document.getElementById('timePickerWrap').classList.add('show');
+        }
+        const savedName = localStorage.getItem('checkout_name');
+        const savedPhone = localStorage.getItem('checkout_phone');
+        if (savedName) document.getElementById('customerName').value = savedName;
+        if (savedPhone) document.getElementById('customerPhone').value = savedPhone;
+    }
+
+    function setProductQtyDirectly(cat, name, qty) {
+        const idx = cart.findIndex(item => !item.isPromo && item.cat === cat && item.name === name);
+        if (idx > -1) {
+            if (qty <= 0) { cart.splice(idx, 1); } else { cart[idx] = { ...cart[idx], qty }; }
+        } else if (qty > 0) {
+            const product = (appData.menu[cat] || []).find(p => p.name === name);
+            if (product) cart.push({ ...product, cat, qty, isPromo: false });
+        }
+        updateCartBadge();
+        renderCartTab();
+    }
+
+    function removePromoFromCart(i) {
+        cart.splice(i, 1);
+        updateCartBadge();
+        renderCartTab();
+        showToast('🗑️ Promo rimossa');
+    }
+
+    function clearCart() {
+        if (!cart.length) return;
+        cart = [];
+        updateCartBadge();
+        renderCartTab();
+        showToast('🗑️ Svuotato');
+    }
+
+    function selectServiceType(type) {
+        orderType = type;
+        document.getElementById('optDelivery').classList.toggle('active', type === 'delivery');
+        document.getElementById('optPickup').classList.toggle('active', type === 'pickup');
+        document.getElementById('addressGroup').style.display = type === 'delivery' ? 'block' : 'none';
+        if (type === 'pickup') {
+            document.getElementById('customerStreet').value = '';
+            document.getElementById('customerNumber').value = '';
+            customerGPSLat = null;
+            customerGPSLng = null;
+        }
+    }
+
+    function selectTime(mode) {
+        timeMode = mode;
+        document.getElementById('timeAsap').classList.toggle('active', mode === 'asap');
+        document.getElementById('timeScheduled').classList.toggle('active', mode === 'scheduled');
+        document.getElementById('timePickerWrap').classList.toggle('show', mode === 'scheduled');
+        if (mode === 'scheduled') {
+            const now = new Date();
+            now.setMinutes(Math.ceil(now.getMinutes() / 5) * 5, 0, 0);
+            document.getElementById('scheduledTime').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            scheduledTime = document.getElementById('scheduledTime').value;
+        } else {
+            scheduledTime = '';
+        }
+    }
+
+    async function getCustomerLocation() {
+        if (!navigator.geolocation) { showToast('GPS non disponibile'); return; }
+        const btn = document.getElementById('gpsBtn');
+        btn.textContent = '⏳ Caricamento...';
+        try {
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 }));
+            customerGPSLat = pos.coords.latitude;
+            customerGPSLng = pos.coords.longitude;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerGPSLat}&lon=${customerGPSLng}&zoom=18&addressdetails=1`);
+            const data = await response.json();
+            document.getElementById('customerStreet').value = data.address?.road || data.address?.pedestrian || '';
+            document.getElementById('customerNumber').value = data.address?.house_number || '';
+            showToast('📍 Posizione rilevata!');
+        } catch (e) {
+            showToast('❌ Impossibile ottenere la posizione');
+        } finally {
+            btn.textContent = '📍 Usa GPS';
+        }
+    }
+
+    async function sendOrder() {
+        if (!document.getElementById('privacyConsent').checked) {
+            showToast('⚠️ Accetta la Privacy Policy per procedere');
+            return;
+        }
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        if (!name || !phone) {
+            showToast('⚠️ Compila Nome e Telefono');
+            return;
+        }
+        const cleanPhone = phone.replace(/[\s\-().+]/g, '');
+        if (!/^(\+?39)?3[0-9]{9}$/.test(cleanPhone) && !/^0[0-9]{6,9}$/.test(cleanPhone)) {
+            showToast('❌ Numero di telefono non valido');
+            return;
+        }
+        if (orderType === 'delivery') {
+            const street = document.getElementById('customerStreet').value.trim();
+            const number = document.getElementById('customerNumber').value.trim();
+            if (!street || !number) {
+                showToast('⚠️ Completa l\'indirizzo per la consegna');
+                return;
+            }
+        }
+
+        let total = 0;
+        cart.forEach(i => { if (i.isPromo) total += i.totalPrice; else total += (i.price * i.qty); });
+
+        const orderData = {
+            orderId: 'ORD-' + Date.now().toString().slice(-6),
+            customerName: name,
+            customerPhone: phone,
+            type: orderType,
+            scheduledTime: timeMode === 'asap' ? 'Subito' : document.getElementById('scheduledTime').value,
+            notes: document.getElementById('customerNotes').value.trim(),
+            items: cart.map(i => i.isPromo ? { name: `🎁 ${i.promoTitle}`, qty: 1, price: i.totalPrice } : { name: i.name, qty: i.qty, price: i.price }),
+            totalPrice: total,
+            status: 'new',
+            timestamp: Date.now()
+        };
+
+        if (orderType === 'delivery') {
+            orderData.address = `${document.getElementById('customerStreet').value.trim()} ${document.getElementById('customerNumber').value.trim()}`;
+            if (customerGPSLat && customerGPSLng) {
+                orderData.customerLat = customerGPSLat;
+                orderData.customerLng = customerGPSLng;
+            }
+        }
+
+        const btn = document.getElementById('placeOrderBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+
+        try {
+            await db.ref('ordini').push().set(orderData);
+            const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+            localOrders.unshift({
+                orderId: orderData.orderId,
+                date: Date.now(),
+                total: total,
+                items: orderData.items.map(i => i.name).join(', '),
+                status: 'new',
+                type: orderType
+            });
+            if (localOrders.length > 5) localOrders.length = 5;
+            localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
+
+            localStorage.setItem('checkout_name', name);
+            localStorage.setItem('checkout_phone', phone);
+
+            cart = [];
+            updateCartBadge();
+            renderCartTab();
+            showToast('🎉 Ordine inviato con successo!');
+            switchTab('catalog');
+        } catch (e) {
+            console.error(e);
+            showToast('❌ Errore durante l\'invio dell\'ordine');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invia Ordine';
+        }
+    }
+
+    // ─── ORDERS ──────────────────────────────────────────────────────────────────
+    function renderMyOrders() {
+        const list = document.getElementById('myOrdersList');
+        try {
+            let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+            if (!orders.length) { list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕</div>'; return; }
+            list.innerHTML = orders.map(o => {
+                const dateStr = new Date(o.date).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+                const status = o.status || 'new';
+                const typeLabel = o.type === 'pickup' ? '🏪 Ritiro' : '🛵 Consegna';
+                const borderColor = status === 'rifiutato' ? '#ef4444' : (status === 'delivered' || (o.type === 'pickup' && status === 'picked')) ? '#22c55e' : 'var(--gold-dark)';
+                return `<div class="my-order-card" style="border-left-color:${borderColor};">
+                    <div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div>
+                    <div class="my-order-items">${o.items}</div>
+                    <div class="my-order-total">€${o.total.toFixed(2)}</div>
+                    <div style="font-size:0.8rem;color:#8a7a5a;margin-top:4px;">Stato: <strong>${status}</strong></div>
+                    ${o.motivoRifiuto ? `<div style="color:#f87171;font-size:0.8rem;margin-top:4px;">❌ ${o.motivoRifiuto}</div>` : ''}
+                </div>`;
+            }).join('');
+        } catch (e) { list.innerHTML = '<p style="color:#f87171">Errore</p>'; }
+    }
+
+    function clearLocalHistory() {
+        localStorage.removeItem('pizzeria_grasso_orders');
+        renderMyOrders();
+        showToast('🗑️ Storico cancellato!');
+    }
+
+    // ─── REVIEWS ──────────────────────────────────────────────────────────────────
+    function loadReviewsPublic() {
+        db.ref('recensioni').orderByChild('timestamp').once('value', s => {
+            const reviews = [];
+            s.forEach(c => { const r = c.val(); if (r.status === 'approved') reviews.push({ id: c.key, ...r }); });
+            reviews.sort((a, b) => b.timestamp - a.timestamp);
+            const list = document.getElementById('reviewsPublicList');
+            if (!reviews.length) { list.innerHTML = '<div style="text-align:center;color:#8a7a5a;padding:30px;">Nessuna recensione ancora.<br>Sii il primo! 🌟</div>'; return; }
+            list.innerHTML = reviews.map(r => {
+                const dateStr = new Date(r.timestamp).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+                return `<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;
+            }).join('');
+        });
+    }
+
+    function openReviewModal() { document.getElementById('reviewModal').classList.add('active'); }
+    function closeReviewModal() { document.getElementById('reviewModal').classList.remove('active'); }
+    function selectStar(n) { selectedStars = n; updateStarsDisplay(); }
+    function updateStarsDisplay() { document.querySelectorAll('#starsInput .star').forEach((s, i) => { s.classList.toggle('active', i < selectedStars); }); }
+
+    function submitReview() {
+        const name = document.getElementById('reviewName').value.trim();
+        const text = document.getElementById('reviewText').value.trim();
+        if (!selectedStars) { showToast('⚠️ Seleziona le stelle'); return; }
+        if (!name) { showToast('❌ Inserisci il nome'); return; }
+        if (!text) { showToast('❌ Scrivi un commento'); return; }
+        db.ref('recensioni').push({
+            name: sanitizeWA(name),
+            text: sanitizeWA(text),
+            stars: selectedStars,
+            orderId: 'Anonimo',
+            timestamp: Date.now(),
+            status: 'pending'
+        }).then(() => { closeReviewModal(); showToast('⭐ Grazie per la recensione!'); });
+    }
+
+    // ─── SEARCH ───────────────────────────────────────────────────────────────────
+    function globalSearch() {
+        const query = document.getElementById('globalSearch').value;
+        const results = document.getElementById('globalSearchResults');
+        if (query.length < 2) { results.innerHTML = ''; return; }
+        const lowerQuery = query.toLowerCase();
+        const items = [];
+        Object.keys(appData.menu).forEach(catKey => {
+            const catName = appData.categories[catKey]?.name || catKey;
+            (appData.menu[catKey] || []).forEach(product => {
+                if (product.name.toLowerCase().includes(lowerQuery) || (product.desc && product.desc.toLowerCase().includes(lowerQuery))) {
+                    items.push({ catKey, catName, product });
+                }
+            });
+        });
+        if (items.length === 0) { results.innerHTML = `<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato</p>`; return; }
+        results.innerHTML = items.map(item => {
+            const qty = getCartQty(item.catKey, item.product.name);
+            const imgHtml = item.product.img ? `<img src="${item.product.img}" class="product-img-square" alt="${item.product.name}" onerror="this.style.display='none'">` : '';
+            const actionsHtml = qty > 0 ?
+                `<div class="qty-counter"><button class="qty-btn minus" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},-1)">−</button><span class="qty-value">${qty}</span><button class="qty-btn" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+</button></div>` :
+                `<button class="add-btn-3d" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+ Aggiungi</button>`;
+            return `<div class="product-card-3d">${imgHtml}<div class="product-info"><div style="font-size:0.75rem;color:var(--gold);margin-bottom:4px;">${item.catName}</div><h4>${item.product.name}</h4><p>${item.product.desc || ''}</p><div class="product-price">€${item.product.price.toFixed(2)}</div></div>${actionsHtml}</div>`;
+        }).join('');
+    }
+
+    // ─── ORDER STATUS TRACKING ────────────────────────────────────────────────────
+    function startOrderStatusTracking() {
+        try {
+            const localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+            if (!localOrders.length) return;
+            localOrders.forEach(order => {
+                if (!order.orderId) return;
+                const query = db.ref('ordini').orderByChild('orderId').equalTo(order.orderId);
+                orderStatusListeners[order.orderId] = query;
+                query.on('value', snapshot => {
+                    snapshot.forEach(child => {
+                        const data = child.val();
+                        if (data) updateLocalOrderStatus(order.orderId, data.status, data.motivoRifiuto);
+                    });
+                });
+            });
+        } catch (e) { console.log('Errore tracking:', e); }
+    }
+
+    function updateLocalOrderStatus(orderId, newStatus, motivoRifiuto) {
+        try {
+            let orders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+            let changed = false;
+            orders = orders.map(o => {
+                if (o.orderId === orderId && o.status !== newStatus) {
+                    changed = true;
+                    o.status = newStatus;
+                    if (newStatus === 'rifiutato' && motivoRifiuto) o.motivoRifiuto = motivoRifiuto;
+                }
+                return o;
+            });
+            if (changed) {
+                localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(orders));
+                renderMyOrders();
+                playOrderStatusSound();
+                const statiLeggibili = {
+                    preparing: 'In preparazione',
+                    ready: 'Pronto',
+                    picked: 'Ritirato',
+                    delivering: 'In consegna',
+                    delivered: 'Consegnato',
+                    rifiutato: 'Rifiutato'
+                };
+                const msg = statiLeggibili[newStatus] || newStatus;
+                showToast(`📦 Ordine ${orderId}: ${msg}`);
+            }
+        } catch (e) { console.log('Errore aggiornamento stato:', e); }
+    }
+
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'scheduledTime') {
+            scheduledTime = e.target.value;
+        }
+    });
 </script>
 </body>
 </html>
