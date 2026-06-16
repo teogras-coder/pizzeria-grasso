@@ -338,7 +338,7 @@
         /* BOTTOM NAV STILE TIKTOK - ICONE INCOLLATE AL FONDO */
         .bottom-nav {
     position: fixed;
-    bottom: 20px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -1025,7 +1025,7 @@ function drag(e) {
     // maxBottom = può salire fino a 150px dal fondo (non oltre)
     const maxBottom = 150;
     // minBottom = può scendere fino a 10px dal fondo
-    const minBottom = 10;
+    const minBottom = -50;
     // Limiti laterali
     const maxLeft = window.innerWidth - bottomNav.offsetWidth - 10;
     const minLeft = 10;
