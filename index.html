@@ -349,118 +349,128 @@ body {
         .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 
         .bottom-nav {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            transform: none !important;
-            z-index: 9999 !important;
-            background: #1a1209 !important;
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
-            border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
-            padding: 8px 0 12px !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            border-radius: 0 !important;
-            box-sizing: border-box;
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            justify-content: space-around;
-            align-items: center;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    background: #1a1209 !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
+    padding: 8px 0 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-around;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
 
-        .bottom-nav::before {
-            display: none !important;
-        }
+.bottom-nav .nav-btn { 
+    flex: 1 1 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    background: none;
+    border: none;
+    color: var(--cream);
+    opacity: 0.55;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 8px;
+    min-width: 0;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3);
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 2;
+    /* FONDAMENTALE: il bottone è un "isola" cliccabile */
+    isolation: isolate;
+}
 
-        .bottom-nav .nav-btn { 
-            flex: 1 1 0 !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            padding: 6px 2px;
-            background: none;
-            border: none;
-            color: var(--cream);
-            opacity: 0.55;
-            cursor: pointer;
-            transition: all 0.15s;
-            border-radius: 8px;
-            min-width: 0;
-            touch-action: manipulation !important;
-            -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3);
-            pointer-events: auto !important;
-            position: relative;
-            z-index: 2;
-        }
+.bottom-nav .nav-btn:active {
+    transform: scale(0.92);
+    opacity: 1;
+    background: rgba(212, 168, 75, 0.15);
+}
 
-        .bottom-nav .nav-btn:active {
-            transform: scale(0.92);
-            opacity: 1;
-            background: rgba(212, 168, 75, 0.15);
-        }
+.bottom-nav .nav-btn.active { 
+    color: var(--gold);
+    opacity: 1;
+}
 
-        .bottom-nav .nav-btn.active { 
-            color: var(--gold);
-            opacity: 1;
-        }
+/* Icona e testo: NON ricevono click, tutto va al bottone */
+.bottom-nav .nav-btn i,
+.bottom-nav .nav-btn span {
+    pointer-events: none !important;
+    position: relative;
+    z-index: 1;
+}
 
-        .bottom-nav .nav-btn i {
-            font-size: 22px;
-            line-height: 1;
-            pointer-events: none;
-        }
+.bottom-nav .nav-btn i {
+    font-size: 22px;
+    line-height: 1;
+}
 
-        .bottom-nav .nav-btn span {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            line-height: 1;
-            pointer-events: none;
-        }
+.bottom-nav .nav-btn span {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1;
+}
 
-        .bottom-nav .nav-btn .badge {
-            position: absolute;
-            top: 2px;
-            right: calc(50% - 16px);
-            background: #e74c3c;
-            color: white;
-            font-size: 9px;
-            font-weight: 900;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #1a1209;
-            pointer-events: none;
-        }
+/* Badge carrello: posizionato FUORI dal flusso, non blocca nulla */
+.bottom-nav .nav-btn .badge {
+    position: absolute !important;
+    top: -2px !important;
+    right: 20% !important;
+    background: #e74c3c !important;
+    color: white !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px solid #1a1209 !important;
+    pointer-events: none !important;
+    z-index: 10 !important;
+    /* Non influenza il layout del bottone */
+    transform: translateZ(0);
+}
 
-        .bottom-nav .nav-btn .live-dot {
-            position: absolute;
-            top: 4px;
-            right: calc(50% - 14px);
-            width: 6px;
-            height: 6px;
-            background: #e74c3c;
-            border-radius: 50%;
-            border: 1px solid var(--dark);
-            animation: pulse 1.5s infinite;
-            pointer-events: none;
-        }
+/* Live dot ordini: stessa cosa */
+.bottom-nav .nav-btn .live-dot {
+    position: absolute !important;
+    top: 4px !important;
+    right: 22% !important;
+    width: 6px !important;
+    height: 6px !important;
+    background: #e74c3c !important;
+    border-radius: 50% !important;
+    border: 1px solid var(--dark) !important;
+    animation: pulse 1.5s infinite;
+    pointer-events: none !important;
+    z-index: 10 !important;
+    transform: translateZ(0);
+}
 
-        .bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
-        .bottom-nav .admin-btn.active { background: rgba(245,158,11,0.2); }
-
+.bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.bottom-nav .admin-btn.active { background: rgba(245,158,11,0.2); }
         .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
         .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
@@ -981,6 +991,7 @@ document.addEventListener('touchmove', function(e) {
     if (e.target.closest('.phone-frame')) return;
     e.preventDefault();
 }, { passive: false });
+
 </script>
 </body>
 </html>
