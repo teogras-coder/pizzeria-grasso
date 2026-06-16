@@ -351,6 +351,12 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
 
 <script>
+// Timestamp avvio app per evitare banner offline falsi
+window.appStartTime = Date.now();
+
+// FIX CRITICO: Disabilita bfcache su Safari iOS
+window.addEventListener('unload', function() {});
+
 // ─── TRADUZIONI INLINE COMPLETE ──────────────────────────────────────────────
 const translations = {
     it: {
@@ -585,13 +591,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function initApp() {
-    // FIX: Nascondi il banner offline dopo 5 secondi (fallback)
-    setTimeout(function() {
-        const banner = document.getElementById('offlineBanner');
-        if (banner) {
-            banner.style.display = 'none';
-        }
-    }, 5000);
+    // FIX: Nascondi SUBITO il banner offline all'avvio
+    const offlineBanner = document.getElementById('offlineBanner');
+    if (offlineBanner) {
+        offlineBanner.style.display = 'none';
+    }
     
     cleanLocalHistory();
     try{const s=localStorage.getItem('pizzeria_cart_v3');if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge()}}}catch(e){}
@@ -617,33 +621,53 @@ function initApp() {
     fixBottomNav();
 }
 
-// ─── FIX PAGINA BIANCA SU iOS ───────────────────────────────────────────────
-// FIX: quando torni indietro dal navigatore, ricarica la pagina
+// ─── FIX PAGINA BIANCA SU iOS - DEFINITIVO ───────────────────────────────────
+// Quando torni da Maps/app esterne
 window.addEventListener('pageshow', function(e) {
-    if (e.persisted) {
+    if (e.persisted || window.performance.navigation.type === 2) {
+        console.log('Ricarica da bfcache');
         window.location.reload();
     }
 });
 
-// FIX: quando la pagina torna visibile, se è vuota, ricarica
+// Quando la pagina torna visibile
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
         setTimeout(function() {
-            if (!document.body || document.body.innerHTML.trim().length < 100) {
+            const body = document.body;
+            const mainApp = document.getElementById('mainApp');
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            
+            // Controlla se la pagina è bianca o corrotta
+            if (!body || body.innerHTML.trim().length < 100 || 
+                (!mainApp && !welcomeScreen) ||
+                (mainApp && mainApp.children.length === 0)) {
+                console.log('Pagina bianca rilevata, ricarico...');
                 window.location.reload();
             }
-        }, 300);
+        }, 200);
     }
 });
 
-// FIX: impedisce il caching eccessivo
-window.addEventListener('load', function() {
-    if (window.performance && window.performance.navigation) {
-        if (window.performance.navigation.type === 2) {
-            window.location.reload();
-        }
+// Controllo continuo per 5 secondi dopo il caricamento
+let whiteScreenCheckInterval = setInterval(function() {
+    const body = document.body;
+    const mainApp = document.getElementById('mainApp');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    
+    if (!body || body.innerHTML.trim().length < 100 || 
+        (!mainApp && !welcomeScreen)) {
+        console.log('Pagina bianca rilevata dal controllo continuo');
+        window.location.reload();
     }
-});
+}, 500);
+
+// Ferma il controllo dopo 5 secondi
+setTimeout(function() {
+    if (whiteScreenCheckInterval) {
+        clearInterval(whiteScreenCheckInterval);
+    }
+}, 5000);
 
 // ─── FCM ──────────────────────────────────────────────────────────────────────
 const messaging=firebase.messaging(),vapidKey='BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
@@ -670,7 +694,16 @@ function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.di
 function setupRealtimeListeners(){
     db.ref('settings').on('value',s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI()}});
     db.ref('promotions').on('value',s=>{appData.promotions=s.exists()?s.val():{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()});
-    db.ref('.info/connected').on('value',s=>{const e=document.getElementById('offlineBanner');if(!e)return;e.style.display=s.val()===false?'block':'none'});
+    db.ref('.info/connected').on('value',s=>{
+        const e=document.getElementById('offlineBanner');
+        if(!e)return;
+        // Mostra banner solo se è offline DOPO 3 secondi dall'avvio (evita falsi positivi)
+        if(s.val()===false && Date.now() > window.appStartTime + 3000){
+            e.style.display='block';
+        } else {
+            e.style.display='none';
+        }
+    });
     
     // Ascolta i cambiamenti della palette
     db.ref('settings/colorPalette').on('value', s => {
@@ -855,12 +888,6 @@ if (origSwitchTab) {
 }
 
 setTimeout(updateNavLiveDotOld, 500);
-
-// ─── RIAVVIO FORZATO PER PAGINA BIANCA ──────────────────────────────────────
-// Se la pagina è vuota, ricarica
-if (document.body.innerHTML.trim().length < 100) {
-    window.location.reload();
-}
 </script>
 </body>
 </html>
