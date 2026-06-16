@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- FIX PAGINA BIANCA: impedisci caching aggressivo -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Antica Pizzeria Grasso</title>
 <link rel="manifest" href="manifest-clienti.json">
 <link rel="icon" type="image/png" href="icon-clienti-192.png">
@@ -613,6 +617,34 @@ function initApp() {
     fixBottomNav();
 }
 
+// ─── FIX PAGINA BIANCA SU iOS ───────────────────────────────────────────────
+// FIX: quando torni indietro dal navigatore, ricarica la pagina
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        window.location.reload();
+    }
+});
+
+// FIX: quando la pagina torna visibile, se è vuota, ricarica
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(function() {
+            if (!document.body || document.body.innerHTML.trim().length < 100) {
+                window.location.reload();
+            }
+        }, 300);
+    }
+});
+
+// FIX: impedisce il caching eccessivo
+window.addEventListener('load', function() {
+    if (window.performance && window.performance.navigation) {
+        if (window.performance.navigation.type === 2) {
+            window.location.reload();
+        }
+    }
+});
+
 // ─── FCM ──────────────────────────────────────────────────────────────────────
 const messaging=firebase.messaging(),vapidKey='BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
 function requestNotificationPermission(){if(!('Notification'in window))return;Notification.requestPermission().then(p=>{if(p!=='granted')return;return messaging.getToken({vapidKey})}).then(tk=>{if(!tk)return;const d=localStorage.getItem('device_id')||'client_'+Math.random().toString(36).substr(2,9);localStorage.setItem('device_id',d);db.ref('fcm_tokens/'+d).set({token:tk,type:'client',lastSeen:Date.now()})}).catch(e=>console.log('Errore token FCM:',e))}
@@ -823,6 +855,12 @@ if (origSwitchTab) {
 }
 
 setTimeout(updateNavLiveDotOld, 500);
+
+// ─── RIAVVIO FORZATO PER PAGINA BIANCA ──────────────────────────────────────
+// Se la pagina è vuota, ricarica
+if (document.body.innerHTML.trim().length < 100) {
+    window.location.reload();
+}
 </script>
 </body>
 </html>
