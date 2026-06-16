@@ -224,7 +224,7 @@
 
         .tab-content { 
     display: none; 
-    padding: 20px 15px 120px; 
+    padding: 20px 15px 70px; 
     animation: fadeIn 0.3s; 
 }
         .tab-content.active { display: block; }
@@ -335,50 +335,38 @@
 
         /* BOTTOM NAV STILE TIKTOK - ICONE INCOLLATE AL FONDO */
         .bottom-nav {
-    position: fixed;
-    bottom: 10px; /* Leggermente sollevata dal fondo */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999 !important; /* SOPRA a tutto */
-    background: rgba(26, 18, 9, 0.98) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(212, 168, 75, 0.3) !important;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
-    padding: 10px 8px 8px;
-    width: 95%;
-    max-width: 420px;
+    position: fixed !important;
+    bottom: 0 !important; /* ATTACCATA AL FONDO */
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    z-index: 999999 !important; /* SOPRA A TUTTO */
+    background: #1a1209 !important; /* COLORE SCURO OPACO, non trasparente */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
+    padding: 8px 0 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important; /* Angoli dritti, attaccata ai bordi */
     box-sizing: border-box;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     justify-content: space-around;
     align-items: center;
-    cursor: grab;
+    cursor: default !important;
     user-select: none;
     touch-action: none;
 }
 
-.bottom-nav:active {
-    cursor: grabbing;
-}
-
-/* Handle per il drag (la barretta in alto) */
+/* Rimuovi la barretta del drag */
 .bottom-nav::before {
-    content: '';
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    background: rgba(212, 168, 75, 0.4);
-    border-radius: 2px;
-    pointer-events: none;
+    display: none !important;
 }
 
-.bottom-nav .nav-btn {
+.bottom-nav .nav-btn { 
     flex: 1 1 0 !important;
     display: flex;
     flex-direction: column;
@@ -396,14 +384,9 @@
     min-width: 0;
 }
 
-.bottom-nav .nav-btn:hover {
-    background: rgba(212, 168, 75, 0.1);
-}
-
-.bottom-nav .nav-btn.active {
+.bottom-nav .nav-btn.active { 
     color: var(--gold);
     opacity: 1;
-    background: rgba(212, 168, 75, 0.15);
 }
 
 .bottom-nav .nav-btn i {
@@ -412,15 +395,11 @@
 }
 
 .bottom-nav .nav-btn span {
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
 }
         .bottom-nav .nav-btn .badge {
             position: absolute;
@@ -969,70 +948,7 @@
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
 
-// Bottom Nav Draggable
-const bottomNav = document.querySelector('.bottom-nav');
-let isDragging = false;
-let startY, startX, startBottom, startLeft;
 
-// Mouse events
-bottomNav.addEventListener('mousedown', startDrag);
-document.addEventListener('mousemove', drag);
-document.addEventListener('mouseup', endDrag);
-
-// Touch events
-bottomNav.addEventListener('touchstart', startDrag, {passive: false});
-document.addEventListener('touchmove', drag, {passive: false});
-document.addEventListener('touchend', endDrag);
-
-function startDrag(e) {
-    if (e.target.closest('.nav-btn')) return;
-    
-    isDragging = true;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    
-    startY = clientY;
-    startX = clientX;
-    
-    const rect = bottomNav.getBoundingClientRect();
-    startBottom = window.innerHeight - rect.bottom;
-    startLeft = rect.left;
-    
-    bottomNav.style.cursor = 'grabbing';
-    e.preventDefault();
-}
-
-function drag(e) {
-    if (!isDragging) return;
-    
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    
-    const deltaY = clientY - startY;
-    const deltaX = clientX - startX;
-    
-    const newBottom = startBottom - deltaY;
-    const newLeft = startLeft + deltaX;
-    
-    // Limiti corretti:
-    // maxBottom = può salire fino a 150px dal fondo (non oltre)
-    const maxBottom = 150;
-    // minBottom = può scendere fino a 10px dal fondo
-    const minBottom = -50;
-    // Limiti laterali
-    const maxLeft = window.innerWidth - bottomNav.offsetWidth - 10;
-    const minLeft = 10;
-    
-    bottomNav.style.bottom = `${Math.max(minBottom, Math.min(maxBottom, newBottom))}px`;
-    bottomNav.style.left = `${Math.max(minLeft, Math.min(maxLeft, newLeft))}px`;
-    bottomNav.style.transform = 'none';
-    
-    e.preventDefault();
-}
-function endDrag() {
-    isDragging = false;
-    bottomNav.style.cursor = 'grab';
-}
 
 </script>
 </body>
