@@ -38,17 +38,35 @@
         }
 
         html, body {
-            height: 100%;
-            overflow: hidden;
-            background: var(--dark);
-        }
+    height: 100%;
+    overflow: hidden;
+    background: var(--dark);
+    position: fixed; /* ← AGGIUNGI QUESTO per iOS */
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
 
-        body {
-            display: flex;
-            justify-content: center;
-            font-family: 'Montserrat', sans-serif;
-            position: relative;
-        }
+body {
+    display: flex;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+    overscroll-behavior: none; /* ← AGGIUNGI per evitare bounce */
+}
+
+.phone-frame {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    z-index: 10;
+    padding-bottom: 70px; /* ← SPAZIO PER LA BOTTOM NAV */
+}
 
         .ambient-lights {
             position: fixed;
@@ -76,18 +94,6 @@
             50% { transform: translate(30px, -30px) scale(1.1); opacity: 0.5; }
         }
 
-        .phone-frame {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            height: 100dvh;
-            background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 40%, var(--brown-light) 100%);
-            position: relative;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            z-index: 10;
-        }
 
         .header {
     background: var(--dark) !important; /* Sfondo scuro */
@@ -224,7 +230,7 @@
 
         .tab-content { 
     display: none; 
-    padding: 20px 15px 70px; 
+    padding: 20px 15px 20px; /* Rimuovi il padding-bottom grande */
     animation: fadeIn 0.3s; 
 }
         .tab-content.active { display: block; }
@@ -336,32 +342,30 @@
         /* BOTTOM NAV STILE TIKTOK - ICONE INCOLLATE AL FONDO */
         .bottom-nav {
     position: fixed !important;
-    bottom: 0 !important; /* ATTACCATA AL FONDO */
+    bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     transform: none !important;
-    z-index: 999999 !important; /* SOPRA A TUTTO */
-    background: #1a1209 !important; /* COLORE SCURO OPACO, non trasparente */
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    z-index: 9999 !important;
+    background: #1a1209 !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
     border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
     padding: 8px 0 12px !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 0 !important; /* Angoli dritti, attaccata ai bordi */
+    border-radius: 0 !important;
     box-sizing: border-box;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     justify-content: space-around;
     align-items: center;
-    cursor: default !important;
     user-select: none;
-    touch-action: none;
+    -webkit-user-select: none;
 }
 
-/* Rimuovi la barretta del drag */
 .bottom-nav::before {
     display: none !important;
 }
@@ -373,15 +377,27 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    padding: 4px 2px;
+    padding: 6px 2px;
     background: none;
     border: none;
     color: var(--cream);
     opacity: 0.55;
     cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 10px;
+    transition: all 0.15s;
+    border-radius: 8px;
     min-width: 0;
+    /* FONDAMENTALE: riabilita il touch sui bottoni */
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3);
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 2;
+}
+
+.bottom-nav .nav-btn:active {
+    transform: scale(0.92);
+    opacity: 1;
+    background: rgba(212, 168, 75, 0.15);
 }
 
 .bottom-nav .nav-btn.active { 
@@ -390,8 +406,9 @@
 }
 
 .bottom-nav .nav-btn i {
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1;
+    pointer-events: none; /* L'icona non interferisce col click */
 }
 
 .bottom-nav .nav-btn span {
@@ -400,24 +417,26 @@
     text-transform: uppercase;
     letter-spacing: 0.3px;
     line-height: 1;
+    pointer-events: none; /* Il testo non interferisce col click */
 }
-        .bottom-nav .nav-btn .badge {
-            position: absolute;
-            top: 0;
-            right: calc(50% - 14px);
-            background: #e74c3c;
-            color: white;
-            font-size: 8px;
-            font-weight: 900;
-            font-family: monospace;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--dark);
-        }
+
+.bottom-nav .nav-btn .badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 16px);
+    background: #e74c3c;
+    color: white;
+    font-size: 9px;
+    font-weight: 900;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1a1209;
+    pointer-events: none;
+}
 
         .bottom-nav .nav-btn .live-dot {
             position: absolute;
