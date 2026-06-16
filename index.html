@@ -8,8 +8,9 @@
     <link rel="icon" type="image/png" href="icon-clienti-192.png">
     <link rel="apple-touch-icon" href="icon-clienti-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#d4a84b">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1a1209">
+<meta name="apple-mobile-web-app-title" content="Pizzeria Grasso">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -37,21 +38,23 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: var(--dark);
-            position: fixed;
-            width: 100%;
-        }
+        html {
+    height: 100%;
+    overflow: hidden;
+    background: var(--dark);
+}
 
-        body {
-            display: flex;
-            justify-content: center;
-            font-family: 'Montserrat', sans-serif;
-            position: relative;
-            overscroll-behavior: none;
-        }
+body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--dark);
+    display: flex;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
 
         .ambient-lights {
             position: fixed;
@@ -966,6 +969,18 @@
     function updateLocalOrderStatus(orderId,newStatus,motivoRifiuto){try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let changed=false;orders=orders.map(o=>{if(o.orderId===orderId&&o.status!==newStatus){changed=true;o.status=newStatus;if(newStatus==='rifiutato'&&motivoRifiuto)o.motivoRifiuto=motivoRifiuto;}return o;});if(changed){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(orders));renderMyOrders();playOrderStatusSound();const statiLeggibili={preparing:'In preparazione',ready:'Pronto',picked:'Ritirato',delivering:'In consegna',delivered:'Consegnato',rifiutato:'Rifiutato'};showToast(`📦 Ordine ${orderId}: ${statiLeggibili[newStatus]||newStatus}`);}}catch(e){console.log('Errore aggiornamento stato:',e);}}
     
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
+// FIX PAGINA BIANCA SU iOS
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        window.location.reload();
+    }
+});
+
+// FIX SCROLL SU iOS
+document.addEventListener('touchmove', function(e) {
+    if (e.target.closest('.phone-frame')) return;
+    e.preventDefault();
+}, { passive: false });
 </script>
 </body>
 </html>
