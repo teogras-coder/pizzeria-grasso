@@ -8,9 +8,9 @@
     <link rel="icon" type="image/png" href="icon-clienti-192.png">
     <link rel="apple-touch-icon" href="icon-clienti-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="theme-color" content="#1a1209">
-<meta name="apple-mobile-web-app-title" content="Pizzeria Grasso">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#1a1209">
+    <meta name="apple-mobile-web-app-title" content="Pizzeria Grasso">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -39,22 +39,22 @@
         }
 
         html {
-    height: 100%;
-    overflow: hidden;
-    background: var(--dark);
-}
+            height: 100%;
+            overflow: hidden;
+            background: var(--dark);
+        }
 
-body {
-    height: 100%;
-    overflow: hidden;
-    background: var(--dark);
-    display: flex;
-    justify-content: center;
-    font-family: 'Montserrat', sans-serif;
-    position: relative;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-}
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--dark);
+            display: flex;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
 
         .ambient-lights {
             position: fixed;
@@ -95,7 +95,7 @@ body {
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             z-index: 10;
-            padding-bottom: 70px;
+            padding-bottom: 80px !important;
         }
 
         .header {
@@ -241,7 +241,7 @@ body {
         @keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { aspect-ratio: 1/1; border-radius: 16px; }
 
-        .tab-content { display: none; padding: 20px 15px 20px; animation: fadeIn 0.3s; }
+        .tab-content { display: none; padding: 20px 15px 30px; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -348,129 +348,135 @@ body {
         .review-textarea { width: 100%; min-height: 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; resize: vertical; font-family: inherit; }
         .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 
+        /* ====== BOTTOM NAV FIX ====== */
         .bottom-nav {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    transform: none !important;
-    z-index: 9999 !important;
-    background: #1a1209 !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
-    padding: 8px 0 12px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 0 !important;
-    box-sizing: border-box;
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-around;
-    align-items: center;
-    user-select: none;
-    -webkit-user-select: none;
-}
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            transform: none !important;
+            z-index: 9999 !important;
+            background: #1a1209 !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-top: 2px solid rgba(212, 168, 75, 0.4) !important;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
+            padding: 8px 0 12px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            pointer-events: auto !important;
+            touch-action: auto !important;
+        }
 
-.bottom-nav .nav-btn { 
-    flex: 1 1 0 !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 6px 2px;
-    background: none;
-    border: none;
-    color: var(--cream);
-    opacity: 0.55;
-    cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 8px;
-    min-width: 0;
-    touch-action: manipulation !important;
-    -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3);
-    pointer-events: auto !important;
-    position: relative;
-    z-index: 2;
-    /* FONDAMENTALE: il bottone è un "isola" cliccabile */
-    isolation: isolate;
-}
+        .bottom-nav .nav-btn {
+            flex: 1 1 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 2px !important;
+            padding: 6px 2px !important;
+            background: none !important;
+            border: none !important;
+            color: var(--cream) !important;
+            opacity: 0.55 !important;
+            cursor: pointer !important;
+            transition: all 0.15s !important;
+            border-radius: 8px !important;
+            min-width: 0 !important;
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3) !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2 !important;
+            isolation: isolate !important;
+        }
 
-.bottom-nav .nav-btn:active {
-    transform: scale(0.92);
-    opacity: 1;
-    background: rgba(212, 168, 75, 0.15);
-}
+        .bottom-nav .nav-btn:active {
+            transform: scale(0.92);
+            opacity: 1;
+            background: rgba(212, 168, 75, 0.15);
+        }
 
-.bottom-nav .nav-btn.active { 
-    color: var(--gold);
-    opacity: 1;
-}
+        .bottom-nav .nav-btn.active {
+            color: var(--gold);
+            opacity: 1;
+        }
 
-/* Icona e testo: NON ricevono click, tutto va al bottone */
-.bottom-nav .nav-btn i,
-.bottom-nav .nav-btn span {
-    pointer-events: none !important;
-    position: relative;
-    z-index: 1;
-}
+        .bottom-nav .nav-btn i,
+        .bottom-nav .nav-btn span {
+            pointer-events: none !important;
+            position: relative;
+            z-index: 1;
+        }
 
-.bottom-nav .nav-btn i {
-    font-size: 22px;
-    line-height: 1;
-}
+        .bottom-nav .nav-btn i {
+            font-size: 22px;
+            line-height: 1;
+        }
 
-.bottom-nav .nav-btn span {
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    line-height: 1;
-}
+        .bottom-nav .nav-btn span {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1;
+        }
 
-/* Badge carrello: posizionato FUORI dal flusso, non blocca nulla */
-.bottom-nav .nav-btn .badge {
-    position: absolute !important;
-    top: -2px !important;
-    right: 20% !important;
-    background: #e74c3c !important;
-    color: white !important;
-    font-size: 9px !important;
-    font-weight: 900 !important;
-    width: 18px !important;
-    height: 18px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 2px solid #1a1209 !important;
-    pointer-events: none !important;
-    z-index: 10 !important;
-    /* Non influenza il layout del bottone */
-    transform: translateZ(0);
-}
+        .bottom-nav .nav-btn .badge {
+            position: absolute !important;
+            top: -2px !important;
+            right: 20% !important;
+            background: #e74c3c !important;
+            color: white !important;
+            font-size: 9px !important;
+            font-weight: 900 !important;
+            width: 18px !important;
+            height: 18px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 2px solid #1a1209 !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+            transform: translateZ(0);
+        }
 
-/* Live dot ordini: stessa cosa */
-.bottom-nav .nav-btn .live-dot {
-    position: absolute !important;
-    top: 4px !important;
-    right: 22% !important;
-    width: 6px !important;
-    height: 6px !important;
-    background: #e74c3c !important;
-    border-radius: 50% !important;
-    border: 1px solid var(--dark) !important;
-    animation: pulse 1.5s infinite;
-    pointer-events: none !important;
-    z-index: 10 !important;
-    transform: translateZ(0);
-}
+        .bottom-nav .nav-btn .live-dot {
+            position: absolute !important;
+            top: 4px !important;
+            right: 22% !important;
+            width: 6px !important;
+            height: 6px !important;
+            background: #e74c3c !important;
+            border-radius: 50% !important;
+            border: 1px solid var(--dark) !important;
+            animation: pulse 1.5s infinite;
+            pointer-events: none !important;
+            z-index: 10 !important;
+            transform: translateZ(0);
+        }
 
-.bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
-.bottom-nav .admin-btn.active { background: rgba(245,158,11,0.2); }
+        .bottom-nav .admin-btn {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .bottom-nav .admin-btn.active {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        /* ====== FINE BOTTOM NAV FIX ====== */
+
         .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
         .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
@@ -599,6 +605,7 @@ body {
         <p style="color:#8a7a5a;">Accesso amministratore.</p>
     </div>
 
+    <!-- BOTTOM NAV - CORRETTA -->
     <nav class="bottom-nav">
         <button class="nav-btn active" data-tab="catalog" onclick="switchTab('catalog')">
             <i class="fas fa-pizza-slice"></i>
@@ -813,11 +820,19 @@ body {
         if(active.length>0){const promo=active[0][1];t.textContent=`🎁 ${promo.title} - Scopri l'offerta!`;b.classList.add('show');b.onclick=()=>{let msg=`${promo.title}\n${promo.message||''}`;if(promo.products&&promo.products.length)msg+='\nProdotti inclusi:\n'+promo.products.map(p=>`${p.name} ×${p.qty} - €${p.price.toFixed(2)}`).join('\n');alert(msg);};}else{b.classList.remove('show');}
     }
 
+    // ====== SWITCH TAB CORRETTO ======
     function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
-        document.getElementById('tab-'+tab).classList.add('active');
-        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.tab===tab));
-        if(tab==='cart')renderCartTab(); if(tab==='orders')renderMyOrders(); if(tab==='reviews')loadReviewsPublic(); if(tab==='search')globalSearch();
+        // Chiudi eventuali modali aperte
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('tab-' + tab);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+        if (tab === 'cart') renderCartTab();
+        if (tab === 'orders') renderMyOrders();
+        if (tab === 'reviews') loadReviewsPublic();
+        if (tab === 'search') globalSearch();
     }
 
     function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -979,18 +994,19 @@ body {
     function updateLocalOrderStatus(orderId,newStatus,motivoRifiuto){try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let changed=false;orders=orders.map(o=>{if(o.orderId===orderId&&o.status!==newStatus){changed=true;o.status=newStatus;if(newStatus==='rifiutato'&&motivoRifiuto)o.motivoRifiuto=motivoRifiuto;}return o;});if(changed){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(orders));renderMyOrders();playOrderStatusSound();const statiLeggibili={preparing:'In preparazione',ready:'Pronto',picked:'Ritirato',delivering:'In consegna',delivered:'Consegnato',rifiutato:'Rifiutato'};showToast(`📦 Ordine ${orderId}: ${statiLeggibili[newStatus]||newStatus}`);}}catch(e){console.log('Errore aggiornamento stato:',e);}}
     
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
-// FIX PAGINA BIANCA SU iOS
-window.addEventListener('pageshow', function(e) {
-    if (e.persisted) {
-        window.location.reload();
-    }
-});
 
-// FIX SCROLL SU iOS
-document.addEventListener('touchmove', function(e) {
-    if (e.target.closest('.phone-frame')) return;
-    e.preventDefault();
-}, { passive: false });
+    // FIX PAGINA BIANCA SU iOS
+    window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+            window.location.reload();
+        }
+    });
+
+    // FIX SCROLL SU iOS
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.closest('.phone-frame')) return;
+        e.preventDefault();
+    }, { passive: false });
 
 </script>
 </body>
