@@ -95,7 +95,7 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             z-index: 10;
-            padding-bottom: 80px !important;
+            padding-bottom: 70px;
         }
 
         .header {
@@ -241,7 +241,7 @@
         @keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { aspect-ratio: 1/1; border-radius: 16px; }
 
-        .tab-content { display: none; padding: 20px 15px 30px; animation: fadeIn 0.3s; }
+        .tab-content { display: none; padding: 20px 15px 20px; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -348,7 +348,7 @@
         .review-textarea { width: 100%; min-height: 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; resize: vertical; font-family: inherit; }
         .review-submit-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 
-        /* ====== BOTTOM NAV FIX ====== */
+        /* BOTTOM NAV DEFINITIVA */
         .bottom-nav {
             position: fixed !important;
             bottom: 0 !important;
@@ -369,36 +369,32 @@
             display: flex !important;
             flex-direction: row !important;
             flex-wrap: nowrap !important;
-            justify-content: space-around !important;
-            align-items: center !important;
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            pointer-events: auto !important;
-            touch-action: auto !important;
+            justify-content: space-around;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        .bottom-nav .nav-btn {
+        .bottom-nav .nav-btn { 
             flex: 1 1 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 2px !important;
-            padding: 6px 2px !important;
-            background: none !important;
-            border: none !important;
-            color: var(--cream) !important;
-            opacity: 0.55 !important;
-            cursor: pointer !important;
-            transition: all 0.15s !important;
-            border-radius: 8px !important;
-            min-width: 0 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px 2px;
+            background: none;
+            border: none;
+            color: var(--cream);
+            opacity: 0.55;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-radius: 8px;
+            min-width: 0;
             touch-action: manipulation !important;
-            -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3) !important;
-            pointer-events: auto !important;
-            position: relative !important;
-            z-index: 2 !important;
-            isolation: isolate !important;
+            -webkit-tap-highlight-color: rgba(212, 168, 75, 0.3);
+            position: relative;
+            isolation: isolate;
         }
 
         .bottom-nav .nav-btn:active {
@@ -407,7 +403,7 @@
             background: rgba(212, 168, 75, 0.15);
         }
 
-        .bottom-nav .nav-btn.active {
+        .bottom-nav .nav-btn.active { 
             color: var(--gold);
             opacity: 1;
         }
@@ -432,50 +428,61 @@
             line-height: 1;
         }
 
-        .bottom-nav .nav-btn .badge {
-            position: absolute !important;
-            top: -2px !important;
-            right: 20% !important;
-            background: #e74c3c !important;
-            color: white !important;
-            font-size: 9px !important;
-            font-weight: 900 !important;
-            width: 18px !important;
-            height: 18px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border: 2px solid #1a1209 !important;
+        /* BADGE CARRELLO - pseudo-elemento, non blocca tocchi */
+        #cartBtn::after {
+            content: attr(data-count);
+            position: absolute;
+            top: 2px;
+            right: 22%;
+            background: #e74c3c;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            font-family: monospace;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #1a1209;
             pointer-events: none !important;
-            z-index: 10 !important;
-            transform: translateZ(0);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+            z-index: 10;
         }
 
-        .bottom-nav .nav-btn .live-dot {
-            position: absolute !important;
-            top: 4px !important;
-            right: 22% !important;
-            width: 6px !important;
-            height: 6px !important;
-            background: #e74c3c !important;
-            border-radius: 50% !important;
-            border: 1px solid var(--dark) !important;
+        #cartBtn[data-count]:not([data-count="0"])::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* LIVE DOT ORDINI - pseudo-elemento */
+        #ordersBtn::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 24%;
+            width: 6px;
+            height: 6px;
+            background: #e74c3c;
+            border-radius: 50%;
+            border: 1px solid var(--dark);
             animation: pulse 1.5s infinite;
             pointer-events: none !important;
-            z-index: 10 !important;
-            transform: translateZ(0);
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
         }
 
-        .bottom-nav .admin-btn {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-        }
-        .bottom-nav .admin-btn.active {
-            background: rgba(245, 158, 11, 0.2);
+        #ordersBtn[data-live="true"]::before {
+            opacity: 1;
         }
 
-        /* ====== FINE BOTTOM NAV FIX ====== */
+        .bottom-nav .admin-btn { background: rgba(245,158,11,0.1); color: #f59e0b; }
+        .bottom-nav .admin-btn.active { background: rgba(245,158,11,0.2); }
 
         .toast-3d { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; z-index: 3000; opacity: 0; transition: all 0.3s; border: 1px solid rgba(212,168,75,0.2); max-width: 90%; text-align: center; }
         .toast-3d.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -513,7 +520,7 @@
     <div class="light-orb"></div>
 </div>
 
-<div id="offlineBanner">⚠️ Sei offline — riconnessione in corso...</div>
+<div id="offlineBanner">️ Sei offline — riconnessione in corso...</div>
 
 <div class="modal-overlay" id="langModal">
     <div class="modal-box">
@@ -575,7 +582,7 @@
     </div>
 
     <div class="tab-content" id="tab-search">
-        <h2 class="category-title" data-i18n="search_title">🔍 Cerca nel Menù</h2>
+        <h2 class="category-title" data-i18n="search_title"> Cerca nel Menù</h2>
         <div class="search-bar-3d">
             <i class="fas fa-search"></i>
             <input type="text" id="globalSearch" data-i18n-placeholder="search_placeholder" placeholder="Cerca..." oninput="globalSearch()">
@@ -605,7 +612,6 @@
         <p style="color:#8a7a5a;">Accesso amministratore.</p>
     </div>
 
-    <!-- BOTTOM NAV - CORRETTA -->
     <nav class="bottom-nav">
         <button class="nav-btn active" data-tab="catalog" onclick="switchTab('catalog')">
             <i class="fas fa-pizza-slice"></i>
@@ -615,15 +621,13 @@
             <i class="fas fa-search"></i>
             <span data-i18n="search">Cerca</span>
         </button>
-        <button class="nav-btn" data-tab="cart" onclick="switchTab('cart')">
+        <button class="nav-btn" data-tab="cart" onclick="switchTab('cart')" id="cartBtn">
             <i class="fas fa-shopping-bag"></i>
             <span data-i18n="cart">Carrello</span>
-            <span class="badge" id="cartBadge" style="display:none;">0</span>
         </button>
-        <button class="nav-btn" data-tab="orders" onclick="switchTab('orders')">
+        <button class="nav-btn" data-tab="orders" onclick="switchTab('orders')" id="ordersBtn">
             <i class="fas fa-history"></i>
             <span data-i18n="orders">Ordini</span>
-            <span class="live-dot" id="liveDot" style="display:none;"></span>
         </button>
         <button class="nav-btn" data-tab="reviews" onclick="switchTab('reviews')">
             <i class="fas fa-star"></i>
@@ -710,12 +714,12 @@
         },
         en: {
             our_menu: 'Our Menu', search_title: '🔍 Search Menu', search_placeholder: 'Search...',
-            my_orders: '📦 My Orders', last_orders: 'You see only the last 5 recent orders.',
+            my_orders: ' My Orders', last_orders: 'You see only the last 5 recent orders.',
             clear_history: 'Clear Local History', our_reviews: '⭐ Our Reviews',
             leave_review: 'Leave a Review', catalog: 'Catalog', search: 'Search', cart: 'Cart',
             orders: 'Orders', feedback: 'Feedback', call: 'Call', navigate: 'Navigate',
             empty_cart: 'Your cart is empty.\nBrowse the menu and add something!',
-            no_orders: 'No recent orders.\nPlace your first order! 🍕',
+            no_orders: 'No recent orders.\nPlace your first order! ',
             no_reviews: 'No reviews yet.\nBe the first! 🌟',
             back_to_menu: 'Back to Menu', add_product: 'added!', delivery: 'Delivery', pickup: 'Pickup',
             asap: 'ASAP', scheduled: 'Choose', name_placeholder: 'Mario Rossi',
@@ -730,7 +734,7 @@
         },
         de: {
             our_menu: 'Unsere Speisekarte', search_title: '🔍 Suche', search_placeholder: 'Suchen...',
-            my_orders: '📦 Meine Bestellungen', last_orders: 'Sie sehen nur die letzten 5 Bestellungen.',
+            my_orders: ' Meine Bestellungen', last_orders: 'Sie sehen nur die letzten 5 Bestellungen.',
             clear_history: 'Verlauf löschen', our_reviews: '⭐ Unsere Bewertungen',
             leave_review: 'Bewertung abgeben', catalog: 'Katalog', search: 'Suche', cart: 'Warenkorb',
             orders: 'Bestellungen', feedback: 'Feedback', call: 'Anruf', navigate: 'Navigieren',
@@ -774,7 +778,7 @@
         categories: {
             focacce: { name: "🥖 Focacce", icon: "fa-bread-slice" },
             pizze: { name: "🍕 Specialità Pugliesi", icon: "fa-pizza-slice" },
-            frittura: { name: "🍗 Frittura", icon: "fa-drumstick-bite" },
+            frittura: { name: " Frittura", icon: "fa-drumstick-bite" },
             bibite: { name: "🥤 Bibite", icon: "fa-glass-martini-alt" }
         },
         menu: { pizze: [], focacce: [], frittura: [], bibite: [] },
@@ -820,24 +824,33 @@
         if(active.length>0){const promo=active[0][1];t.textContent=`🎁 ${promo.title} - Scopri l'offerta!`;b.classList.add('show');b.onclick=()=>{let msg=`${promo.title}\n${promo.message||''}`;if(promo.products&&promo.products.length)msg+='\nProdotti inclusi:\n'+promo.products.map(p=>`${p.name} ×${p.qty} - €${p.price.toFixed(2)}`).join('\n');alert(msg);};}else{b.classList.remove('show');}
     }
 
-    // ====== SWITCH TAB CORRETTO ======
     function switchTab(tab) {
-        // Chiudi eventuali modali aperte
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-        
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById('tab-' + tab);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-        if (tab === 'cart') renderCartTab();
-        if (tab === 'orders') renderMyOrders();
-        if (tab === 'reviews') loadReviewsPublic();
-        if (tab === 'search') globalSearch();
+        document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+        document.getElementById('tab-'+tab).classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.tab===tab));
+        if(tab==='cart')renderCartTab(); if(tab==='orders')renderMyOrders(); if(tab==='reviews')loadReviewsPublic(); if(tab==='search')globalSearch();
     }
 
     function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
     function getCartQty(cat,name){const ex=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===name);return ex?(ex.qty||0):0;}
-    function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});const qb=document.getElementById('cartBadge');if(qb){qb.textContent=n;qb.style.display=n>0?'flex':'none';}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}}
+    
+    function updateCartBadge(){
+        let n=0;
+        cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0);});
+        const cartBtn = document.getElementById('cartBtn');
+        if(cartBtn){
+            cartBtn.setAttribute('data-count', n);
+        }
+        try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart));}catch(e){}
+    }
+
+    function setOrdersLiveDot(show) {
+        const ordersBtn = document.getElementById('ordersBtn');
+        if(ordersBtn){
+            ordersBtn.setAttribute('data-live', show ? 'true' : 'false');
+        }
+    }
+
     function sanitizeWA(t){return String(t).replace(/[*_~`]/g,'\\$&');}
     function callPizzeria(){window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`;}
     function openPizzeriaMaps(){window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG"),'_blank');}
@@ -953,7 +966,7 @@
     }
 
     function setProductQtyDirectly(cat,name,qty){const idx=cart.findIndex(item=>!item.isPromo&&item.cat===cat&&item.name===name);if(idx>-1){if(qty<=0)cart.splice(idx,1);else cart[idx]={...cart[idx],qty};}else if(qty>0){const product=(appData.menu[cat]||[]).find(p=>p.name===name);if(product)cart.push({...product,cat,qty,isPromo:false});}updateCartBadge();renderCartTab();}
-    function removePromoFromCart(i){cart.splice(i,1);updateCartBadge();renderCartTab();showToast(`🗑️ ${t('promo_removed')}`);}
+    function removePromoFromCart(i){cart.splice(i,1);updateCartBadge();renderCartTab();showToast(`️ ${t('promo_removed')}`);}
     function clearCart(){if(!cart.length)return;cart=[];updateCartBadge();renderCartTab();showToast(`🗑️ ${t('cart_emptied')}`);}
 
     function selectServiceType(type){orderType=type;document.getElementById('optDelivery').classList.toggle('active',type==='delivery');document.getElementById('optPickup').classList.toggle('active',type==='pickup');document.getElementById('addressGroup').style.display=type==='delivery'?'block':'none';if(type==='pickup'){document.getElementById('customerStreet').value='';document.getElementById('customerNumber').value='';customerGPSLat=null;customerGPSLng=null;}}
@@ -962,7 +975,7 @@
     async function getCustomerLocation(){
         if(!navigator.geolocation){showToast('GPS non disponibile');return;}
         const btn=document.getElementById('gpsBtn');btn.textContent=`⏳ ${t('gps_loading')}`;
-        try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));customerGPSLat=pos.coords.latitude;customerGPSLng=pos.coords.longitude;const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerGPSLat}&lon=${customerGPSLng}&zoom=18&addressdetails=1`);const data=await response.json();document.getElementById('customerStreet').value=data.address?.road||data.address?.pedestrian||'';document.getElementById('customerNumber').value=data.address?.house_number||'';showToast(`📍 ${t('gps_ok')}`);}catch(e){showToast(`❌ ${t('gps_fail')}`);}finally{btn.textContent='📍 Usa GPS';}
+        try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));customerGPSLat=pos.coords.latitude;customerGPSLng=pos.coords.longitude;const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerGPSLat}&lon=${customerGPSLng}&zoom=18&addressdetails=1`);const data=await response.json();document.getElementById('customerStreet').value=data.address?.road||data.address?.pedestrian||'';document.getElementById('customerNumber').value=data.address?.house_number||'';showToast(` ${t('gps_ok')}`);}catch(e){showToast(`❌ ${t('gps_fail')}`);}finally{btn.textContent='📍 Usa GPS';}
     }
 
     async function sendOrder(){
@@ -978,7 +991,7 @@
         try{await db.ref('ordini').push().set(orderData);const localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders.unshift({orderId:orderData.orderId,date:Date.now(),total:total,items:orderData.items.map(i=>i.name).join(', '),status:'new',type:orderType});if(localOrders.length>5)localOrders.length=5;localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));localStorage.setItem('checkout_name',name);localStorage.setItem('checkout_phone',phone);localStorage.setItem('checkout_street',document.getElementById('customerStreet').value.trim());localStorage.setItem('checkout_number',document.getElementById('customerNumber').value.trim());cart=[];updateCartBadge();renderCartTab();showToast(`🎉 ${t('order_sent')}`);switchTab('catalog');}catch(e){console.error(e);showToast(`❌ ${t('order_error')}`);}finally{btn.disabled=false;btn.innerHTML=`<i class="fas fa-paper-plane"></i> ${t('send_order')}`;}
     }
 
-    function renderMyOrders(){const list=document.getElementById('myOrdersList');try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!orders.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;return;}list.innerHTML=orders.map(o=>{const dateStr=new Date(o.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}),status=o.status||'new',typeLabel=o.type==='pickup'?'🏪 Ritiro':'🛵 Consegna',borderColor=status==='rifiutato'?'#ef4444':(status==='delivered'||(o.type==='pickup'&&status==='picked'))?'#22c55e':'var(--gold-dark)';return`<div class="my-order-card" style="border-left-color:${borderColor};"><div class="my-order-header"><span class="my-order-id">📦 ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div><div class="my-order-items">${o.items}</div><div class="my-order-total">€${o.total.toFixed(2)}</div><div style="font-size:0.8rem;color:#8a7a5a;margin-top:4px;">Stato: <strong>${status}</strong></div>${o.motivoRifiuto?`<div style="color:#f87171;font-size:0.8rem;margin-top:4px;">❌ ${o.motivoRifiuto}</div>`:''}</div>`;}).join('');}catch(e){list.innerHTML='<p style="color:#f87171">Errore</p>';}}
+    function renderMyOrders(){const list=document.getElementById('myOrdersList');try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!orders.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;return;}list.innerHTML=orders.map(o=>{const dateStr=new Date(o.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}),status=o.status||'new',typeLabel=o.type==='pickup'?'🏪 Ritiro':'🛵 Consegna',borderColor=status==='rifiutato'?'#ef4444':(status==='delivered'||(o.type==='pickup'&&status==='picked'))?'#22c55e':'var(--gold-dark)';return`<div class="my-order-card" style="border-left-color:${borderColor};"><div class="my-order-header"><span class="my-order-id"> ${o.orderId}</span><span class="my-order-date">${dateStr} • ${typeLabel}</span></div><div class="my-order-items">${o.items}</div><div class="my-order-total">€${o.total.toFixed(2)}</div><div style="font-size:0.8rem;color:#8a7a5a;margin-top:4px;">Stato: <strong>${status}</strong></div>${o.motivoRifiuto?`<div style="color:#f87171;font-size:0.8rem;margin-top:4px;">❌ ${o.motivoRifiuto}</div>`:''}</div>`;}).join('');}catch(e){list.innerHTML='<p style="color:#f87171">Errore</p>';}}
     function clearLocalHistory(){localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();showToast(`🗑️ ${t('history_cleared')}`);}
 
     function loadReviewsPublic(){db.ref('recensioni').orderByChild('timestamp').once('value',s=>{const reviews=[];s.forEach(c=>{const r=c.val();if(r.status==='approved')reviews.push({id:c.key,...r});});reviews.sort((a,b)=>b.timestamp-a.timestamp);const list=document.getElementById('reviewsPublicList');if(!reviews.length){list.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}list.innerHTML=reviews.map(r=>{const dateStr=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${dateStr}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`;}).join('');});}
@@ -991,7 +1004,7 @@
     function globalSearch(){const query=document.getElementById('globalSearch').value,results=document.getElementById('globalSearchResults');if(query.length<2){results.innerHTML='';return;}const lowerQuery=query.toLowerCase(),items=[];Object.keys(appData.menu).forEach(catKey=>{const catName=appData.categories[catKey]?.name||catKey;(appData.menu[catKey]||[]).forEach(product=>{const trans=product.translations?.[currentLang]||{},searchName=trans.name||product.name,searchDesc=trans.desc||product.desc||'';if(searchName.toLowerCase().includes(lowerQuery)||searchDesc.toLowerCase().includes(lowerQuery))items.push({catKey,catName,product});});});if(items.length===0){results.innerHTML='<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato</p>';return;}results.innerHTML=items.map(item=>{const qty=getCartQty(item.catKey,item.product.name),trans=item.product.translations?.[currentLang]||{},displayName=trans.name||item.product.name,displayDesc=trans.desc||item.product.desc||'',imgHtml=item.product.img?`<img src="${item.product.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'',actionsHtml=qty>0?`<div class="qty-counter"><button class="qty-btn minus" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},-1)">−</button><span class="qty-value">${qty}</span><button class="qty-btn" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+</button></div>`:`<button class="add-btn-3d" onclick="changeProductQty('${item.catKey}',${appData.menu[item.catKey].indexOf(item.product)},1)">+ Aggiungi</button>`;return`<div class="product-card-3d">${imgHtml}<div class="product-info"><div style="font-size:0.75rem;color:var(--gold);margin-bottom:4px;">${item.catName}</div><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${item.product.price.toFixed(2)}</div></div>${actionsHtml}</div>`;}).join('');}
 
     function startOrderStatusTracking(){try{const localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!localOrders.length)return;localOrders.forEach(order=>{if(!order.orderId)return;const query=db.ref('ordini').orderByChild('orderId').equalTo(order.orderId);orderStatusListeners[order.orderId]=query;query.on('value',snapshot=>{snapshot.forEach(child=>{const data=child.val();if(data)updateLocalOrderStatus(order.orderId,data.status,data.motivoRifiuto);});});});}catch(e){console.log('Errore tracking:',e);}}
-    function updateLocalOrderStatus(orderId,newStatus,motivoRifiuto){try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let changed=false;orders=orders.map(o=>{if(o.orderId===orderId&&o.status!==newStatus){changed=true;o.status=newStatus;if(newStatus==='rifiutato'&&motivoRifiuto)o.motivoRifiuto=motivoRifiuto;}return o;});if(changed){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(orders));renderMyOrders();playOrderStatusSound();const statiLeggibili={preparing:'In preparazione',ready:'Pronto',picked:'Ritirato',delivering:'In consegna',delivered:'Consegnato',rifiutato:'Rifiutato'};showToast(`📦 Ordine ${orderId}: ${statiLeggibili[newStatus]||newStatus}`);}}catch(e){console.log('Errore aggiornamento stato:',e);}}
+    function updateLocalOrderStatus(orderId,newStatus,motivoRifiuto){try{let orders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let changed=false;orders=orders.map(o=>{if(o.orderId===orderId&&o.status!==newStatus){changed=true;o.status=newStatus;if(newStatus==='rifiutato'&&motivoRifiuto)o.motivoRifiuto=motivoRifiuto;}return o;});if(changed){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(orders));renderMyOrders();playOrderStatusSound();const statiLeggibili={preparing:'In preparazione',ready:'Pronto',picked:'Ritirato',delivering:'In consegna',delivered:'Consegnato',rifiutato:'Rifiutato'};showToast(` Ordine ${orderId}: ${statiLeggibili[newStatus]||newStatus}`);}}catch(e){console.log('Errore aggiornamento stato:',e);}}
     
     document.addEventListener('change',function(e){if(e.target.id==='scheduledTime')scheduledTime=e.target.value;});
 
@@ -1007,7 +1020,6 @@
         if (e.target.closest('.phone-frame')) return;
         e.preventDefault();
     }, { passive: false });
-
 </script>
 </body>
 </html>
