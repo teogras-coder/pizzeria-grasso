@@ -23,7 +23,8 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--dark)}
+/* FIX SFONDO: Impedisce il bianco assoluto durante il caricamento */
+html,body{height:100%;overflow:hidden;background:#1a1209 !important;color:#f5e6c8}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
 .light-orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.3;animation:float 8s ease-in-out infinite}
@@ -628,7 +629,19 @@ function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.di
 function setupRealtimeListeners(){
     db.ref('settings').on('value',s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI()}});
     db.ref('promotions').on('value',s=>{appData.promotions=s.exists()?s.val():{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()});
-    db.ref('.info/connected').on('value',s=>{const e=document.getElementById('offlineBanner');if(!e)return;e.style.display=s.val()===false?'block':'none'});
+    
+    // FIX BANNER ROSSO: Mostra offline solo se passa del tempo dall'avvio
+    db.ref('.info/connected').on('value',s=>{
+        const e=document.getElementById('offlineBanner');
+        if(!e)return;
+        // Se sono passati più di 5 secondi dall'avvio E siamo offline, mostra banner
+        if(s.val()===false && Date.now() > window.appStartTime + 5000){
+            e.style.display='block';
+        } else {
+            e.style.display='none';
+        }
+    });
+    
     db.ref('settings/colorPalette').on('value', s => {
         if (s.exists()) {
             applyPalette(s.val());
