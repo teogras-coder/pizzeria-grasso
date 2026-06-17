@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Antica Pizzeria Grasso</title>
 <link rel="manifest" href="manifest-clienti.json">
 <link rel="icon" type="image/png" href="icon-clienti-192.png">
@@ -23,8 +20,7 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* FIX PWA IOS: Sfondo scuro forzato con !important per evitare schermate bianche */
-html, body {height:100%;overflow:hidden;background-color:#1a1209 !important;color:#f5e6c8 !important}
+html,body{height:100%;overflow:hidden;background:var(--dark)}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
 .light-orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.3;animation:float 8s ease-in-out infinite}
@@ -259,11 +255,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </style>
 </head>
 <body>
-<!-- FIX PWA IOS: Forza sfondo scuro immediatamente prima di qualsiasi rendering -->
-<script>
-document.documentElement.style.backgroundColor = '#1a1209';
-document.body.style.backgroundColor = '#1a1209';
-</script>
 
 <div class="confirm-modal-overlay" id="confirmModal"><div class="confirm-modal-box"><p id="confirmModalText"></p><div class="confirm-modal-actions"><button class="confirm-btn-no" id="confirmBtnNo" data-i18n="cancel">Annulla</button><button class="confirm-btn-yes" id="confirmBtnYes" data-i18n="confirm">Conferma</button></div></div></div>
 <div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;"><div class="modal-rifiuto-content"><div class="modal-rifiuto-icon">❌</div><h2 data-i18n="order_rejected_title">Ordine Rifiutato</h2><p id="motivoRifiutoModal" data-i18n="order_rejected_default">La pizzeria non può accettare il tuo ordine.</p><button class="btn-ho-capito" onclick="chiudiModalRifiuto()" data-i18n="understood">Ho capito</button></div></div>
@@ -356,12 +347,6 @@ document.body.style.backgroundColor = '#1a1209';
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
 
 <script>
-// Timestamp avvio app per evitare banner offline falsi
-window.appStartTime = Date.now();
-
-// FIX CRITICO: Disabilita bfcache su Safari iOS
-window.addEventListener('unload', function() {});
-
 // ─── TRADUZIONI INLINE COMPLETE ──────────────────────────────────────────────
 const translations = {
     it: {
@@ -397,8 +382,8 @@ const translations = {
         order_sent: "✅ Ordine inviato!", order_error: "❌ Errore invio", history_cleared: "🗑️ Storico cancellato!",
         thanks_review: "⭐ Grazie per la recensione!", no_reviews: "Nessuna recensione.<br>Sii il primo! 🌟",
         no_orders: "Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕", not_available: "⚠️ Non disponibile",
-        no_products: "Nessun prodotto trovato 🍕", closed_now: "⚠️ Siamo chiusi. Il menu è consultabile, ma non è possibile ordinare.",
-        no_delivery: "🚫 No delivery", no_pickup: "🚫 No ritiro", wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
+        no_products: "Nessun prodotto trovato 🍕", closed_now: "⚠️ Chiuso", no_delivery: "🚫 No delivery",
+        no_pickup: "🚫 No ritiro", wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
         fill_name: "⚠️ Nome", invalid_phone: "❌ Telefono non valido", out_of_range: "❌ Fuori raggio",
         fill_address: "⚠️ Completa indirizzo", min_order: "⚠️ Minimo: €", empty_cart_confirm: "Vuoi svuotare il carrello?",
         clear_history_confirm: "Cancellare tutto lo storico?", add_another_promo: "Hai già questa promo. Aggiungerne un'altra?",
@@ -439,8 +424,8 @@ const translations = {
         order_sent: "✅ Order sent!", order_error: "❌ Send error", history_cleared: "🗑️ History cleared!",
         thanks_review: "⭐ Thanks for the review!", no_reviews: "No reviews yet.<br>Be the first! 🌟",
         no_orders: "No recent orders.<br>Place your first order! 🍕", not_available: "⚠️ Not available",
-        no_products: "No products found 🍕", closed_now: "⚠️ We are closed. Menu is view-only, ordering is disabled.",
-        no_delivery: "🚫 No delivery", no_pickup: "🚫 No pickup", wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
+        no_products: "No products found 🍕", closed_now: "⚠️ Closed", no_delivery: "🚫 No delivery",
+        no_pickup: "🚫 No pickup", wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
         fill_name: "⚠️ Name", invalid_phone: "❌ Invalid phone", out_of_range: "❌ Out of range",
         fill_address: "⚠️ Complete address", min_order: "⚠️ Minimum: €", empty_cart_confirm: "Empty the cart?",
         clear_history_confirm: "Clear all history?", add_another_promo: "You already have this promo. Add another?",
@@ -481,8 +466,8 @@ const translations = {
         order_sent: "✅ Bestellung gesendet!", order_error: "❌ Sende-Fehler", history_cleared: "🗑️ Verlauf gelöscht!",
         thanks_review: "⭐ Danke für die Bewertung!", no_reviews: "Noch keine Bewertungen.<br>Seien Sie der Erste! 🌟",
         no_orders: "Keine aktuellen Bestellungen.<br>Geben Sie Ihre erste Bestellung auf! 🍕", not_available: "⚠️ Nicht verfügbar",
-        no_products: "Keine Produkte gefunden 🍕", closed_now: "⚠️ Wir sind geschlossen. Nur Menüansicht, keine Bestellungen möglich.",
-        no_delivery: "🚫 Keine Lieferung", no_pickup: "🚫 Keine Abholung", wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
+        no_products: "Keine Produkte gefunden 🍕", closed_now: "⚠️ Geschlossen", no_delivery: "🚫 Keine Lieferung",
+        no_pickup: "🚫 Keine Abholung", wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
         fill_name: "⚠️ Name", invalid_phone: "❌ Ungültiges Telefon", out_of_range: "❌ Außerhalb des Bereichs",
         fill_address: "⚠️ Adresse vervollständigen", min_order: "⚠️ Mindestbestellwert: €", empty_cart_confirm: "Warenkorb leeren?",
         clear_history_confirm: "Gesamten Verlauf löschen?", add_another_promo: "Sie haben diese Aktion bereits. Eine weitere hinzufügen?",
@@ -562,6 +547,7 @@ function applyPalette(name) {
     root.style.setProperty('--card-light', palette.cardLight);
     root.style.setProperty('--cream', palette.cream);
     
+    // AGGIUNTO: colora il logo
     const tint = document.getElementById('logoTint');
     if (tint) {
         tint.style.background = palette.gold;
@@ -595,17 +581,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function initApp() {
-    // FIX: Assicura che almeno una schermata sia visibile in caso di bug iOS PWA
-    const mainApp = document.getElementById('mainApp');
-    const welcome = document.getElementById('welcomeScreen');
-    if (mainApp && welcome && mainApp.style.display === 'none' && welcome.style.display === 'none') {
-        mainApp.style.display = 'block';
-    }
-    
-    const offlineBanner = document.getElementById('offlineBanner');
-    if (offlineBanner) {
-        offlineBanner.style.display = 'none';
-    }
+    // FIX: Nascondi il banner offline dopo 5 secondi (fallback)
+    setTimeout(function() {
+        const banner = document.getElementById('offlineBanner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
+    }, 5000);
     
     cleanLocalHistory();
     try{const s=localStorage.getItem('pizzeria_cart_v3');if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge()}}}catch(e){}
@@ -624,37 +606,12 @@ function initApp() {
         changeProductQty(b.dataset.cat,parseInt(b.dataset.idx,10),parseInt(b.dataset.delta,10));
     });
     
+    // CARICA LA PALETTE DA FIREBASE
     applyPaletteFromFirebase();
+    
+    // FIX BOTTOM NAV DEFINITIVO
     fixBottomNav();
 }
-
-// ─── FIX PAGINA BIANCA PWA iOS - DEFINITIVO ───────────────────────────────────
-window.addEventListener('pageshow', function(e) {
-    if (e.persisted) {
-        console.log('PWA: Ricarica da bfcache');
-        window.location.reload();
-    }
-});
-
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-        // Forza il colore di sfondo nel caso iOS lo abbia resettato
-        document.body.style.backgroundColor = '#1a1209';
-        document.documentElement.style.backgroundColor = '#1a1209';
-        
-        // Se siamo in modalità standalone (PWA) e le schermate principali sono nascoste, ricarica
-        if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-            setTimeout(() => {
-                const mainApp = document.getElementById('mainApp');
-                const welcome = document.getElementById('welcomeScreen');
-                if (mainApp && welcome && mainApp.style.display === 'none' && welcome.style.display === 'none') {
-                    console.log('PWA: Schermate nascoste al ritorno, ricarica forzata...');
-                    window.location.reload();
-                }
-            }, 500);
-        }
-    }
-});
 
 // ─── FCM ──────────────────────────────────────────────────────────────────────
 const messaging=firebase.messaging(),vapidKey='BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
@@ -681,16 +638,9 @@ function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.di
 function setupRealtimeListeners(){
     db.ref('settings').on('value',s=>{if(s.exists()){appData.settings={...appData.settings,...s.val()};updateStatusBanner();updateFooter();updateServicesUI()}});
     db.ref('promotions').on('value',s=>{appData.promotions=s.exists()?s.val():{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()});
-    db.ref('.info/connected').on('value',s=>{
-        const e=document.getElementById('offlineBanner');
-        if(!e)return;
-        if(s.val()===false && Date.now() > window.appStartTime + 5000 && !navigator.onLine){
-            e.style.display='block';
-        } else {
-            e.style.display='none';
-        }
-    });
+    db.ref('.info/connected').on('value',s=>{const e=document.getElementById('offlineBanner');if(!e)return;e.style.display=s.val()===false?'block':'none'});
     
+    // Ascolta i cambiamenti della palette
     db.ref('settings/colorPalette').on('value', s => {
         if (s.exists()) {
             applyPalette(s.val());
@@ -712,13 +662,7 @@ function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso"
 function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appData.branding.city||"Manfredonia"} • Tel. <span id="footerPhone">${appData.settings.visiblePhone||"0884660377"}</span>`}
 function renderPromotionsBanner(){const b=document.getElementById('offersBanner'),txt=document.getElementById('offerText'),a=getActivePromotion();if(a){b.classList.add('show');const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);const rm=(a.maxUses||0)-(a.currentUses||0);txt.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''}  Rimasti ${rm}`;b.onclick=()=>addPromoToCart(a.id)}else{b.classList.remove('show');b.onclick=null}}
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0];const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null}
-async function addPromoToCart(pid){
-    // FIX: Blocca aggiunta promo se chiusi
-    if(!checkIfOpen()){
-        showToast(t('closed_now'));
-        return;
-    }
-    const p=appData.promotions[pid];if(!p)return;const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast(t('promo_unavailable'));return}if(!p.products||!p.products.length)return;const tp=p.products.reduce((s,x)=>s+(x.price*x.qty),0);const pi={promoId:pid,promoTitle:p.title,products:p.products.map(x=>({...x})),totalPrice:tp,isPromo:true};const ei=cart.findIndex(c=>c.isPromo&&c.promoId===pid);if(ei>=0){const ok=await showConfirm(t('add_another_promo'));if(!ok)return}cart.push(pi);db.ref('promotions/'+pid+'/currentUses').transaction(v=>{const c=v||0;if(c>=p.maxUses)return;return c+1}).then(r=>{if(!r.committed){showToast(t('promo_exhausted'));cart.pop();updateCartBadge();return}db.ref('promotions').once('value').then(s=>{appData.promotions=s.val()||{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()})});updateCartBadge();showToast(`🎁 ${p.title} ${t('add_product')}`)}
+async function addPromoToCart(pid){const p=appData.promotions[pid];if(!p)return;const td=new Date().toISOString().split('T')[0];if(!p.active||p.startDate>td||p.endDate<td||(p.currentUses||0)>=p.maxUses){showToast(t('promo_unavailable'));return}if(!p.products||!p.products.length)return;const tp=p.products.reduce((s,x)=>s+(x.price*x.qty),0);const pi={promoId:pid,promoTitle:p.title,products:p.products.map(x=>({...x})),totalPrice:tp,isPromo:true};const ei=cart.findIndex(c=>c.isPromo&&c.promoId===pid);if(ei>=0){const ok=await showConfirm(t('add_another_promo'));if(!ok)return}cart.push(pi);db.ref('promotions/'+pid+'/currentUses').transaction(v=>{const c=v||0;if(c>=p.maxUses)return;return c+1}).then(r=>{if(!r.committed){showToast(t('promo_exhausted'));cart.pop();updateCartBadge();return}db.ref('promotions').once('value').then(s=>{appData.promotions=s.val()||{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()})});updateCartBadge();showToast(`🎁 ${p.title} ${t('add_product')}`)}
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k}
 function renderCategories(){const l=document.getElementById('categoriesList');if(!l)return;l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return`<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`}).join('')}
 function showCategory(c){if(!c||!appData.menu||!appData.menu[c]){showToast(t('not_available'));return}currentSearchCat=c;document.getElementById('productSearch').value='';document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);renderProductList(c);window.scrollTo(0,0)}
@@ -773,20 +717,7 @@ function checkStatusBeforeOrder(typ){if(!checkIfOpen()){showToast(t('closed_now'
 
 // ─── CART ─────────────────────────────────────────────────────────────────────
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
-function changeProductQty(c,i,d){
-    // FIX: Blocca aggiunta prodotti se chiusi
-    if(!checkIfOpen()){
-        showToast(t('closed_now'));
-        return;
-    }
-    if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Errore');return}
-    const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);
-    if(ex){ex.qty=(ex.qty||0)+d;if(ex.qty<=0)cart.splice(cart.indexOf(ex),1);else if(d>0)showToast(`🍕 ${it.name} ×${ex.qty}`)}
-    else if(d>0){cart.push({...it,cat:c,qty:1,isPromo:false});showToast(`🍕 ${it.name} ${t('add_product')}`)}
-    updateCartBadge();
-    if(currentSearchCat===c)renderProductList(c,document.getElementById('productSearch')?.value||'');
-    if(document.getElementById('cartModal').classList.contains('active'))openCart();
-}
+function changeProductQty(c,i,d){if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('⚠️ Errore');return}const it=appData.menu[c][i],ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);if(ex){ex.qty=(ex.qty||0)+d;if(ex.qty<=0)cart.splice(cart.indexOf(ex),1);else if(d>0)showToast(`🍕 ${it.name} ×${ex.qty}`)}else if(d>0){cart.push({...it,cat:c,qty:1,isPromo:false});showToast(`🍕 ${it.name} ${t('add_product')}`)}updateCartBadge();if(currentSearchCat===c)renderProductList(c,document.getElementById('productSearch')?.value||'');if(document.getElementById('cartModal').classList.contains('active'))openCart()}
 function updateCartBadge(){
     let n=0;
     cart.forEach(i=>{
@@ -830,51 +761,7 @@ function selectOrderType(typ){orderType=typ;document.getElementById('typeDeliver
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime()}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`}
 async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
-function openCart(){
-    const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
-    if(!cart.length){
-        it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;
-        ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';
-        document.getElementById('deliveryFeeRow').style.display='none';
-        document.getElementById('distanceInfo').style.display='none';
-    }else{
-        let h='';
-        cart.forEach((x,i)=>{
-            if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`
-        });
-        cart.forEach(x=>{
-            if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`
-        });
-        it.innerHTML=h;
-        ts.style.display='flex';
-        cl.style.display='flex';
-        cf.style.display='block';
-        tt.style.display='flex';
-        
-        // FIX: Se chiusi, disabilita il pulsante di invio ordine
-        if(!checkIfOpen()){
-            cb.disabled=true;
-            cb.innerHTML='<i class="fas fa-lock"></i> ' + t('closed_now');
-            cb.style.opacity='0.6';
-            cb.style.cursor='not-allowed';
-        } else {
-            cb.disabled=false;
-            cb.innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order');
-            cb.style.opacity='1';
-            cb.style.cursor='pointer';
-        }
-        
-        const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;
-        document.getElementById('typeDelivery').classList.toggle('disabled',!de);
-        document.getElementById('typePickup').classList.toggle('disabled',!pe);
-        if(!de&&pe)selectOrderType('pickup');
-        else if(de&&!pe)selectOrderType('delivery');
-        else selectOrderType(orderType);
-        selectTimeMode(timeMode);
-        updateCartTotals();
-    }
-    m.classList.add('active');
-}
+function openCart(){if(!checkIfOpen()){showToast(t('closed_now'));return}const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');if(!cart.length){it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none'}else{let h='';cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`});cart.forEach(x=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`});it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex';const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe);if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType);selectTimeMode(timeMode);updateCartTotals()}m.classList.add('active')}
 async function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){const pid=cart[i].promoId;db.ref('promotions/'+pid+'/currentUses').transaction(v=>Math.max(0,(v||0)-1)).then(()=>{db.ref('promotions').once('value').then(s=>{appData.promotions=s.val()||{};localStorage.setItem('pg_cache_promotions',JSON.stringify(appData.promotions));renderPromotionsBanner()})});cart.splice(i,1);updateCartBadge();openCart();showToast(t('promo_removed'))}}
 function closeCart(){document.getElementById('cartModal').classList.remove('active')}
 
@@ -926,6 +813,7 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden) setTimeout(fixBottomNav, 100);
 });
 
+// Sovrascrivi switchTab per fixare la bottom nav
 const origSwitchTab = window.switchTab;
 if (origSwitchTab) {
     window.switchTab = function(tab) {
