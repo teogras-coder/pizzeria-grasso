@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<!-- FIX PAGINA BIANCA: impedisci caching aggressivo -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -24,7 +23,8 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--dark)}
+/* FIX PWA IOS: Sfondo scuro forzato per evitare schermate bianche */
+html, body {height:100%;overflow:hidden;background:#1a1209 !important;color:#f5e6c8 !important}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
 .light-orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.3;animation:float 8s ease-in-out infinite}
@@ -259,6 +259,11 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </style>
 </head>
 <body>
+<!-- FIX PWA IOS: Forza sfondo scuro immediatamente prima di qualsiasi rendering -->
+<script>
+document.documentElement.style.backgroundColor = '#1a1209';
+document.body.style.backgroundColor = '#1a1209';
+</script>
 
 <div class="confirm-modal-overlay" id="confirmModal"><div class="confirm-modal-box"><p id="confirmModalText"></p><div class="confirm-modal-actions"><button class="confirm-btn-no" id="confirmBtnNo" data-i18n="cancel">Annulla</button><button class="confirm-btn-yes" id="confirmBtnYes" data-i18n="confirm">Conferma</button></div></div></div>
 <div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;"><div class="modal-rifiuto-content"><div class="modal-rifiuto-icon">❌</div><h2 data-i18n="order_rejected_title">Ordine Rifiutato</h2><p id="motivoRifiutoModal" data-i18n="order_rejected_default">La pizzeria non può accettare il tuo ordine.</p><button class="btn-ho-capito" onclick="chiudiModalRifiuto()" data-i18n="understood">Ho capito</button></div></div>
@@ -557,7 +562,6 @@ function applyPalette(name) {
     root.style.setProperty('--card-light', palette.cardLight);
     root.style.setProperty('--cream', palette.cream);
     
-    // AGGIUNTO: colora il logo
     const tint = document.getElementById('logoTint');
     if (tint) {
         tint.style.background = palette.gold;
@@ -591,7 +595,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function initApp() {
-    // FIX: Nascondi SUBITO il banner offline all'avvio
     const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         offlineBanner.style.display = 'none';
@@ -614,60 +617,39 @@ function initApp() {
         changeProductQty(b.dataset.cat,parseInt(b.dataset.idx,10),parseInt(b.dataset.delta,10));
     });
     
-    // CARICA LA PALETTE DA FIREBASE
     applyPaletteFromFirebase();
-    
-    // FIX BOTTOM NAV DEFINITIVO
     fixBottomNav();
 }
 
-// ─── FIX PAGINA BIANCA SU iOS - DEFINITIVO ───────────────────────────────────
-// Quando torni da Maps/app esterne
+// ─── FIX PAGINA BIANCA PWA iOS - DEFINITIVO ───────────────────────────────────
 window.addEventListener('pageshow', function(e) {
-    if (e.persisted || window.performance.navigation.type === 2) {
-        console.log('Ricarica da bfcache');
+    if (e.persisted) {
+        console.log('PWA: Ricarica da bfcache');
         window.location.reload();
     }
 });
 
-// Quando la pagina torna visibile
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
         setTimeout(function() {
-            const body = document.body;
-            const mainApp = document.getElementById('mainApp');
-            const welcomeScreen = document.getElementById('welcomeScreen');
+            // Forza il colore di sfondo nel caso iOS lo abbia resettato
+            document.body.style.backgroundColor = '#1a1209';
+            document.documentElement.style.backgroundColor = '#1a1209';
             
-            // Controlla se la pagina è bianca o corrotta
-            if (!body || body.innerHTML.trim().length < 100 || 
-                (!mainApp && !welcomeScreen) ||
-                (mainApp && mainApp.children.length === 0)) {
-                console.log('Pagina bianca rilevata, ricarico...');
+            // Controlla se il contenuto principale è sparito
+            const mainApp = document.getElementById('mainApp');
+            const welcome = document.getElementById('welcomeScreen');
+            const isContentMissing = !mainApp || !welcome || 
+                (mainApp.style.display === 'none' && welcome.style.display === 'none') ||
+                document.body.innerHTML.trim().length < 300;
+                
+            if (isContentMissing) {
+                console.log('PWA: Schermata bianca rilevata, ricarica forzata...');
                 window.location.reload();
             }
-        }, 200);
+        }, 300);
     }
 });
-
-// Controllo continuo per 5 secondi dopo il caricamento
-let whiteScreenCheckInterval = setInterval(function() {
-    const body = document.body;
-    const mainApp = document.getElementById('mainApp');
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    
-    if (!body || body.innerHTML.trim().length < 100 || 
-        (!mainApp && !welcomeScreen)) {
-        console.log('Pagina bianca rilevata dal controllo continuo');
-        window.location.reload();
-    }
-}, 500);
-
-// Ferma il controllo dopo 5 secondi
-setTimeout(function() {
-    if (whiteScreenCheckInterval) {
-        clearInterval(whiteScreenCheckInterval);
-    }
-}, 5000);
 
 // ─── FCM ──────────────────────────────────────────────────────────────────────
 const messaging=firebase.messaging(),vapidKey='BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
@@ -697,15 +679,13 @@ function setupRealtimeListeners(){
     db.ref('.info/connected').on('value',s=>{
         const e=document.getElementById('offlineBanner');
         if(!e)return;
-        // Mostra banner solo se è offline DOPO 3 secondi dall'avvio (evita falsi positivi)
-        if(s.val()===false && Date.now() > window.appStartTime + 3000){
+        if(s.val()===false && Date.now() > window.appStartTime + 5000 && !navigator.onLine){
             e.style.display='block';
         } else {
             e.style.display='none';
         }
     });
     
-    // Ascolta i cambiamenti della palette
     db.ref('settings/colorPalette').on('value', s => {
         if (s.exists()) {
             applyPalette(s.val());
@@ -878,7 +858,6 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden) setTimeout(fixBottomNav, 100);
 });
 
-// Sovrascrivi switchTab per fixare la bottom nav
 const origSwitchTab = window.switchTab;
 if (origSwitchTab) {
     window.switchTab = function(tab) {
