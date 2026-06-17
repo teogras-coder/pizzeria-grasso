@@ -844,7 +844,57 @@ function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementByI
 
 // ─── PUBLIC REVIEWS ───────────────────────────────────────────────────────────
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
-function loadReviewsPublic(){db.ref('recensioni').orderByChild('timestamp').once('value',s=>{const rv=[];s.forEach(c=>{const r=c.val();if(r.status==='approved')rv.push({id:c.key,...r})});rv.sort((a,b)=>b.timestamp-a.timestamp);const l=document.getElementById('reviewsPublicList');if(!l)return;if(!rv.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return}l.innerHTML=rv.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`}).join('')})}
+function loadReviewsPublic(){
+    db.ref('recensioni').orderByChild('timestamp').once('value',s=>{
+        const rv=[];
+        let totalApproved = 0;
+        
+        s.forEach(c=>{
+            const r=c.val();
+            if(r.status==='approved') {
+                rv.push({id:c.key,...r});
+                totalApproved++;
+            }
+        });
+        
+        // Ordina dalla più recente alla più vecchia
+        rv.sort((a,b)=>b.timestamp-a.timestamp);
+        
+        const l=document.getElementById('reviewsPublicList');
+        if(!l)return;
+        
+        if(!rv.length){
+            l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;
+            return;
+        }
+
+        // Calcola quante mostrarne (max 5)
+        const maxToShow = 5;
+        const recensioniDaMostrare = rv.slice(0, maxToShow);
+        const rimanenti = totalApproved - maxToShow;
+
+        // 1. Creiamo il riquadro con il conteggio totale
+        let html = `<div style="text-align:center;margin-bottom:20px;padding:15px;background:rgba(212,168,75,0.1);border-radius:12px;border:1px solid rgba(212,168,75,0.3);">
+            <div style="color:var(--gold);font-size:1.8rem;font-weight:700;">⭐ ${totalApproved}</div>
+            <div style="color:var(--cream);font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Recensioni totali</div>
+        </div>`;
+
+        // 2. Aggiungiamo le card (max 5)
+        html += recensioniDaMostrare.map(r=>{
+            const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+            return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`
+        }).join('');
+
+        // 3. Se ce ne sono altre, mostriamo il messaggio in fondo
+        if(rimanenti > 0){
+            html += `<div style="text-align:center;color:#8a7a5a;padding:20px;font-size:0.9rem;font-weight:600;">
+                <i class="fas fa-chevron-down"></i> ...e altre ${rimanenti} recensioni
+            </div>`;
+        }
+
+        l.innerHTML = html;
+    })
+}
 
 // ─── MODAL CLOSE ON BACKDROP ─────────────────────────────────────────────────
 window.onclick=e=>{if(e.target.id==='cartModal')closeCart();if(e.target.id==='privacyModal')closePrivacyModal();if(e.target.id==='reviewModal')closeReviewModal();if(e.target.id==='authModal')closeAuthModal()};
