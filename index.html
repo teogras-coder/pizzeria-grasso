@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Antica Pizzeria Grasso</title>
@@ -23,7 +23,7 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* DIFESA NUCLEARE: Sfondo forzato a tutti i livelli */
+/* FIX PWA IOS: Sfondo scuro forzato con !important per evitare schermate bianche */
 html, body {height:100%;overflow:hidden;background-color:#1a1209 !important;color:#f5e6c8 !important}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
@@ -259,29 +259,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </style>
 </head>
 <body>
-
-<!-- DIFESA NUCLEARE 1: Script inline immediato per colorare lo sfondo PRIMA che iOS possa renderlo bianco -->
+<!-- FIX PWA IOS: Forza sfondo scuro immediatamente prima di qualsiasi rendering -->
 <script>
 document.documentElement.style.backgroundColor = '#1a1209';
 document.body.style.backgroundColor = '#1a1209';
-
-// DIFESA NUCLEARE 2: Registra il momento in cui l'app va in background
-window.addEventListener('pagehide', function() {
-    localStorage.setItem('pwa_bg_timestamp', Date.now().toString());
-});
-
-// DIFESA NUCLEARE 3: Al ritorno, se l'app è stata in background, FORZA un ricaricamento pulito con URL nuovo
-window.addEventListener('pageshow', function(event) {
-    const bgTime = localStorage.getItem('pwa_bg_timestamp');
-    // Se è stata in background per più di 1.5 secondi, il processo JS è probabilmente morto
-    if (bgTime && (Date.now() - parseInt(bgTime) > 1500)) {
-        localStorage.removeItem('pwa_bg_timestamp');
-        // Usa location.replace con un timestamp per bypassare totalmente la cache di iOS
-        const url = new URL(window.location.href);
-        url.searchParams.set('nocache', Date.now());
-        window.location.replace(url.toString());
-    }
-});
 </script>
 
 <div class="confirm-modal-overlay" id="confirmModal"><div class="confirm-modal-box"><p id="confirmModalText"></p><div class="confirm-modal-actions"><button class="confirm-btn-no" id="confirmBtnNo" data-i18n="cancel">Annulla</button><button class="confirm-btn-yes" id="confirmBtnYes" data-i18n="confirm">Conferma</button></div></div></div>
@@ -375,7 +356,11 @@ window.addEventListener('pageshow', function(event) {
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
 
 <script>
+// Timestamp avvio app per evitare banner offline falsi
 window.appStartTime = Date.now();
+
+// FIX CRITICO: Disabilita bfcache su Safari iOS
+window.addEventListener('unload', function() {});
 
 // ─── TRADUZIONI INLINE COMPLETE ──────────────────────────────────────────────
 const translations = {
@@ -610,6 +595,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function initApp() {
+    // FIX: Assicura che almeno una schermata sia visibile in caso di bug iOS PWA
     const mainApp = document.getElementById('mainApp');
     const welcome = document.getElementById('welcomeScreen');
     if (mainApp && welcome && mainApp.style.display === 'none' && welcome.style.display === 'none') {
@@ -641,6 +627,34 @@ function initApp() {
     applyPaletteFromFirebase();
     fixBottomNav();
 }
+
+// ─── FIX PAGINA BIANCA PWA iOS - DEFINITIVO ───────────────────────────────────
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        console.log('PWA: Ricarica da bfcache');
+        window.location.reload();
+    }
+});
+
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        // Forza il colore di sfondo nel caso iOS lo abbia resettato
+        document.body.style.backgroundColor = '#1a1209';
+        document.documentElement.style.backgroundColor = '#1a1209';
+        
+        // Se siamo in modalità standalone (PWA) e le schermate principali sono nascoste, ricarica
+        if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+            setTimeout(() => {
+                const mainApp = document.getElementById('mainApp');
+                const welcome = document.getElementById('welcomeScreen');
+                if (mainApp && welcome && mainApp.style.display === 'none' && welcome.style.display === 'none') {
+                    console.log('PWA: Schermate nascoste al ritorno, ricarica forzata...');
+                    window.location.reload();
+                }
+            }, 500);
+        }
+    }
+});
 
 // ─── FCM ──────────────────────────────────────────────────────────────────────
 const messaging=firebase.messaging(),vapidKey='BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
@@ -699,6 +713,7 @@ function updateFooter(){document.getElementById('footerInfo').innerHTML=`${appDa
 function renderPromotionsBanner(){const b=document.getElementById('offersBanner'),txt=document.getElementById('offerText'),a=getActivePromotion();if(a){b.classList.add('show');const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);const rm=(a.maxUses||0)-(a.currentUses||0);txt.innerHTML=`<strong>🎁 ${a.title} - €${tp.toFixed(2)}</strong>${a.message?' - '+a.message:''}  Rimasti ${rm}`;b.onclick=()=>addPromoToCart(a.id)}else{b.classList.remove('show');b.onclick=null}}
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0];const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null}
 async function addPromoToCart(pid){
+    // FIX: Blocca aggiunta promo se chiusi
     if(!checkIfOpen()){
         showToast(t('closed_now'));
         return;
@@ -759,6 +774,7 @@ function checkStatusBeforeOrder(typ){if(!checkIfOpen()){showToast(t('closed_now'
 // ─── CART ─────────────────────────────────────────────────────────────────────
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 function changeProductQty(c,i,d){
+    // FIX: Blocca aggiunta prodotti se chiusi
     if(!checkIfOpen()){
         showToast(t('closed_now'));
         return;
@@ -835,6 +851,7 @@ function openCart(){
         cf.style.display='block';
         tt.style.display='flex';
         
+        // FIX: Se chiusi, disabilita il pulsante di invio ordine
         if(!checkIfOpen()){
             cb.disabled=true;
             cb.innerHTML='<i class="fas fa-lock"></i> ' + t('closed_now');
