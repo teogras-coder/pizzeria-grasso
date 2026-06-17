@@ -23,7 +23,7 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* DIFESA 1: Sfondo forzato a livello di root per evitare il bianco assoluto */
+/* DIFESA NUCLEARE: Sfondo forzato a tutti i livelli */
 html, body {height:100%;overflow:hidden;background-color:#1a1209 !important;color:#f5e6c8 !important}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
@@ -259,10 +259,29 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </style>
 </head>
 <body>
-<!-- DIFESA 2: Script inline immediato per colorare lo sfondo prima che iOS possa renderlo bianco -->
+
+<!-- DIFESA NUCLEARE 1: Script inline immediato per colorare lo sfondo PRIMA che iOS possa renderlo bianco -->
 <script>
 document.documentElement.style.backgroundColor = '#1a1209';
 document.body.style.backgroundColor = '#1a1209';
+
+// DIFESA NUCLEARE 2: Registra il momento in cui l'app va in background
+window.addEventListener('pagehide', function() {
+    localStorage.setItem('pwa_bg_timestamp', Date.now().toString());
+});
+
+// DIFESA NUCLEARE 3: Al ritorno, se l'app è stata in background, FORZA un ricaricamento pulito con URL nuovo
+window.addEventListener('pageshow', function(event) {
+    const bgTime = localStorage.getItem('pwa_bg_timestamp');
+    // Se è stata in background per più di 1.5 secondi, il processo JS è probabilmente morto
+    if (bgTime && (Date.now() - parseInt(bgTime) > 1500)) {
+        localStorage.removeItem('pwa_bg_timestamp');
+        // Usa location.replace con un timestamp per bypassare totalmente la cache di iOS
+        const url = new URL(window.location.href);
+        url.searchParams.set('nocache', Date.now());
+        window.location.replace(url.toString());
+    }
+});
 </script>
 
 <div class="confirm-modal-overlay" id="confirmModal"><div class="confirm-modal-box"><p id="confirmModalText"></p><div class="confirm-modal-actions"><button class="confirm-btn-no" id="confirmBtnNo" data-i18n="cancel">Annulla</button><button class="confirm-btn-yes" id="confirmBtnYes" data-i18n="confirm">Conferma</button></div></div></div>
@@ -356,31 +375,7 @@ document.body.style.backgroundColor = '#1a1209';
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
 
 <script>
-// Timestamp avvio app
 window.appStartTime = Date.now();
-
-// DIFESA 3: HEARTBEAT per impedire a iOS di congelare la PWA in background
-setInterval(() => {
-    try {
-        localStorage.setItem('pwa_heartbeat', Date.now().toString());
-    } catch(e) {}
-}, 10000);
-
-// DIFESA 4: FORZATURA RICARICA AL FOCUS (La più efficace per il bug iOS PWA)
-window.addEventListener('focus', function() {
-    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-        // Se l'app è una PWA, ricarica forzatamente quando torna in primo piano
-        setTimeout(() => {
-            window.location.reload(true);
-        }, 100);
-    }
-});
-
-window.addEventListener('pageshow', function(e) {
-    if (e.persisted) {
-        window.location.reload(true);
-    }
-});
 
 // ─── TRADUZIONI INLINE COMPLETE ──────────────────────────────────────────────
 const translations = {
