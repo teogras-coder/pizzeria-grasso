@@ -149,20 +149,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .admin-category-header-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; color: var(--dark); font-size: 1rem; }
 .admin-category-header-title { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; }
 .admin-category-header-count { background: var(--gold-dark); color: var(--dark); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-left: auto; margin-right: 10px; }
-.admin-category-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.6s ease;
-    padding: 0 14px;
-}
-
-/* Quando la categoria è aperta, rimuovi il limite */
-.admin-category-accordion.open .admin-category-body {
-    max-height: none !important;
-    overflow-y: visible !important;
-    padding: 14px;
-    border-top: 1px solid rgba(212,168,75,0.1);
-}
+.admin-category-body { max-height: 0; overflow: hidden; transition: max-height 0.6s ease; padding: 0 14px; }
 .admin-category-accordion.open .admin-category-body { max-height: 5000px; padding: 14px; border-top: 1px solid rgba(212,168,75,0.1); }
 .admin-product-item { background: rgba(0,0,0,0.15); padding: 12px; border-radius: 10px; margin-bottom: 10px; }
 .admin-product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -625,6 +612,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
+// ─── CACHE OTTIMIZZATA ──────────────────────────────────────────────────────
+let ordersCache = {};
 let appData = {
   categories: {}, menu: {}, promotions: {},
   settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15, deliveryBaseFee: 3.00, deliveryExtraFee: 2.00, deliveryMaxRadius: 4, deliveryExtraRadius: 6 },
@@ -758,7 +747,7 @@ function initApp() {
   updateClock();
   setInterval(updateClock, 1000);
   loadAllData();
-  setupListeners();
+  setupOptimizedListeners();
   renderPalettes();
   loadTokensList();
   applyCurrentPalette();
@@ -774,6 +763,7 @@ function updateClock() {
 
 async function loadAllData() {
   try {
+    // Carica tutto in parallelo, ma con cache
     const [cats, menu, settings, images, branding, promos, drivers] = await Promise.all([
       db.ref('categories').once('value'),
       db.ref('menu').once('value'),
@@ -797,40 +787,67 @@ async function loadAllData() {
   }
 }
 
-function setupListeners() {
-  let previousOrders = {};
-  
-  db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', s => {
-    const orders = {};
-    s.forEach(c => { orders[c.key] = { id: c.key, ...c.val() }; });
-    
-    if (!isFirstLoad) {
-      Object.values(orders).forEach(order => {
-        const prev = previousOrders[order.id];
-        if (prev && prev.status !== order.status) {
-          const driverName = order.assignedName || 'Fattorino';
-          const orderId = order.orderId || order.id;
-          
-          if (order.status === 'preparing' && prev.status === 'new') {
-            playAdminNotification();
-            showToast(`🛵 ${driverName} ha accettato l'ordine ${orderId}`);
-          } else if (order.status === 'picked' && prev.status === 'ready') {
-            playAdminNotification();
-            showToast(`📦 ${driverName} ha ritirato l'ordine ${orderId}`);
-          } else if (order.status === 'delivered' && prev.status === 'delivering') {
-            playAdminNotification();
-            showToast(`✅ ${driverName} ha consegnato l'ordine ${orderId}`);
-          }
-        }
-      });
-    } else {
-      isFirstLoad = false;
-    }
-    
-    previousOrders = orders;
-    renderOrders(orders);
+// ─── LISTENER OTTIMIZZATO PER ORDINI ──────────────────────────────────────
+function setupOptimizedListeners() {
+  // Carica i primi 30 ordini
+  db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
+    snapshot.forEach(child => {
+      ordersCache[child.key] = { id: child.key, ...child.val() };
+    });
+    renderOrders(ordersCache);
   });
-  
+
+  // Ascolta solo i nuovi ordini (child_added)
+  db.ref('ordini').orderByChild('timestamp').startAt(Date.now() - 60000).on('child_added', (snapshot) => {
+    const order = snapshot.val();
+    order.id = snapshot.key;
+    if (!ordersCache[order.id]) {
+      ordersCache[order.id] = order;
+      renderOrders(ordersCache);
+      playAdminNotification();
+      showToast(`🆕 Nuovo ordine ${order.orderId || order.id} da ${order.customerName}`);
+    }
+  });
+
+  // Ascolta i cambiamenti di stato (child_changed)
+  db.ref('ordini').on('child_changed', (snapshot) => {
+    const order = snapshot.val();
+    order.id = snapshot.key;
+    const oldStatus = ordersCache[order.id]?.status;
+    
+    ordersCache[order.id] = order;
+    
+    if (oldStatus !== order.status) {
+      renderOrders(ordersCache);
+      
+      // Notifiche per cambi di stato
+      const orderId = order.orderId || order.id;
+      if (order.status === 'preparing' && oldStatus === 'new') {
+        playAdminNotification();
+        showToast(`🛵 ${order.assignedName || 'Fattorino'} ha accettato l'ordine ${orderId}`);
+      } else if (order.status === 'ready' && oldStatus === 'preparing') {
+        playAdminNotification();
+        showToast(`✅ Ordine ${orderId} pronto!`);
+      } else if (order.status === 'picked' && oldStatus === 'ready') {
+        playAdminNotification();
+        showToast(`📦 Fattorino ha ritirato l'ordine ${orderId}`);
+      } else if (order.status === 'delivered' && oldStatus === 'delivering') {
+        playAdminNotification();
+        showToast(`🎉 Ordine ${orderId} consegnato!`);
+      }
+    }
+  });
+
+  // Ascolta rimozioni (child_removed)
+  db.ref('ordini').on('child_removed', (snapshot) => {
+    const id = snapshot.key;
+    if (ordersCache[id]) {
+      delete ordersCache[id];
+      renderOrders(ordersCache);
+    }
+  });
+
+  // Altri listener
   db.ref('recensioni').on('value', s => loadReviews());
   db.ref('settings').on('value', s => { 
     if (s.exists()) { 
@@ -1452,7 +1469,6 @@ async function deleteCategory(k) {
   populatePromoProductSelect();
 }
 
-// ─── TRADUZIONE AUTOMATICA CON MYMEMORY API ──────────────────────────────────
 async function translateText(text, langPair) {
   if (!text || !text.trim()) return '';
   try {
@@ -1519,7 +1535,6 @@ async function translateProduct(cat, idx, btnElement) {
   }
 }
 
-// ─── MENU CON TRADUZIONI E PULSANTE TRADUCI ─────────────────────────────────
 function renderMenu() {
   const container = document.getElementById('menuAccordion');
   const searchTerm = (document.getElementById('menuSearch')?.value || '').toLowerCase();
@@ -1588,23 +1603,14 @@ function renderMenu() {
   container.innerHTML = (h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto trovato</p>') + '<div style="height:150px;"></div>';
 }
 
-function toggleCategoryAccordion(c) {
-    openCategories.forEach(oc => {
-        if (oc !== c) {
-            openCategories.delete(oc);
-            const el = document.getElementById('accordion-' + oc);
-            if (el) el.classList.remove('open');
-        }
-    });
-    if (openCategories.has(c)) {
-        openCategories.delete(c);
-        const el = document.getElementById('accordion-' + c);
-        if (el) el.classList.remove('open');
-    } else {
-        openCategories.add(c);
-        const el = document.getElementById('accordion-' + c);
-        if (el) el.classList.add('open');
-    }
+function toggleCategoryAccordion(c) { 
+  if (openCategories.has(c)) { 
+    openCategories.delete(c); 
+    document.getElementById('accordion-' + c)?.classList.remove('open'); 
+  } else { 
+    openCategories.add(c); 
+    document.getElementById('accordion-' + c)?.classList.add('open'); 
+  } 
 }
 
 async function addProduct(c) {
@@ -2057,15 +2063,15 @@ function showToast(msg) {
 }
 
 async function resetOrderCounter() {
-    const ok = await showConfirm('⚠️ SEI SICURO?\n\nIl contatore ordini verrà azzerato.\nIl prossimo ordine sarà ORD-00001.');
-    if (!ok) return;
-    
-    try {
-        await db.ref('counter/ordini').set(0);
-        showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001');
-    } catch(e) {
-        showToast('❌ Errore: ' + e.message);
-    }
+  const ok = await showConfirm('⚠️ SEI SICURO?\n\nIl contatore ordini verrà azzerato.\nIl prossimo ordine sarà ORD-00001.');
+  if (!ok) return;
+  
+  try {
+    await db.ref('counter/ordini').set(0);
+    showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001');
+  } catch(e) {
+    showToast('❌ Errore: ' + e.message);
+  }
 }
 
 document.addEventListener('visibilitychange', () => {
