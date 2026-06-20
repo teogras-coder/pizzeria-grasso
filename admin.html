@@ -965,6 +965,20 @@ async function rifiutaOrdine(id) {
     if (motivo === null) return;
     if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
     
+    // 🔥 SCRITTURA FORZATA E IMMEDIATA
+    db.ref('ordini/' + id).set({ 
+        ...ordersCache[id], // Mantiene tutti i dati esistenti dell'ordine
+        status: 'rifiutato', 
+        motivoRifiuto: sanitize(motivo), 
+        timestampRifiuto: Date.now(),
+        stampato: true,     // 🔥 FLAG CRITICO
+        lastModified: Date.now() // 🔥 TIMESTAMP DI MODIFICA
+    }).then(() => {
+        showToast('❌ Ordine rifiutato e bloccato per stampa');
+        renderOrders(ordersCache);
+    });
+}
+    
     db.ref('ordini/' + id).update({ 
         status: 'rifiutato', 
         motivoRifiuto: sanitize(motivo), 
