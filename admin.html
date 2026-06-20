@@ -763,7 +763,6 @@ function updateClock() {
 
 async function loadAllData() {
   try {
-    // Carica tutto in parallelo, ma con cache
     const [cats, menu, settings, images, branding, promos, drivers] = await Promise.all([
       db.ref('categories').once('value'),
       db.ref('menu').once('value'),
@@ -820,7 +819,6 @@ function setupOptimizedListeners() {
     if (oldStatus !== order.status) {
       renderOrders(ordersCache);
       
-      // Notifiche per cambi di stato
       const orderId = order.orderId || order.id;
       if (order.status === 'preparing' && oldStatus === 'new') {
         playAdminNotification();
@@ -961,11 +959,23 @@ function updateOrderStatus(id, st, orderType) {
   showToast('✅ Aggiornato');
 }
 
+// 🔥🔥🔥 FUNZIONE RIFIUTA ORDINE FIXATA (AGGIUNTO stampato: true) 🔥🔥🔥
 async function rifiutaOrdine(id) {
-  const motivo = await showPrompt('Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
-  if (motivo === null) return;
-  if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
-  db.ref('ordini/' + id).update({ status: 'rifiutato', motivoRifiuto: sanitize(motivo), timestampRifiuto: Date.now() }).then(() => showToast('❌ Ordine rifiutato'));
+    const motivo = await showPrompt('Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
+    if (motivo === null) return;
+    if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
+    
+    // 🔥 AGGIUNGI 'stampato' a true per evitare che il bot ristampi
+    db.ref('ordini/' + id).update({ 
+        status: 'rifiutato', 
+        motivoRifiuto: sanitize(motivo), 
+        timestampRifiuto: Date.now(),
+        stampato: true  // 🔥 EVITA RISTAMPE
+    }).then(() => {
+        showToast('❌ Ordine rifiutato');
+        // 🔥 FORZA L'AGGIORNAMENTO DELLA LISTA
+        renderOrders(ordersCache);
+    });
 }
 
 async function deleteOrder(id) {
