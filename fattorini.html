@@ -228,7 +228,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ─── CACHE OTTIMIZZATA ──────────────────────────────────────────────────────
+// ─── VARIABILI GLOBALI ──────────────────────────────────────────────────────
 let ordersCache = {};
 let currentDriver = null;
 let currentTab = 'available';
@@ -239,6 +239,45 @@ let notificationRef = null;
 let notificationCallback = null;
 let wakeLock = null;
 let notificationSound = null;
+
+// ─── NOTIFICHE PUSH ───────────────────────────────────────────────────────────
+const messaging = firebase.messaging();
+const vapidKey = 'BH5o0UEFcIOyse-Rnhscl4kR9chvlcp7nP9EAn9UEpjYoEEd_ruwhxWkE570LrBVBcidHmmzdMVg8gllk3qP1fY';
+
+function requestNotificationPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        return messaging.getToken({ vapidKey: vapidKey });
+      }
+    }).then((token) => {
+      if (token) {
+        const deviceId = localStorage.getItem('device_id') || 'driver_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('device_id', deviceId);
+        db.ref('fcm_tokens/' + deviceId).set({
+          token: token,
+          type: 'driver',
+          lastSeen: Date.now()
+        });
+      }
+    }).catch((err) => {
+      console.log('Errore token FCM:', err);
+    });
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js').then(() => {
+    requestNotificationPermission();
+  }).catch((err) => {
+    console.log('Errore Service Worker:', err);
+  });
+}
+
+messaging.onMessage((payload) => {
+  showToast('🔔 ' + payload.notification.title + ': ' + payload.notification.body);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+});
 
 // ─── MODALI CUSTOM ────────────────────────────────────────────────────────────
 function showConfirm(title, message, isDanger = false) {
@@ -298,7 +337,7 @@ function sanitize(text) {
   return text.replace(/[<>]/g, '').trim();
 }
 
-// ─── LISTENER NOTIFICHE OTTIMIZZATO ──────────────────────────────────────
+// ─── LISTENER NOTIFICHE ──────────────────────────────────────────────────────
 function setupNotificationListener() {
   if (notificationRef && notificationCallback) {
     notificationRef.off('child_added', notificationCallback);
@@ -409,6 +448,7 @@ async function checkPin() {
       
       initNotificationSound();
       requestNotificationPermissionUI();
+      requestNotificationPermission();
       setupNotificationListener();
       loadPizzeriaSettings();
       loadOrdersFromCache();
@@ -451,16 +491,16 @@ function saveOrdersToCache() {
   localStorage.setItem('driverOrdersCache', JSON.stringify(toSave));
 }
 
-// ─── LISTENER OTTIMIZZATO PER ORDINI ──────────────────────────────────────
+// ─── LISTENER OTTIMIZZATO PER ORDINI (FATTORINI - FIX COMPLETO) ──────────
 function setupOptimizedListeners() {
-  // Carica iniziale: solo ordini recenti e rilevanti
-  db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', snapshot => {
+  // 1. Carica gli ordini all'avvio - SOLO quelli rilevanti
+  db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
     snapshot.forEach(child => {
       const order = child.val();
       order.id = child.key;
       
-      // Salva solo se rilevante per il driver
-      if (!order.assignedDriver || order.assignedDriver === currentDriver.pin) {
+      // Salva in cache SOLO se rilevante per il fattorino
+      if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
         ordersCache[order.id] = order;
       }
     });
@@ -469,31 +509,36 @@ function setupOptimizedListeners() {
     saveOrdersToCache();
   });
 
-  // Nuovi ordini disponibili
-  db.ref('ordini').orderByChild('timestamp').startAt(Date.now() - 60000).on('child_added', snapshot => {
+  // 2. Ascolta i NUOVI ordini (child_added)
+  db.ref('ordini').on('child_added', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    if (!ordersCache[order.id] && !order.assignedDriver && order.type === 'delivery' && order.status === 'new') {
-      ordersCache[order.id] = order;
-      renderOrders();
-      playNotificationSound();
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-      if (firstLoad) return;
-      
-      // Mostra banner notifica
-      showNotification(1);
+    // Se è un ordine disponibile (non assegnato) o assegnato a me
+    if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
+      if (!ordersCache[order.id]) {
+        ordersCache[order.id] = order;
+        renderOrders();
+        saveOrdersToCache();
+        
+        // Suono per nuovo ordine disponibile
+        if (!order.assignedDriver && order.type === 'delivery' && order.status === 'new') {
+          playNotificationSound();
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          showNotification(1);
+        }
+      }
     }
   });
 
-  // Cambiamenti di stato
-  db.ref('ordini').on('child_changed', snapshot => {
+  // 3. Ascolta i CAMBIAMENTI DI STATO (child_changed)
+  db.ref('ordini').on('child_changed', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     const oldStatus = ordersCache[order.id]?.status;
     
     // Aggiorna solo se l'ordine è rilevante per il driver
-    if (!order.assignedDriver || order.assignedDriver === currentDriver.pin) {
+    if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
       ordersCache[order.id] = order;
       saveOrdersToCache();
       
@@ -501,7 +546,7 @@ function setupOptimizedListeners() {
         renderOrders();
         
         // Notifica: ordine pronto per il ritiro
-        if (order.assignedDriver === currentDriver.pin && order.status === 'ready' && oldStatus !== 'ready') {
+        if (order.assignedDriver === currentDriver?.pin && order.status === 'ready' && oldStatus !== 'ready') {
           playNotificationSound();
           if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
           showToast('✅ Un tuo ordine è PRONTO per il ritiro!');
@@ -513,16 +558,16 @@ function setupOptimizedListeners() {
           }
         }
         
-        // Notifica: ordine assegnato a me
-        if (order.assignedDriver === currentDriver.pin && oldStatus === 'new' && order.status === 'preparing') {
+        // Notifica: ordine assegnato a me (accettato dal gestionale)
+        if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && order.status === 'preparing') {
           showToast('✅ Ordine accettato! Inizia la preparazione...');
         }
       }
     }
   });
 
-  // Rimozioni
-  db.ref('ordini').on('child_removed', snapshot => {
+  // 4. Ascolta le RIMOZIONI (child_removed)
+  db.ref('ordini').on('child_removed', (snapshot) => {
     const id = snapshot.key;
     if (ordersCache[id]) {
       delete ordersCache[id];
@@ -531,7 +576,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // Offline status
+  // 5. Offline status
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -574,6 +619,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// ─── RENDER ORDINI ──────────────────────────────────────────────────────────
 function renderOrders() {
   const container = document.getElementById('ordersContainer');
   const availableCount = document.getElementById('availableCount');
@@ -585,7 +631,7 @@ function renderOrders() {
   let completedCount = 0;
   
   Object.values(ordersCache).forEach(order => {
-    // Scheda "disponibili": solo delivery non assegnati
+    // Scheda "disponibili": solo delivery non assegnati e in stato 'new'
     if (
       order.status === 'new' &&
       !order.assignedDriver &&
@@ -593,7 +639,7 @@ function renderOrders() {
     ) {
       available.push(order);
     }
-    // Scheda "le mie": tutti i tipi assegnati a me
+    // Scheda "le mie": tutti gli ordini assegnati a me
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
@@ -692,6 +738,7 @@ function renderOrders() {
   }).join('');
 }
 
+// ─── AZIONI ORDINI ────────────────────────────────────────────────────────────
 async function clearCompletedOrders() {
   const ok = await showConfirm(
     'Cancellare ordini completati?',
