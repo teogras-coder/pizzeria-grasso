@@ -877,13 +877,13 @@ function filterProducts(term){if(currentSearchCat)renderProductList(currentSearc
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat=''}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
 
-// ─── STATUS ───────────────────────────────────────────────────────────────────
+// ─── STATUS ──────────────────────────────────────────────────────────────────
 function checkIfOpen(){const s=appData.settings;if(s.manualStatus==='open')return true;if(s.manualStatus==='closed')return false;const days=['dom','lun','mar','mer','gio','ven','sab'],today=days[new Date().getDay()];if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false;const ds=new Date().toISOString().split('T')[0];if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(ds))return false;const hs=s.hours||"11:00-15:00,18:00-23:00",ranges=hs.split(',').map(r=>r.trim()).filter(Boolean),cm=new Date().getHours()*60+new Date().getMinutes();for(let r of ranges){const p=r.split('-');if(p.length!==2)continue;const[sh,sm]=p[0].split(':').map(Number),[eh,em]=p[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(cm>=sh*60+sm&&cm<eh*60+em)return true}return false}
 function updateStatusBanner(){const b=document.getElementById('statusBanner'),txt=document.getElementById('statusText'),o=checkIfOpen();b.className=`status-banner ${o?'status-open':'status-closed'}`;txt.textContent=o?t('open'):t('closed')}
 function updateServicesUI(){const b=document.getElementById('deliveryBtn');if(b){if(appData.settings.deliveryEnabled===false){b.classList.add('disabled');b.onclick=()=>showToast(t('no_delivery'))}else{b.classList.remove('disabled');b.onclick=()=>checkStatusBeforeOrder('delivery')}}}
 function checkStatusBeforeOrder(typ){if(!checkIfOpen()){showToast(t('closed_now'));return}if(typ==='delivery'&&appData.settings.deliveryEnabled===false){showToast(t('no_delivery'));return}if(typ==='pickup'&&appData.settings.pickupEnabled===false){showToast(t('no_pickup'));return}orderType=typ;openCart()}
 
-// ── CART ─────────────────────────────────────────────────────────────────────
+// ── CART ────────────────────────────────────────────────────────────────────
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
 function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(!d)return;d.style.display=hasActive?'block':'none'}
@@ -911,14 +911,6 @@ function closeReviewModal(){document.getElementById('reviewModal').classList.rem
 function selectStar(n){selectedStars=n;updateStarsDisplay()}
 function updateStarsDisplay(){document.querySelectorAll('#starsInput .star').forEach((s,i)=>{s.classList.toggle('active',i<selectedStars)})}
 function submitReview(){const n=document.getElementById('reviewName').value.trim(),txt=document.getElementById('reviewText').value.trim(),oid=pendingReviewOrderId||document.getElementById('reviewOrderId').value.trim();if(!selectedStars){showToast('⚠️ Seleziona stelle');return}if(!n){showToast('❌ Inserisci nome');return}if(!txt){showToast('❌ Scrivi commento');return}db.ref('recensioni').push({name:sanitizeWA(n),text:sanitizeWA(txt),stars:selectedStars,orderId:oid||'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{if(pendingReviewOrderId){let lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');lo=lo.map(o=>o.orderId===pendingReviewOrderId?{...o,reviewed:true}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(lo));renderMyOrders()}closeReviewModal();showToast(t('thanks_review'))})}
-
-// ─── MY ORDERS ────────────────────────────────────────────────────────────────
-function showMyOrders(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='block';window.scrollTo(0,0);startOrderStatusTracking();renderMyOrders();updateNavLiveDotOld()}
-function cleanLocalHistory(){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');o=o.filter(x=>(Date.now()-x.date)<30*24*3600*1000);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o))}catch(e){}}
-function saveOrderToLocal(od){try{let o=[];try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}if(o.find(x=>x.orderId===od.orderId))return;o.unshift({orderId:od.orderId,date:Date.now(),total:od.finalTotal,items:od.items.map(i=>i.name).join(', '),reviewed:false,status:'new',type:od.type||'delivery'});if(o.length>5)o=o.slice(0,5);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld()}catch(e){}}
-async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_confirm'));if(!ok)return;Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();updateNavLiveDotOld();showToast(t('history_cleared'))}
-function getOrderProgress(s,typ){if(typ==='pickup'){const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:35,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:70,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-picked'},'delivered':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:30,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:55,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:70,step:3,label:t('picked'),icon:'📦',class:'status-picked'},'delivering':{percent:85,step:4,label:t('delivering'),icon:'🛵',class:'status-delivering'},'delivered':{percent:100,step:5,label:t('delivered'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}
-function renderOrderTracker(s,mr,ot){const typ=ot||'delivery',pr=getOrderProgress(s,typ);if(s==='rifiutato'||s==='annullato'){const label=s==='rifiutato'?t('rejected'):t('annullato');return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>${mr?`<div class="order-reject-message"><strong>${s==='rifiutato'?'Motivo':'Dettaglio'}:</strong> ${mr}</div>`:''}</div>`}if(s==='delivered'||(typ==='pickup'&&(s==='picked'||s==='delivered')))return`<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?t('picked'):t('delivered')}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;const st=typ==='pickup'?[{label:'Ricevuto',icon:'📥'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'🎉'}]:[{label:'Ricevuto',icon:''},{label:t('preparing'),icon:''},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'📦'},{label:t('delivering'),icon:''},{label:t('delivered'),icon:''}];return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div><div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div></div>`}
 
 // ─── LOGICA ANNULLAMENTO 15 MINUTI (DEFINITIVA) ──────────────────────────────
 
@@ -1015,6 +1007,35 @@ async function annullaOrdine(orderId){
     }
 }
 
+// ─── SALVATAGGIO ORDINE CORRETTO (FONDAMENTALE PER IL TASTO ANNULLA) ─────────
+function saveOrderToLocal(od){
+    try{
+        let o=[];
+        try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}
+        
+        // Evita duplicati
+        if(o.find(x=>x.orderId===od.orderId)) return;
+        
+        // SALVA TUTTI I CAMPI NECESSARI PER LA LOGICA DI ANNULLAMENTO
+        o.unshift({
+            orderId: od.orderId,
+            date: Date.now(),           // Timestamp locale per il rendering
+            timestamp: od.timestamp || Date.now(), // TIMESTAMP FIREBASE (CRUCIALE!)
+            scheduledTime: od.scheduledTime || 'Subito', // ORARIO PROGRAMMATO (CRUCIALE!)
+            type: od.type || 'delivery',
+            total: od.finalTotal,
+            items: od.items.map(i=>i.name).join(', '),
+            reviewed: false,
+            status: 'new'
+        });
+        
+        if(o.length>5) o=o.slice(0,5);
+        localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(o));
+        renderMyOrders();
+        updateNavLiveDotOld();
+    }catch(e){ console.error('Errore saveOrderToLocal:', e); }
+}
+
 // ─── MY ORDERS CON TASTO ANNULLA INTEGRATO ───────────────────────────────────
 
 function renderMyOrders(){
@@ -1072,6 +1093,7 @@ function renderMyOrders(){
 }
 
 function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementById('reviewOrderId').value=oid;openReviewModal()}
+
 // ─── PUBLIC REVIEWS ───────────────────────────────────────────────────────────
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
 function loadReviewsPublic(){
