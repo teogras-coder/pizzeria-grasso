@@ -493,6 +493,8 @@ const translations = {
 const firebaseConfig={apiKey:"AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",authDomain:"teogra-c8cf5.firebaseapp.com",databaseURL:"https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",projectId:"teogra-c8cf5",storageBucket:"teogra-c8cf5.firebasestorage.app",messagingSenderId:"686300112893",appId:"1:686300112893:web:e147b82f91374f12db1b94"};
 firebase.initializeApp(firebaseConfig);const db=firebase.database();
 let currentUser=null,currentLang='it',userType='none',cart=[],orderType='delivery',timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null,orderStatusListeners={};const CACHE_DURATION=3600000;
+// ─── DATI ORDINI PER L'ANNULLAMENTO ──────────────────────────────────────────
+let ordersData = {};
 
 // ─── CACHE OTTIMIZZATA ──────────────────────────────────────────────────────
 let appData = { categories: {}, menu: {}, promotions: {}, settings: {}, branding: {}, images: {} };
@@ -735,18 +737,30 @@ function setupOptimizedListeners() {
         }
     });
     
-    // 🔥 ASCLTA GLI ORDINI RIFIUTATI
+    // Ascolta gli ordini rifiutati e annullati
     db.ref('ordini').on('child_changed', (snapshot) => {
         const order = snapshot.val();
         const orderId = snapshot.key;
-        
-        // Se l'ordine è stato rifiutato
-        if (order && order.status === 'rifiutato') {
-            updateLocalOrderStatus(order.orderId || orderId, 'rifiutato', order.motivoRifiuto);
+        if (order && order.orderId) {
+            ordersData[orderId] = order;
+            if (order.status === 'rifiutato' || order.status === 'annullato') {
+                updateLocalOrderStatus(order.orderId, order.status, order.motivoRifiuto || order.motivoAnnullamento);
+            }
+            renderMyOrders();
         }
-        // 🔥🔥🔥 SE L'ORDINE È STATO ANNULLATO 🔥🔥🔥
-        if (order && order.status === 'annullato') {
-            updateLocalOrderStatus(order.orderId || orderId, 'annullato', order.motivoAnnullamento || 'Annullato dal cliente');
+    });
+    
+    // Ascolta nuovi ordini per il tracking
+    db.ref('ordini').on('child_added', (snapshot) => {
+        const order = snapshot.val();
+        if (order && order.orderId) {
+            ordersData[snapshot.key] = order;
+            // Controlla se questo ordine è nei nostri ordini locali
+            let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+            const exists = localOrders.some(o => o.orderId === order.orderId);
+            if (exists) {
+                renderMyOrders();
+            }
         }
     });
 }
@@ -872,7 +886,8 @@ function checkStatusBeforeOrder(typ){if(!checkIfOpen()){showToast(t('closed_now'
 // ─── CART ─────────────────────────────────────────────────────────────────────
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
-function updateNavLiveDotOld(){const d=document.getElementById('navLiveDot');if(!d)return;try{const o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');d.style.display=hasActive?'block':'none'}catch(e){d.style.display='none'}}
+function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(!d)return;d.style.display=hasActive?'block':'none'}
+function updateNavLiveDotOld(){try{const o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');updateNavLiveDot(hasActive)}catch(e){updateNavLiveDot(false)}}
 async function clearCart(){if(!cart.length)return;const ok=await showConfirm(t('empty_cart_confirm'));if(!ok)return;cart=[];updateCartBadge();closeCart();showToast(t('cart_emptied'))}
 function calculateDistance(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function computeDeliveryFee(dist){const bf=parseFloat(appData.settings.deliveryBaseFee)||3,mr=parseFloat(appData.settings.deliveryMaxRadius)||4,er=parseFloat(appData.settings.deliveryExtraRadius)||6,ef=parseFloat(appData.settings.deliveryExtraFee)||2;if(dist===null)return{fee:bf,outOfRange:false,withExtra:false};if(dist>er)return{fee:0,outOfRange:true,withExtra:false};if(dist>mr)return{fee:bf+ef,outOfRange:false,withExtra:true};return{fee:bf,outOfRange:false,withExtra:false}}
@@ -927,35 +942,71 @@ function calcolaMinutiRimasti(order){
     const diffMs=dataProgrammata-oggi;return Math.floor(diffMs/(1000*60));
 }
 function puoAnnullareOrdine(order){
-    if(order.status!=='new')return false;
-    if(order.assignedDriver)return false;
-    if(order.type==='pickup')return false;
-    const minuti=calcolaMinutiRimasti(order);
-    if(minuti===-1)return false;
-    return minuti>=15;
+    if(!order || order.status !== 'new') return false;
+    if(order.type === 'pickup') return false;
+    if(order.assignedDriver) return false;
+    const minuti = calcolaMinutiRimasti(order);
+    if(minuti === -1) return false;
+    return minuti >= 15;
 }
 async function annullaOrdine(orderId){
-    const order=ordersData[orderId];if(!order){showToast('❌ Ordine non trovato');return;}
+    if(!orderId){showToast('❌ ID ordine mancante');return;}
+    
+    // Cerca l'ordine nei dati locali
+    let localOrders = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+    const order = localOrders.find(o => o.orderId === orderId);
+    
+    if(!order){showToast('❌ Ordine non trovato');return;}
     if(!puoAnnullareOrdine(order)){showToast('❌ Non puoi più annullare questo ordine');return;}
-    const minutiRimasti=calcolaMinutiRimasti(order);
-    const conferma=await showConfirm('Annullare Ordine?',`Sei sicuro di voler annullare l'ordine ${order.orderId||orderId}?\nMancano ${minutiRimasti} minuti all'orario programmato.`);
-    if(!conferma)return;
+    
+    const minutiRimasti = calcolaMinutiRimasti(order);
+    const confirmMsg = `Sei sicuro di voler annullare l'ordine ${orderId}?\nMancano ${minutiRimasti} minuti all'orario programmato.`;
+    const conferma = await showConfirm(confirmMsg);
+    if(!conferma) return;
+    
     try{
-        await db.ref(`ordini/${orderId}`).update({
+        // Cerca il nodo Firebase con questo orderId
+        const snapshot = await db.ref('ordini').orderByChild('orderId').equalTo(orderId).once('value');
+        if(!snapshot.exists()){
+            showToast('❌ Ordine non trovato su server');
+            return;
+        }
+        
+        let key = null;
+        snapshot.forEach(child => {
+            key = child.key;
+        });
+        
+        if(!key){
+            showToast('❌ Errore: chiave ordine non trovata');
+            return;
+        }
+        
+        await db.ref('ordini/' + key).update({
             status:'annullato',
             annullatoDa:'cliente',
             annullatoIl:Date.now(),
             motivoAnnullamento:'Annullato dal cliente tramite app'
         });
-        let ordiniLocali=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
-        ordiniLocali=ordiniLocali.map(o=>{if(o.orderId===order.orderId||o.orderId===orderId){return{...o,status:'annullato'};}return o;});
-        localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(ordiniLocali));
+        
+        // Aggiorna lo storico locale
+        localOrders = localOrders.map(o => {
+            if(o.orderId === orderId){
+                return {...o, status:'annullato', motivoAnnullamento:'Annullato dal cliente tramite app'};
+            }
+            return o;
+        });
+        localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(localOrders));
+        
         showToast('✅ Ordine annullato!');
         renderMyOrders();
         updateNavLiveDotOld();
         playNotificationSound();
-        if(navigator.vibrate)navigator.vibrate([300,200,300]);
-    }catch(e){showToast('❌ Errore annullamento: '+e.message);}
+        if(navigator.vibrate) navigator.vibrate([300,200,300]);
+    }catch(e){
+        console.error('Errore annullamento:', e);
+        showToast('❌ Errore annullamento: ' + e.message);
+    }
 }
 
 // ─── PUBLIC REVIEWS ───────────────────────────────────────────────────────────
@@ -1009,9 +1060,8 @@ function loadReviewsPublic(){
 }
 
 // ─── ORDER TRACKING ──────────────────────────────────────────────────────────
-function startOrderStatusTracking(){try{Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};const lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!lo.length)return;lo.forEach(o=>{if(!o.orderId)return;const q=db.ref('ordini').orderByChild('orderId').equalTo(o.orderId);orderStatusListeners[o.orderId]=q;q.on('value',s=>{s.forEach(c=>{const d=c.val();if(d)updateLocalOrderStatus(o.orderId,d.status,d.motivoRifiuto||d.motivoAnnullamento)})})})}catch(e){console.log('Errore tracking:',e)}}
+function startOrderStatusTracking(){try{Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};const lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!lo.length)return;lo.forEach(o=>{if(!o.orderId)return;const q=db.ref('ordini').orderByChild('orderId').equalTo(o.orderId);orderStatusListeners[o.orderId]=q;q.on('value',s=>{s.forEach(c=>{const d=c.val();if(d){ordersData[c.key] = d;updateLocalOrderStatus(o.orderId,d.status,d.motivoRifiuto||d.motivoAnnullamento)}})})})}catch(e){console.log('Errore tracking:',e)}}
 
-// 🔥🔥🔥 FUNZIONE UPDATE LOCAL ORDER STATUS FIXATA (INCLUDE RIFIUTATO E ANNULLATO) 🔥🔥🔥
 function updateLocalOrderStatus(oid, ns, mr) {
     try {
         let o = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
