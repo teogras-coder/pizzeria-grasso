@@ -58,7 +58,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(3px); }
 .sidebar-overlay.active { display: block; }
 .sidebar.mobile-active { transform: translateX(0) !important; }
-.main-content { padding: 25px; overflow-y: auto; height: 100%; scroll-behavior: smooth; }
+.main-content { padding: 25px; padding-bottom: 200px; overflow-y: auto; min-height: 100vh; scroll-behavior: smooth; }
 .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(212,168,75,0.2); flex-wrap: wrap; gap: 15px; }
 .content-header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.8rem; }
 .content-header .subtitle { color: #8a7a5a; font-size: 0.85rem; margin-top: 5px; }
