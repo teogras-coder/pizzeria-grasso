@@ -2100,25 +2100,6 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-(function() {
-    const originalRenderMenu = window.renderMenu;
-    window.renderMenu = function() {
-        if (originalRenderMenu) originalRenderMenu();
-        setTimeout(() => {
-            const container = document.getElementById('menuAccordion');
-            if (!container) return;
-            container.style.paddingBottom = '0px';
-            let spacer = document.getElementById('spacerInfinito');
-            if (!spacer) {
-                spacer = document.createElement('div');
-                spacer.id = 'spacerInfinito';
-                spacer.style.cssText = 'height:600px; width:100%; pointer-events:none; display:block;';
-                container.appendChild(spacer);
-            }
-        }, 200);
-    };
-    setTimeout(() => { if (window.renderMenu) window.renderMenu(); }, 500);
-})();
 </script>
 </body>
 </html>
