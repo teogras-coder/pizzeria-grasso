@@ -1015,6 +1015,8 @@ async function annullaOrdine(orderId){
     }
 }
 
+// ─── MY ORDERS CON TASTO ANNULLA INTEGRATO ───────────────────────────────────
+
 function renderMyOrders(){
     const l=document.getElementById('myOrdersList');
     if(!l)return;
@@ -1024,48 +1026,52 @@ function renderMyOrders(){
             l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;
             return;
         }
+        
         const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');
         updateNavLiveDot(hasActive);
+        
         const statiItaliani={'new':'Nuovo','preparing':'In preparazione','ready':'Pronto','picked':'Ritirato','delivering':'In consegna','delivered':'Consegnato','rifiutato':'Rifiutato','annullato':'Annullato'};
         
         l.innerHTML=o.map(x=>{
-            const ds=new Date(x.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}),
-                  s=x.status||'new',
-                  stIt=statiItaliani[s]||s,
-                  ot=x.type||'delivery',
-                  tr=renderOrderTracker(s,x.motivoRifiuto||x.motivoAnnullamento,ot),
-                  cr=(s==='delivered'||(ot==='pickup'&&s==='picked'))&&!x.reviewed,
-                  tl=ot==='pickup'?'🏪 Ritiro':' Consegna',
-                  bc=s==='rifiutato'?'#ef4444':s==='annullato'?'#f87171':(s==='delivered'||(ot==='pickup'&&s==='picked'))?'#22c55e':'var(--gold-dark)';
+            const ds=new Date(x.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+            const s=x.status||'new';
+            const ot=x.type||'delivery';
+            const tr=renderOrderTracker(s,x.motivoRifiuto||x.motivoAnnullamento,ot);
+            const cr=(s==='delivered'||(ot==='pickup'&&s==='picked'))&&!x.reviewed;
+            const tl=ot==='pickup'?'🏪 Ritiro':'🛵 Consegna';
+            const bc=s==='rifiutato'?'#ef4444':s==='annullato'?'#f87171':(s==='delivered'||(ot==='pickup'&&s==='picked'))?'#22c55e':'var(--gold-dark)';
             
-            const puoAnnullare=puoAnnullareOrdine(x);
-            const minutiRimasti=calcolaMinutiAllOrario(x) || (15 - Math.floor((new Date().getTime() - x.timestamp) / (1000 * 60)));
-            const labelAnnulla=puoAnnullare?`⏳ ${Math.max(0, minutiRimasti)} min`:'';
+            // CALCOLO VISUALIZZAZIONE TASTO ANNULLA
+            const puoAnnullare = puoAnnullareOrdine(x);
+            const minutiRimasti = calcolaMinutiAllOrario(x);
+            const labelAnnulla = puoAnnullare ? `⏳ ${Math.max(0, minutiRimasti)} min` : '';
             
-            return`<div class="my-order-card" style="border-left-color:${bc}">
+            return `<div class="my-order-card" style="border-left-color:${bc}">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${x.orderId}</span>
                     <span class="my-order-date">${ds} • ${tl}</span>
-                    ${puoAnnullare?`<span style="color:#4ade80;font-size:0.65rem;">${labelAnnulla}</span>`:''}
+                    ${puoAnnullare ? `<span style="color:#4ade80;font-size:0.65rem;">${labelAnnulla}</span>` : ''}
                 </div>
                 <div class="my-order-items">${x.items}</div>
                 <div class="my-order-total">€${x.total.toFixed(2)}</div>
                 ${tr}
                 <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-                    ${cr?`<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">${t('review_btn')}</button>`:''}
-                    ${x.reviewed?`<span class="btn-reviewed">${t('already_reviewed')}</span>`:''}
-                    ${puoAnnullare?`<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla (${Math.max(0, minutiRimasti)} min)</button>`:''}
-                    ${s==='annullato'?`<span style="color:#f87171;font-weight:700;">❌ Annullato</span>`:''}
+                    ${cr ? `<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">${t('review_btn')}</button>` : ''}
+                    ${x.reviewed ? `<span class="btn-reviewed">${t('already_reviewed')}</span>` : ''}
+                    
+                    <!-- TASTO ANNULLA -->
+                    ${puoAnnullare ? `<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla (${Math.max(0, minutiRimasti)} min)</button>` : ''}
+                    
+                    ${s==='annullato' ? `<span style="color:#f87171;font-weight:700;">❌ Annullato</span>` : ''}
                 </div>
             </div>`
-        }).join('')
+        }).join('');
     }catch(e){
-        l.innerHTML='<p style="color:#f87171">Errore</p>'
+        l.innerHTML='<p style="color:#f87171">Errore caricamento ordini</p>';
     }
 }
 
 function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementById('reviewOrderId').value=oid;openReviewModal()}
-
 // ─── PUBLIC REVIEWS ───────────────────────────────────────────────────────────
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
 function loadReviewsPublic(){
@@ -1229,7 +1235,7 @@ if (origSwitchTab) {
 setInterval(() => {
     if (!document.hidden) {
         loadFromFirebaseOptimized();
-        renderMyOrders(); // Ricalcola i 15 minuti ogni 30 secondi
+        renderMyOrders(); // ← AGGIUNTO: aggiorna countdown annullamento ogni 30 sec
     }
 }, 300000);
 
