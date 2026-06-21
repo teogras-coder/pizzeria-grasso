@@ -920,13 +920,20 @@ async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_c
 function getOrderProgress(s,typ){if(typ==='pickup'){const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:35,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:70,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-picked'},'delivered':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:30,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:55,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:70,step:3,label:t('picked'),icon:'📦',class:'status-picked'},'delivering':{percent:85,step:4,label:t('delivering'),icon:'🛵',class:'status-delivering'},'delivered':{percent:100,step:5,label:t('delivered'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}
 function renderOrderTracker(s,mr,ot){const typ=ot||'delivery',pr=getOrderProgress(s,typ);if(s==='rifiutato'||s==='annullato'){const label=s==='rifiutato'?t('rejected'):t('annullato');return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>${mr?`<div class="order-reject-message"><strong>${s==='rifiutato'?'Motivo':'Dettaglio'}:</strong> ${mr}</div>`:''}</div>`}if(s==='delivered'||(typ==='pickup'&&(s==='picked'||s==='delivered')))return`<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?t('picked'):t('delivered')}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;const st=typ==='pickup'?[{label:'Ricevuto',icon:'📥'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'🎉'}]:[{label:'Ricevuto',icon:''},{label:t('preparing'),icon:''},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'📦'},{label:t('delivering'),icon:''},{label:t('delivered'),icon:''}];return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div><div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div></div>`}
 
-// ─── LOGICA ANNULLAMENTO 15 MINUTI ───────────────────────────────────────────
+// ─── LOGICA ANNULLAMENTO 15 MINUTI (CORRETTA) ───────────────────────────────
+
 function calcolaMinutiAllOrario(order){
-    if(!order || !order.scheduledTime || order.scheduledTime === 'Subito'){
-        return null; // Non applicabile per ordini immediati
+    if(!order || !order.timestamp) return null;
+    
+    const oraAttuale = new Date().getTime();
+    
+    // CASO 1: Ordine "Subito" → L'annullamento è possibile entro 15 min dalla creazione
+    if(!order.scheduledTime || order.scheduledTime === 'Subito'){
+        const minutiDallaCreazione = Math.floor((oraAttuale - order.timestamp) / (1000 * 60));
+        return 15 - minutiDallaCreazione; // Restituisce i minuti rimanenti per annullare
     }
     
-    const oggi = new Date();
+    // CASO 2: Ordine Programmato → Calcola minuti mancanti all'orario programmato
     const dataOrdine = getDataOrdine(order);
     if(!dataOrdine) return null;
     
@@ -938,27 +945,20 @@ function calcolaMinutiAllOrario(order){
         ore, minuti, 0
     );
     
-    const diffMs = dataProgrammata - oggi;
-    return Math.floor(diffMs / (1000 * 60));
+    const diffMs = dataProgrammata - oraAttuale;
+    return Math.floor(diffMs / (1000 * 60)); // Minuti mancanti all'orario
 }
 
 function puoAnnullareOrdine(order){
     if(!order || order.status !== 'new') return false;
     if(order.assignedDriver) return false; // Già assegnato = no annullamento
     
-    const oraAttuale = new Date().getTime();
-    const tempoTrascorsoDallaCreazione = Math.floor((oraAttuale - order.timestamp) / (1000 * 60));
+    const minutiMancanti = calcolaMinutiAllOrario(order);
     
-    // CASO 1: Ordine "Subito" → Max 15 minuti dalla creazione
-    if(!order.scheduledTime || order.scheduledTime === 'Subito'){
-        return tempoTrascorsoDallaCreazione < 15;
-    }
+    if(minutiMancanti === null) return false;
     
-    // CASO 2: Ordine Programmato → Devono mancare ALMENO 15 minuti all'orario
-    const minutiAllOrario = calcolaMinutiAllOrario(order);
-    if(minutiAllOrario === null) return false;
-    
-    return minutiAllOrario >= 15;
+    // REGOLA D'ORO: Il tasto è visibile FINCHÉ mancano >= 15 minuti all'orario
+    return minutiMancanti >= 15;
 }
 
 async function annullaOrdine(orderId){
@@ -976,7 +976,7 @@ async function annullaOrdine(orderId){
         return;
     }
     
-    const minutiRimasti = calcolaMinutiAllOrario(order) || (15 - Math.floor((new Date().getTime() - order.timestamp) / (1000 * 60)));
+    const minutiRimasti = calcolaMinutiAllOrario(order);
     const confirmMsg = `Sei sicuro di voler annullare l'ordine ${orderId}?\nMancano ${minutiRimasti} minuti.`;
     const conferma = await showConfirm(confirmMsg);
     if(!conferma) return;
