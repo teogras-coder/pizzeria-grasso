@@ -243,7 +243,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
 
-/* ===== BOTTOM NAV ===== */
 .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:999999!important;background:#1a1209!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border-top:1px solid rgba(212,168,75,.15)!important;box-shadow:0 -4px 30px rgba(0,0,0,.8)!important;padding:4px 0 10px!important;height:58px!important;display:flex!important;flex-direction:row!important;justify-content:space-around!important;align-items:center!important;pointer-events:auto!important;touch-action:auto!important;user-select:none!important;-webkit-user-select:none!important;transform:translateZ(0)!important;will-change:transform!important}
 .bottom-nav .nav-btn{flex:1!important;max-width:20%!important;height:48px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0px!important;padding:4px 2px!important;background:transparent!important;border:none!important;color:rgba(255,255,255,.4)!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;position:relative!important;z-index:10!important;border-radius:8px!important;transition:color .15s ease!important;-webkit-tap-highlight-color:transparent!important}
 .bottom-nav .nav-btn i{font-size:22px!important;line-height:1!important;margin-bottom:1px!important;pointer-events:none!important;transition:transform .15s ease!important}
@@ -920,20 +919,23 @@ async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_c
 function getOrderProgress(s,typ){if(typ==='pickup'){const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:35,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:70,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-picked'},'delivered':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:30,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:55,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:70,step:3,label:t('picked'),icon:'📦',class:'status-picked'},'delivering':{percent:85,step:4,label:t('delivering'),icon:'🛵',class:'status-delivering'},'delivered':{percent:100,step:5,label:t('delivered'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}
 function renderOrderTracker(s,mr,ot){const typ=ot||'delivery',pr=getOrderProgress(s,typ);if(s==='rifiutato'||s==='annullato'){const label=s==='rifiutato'?t('rejected'):t('annullato');return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>${mr?`<div class="order-reject-message"><strong>${s==='rifiutato'?'Motivo':'Dettaglio'}:</strong> ${mr}</div>`:''}</div>`}if(s==='delivered'||(typ==='pickup'&&(s==='picked'||s==='delivered')))return`<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?t('picked'):t('delivered')}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;const st=typ==='pickup'?[{label:'Ricevuto',icon:'📥'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'🎉'}]:[{label:'Ricevuto',icon:''},{label:t('preparing'),icon:''},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'📦'},{label:t('delivering'),icon:''},{label:t('delivered'),icon:''}];return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div><div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div></div>`}
 
-// ─── LOGICA ANNULLAMENTO 15 MINUTI (DEFINITIVA) ──────────────────────────────
+// ─── LOGICA ANNULLAMENTO (CORRETTA) ──────────────────────────────────────────
+// Regola: gli ordini "Subito" non sono mai annullabili. Gli ordini
+// programmati sono annullabili da subito, e finché manca PIÙ di 15
+// minuti all'orario fissato. A 15 minuti o meno, il tasto scompare.
+
+function getDataOrdine(order){
+    // Determina la data di riferimento dell'ordine (oggi, salvo diversa indicazione)
+    if(order.scheduledDate) return order.scheduledDate;
+    return new Date(order.timestamp).toISOString().split('T')[0];
+}
 
 function calcolaMinutiAllOrario(order){
     if(!order || !order.timestamp) return null;
+    if(!order.scheduledTime || order.scheduledTime === 'Subito') return null;
     
     const oraAttuale = new Date().getTime();
     
-    // CASO 1: Ordine "Subito" → Annullabile entro 15 min dalla creazione
-    if(!order.scheduledTime || order.scheduledTime === 'Subito'){
-        const minutiDallaCreazione = Math.floor((oraAttuale - order.timestamp) / (1000 * 60));
-        return 15 - minutiDallaCreazione;
-    }
-    
-    // CASO 2: Ordine Programmato → Minuti mancanti all'orario programmato
     const dataOrdine = getDataOrdine(order);
     if(!dataOrdine) return null;
     
@@ -953,11 +955,15 @@ function puoAnnullareOrdine(order){
     if(!order || order.status !== 'new') return false;
     if(order.assignedDriver) return false;
     
+    const isSubito = !order.scheduledTime || order.scheduledTime === 'Subito';
+    
+    // Gli ordini "Subito" non sono MAI annullabili dal cliente
+    if(isSubito) return false;
+    
+    // Ordine programmato: annullabile finché manca PIÙ di 15 minuti all'orario
     const minutiMancanti = calcolaMinutiAllOrario(order);
     if(minutiMancanti === null) return false;
-    
-    // Tasto visibile FINCHÉ mancano >= 15 minuti all'orario
-    return minutiMancanti >= 15;
+    return minutiMancanti > 15;
 }
 
 async function annullaOrdine(orderId){
