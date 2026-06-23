@@ -36,7 +36,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 @keyframes particleFloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px);opacity:0}}
 .ripple{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(240,215,140,.6) 0%,transparent 70%);transform:scale(0);animation:rippleEffect .6s ease-out;pointer-events:none;z-index:9999}
 @keyframes rippleEffect{to{transform:scale(4);opacity:0}}
-.phone-frame{width:100%;max-width:480px;height:100vh;height:100dvh;background:linear-gradient(170deg,var(--dark) 0%,var(--brown) 40%,var(--brown-light) 100%);position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;z-index:10;padding-bottom:65px!important}
+.phone-frame{width:100%;max-width:480px;height:100vh;height:100dvh;background:linear-gradient(170deg,var(--dark) 0%,var(--brown) 40%,var(--brown-light) 100%);position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;z-index:10;padding-bottom:20px!important}
 .header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:hidden}
 .logo-area{width:100%;position:relative;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:2px;box-shadow:0 3px 0 0 rgba(240,215,140,.85);margin-bottom:2px;transition:box-shadow .8s ease;background:var(--dark)!important}
 .logo-tint-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--gold);mix-blend-mode:multiply;pointer-events:none;z-index:2;opacity:.45;transition:background .8s ease}
@@ -243,23 +243,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
 
-.bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:999999!important;background:#1a1209!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border-top:1px solid rgba(212,168,75,.15)!important;box-shadow:0 -4px 30px rgba(0,0,0,.8)!important;padding:4px 0 10px!important;height:58px!important;display:flex!important;flex-direction:row!important;justify-content:space-around!important;align-items:center!important;pointer-events:auto!important;touch-action:auto!important;user-select:none!important;-webkit-user-select:none!important;transform:translateZ(0)!important;will-change:transform!important}
-.bottom-nav .nav-btn{flex:1!important;max-width:20%!important;height:48px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0px!important;padding:4px 2px!important;background:transparent!important;border:none!important;color:rgba(255,255,255,.4)!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;position:relative!important;z-index:10!important;border-radius:8px!important;transition:color .15s ease!important;-webkit-tap-highlight-color:transparent!important}
-.bottom-nav .nav-btn i{font-size:22px!important;line-height:1!important;margin-bottom:1px!important;pointer-events:none!important;transition:transform .15s ease!important}
-.bottom-nav .nav-btn span{font-size:9px!important;font-weight:600!important;text-transform:uppercase!important;letter-spacing:.3px!important;line-height:1.2!important;pointer-events:none!important}
-.bottom-nav .nav-btn.active{color:var(--gold)!important}
-.bottom-nav .nav-btn.active i{transform:scale(1.05)!important}
-.bottom-nav .nav-btn:active{transform:scale(.92)!important}
-.bottom-nav .nav-btn .badge{position:absolute!important;top:0px!important;right:18%!important;background:#e74c3c!important;color:white!important;font-size:9px!important;font-weight:900!important;font-family:monospace!important;min-width:17px!important;height:17px!important;border-radius:50%!important;display:none!important;align-items:center!important;justify-content:center!important;padding:0 4px!important;border:2px solid #1a1209!important;pointer-events:none!important;z-index:20!important}
-.bottom-nav .nav-btn .badge.show{display:flex!important}
-.bottom-nav .nav-btn .live-dot{position:absolute!important;top:2px!important;right:20%!important;width:7px!important;height:7px!important;background:#e74c3c!important;border-radius:50%!important;border:1.5px solid #1a1209!important;display:none!important;pointer-events:none!important;z-index:20!important;animation:livePulse 1.5s ease-in-out infinite!important}
-.bottom-nav .nav-btn .live-dot.show{display:block!important}
-@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
-.phone-frame{padding-bottom:65px!important}
-.modal-3d,.modal-overlay,.modal-3d.active,.modal-overlay.active{z-index:2000!important}
-.bottom-nav *{pointer-events:none!important}
-.bottom-nav .nav-btn{pointer-events:auto!important}
-@media (max-width:768px){.bottom-nav{height:54px!important;padding:3px 0 8px!important}.bottom-nav .nav-btn{height:44px!important;min-height:44px!important}.bottom-nav .nav-btn i{font-size:20px!important}.bottom-nav .nav-btn span{font-size:8px!important}.bottom-nav .nav-btn .badge{min-width:15px!important;height:15px!important;font-size:8px!important}}
+/* Rimossa la bottom-nav fissa come richiesto */
+
 </style>
 </head>
 <body>
@@ -639,7 +624,6 @@ function initApp() {
     startOrderStatusTracking();
     controllaRifiutiCliente();
     applyPaletteFromFirebase();
-    fixBottomNav();
 }
 
 // ── CARICAMENTO OTTIMIZZATO DA FIREBASE ──────────────────────────────────
@@ -919,13 +903,9 @@ async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_c
 function getOrderProgress(s,typ){if(typ==='pickup'){const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:35,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:70,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-picked'},'delivered':{percent:100,step:3,label:t('picked'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preparing':{percent:30,step:1,label:t('preparing'),icon:'🍕',class:'status-preparing'},'ready':{percent:55,step:2,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:70,step:3,label:t('picked'),icon:'📦',class:'status-picked'},'delivering':{percent:85,step:4,label:t('delivering'),icon:'🛵',class:'status-delivering'},'delivered':{percent:100,step:5,label:t('delivered'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};return p[s]||p['new']}
 function renderOrderTracker(s,mr,ot){const typ=ot||'delivery',pr=getOrderProgress(s,typ);if(s==='rifiutato'||s==='annullato'){const label=s==='rifiutato'?t('rejected'):t('annullato');return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>${mr?`<div class="order-reject-message"><strong>${s==='rifiutato'?'Motivo':'Dettaglio'}:</strong> ${mr}</div>`:''}</div>`}if(s==='delivered'||(typ==='pickup'&&(s==='picked'||s==='delivered')))return`<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?t('picked'):t('delivered')}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;const st=typ==='pickup'?[{label:'Ricevuto',icon:'📥'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'🎉'}]:[{label:'Ricevuto',icon:''},{label:t('preparing'),icon:''},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'📦'},{label:t('delivering'),icon:''},{label:t('delivered'),icon:''}];return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div><div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div></div>`}
 
-// ─── LOGICA ANNULLAMENTO (CORRETTA) ──────────────────────────────────────────
-// Regola: gli ordini "Subito" non sono mai annullabili. Gli ordini
-// programmati sono annullabili da subito, e finché manca PIÙ di 15
-// minuti all'orario fissato. A 15 minuti o meno, il tasto scompare.
+// ─── LOGICA ANNULLAMENTO (CORRETTA E VISIBILE) ──────────────────────────────
 
 function getDataOrdine(order){
-    // Determina la data di riferimento dell'ordine (oggi, salvo diversa indicazione)
     if(order.scheduledDate) return order.scheduledDate;
     return new Date(order.timestamp).toISOString().split('T')[0];
 }
@@ -935,7 +915,6 @@ function calcolaMinutiAllOrario(order){
     if(!order.scheduledTime || order.scheduledTime === 'Subito') return null;
     
     const oraAttuale = new Date().getTime();
-    
     const dataOrdine = getDataOrdine(order);
     if(!dataOrdine) return null;
     
@@ -956,11 +935,8 @@ function puoAnnullareOrdine(order){
     if(order.assignedDriver) return false;
     
     const isSubito = !order.scheduledTime || order.scheduledTime === 'Subito';
-    
-    // Gli ordini "Subito" non sono MAI annullabili dal cliente
     if(isSubito) return false;
     
-    // Ordine programmato: annullabile finché manca PIÙ di 15 minuti all'orario
     const minutiMancanti = calcolaMinutiAllOrario(order);
     if(minutiMancanti === null) return false;
     return minutiMancanti > 15;
@@ -981,7 +957,7 @@ async function annullaOrdine(orderId){
     }
     
     const minutiRimasti = calcolaMinutiAllOrario(order);
-    const confirmMsg = `Sei sicuro di voler annullare l'ordine ${orderId}?\nMancano ${minutiRimasti} minuti.`;
+    const confirmMsg = `Sei sicuro di voler annullare l'ordine ${orderId}?\nMancano circa ${minutiRimasti} minuti.`;
     const conferma = await showConfirm(confirmMsg);
     if(!conferma) return;
     
@@ -993,7 +969,6 @@ async function annullaOrdine(orderId){
         snapshot.forEach(child => { key = child.key; });
         if(!key){showToast('❌ Errore: chiave ordine non trovata');return;}
         
-        // Aggiorna Firebase
         await db.ref('ordini/' + key).update({
             status: 'annullato',
             annullatoDa: 'cliente',
@@ -1001,7 +976,6 @@ async function annullaOrdine(orderId){
             motivoAnnullamento: `Annullato dal cliente (${minutiRimasti} min prima)`
         });
         
-        // Aggiorna locale
         localOrders = localOrders.map(o => {
             if(o.orderId === orderId){
                 return {...o, status:'annullato', motivoAnnullamento:'Annullato dal cliente'};
@@ -1036,8 +1010,6 @@ function renderMyOrders(){
         const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');
         updateNavLiveDot(hasActive);
         
-        const statiItaliani={'new':'Nuovo','preparing':'In preparazione','ready':'Pronto','picked':'Ritirato','delivering':'In consegna','delivered':'Consegnato','rifiutato':'Rifiutato','annullato':'Annullato'};
-        
         l.innerHTML=o.map(x=>{
             const ds=new Date(x.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
             const s=x.status||'new';
@@ -1050,13 +1022,11 @@ function renderMyOrders(){
             // CALCOLO VISUALIZZAZIONE TASTO ANNULLA
             const puoAnnullare = puoAnnullareOrdine(x);
             const minutiRimasti = calcolaMinutiAllOrario(x);
-            const labelAnnulla = puoAnnullare ? `⏳ ${Math.max(0, minutiRimasti)} min` : '';
             
             return `<div class="my-order-card" style="border-left-color:${bc}">
                 <div class="my-order-header">
                     <span class="my-order-id">📦 ${x.orderId}</span>
                     <span class="my-order-date">${ds} • ${tl}</span>
-                    ${puoAnnullare ? `<span style="color:#4ade80;font-size:0.65rem;">${labelAnnulla}</span>` : ''}
                 </div>
                 <div class="my-order-items">${x.items}</div>
                 <div class="my-order-total">€${x.total.toFixed(2)}</div>
@@ -1065,7 +1035,7 @@ function renderMyOrders(){
                     ${cr ? `<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">${t('review_btn')}</button>` : ''}
                     ${x.reviewed ? `<span class="btn-reviewed">${t('already_reviewed')}</span>` : ''}
                     
-                    <!-- TASTO ANNULLA -->
+                    <!-- TASTO ANNULLA VISIBILE SOLO SE POSSIBILE -->
                     ${puoAnnullare ? `<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla (${Math.max(0, minutiRimasti)} min)</button>` : ''}
                     
                     ${s==='annullato' ? `<span style="color:#f87171;font-weight:700;">❌ Annullato</span>` : ''}
@@ -1210,40 +1180,12 @@ function chiudiModalRifiuto(){const m=document.getElementById('modalRifiutoOrdin
 function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.display='none'}
 function controllaRifiutiCliente(){try{const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).on('value',s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})})}catch(e){}}
 
-// ─── BOTTOM NAV ──────────────────────────────────────────────────────────────
-function fixBottomNav() {
-    const nav = document.getElementById('mainBottomNav');
-    if (!nav) return;
-    nav.style.pointerEvents = 'auto';
-    nav.style.touchAction = 'auto';
-    nav.style.zIndex = '999999';
-    nav.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.style.pointerEvents = 'auto';
-        btn.style.touchAction = 'manipulation';
-    });
-}
-
-document.addEventListener('click', () => {
-    setTimeout(fixBottomNav, 10);
-});
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) setTimeout(fixBottomNav, 100);
-});
-
-const origSwitchTab = window.switchTab;
-if (origSwitchTab) {
-    window.switchTab = function(tab) {
-        origSwitchTab(tab);
-        setTimeout(fixBottomNav, 50);
-    };
-}
-
+// Aggiornamento periodico per tenere conto del countdown dei 15 minuti
 setInterval(() => {
-    if (!document.hidden) {
-        loadFromFirebaseOptimized();
-        renderMyOrders(); // ← AGGIUNTO: aggiorna countdown annullamento ogni 30 sec
+    if (!document.hidden && document.getElementById('myOrdersView').style.display === 'block') {
+        renderMyOrders();
     }
-}, 300000);
+}, 60000); // Ogni minuto aggiorna la vista ordini se visibile
 
 setTimeout(updateNavLiveDotOld, 500);
 </script>
