@@ -242,9 +242,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-register{background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
-
-/* Rimossa la bottom-nav fissa come richiesto */
-
 </style>
 </head>
 <body>
@@ -624,6 +621,67 @@ function initApp() {
     startOrderStatusTracking();
     controllaRifiutiCliente();
     applyPaletteFromFirebase();
+    
+    // 🔥 AGGIUNTO: Listener per ricaricare quando l'app torna in primo piano
+    setupVisibilityListener();
+}
+
+// ─── 🔥 NUOVA FUNZIONE: RICARICA DATI QUANDO L'APP TORNA IN PRIMO PIANO ──
+function setupVisibilityListener() {
+    let lastReload = 0;
+    const MIN_RELOAD_INTERVAL = 30000; // 30 secondi tra un reload e l'altro
+    
+    document.addEventListener('visibilitychange', function() {
+        // Se la pagina è tornata visibile (utente ha riaperto l'app)
+        if (!document.hidden) {
+            const now = Date.now();
+            
+            // Evita reload multipli in poco tempo
+            if (now - lastReload < MIN_RELOAD_INTERVAL) {
+                console.log('⏳ Skip reload (troppo presto)');
+                return;
+            }
+            lastReload = now;
+            
+            console.log('🔄 App riaperta, ricarico dati da Firebase...');
+            
+            // Ricarica menu e categorie da Firebase
+            if (typeof loadMenuFromFirebase === 'function') {
+                loadMenuFromFirebase();
+            }
+            if (typeof loadCategoriesFromFirebase === 'function') {
+                loadCategoriesFromFirebase();
+            }
+            if (typeof loadPromosFromFirebase === 'function') {
+                loadPromosFromFirebase();
+            }
+            
+            // Se il cliente sta guardando una categoria, aggiorna la vista
+            if (typeof currentSearchCat !== 'undefined' && currentSearchCat) {
+                const searchValue = document.getElementById('productSearch')?.value || '';
+                if (typeof renderProductList === 'function') {
+                    renderProductList(currentSearchCat, searchValue);
+                }
+            } else {
+                // Altrimenti ricarica la home (categorie)
+                if (typeof renderCategories === 'function') {
+                    renderCategories();
+                }
+            }
+            
+            // Aggiorna il banner delle promozioni
+            if (typeof renderPromotionsBanner === 'function') {
+                renderPromotionsBanner();
+            }
+            
+            // Aggiorna lo stato (aperto/chiuso)
+            if (typeof updateStatusBanner === 'function') {
+                updateStatusBanner();
+            }
+            
+            showToast('🔄 Menu aggiornato!');
+        }
+    });
 }
 
 // ── CARICAMENTO OTTIMIZZATO DA FIREBASE ──────────────────────────────────
@@ -906,13 +964,8 @@ function renderOrderTracker(s,mr,ot){const typ=ot||'delivery',pr=getOrderProgres
 // ─── LOGICA ANNULLAMENTO SEMPLIFICATA E TESTO FISSO ────────────────────────
 
 function puoAnnullareOrdine(order){
-    // Il tasto appare SOLO se l'ordine è 'new' (Nuovo/Ricevuto)
-    // Appena lo stato cambia (es. in preparazione), il tasto sparisce da solo.
     if(!order || order.status !== 'new') return false;
-    
-    // Se c'è un fattorino assegnato, nascondi il tasto
     if(order.assignedDriver) return false; 
-    
     return true; 
 }
 
@@ -948,65 +1001,6 @@ async function annullaOrdine(orderId){
     }
 }
 
-// Funzione per generare la barra LIVE (tracker) CON ICONE
-function getOrderProgress(s, typ){
-    if(typ==='pickup'){
-        const p={
-            'new':{percent:10,step:0,label:'Ricevuto',icon:'',class:'status-new'},
-            'preparing':{percent:35,step:1,label:'In preparazione',icon:'',class:'status-preparing'},
-            'ready':{percent:70,step:2,label:'Pronto',icon:'✅',class:'status-ready'},
-            'picked':{percent:100,step:3,label:'Ritirato',icon:'🎉',class:'status-picked'}
-        };
-        return p[s]||p['new'];
-    }
-    const p={
-        'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},
-        'preparing':{percent:30,step:1,label:'In preparazione',icon:'',class:'status-preparing'},
-        'ready':{percent:55,step:2,label:'Pronto',icon:'✅',class:'status-ready'},
-        'picked':{percent:70,step:3,label:'Ritirato',icon:'📦',class:'status-picked'},
-        'delivering':{percent:85,step:4,label:'In consegna!',icon:'',class:'status-delivering'},
-        'delivered':{percent:100,step:5,label:'Consegnato!',icon:'🎉',class:'status-delivered'}
-    };
-    return p[s]||p['new'];
-}
-
-function renderOrderTracker(s, mr, ot){
-    const typ=ot||'delivery';
-    const pr=getOrderProgress(s,typ);
-    
-    // Se rifiutato o annullato mostra solo lo stato
-    if(s==='rifiutato'||s==='annullato'){
-        const label=s==='rifiutato'?'Ordine rifiutato':'Ordine annullato';
-        return `<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div></div>`;
-    }
-    
-    // Se completato mostra barra piena
-    if(s==='delivered'||(typ==='pickup'&&s==='picked')){
-        return `<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?'Ritirato':'Consegnato!'}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;
-    }
-    
-    // Altrimenti mostra la barra progressiva LIVE con icone
-    const st=typ==='pickup'?[
-        {label:'Ricevuto',icon:''},
-        {label:'In preparazione',icon:'🍕'},
-        {label:'Pronto',icon:'✅'},
-        {label:'Ritirato',icon:'🎉'}
-    ]:[
-        {label:'Ricevuto',icon:'📥'},
-        {label:'In preparazione',icon:'🍕'},
-        {label:'Pronto',icon:'✅'},
-        {label:'Ritirato',icon:'📦'},
-        {label:'In consegna!',icon:'🛵'},
-        {label:'Consegnato!',icon:''}
-    ];
-    
-    return `<div class="order-status-tracker">
-        <div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div>
-        <div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div>
-        <div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div>
-    </div>`;
-}
-
 function renderMyOrders(){
     const l=document.getElementById('myOrdersList');
     if(!l)return;
@@ -1027,10 +1021,7 @@ function renderMyOrders(){
             const tl=ot==='pickup'?' Ritiro':'🛵 Consegna';
             const bc=s==='rifiutato'?'#ef4444':s==='annullato'?'#f87171':'var(--gold-dark)';
             
-            // Richiama la barra LIVE con icone
             const tr = renderOrderTracker(s, x.motivoRifiuto||x.motivoAnnullamento, ot);
-            
-            // Verifica se può annullare (solo se stato è 'new')
             const puoAnnullare = puoAnnullareOrdine(x);
 
             return `<div class="my-order-card" style="border-left-color:${bc}">
@@ -1040,11 +1031,7 @@ function renderMyOrders(){
                 </div>
                 <div class="my-order-items">${x.items}</div>
                 <div class="my-order-total">€${x.total.toFixed(2)}</div>
-                
-                <!-- BARRA LIVE CON ICONE -->
                 ${tr}
-                
-                <!-- TASTO ANNULLA CON TESTO FISSO -->
                 <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
                     ${puoAnnullare ? `<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Si può annullare fino a 15 min prima</button>` : ''}
                     ${s==='annullato' ? `<span style="color:#f87171;font-weight:bold;">ORDINE ANNULLATO</span>` : ''}
@@ -1195,7 +1182,7 @@ setInterval(() => {
     if (!document.hidden && document.getElementById('myOrdersView').style.display === 'block') {
         renderMyOrders();
     }
-}, 60000); // Ogni minuto aggiorna la vista ordini se visibile
+}, 60000);
 
 setTimeout(updateNavLiveDotOld, 500);
 </script>
