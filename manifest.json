@@ -1,7 +1,8 @@
 {
   "name": "Gestionale Grasso Admin",
   "short_name": "Grasso Admin",
-  "start_url": "admin.html",
+  "start_url": "/admin.html",
+  "id": "/admin.html",
   "display": "standalone",
   "background_color": "#1a1209",
   "theme_color": "#d4a84b",
