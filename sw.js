@@ -6,13 +6,12 @@ const DYNAMIC_CACHE = 'dynamic-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/admin.html',
+  '/admin.html', // ✅ AGGIUNTO: Fondamentale per l'admin
   '/manifest-clienti.json',
   '/manifest.json',
   '/offline.html'
 ];
 
-// Installazione: Cachea le risorse statiche
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then(cache => {
@@ -22,7 +21,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Attivazione: Pulisce vecchie cache
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -34,11 +32,9 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: Strategia mista
 self.addEventListener('fetch', event => {
   const { request } = event;
   
-  // Risorse statiche (CDN, fonts, immagini): Cache First
   if (request.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2)$/)) {
     event.respondWith(
       caches.match(request).then(cached => {
@@ -51,9 +47,7 @@ self.addEventListener('fetch', event => {
         });
       })
     );
-  } 
-  // HTML e API: Network First con fallback
-  else {
+  } else {
     event.respondWith(
       fetch(request).then(response => {
         const clone = response.clone();
@@ -68,12 +62,5 @@ self.addEventListener('fetch', event => {
         });
       })
     );
-  }
-});
-
-// Gestione skip waiting manuale
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
   }
 });
