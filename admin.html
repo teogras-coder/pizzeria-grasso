@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-admin-192.png">
+<link rel="apple-touch-icon" href="icon-admin-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#d4a84b">
@@ -237,7 +237,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 
 <div class="mobile-top-bar">
     <div class="logo-area">
-        <img src="https://i.imgur.com/nWLqs68.png" alt="Logo Grasso">
+        <img src="logo.png" alt="Logo Grasso">
         <span>GRASSO</span>
     </div>
     <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -593,6 +593,22 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <div class="palette-grid" id="paletteGrid"></div>
       </div>
     </div>
+
+    <!-- ✅ NUOVA SEZIONE: AGGIORNAMENTO REMOTO APP CLIENTI -->
+    <div class="section" id="section-update">
+      <div class="content-header"><h1><i class="fas fa-sync-alt"></i> Aggiornamento App</h1></div>
+      <div class="card" style="border: 2px solid var(--gold);">
+        <div class="card-title"><i class="fas fa-mobile-alt"></i> Forza Aggiornamento Clienti</div>
+        <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 15px;">
+          Quando premi questo tasto, tutti i dispositivi clienti riceveranno una notifica e si aggiorneranno automaticamente entro 2 secondi.
+          Utile dopo aver modificato menu, prezzi o promozioni.
+        </p>
+        <button class="btn-primary" onclick="forceAppUpdate()" id="btnForceUpdate" style="width:100%; padding:16px; font-size:1.1rem;">
+          <i class="fas fa-paper-plane"></i> Invia Segnale di Aggiornamento a Tutti i Clienti
+        </button>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -751,6 +767,20 @@ function initApp() {
   renderPalettes();
   loadTokensList();
   applyCurrentPalette();
+  
+  // ✅ REGISTRAZIONE SERVICE WORKER V3
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'activated') {
+            console.log('🔄 Admin SW aggiornato');
+          }
+        });
+      });
+    });
+  }
 }
 
 function updateClock() {
@@ -788,6 +818,7 @@ async function loadAllData() {
 
 // ─── LISTENER OTTIMIZZATO PER ORDINI ──────────────────────────────────────
 function setupOptimizedListeners() {
+  // ✅ LIMITA AGLI ULTIMI 30 ORDINI PER PERFORMANCE
   db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
     snapshot.forEach(child => {
       ordersCache[child.key] = { id: child.key, ...child.val() };
@@ -2068,6 +2099,20 @@ async function sendNotification() {
     document.getElementById('notifBody').value = '';
   } catch(e) {
     showToast('❌ Errore invio: ' + e.message);
+  }
+}
+
+// ✅ FUNZIONE AGGIORNAMENTO REMOTO APP CLIENTI
+async function forceAppUpdate() {
+  const ok = await showConfirm('Forzare aggiornamento?', 'Tutti i clienti riceveranno la nuova versione e si aggiorneranno entro 2 secondi.');
+  if (!ok) return;
+  
+  try {
+    const newVersion = Date.now();
+    await db.ref('settings/appClientVersion').set(newVersion);
+    showToast('✅ Segnale inviato! I client si aggiorneranno entro 2 secondi.');
+  } catch(e) {
+    showToast('❌ Errore: ' + e.message);
   }
 }
 
