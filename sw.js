@@ -36,14 +36,11 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // ✅ FIX CRITICO: Se l'URL ha il parametro ?v= (aggiornamento forzato), 
-  // bypassa COMPLETAMENTE la cache e vai diretto al network.
-  // Questo impedisce il loop infinito di ricaricamenti.
+  const url = new URL(event.request.url);
+  
+  // ✅ Se c'è ?v= bypassa TUTTA la cache
   if (url.searchParams.has('v')) {
-    event.respondWith(fetch(request));
+    event.respondWith(fetch(event.request));
     return;
   }
 
