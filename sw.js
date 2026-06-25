@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pizzeria-grasso-v4'; // 🔥 FORZATO A V4
+const CACHE_NAME = 'pizzeria-grasso-v4'; 
 const STATIC_CACHE = 'static-v4';
 const DYNAMIC_CACHE = 'dynamic-v4';
 
@@ -6,7 +6,7 @@ const DYNAMIC_CACHE = 'dynamic-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/admin.html', // ✅ AGGIUNTO: Fondamentale per il gestionale
+  '/admin.html',
   '/manifest-clienti.json',
   '/manifest.json',
   '/offline.html'
@@ -37,8 +37,17 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const { request } = event;
-  
-  // Risorse statiche (CSS, JS, Immagini, Font)
+  const url = new URL(request.url);
+
+  // ✅ FIX CRITICO: Se l'URL ha il parametro ?v= (aggiornamento forzato), 
+  // bypassa COMPLETAMENTE la cache e vai diretto al network.
+  // Questo impedisce il loop infinito di ricaricamenti.
+  if (url.searchParams.has('v')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Risorse statiche (CSS, JS, Immagini, Font) -> Cache First
   if (request.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2)$/)) {
     event.respondWith(
       caches.match(request).then(cached => {
