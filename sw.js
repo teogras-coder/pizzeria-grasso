@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pizzeria-grasso-v3'; // 🔥 AGGIORNATO A V3
+const CACHE_NAME = 'pizzeria-grasso-v3'; // 🔥 OBBLIGATORIO: Cambia da v2 a v3
 const STATIC_CACHE = 'static-v3';
 const DYNAMIC_CACHE = 'dynamic-v3';
 
@@ -6,7 +6,7 @@ const DYNAMIC_CACHE = 'dynamic-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/admin.html', // ✅ AGGIUNTO: Fondamentale per l'admin
+  '/admin.html', // ✅ AGGIUNTO: Fondamentale per vedere il tasto
   '/manifest-clienti.json',
   '/manifest.json',
   '/offline.html'
