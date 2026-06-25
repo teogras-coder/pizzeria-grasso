@@ -1,12 +1,12 @@
-const CACHE_NAME = 'pizzeria-grasso-v3'; // 🔥 OBBLIGATORIO: Cambia da v2 a v3
-const STATIC_CACHE = 'static-v3';
-const DYNAMIC_CACHE = 'dynamic-v3';
+const CACHE_NAME = 'pizzeria-grasso-v4'; // 🔥 FORZATO A V4
+const STATIC_CACHE = 'static-v4';
+const DYNAMIC_CACHE = 'dynamic-v4';
 
 // Risorse essenziali da precaricare
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/admin.html', // ✅ AGGIUNTO: Fondamentale per vedere il tasto
+  '/admin.html', // ✅ AGGIUNTO: Fondamentale per il gestionale
   '/manifest-clienti.json',
   '/manifest.json',
   '/offline.html'
@@ -15,7 +15,7 @@ const STATIC_ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then(cache => {
-      console.log('Cache statiche installate');
+      console.log('Cache v4 installata');
       return cache.addAll(STATIC_ASSETS);
     }).then(() => self.skipWaiting())
   );
@@ -26,7 +26,10 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => {
       return Promise.all(
         keys.filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE)
-            .map(key => caches.delete(key))
+            .map(key => {
+              console.log('Elimino vecchia cache:', key);
+              return caches.delete(key);
+            })
       );
     }).then(() => self.clients.claim())
   );
@@ -35,6 +38,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   
+  // Risorse statiche (CSS, JS, Immagini, Font)
   if (request.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2)$/)) {
     event.respondWith(
       caches.match(request).then(cached => {
@@ -47,7 +51,9 @@ self.addEventListener('fetch', event => {
         });
       })
     );
-  } else {
+  } 
+  // HTML e API (Network First)
+  else {
     event.respondWith(
       fetch(request).then(response => {
         const clone = response.clone();
