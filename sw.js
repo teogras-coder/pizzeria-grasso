@@ -1,26 +1,28 @@
-const CACHE_NAME = 'pizzeria-grasso-v4'; 
-const STATIC_CACHE = 'static-v4';
-const DYNAMIC_CACHE = 'dynamic-v4';
+const CACHE_NAME = 'pizzeria-grasso-v2';
+const STATIC_CACHE = 'static-v2';
+const DYNAMIC_CACHE = 'dynamic-v2';
 
-// Risorse essenziali da precaricare
+// Risorse statiche da cacheare immediatamente
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/admin.html',
-  '/manifest-clienti.json',
   '/manifest.json',
-  '/offline.html'
+  '/offline.html'  // Pagina offline opzionale
 ];
 
+// Install: cachea risorse statiche
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => {
-      console.log('Cache v4 installata');
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(STATIC_CACHE)
+      .then(cache => {
+        console.log('Cache statiche');
+        return cache.addAll(STATIC_ASSETS);
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
+// Activate: pulisce vecchie cache
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -35,44 +37,63 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Fetch: strategia Cache First per statiche, Network First per dinamiche
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
+  const { request } = event;
+  const url = new URL(request.url);
   
-  // ✅ Se c'è ?v= bypassa TUTTA la cache
-  if (url.searchParams.has('v')) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
-
-  // Risorse statiche (CSS, JS, Immagini, Font) -> Cache First
+  // Risorse statiche (CDN, fonts, etc)
   if (request.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2)$/)) {
     event.respondWith(
-      caches.match(request).then(cached => {
-        if (cached) return cached;
-        return fetch(request).then(response => {
-          if (!response || response.status !== 200) return response;
-          const clone = response.clone();
-          caches.open(DYNAMIC_CACHE).then(cache => cache.put(request, clone));
-          return response;
-        });
-      })
+      caches.match(request)
+        .then(cached => {
+          if (cached) {
+            // Cache first per risorse statiche
+            return cached;
+          }
+          // Altrimenti fetch e cache
+          return fetch(request)
+            .then(response => {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+              const responseToCache = response.clone();
+              caches.open(DYNAMIC_CACHE)
+                .then(cache => cache.put(request, responseToCache));
+              return response;
+            });
+        })
     );
   } 
-  // HTML e API (Network First)
+  // HTML e API - Network first
   else {
     event.respondWith(
-      fetch(request).then(response => {
-        const clone = response.clone();
-        caches.open(DYNAMIC_CACHE).then(cache => cache.put(request, clone));
-        return response;
-      }).catch(() => {
-        return caches.match(request).then(cached => {
-          if (cached) return cached;
-          if (request.headers.get('accept').includes('text/html')) {
-            return caches.match('/index.html');
-          }
-        });
-      })
+      fetch(request)
+        .then(response => {
+          // Cache la risposta per il prossimo utilizzo
+          const responseToCache = response.clone();
+          caches.open(DYNAMIC_CACHE)
+            .then(cache => cache.put(request, responseToCache));
+          return response;
+        })
+        .catch(() => {
+          // Fallback alla cache se offline
+          return caches.match(request)
+            .then(cached => {
+              if (cached) return cached;
+              // Se è una richiesta HTML, servi la index
+              if (request.headers.get('accept').includes('text/html')) {
+                return caches.match('/index.html');
+              }
+            });
+        })
     );
+  }
+});
+
+// Notifica aggiornamento
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
