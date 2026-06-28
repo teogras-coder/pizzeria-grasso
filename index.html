@@ -38,8 +38,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .phone-frame{width:100%;max-width:480px;height:100vh;height:100dvh;background:linear-gradient(170deg,var(--dark) 0%,var(--brown) 40%,var(--brown-light) 100%);position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;z-index:10;padding-bottom:20px!important}
 .header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:hidden}
 .logo-area{width:100%;position:relative;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:2px;box-shadow:0 3px 0 0 rgba(240,215,140,.85);margin-bottom:2px;transition:box-shadow .8s ease;background:var(--dark)!important}
-.logo-tint-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--gold);mix-blend-mode:multiply;pointer-events:none;z-index:2;opacity:.45;transition:background .8s ease}
-.logo-area img{width:100%;height:auto;display:block;object-fit:cover;max-height:220px;transform:scaleX(1.18);transform-origin:center center;position:relative;z-index:1}
+.logo-tint-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--gold);mix-blend-mode:color;pointer-events:none;z-index:2;opacity:.8;transition:background .8s ease,opacity .8s ease}
+.logo-area img{width:100%;height:auto;display:block;object-fit:cover;max-height:220px;transform:scaleX(1.18);transform-origin:center center;position:relative;z-index:1;filter:grayscale(1) brightness(0.95) contrast(1.05);}
 .hero-section{position:relative;height:130px;overflow:hidden;flex-shrink:0;margin-bottom:0}
 .hero-img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(26,18,9,.95) 100%);z-index:2;pointer-events:none}
@@ -74,7 +74,13 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .quick-nav-btn .nav-badge{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:white;font-size:9px;font-weight:900;font-family:monospace;min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:none;align-items:center;justify-content:center;border:2px solid var(--dark);pointer-events:none}
 .quick-nav-btn .nav-live-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:#e74c3c;border-radius:50%;border:1px solid var(--dark);display:none;animation:pulseDot 1.5s ease-in-out infinite;pointer-events:none}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-#productsView,#myOrdersView,#reviewsPublicView{display:none;padding:0 20px 100px}
+.floating-cart-btn{position:fixed;bottom:22px;right:22px;left:auto;top:auto;z-index:10010;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);border:2px solid rgba(255,255,255,.25);color:var(--dark);font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.35),0 0 0 0 rgba(255,255,255,0);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;touch-action:none;}
+.floating-cart-btn:hover{transform:translateY(-2px);box-shadow:0 16px 35px rgba(0,0,0,.45),0 0 0 12px rgba(255,255,255,.15);border-color:rgba(255,255,255,.75)}
+.floating-cart-btn.snapped{box-shadow:0 14px 38px rgba(0,0,0,.35),0 0 0 14px rgba(255,255,255,.18);border-color:rgba(255,255,255,.9)}
+.floating-cart-btn.hidden{display:none}
+.floating-cart-btn .floating-cart-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e74c3c;color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#productsView,#myOrdersView,#reviewsPublicView{display:none;padding:0 20px 20px;box-sizing:border-box}
+#productList{overflow-y:auto;max-height:calc(100vh - 280px);padding-right:6px;}
 .back-btn-3d{background:var(--card-light);border:none;color:var(--gold);padding:12px 20px;border-radius:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;margin:20px 0;box-shadow:0 4px 0 var(--shadow)}
 .category-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);margin-bottom:20px;text-shadow:0 0 10px rgba(212,168,75,.3)}
 .search-bar-3d{position:relative;margin-bottom:20px}
@@ -264,6 +270,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="ambient-lights"><div class="light-orb"></div><div class="light-orb"></div><div class="light-orb"></div></div>
 <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-i18n="offline_msg">⚠️ Sei offline — riconnessione in corso...</div>
+
+<button id="floatingCartButton" class="floating-cart-btn hidden" aria-label="Apri carrello"><i class="fas fa-shopping-cart"></i><span class="floating-cart-badge" id="floatingCartBadge">0</span></button>
 
 <div class="phone-frame" id="mainApp" style="display:none;">
 <header class="header">
@@ -609,7 +617,7 @@ function initApp(){
         const s=localStorage.getItem('pizzeria_cart_v3');
         if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge()}}
     }catch(e){}
-    
+    setupFloatingCartDrag();
     loadFromFirebaseOptimized();
     setupOptimizedListeners();
     loadReviewsPublic();
@@ -816,7 +824,8 @@ function updateServicesUI(){}
 
 // ─── CARRELLO ──────────────────────────────────────────────────────────────
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
-function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
+function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}const fb=document.getElementById('floatingCartButton');const fbBadge=document.getElementById('floatingCartBadge');if(fb){fb.classList.toggle('hidden',n===0);}if(fbBadge){fbBadge.textContent=n;}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
+function setupFloatingCartDrag(){const btn=document.getElementById('floatingCartButton');if(!btn)return;let dragging=false;let pointerId=null;let startX=0;let startY=0;let origX=0;let origY=0;let moved=false;const margin=12;const clamp=(value,min,max)=>Math.min(Math.max(value,min),max);const updatePosition=(x,y)=>{const maxX=window.innerWidth-btn.offsetWidth-margin;const maxY=window.innerHeight-btn.offsetHeight-margin;btn.style.left=clamp(x,margin,maxX)+'px';btn.style.top=clamp(y,margin,maxY)+'px';btn.style.right='auto';btn.style.bottom='auto';btn.classList.remove('snapped')};const snapToEdge=(x,y)=>{const maxY=window.innerHeight-btn.offsetHeight-margin;const clampedY=clamp(y,margin,maxY);const closeToLeft=x < 100;const closeToRight=(window.innerWidth-(x+btn.offsetWidth)) < 100; if(closeToLeft){btn.style.left=margin+'px';btn.style.right='auto';btn.classList.add('snapped')}else if(closeToRight){btn.style.left='auto';btn.style.right=margin+'px';btn.classList.add('snapped')}else{btn.style.left=clamp(x,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.right='auto';btn.classList.remove('snapped')}btn.style.top=clampedY+'px';btn.style.bottom='auto'};const resetPosition=()=>{const rect=btn.getBoundingClientRect();btn.style.left=clamp(rect.left,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.top=clamp(rect.top,margin,window.innerHeight-btn.offsetHeight-margin)+'px';btn.style.right='auto';btn.style.bottom='auto'};btn.style.touchAction='none';btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;dragging=true;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;const rect=btn.getBoundingClientRect();origX=rect.left;origY=rect.top;moved=false;btn.setPointerCapture(e.pointerId);});btn.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;const dy=e.clientY-startY;if(!moved&&Math.hypot(dx,dy)>6)moved=true;if(moved)updatePosition(origX+dx,origY+dy);});const endDrag=e=>{if(!dragging||e.pointerId!==pointerId)return;dragging=false;btn.releasePointerCapture(e.pointerId);if(moved){const rect=btn.getBoundingClientRect();snapToEdge(rect.left,rect.top);}setTimeout(()=>{moved=false},0);};btn.addEventListener('pointerup',endDrag);btn.addEventListener('pointercancel',endDrag);btn.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();}else{openCart();}});window.addEventListener('resize',resetPosition);}
 function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(!d)return;d.style.display=hasActive?'block':'none'}
 function updateNavLiveDotOld(){try{const o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');updateNavLiveDot(hasActive)}catch(e){updateNavLiveDot(false)}}
 async function clearCart(){if(!cart.length)return;const ok=await showConfirm(t('empty_cart_confirm'));if(!ok)return;cart=[];updateCartBadge();closeCart();showToast(t('cart_emptied'))}
