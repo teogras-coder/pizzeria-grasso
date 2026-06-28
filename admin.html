@@ -293,7 +293,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <div class="nav-item" onclick="showSection('drivers', this)" data-section="drivers"><i class="fas fa-users"></i> Fattorini</div>
       <div class="nav-item" onclick="showSection('security', this)" data-section="security"><i class="fas fa-lock"></i> Sicurezza</div>
       <div class="nav-item" onclick="showSection('colors', this)" data-section="colors"><i class="fas fa-palette"></i> Colori</div>
-      <div class="nav-item" onclick="showSection('update', this)" data-section="update"><i class="fas fa-sync-alt"></i> Aggiorna Clienti</div>
+      <div class="nav-item" onclick="showSection('dashboard', this)" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
     </nav>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Esci</button>
@@ -587,26 +587,35 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       </div>
     </div>
 
+    <div class="section" id="section-dashboard">
+      <div class="content-header">
+        <div>
+          <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+          <div class="subtitle">Statistiche in tempo reale sui clienti e sugli ordini.</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="number" id="dashboardClients">0</div><div class="label">Clienti registrati</div></div>
+        <div class="stat-card"><div class="number" id="dashboardDrivers">0</div><div class="label">Fattorini registrati</div></div>
+        <div class="stat-card"><div class="number" id="dashboardDevices">0</div><div class="label">Dispositivi totali</div></div>
+        <div class="stat-card"><div class="number" id="dashboardActiveOrders">0</div><div class="label">Ordini attivi</div></div>
+        <div class="stat-card"><div class="number" id="dashboardTotalOrders">0</div><div class="label">Ordini totali</div></div>
+        <div class="stat-card"><div class="number" id="dashboardDeliveredOrders">0</div><div class="label">Consegnati</div></div>
+      </div>
+      <div class="card" style="border: 2px solid var(--gold);">
+        <div class="card-title"><i class="fas fa-sync-alt"></i> Sincronizzazione automatica</div>
+        <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 0;">
+          I client si sincronizzano automaticamente: non è più necessario premere il pulsante di aggiornamento.
+          Le modifiche a menu, prezzi e promozioni arrivano in tempo reale all'app del cliente.
+        </p>
+      </div>
+    </div>
+
     <div class="section" id="section-colors">
       <div class="content-header"><h1><i class="fas fa-palette"></i> Colori</h1></div>
       <div class="card">
         <p style="color:#8a7a5a;margin-bottom:15px;">Seleziona una palette colori per l'app. I cambiamenti sono immediati!</p>
         <div class="palette-grid" id="paletteGrid"></div>
-      </div>
-    </div>
-
-    <!-- ✅ NUOVA SEZIONE: AGGIORNAMENTO REMOTO APP CLIENTI -->
-    <div class="section" id="section-update">
-      <div class="content-header"><h1><i class="fas fa-sync-alt"></i> Aggiornamento App</h1></div>
-      <div class="card" style="border: 2px solid var(--gold);">
-        <div class="card-title"><i class="fas fa-mobile-alt"></i> Forza Aggiornamento Clienti</div>
-        <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 15px;">
-          Quando premi questo tasto, tutti i dispositivi clienti riceveranno una notifica e si aggiorneranno automaticamente entro 2 secondi.
-          Utile dopo aver modificato menu, prezzi o promozioni.
-        </p>
-        <button class="btn-primary" onclick="forceAppUpdate()" id="btnForceUpdate" style="width:100%; padding:16px; font-size:1.1rem;">
-          <i class="fas fa-paper-plane"></i> Invia Segnale di Aggiornamento a Tutti i Clienti
-        </button>
       </div>
     </div>
 
@@ -920,7 +929,17 @@ function renderOrders(orders) {
   document.getElementById('statDelivering').textContent = gruppi.delivering.length;
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
 
-  const attivi = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
+  const activeOrders = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
+  const totalOrders = activeOrders + gruppi.delivered.length;
+  const deliveredOrders = gruppi.delivered.length;
+  const dashboardActiveOrders = document.getElementById('dashboardActiveOrders');
+  const dashboardTotalOrders = document.getElementById('dashboardTotalOrders');
+  const dashboardDeliveredOrders = document.getElementById('dashboardDeliveredOrders');
+  if (dashboardActiveOrders) dashboardActiveOrders.textContent = activeOrders;
+  if (dashboardTotalOrders) dashboardTotalOrders.textContent = totalOrders;
+  if (dashboardDeliveredOrders) dashboardDeliveredOrders.textContent = deliveredOrders;
+
+  const attivi = activeOrders;
   const badge = document.getElementById('newOrdersBadge');
   if (attivi > 0) { badge.textContent = attivi; badge.style.display = 'inline'; }
   else badge.style.display = 'none';
@@ -2028,9 +2047,15 @@ function updateTokensCount() {
   const countClients = document.getElementById('countClients');
   const countDrivers = document.getElementById('countDrivers');
   const countAll = document.getElementById('countAll');
+  const dashboardClients = document.getElementById('dashboardClients');
+  const dashboardDrivers = document.getElementById('dashboardDrivers');
+  const dashboardDevices = document.getElementById('dashboardDevices');
   if (countClients) countClients.textContent = clients + ' registrati';
   if (countDrivers) countDrivers.textContent = drivers + ' registrati';
   if (countAll) countAll.textContent = (clients + drivers) + ' totali';
+  if (dashboardClients) dashboardClients.textContent = clients;
+  if (dashboardDrivers) dashboardDrivers.textContent = drivers;
+  if (dashboardDevices) dashboardDevices.textContent = clients + drivers;
 }
 
 function loadTokensList() {
