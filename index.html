@@ -243,6 +243,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .lang-selector{margin-bottom:15px;background:rgba(212,168,75,.1);padding:15px;border-radius:15px;border:1px solid rgba(212,168,75,.3);width:100%;max-width:380px}
 .lang-selector label{color:var(--gold);font-weight:600;margin-bottom:8px;display:block}
 .lang-selector select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--gold);background:var(--brown);color:var(--cream);font-size:1rem}
+.language-chip{position:absolute;top:20px;right:20px;background:rgba(0,0,0,.18);color:#fff;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);display:inline-flex;align-items:center;gap:8px;font-size:.95rem;cursor:pointer;backdrop-filter:blur(10px);z-index:20}
+.language-chip:hover{background:rgba(255,255,255,.12)}
 .welcome-buttons{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
 .btn-register{background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
@@ -258,7 +260,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
     <h1 class="welcome-title" data-i18n="welcome_title">🍕 Benvenuto da Grasso!</h1>
     <div class="home-instructions"><h3 data-i18n="save_home_title">📱 Salva l'app sulla Home!</h3><ol><li><span data-i18n="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li><li><span data-i18n="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li><li><span data-i18n="save_home_step3">Ordina con un tocco! 🚀</span></li></ol></div>
-    <div class="lang-selector"><label data-i18n="language_label">🌍 Lingua / Language</label><select id="langSelect" onchange="changeLanguage(this.value)"><option value="it">🇮🇹 Italiano</option><option value="en">🇬🇧 English</option><option value="de">🇩 Deutsch</option></select></div>
+    <div class="lang-selector"><label data-i18n="language_label">🌍 Lingua / Language</label><select id="langSelect" onchange="changeLanguage(this.value)"><option value="it">🇮🇹 Italiano</option><option value="en">🇬🇧 English</option><option value="de">🇩🇪 Deutsch</option></select></div>
     <div class="welcome-buttons"><button class="btn-register" onclick="showRegisterModal()" data-i18n="register_btn">👤 Registrati</button><button class="btn-guest" onclick="enterAsGuest()" data-i18n="guest_btn">👻 Continua come Ospite</button></div>
     <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
 </div>
@@ -278,6 +280,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     <div class="logo-area">
         <div class="logo-tint-overlay" id="logoTint"></div>
         <img src="https://i.imgur.com/nWLqs68.png" alt="Antica Pizzeria Grasso" style="width:100%;height:auto;display:block;object-fit:cover;max-height:220px;transform:scaleX(1.18);transform-origin:center center;">
+    </div>
+    <div id="languageChip" class="language-chip" onclick="cycleLanguage()" title="Cambia lingua">
+        <span id="languageChipEmoji">🌍</span>
+        <span id="languageChipLabel">Italiano</span>
     </div>
     <div class="gold-shimmer-bar"><div class="shimmer-light"></div></div>
     <div class="hero-section"><img id="heroImg" class="hero-img" src="" alt="Pizza" style="background-color:#2d1f12;"><div class="hero-overlay"></div></div>
@@ -519,10 +525,28 @@ function changeLanguage(lang){
     currentLang=lang;
     localStorage.setItem('grasso_lang',lang);
     document.getElementById('langSelect').value=lang;
+    updateLanguageChip();
     applyTranslations();
     if(document.getElementById('cartModal').classList.contains('active'))openCart();
     if(document.getElementById('myOrdersView').style.display==='block')renderMyOrders();
     if(currentSearchCat)renderProductList(currentSearchCat,document.getElementById('productSearch')?.value||'');
+}
+function getLanguageLabel(lang){
+    if(lang==='en')return '🇬🇧 English';
+    if(lang==='de')return '🇩🇪 Deutsch';
+    return '🇮🇹 Italiano';
+}
+function updateLanguageChip(){
+    const chip = document.getElementById('languageChip');
+    if(!chip)return;
+    const label = document.getElementById('languageChipLabel');
+    const emoji = document.getElementById('languageChipEmoji');
+    if(label) label.textContent = getLanguageLabel(currentLang).split(' ').slice(1).join(' ');
+    if(emoji) emoji.textContent = currentLang==='en' ? '🇬🇧' : currentLang==='de' ? '🇩🇪' : '🇮🇹';
+}
+function cycleLanguage(){
+    const next = currentLang === 'it' ? 'en' : currentLang === 'en' ? 'de' : 'it';
+    changeLanguage(next);
 }
 function detectBrowserLanguage(){
     const saved=localStorage.getItem('grasso_lang');
@@ -578,6 +602,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const lang=detectBrowserLanguage();
     currentLang=lang;
     document.getElementById('langSelect').value=lang;
+    updateLanguageChip();
     applyTranslations();
     
     loadFromCache();
@@ -659,7 +684,8 @@ function setupVisibilityListener(){
             
             renderPromotionsBanner();
             updateStatusBanner();
-            showToast('🔄 Menu aggiornato!');
+            // Non mostrare sempre il messaggio: l'app può tornare in primo piano anche senza una vera modifica del menu
+            // showToast('🔄 Menu aggiornato!');
         }
     });
 }
