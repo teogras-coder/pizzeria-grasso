@@ -557,6 +557,18 @@ function setupOptimizedListeners() {
             });
           }
         }
+
+        if (order.assignedDriver === currentDriver?.pin && order.status === 'delayed' && oldStatus !== 'delayed') {
+          playNotificationSound();
+          if (navigator.vibrate) navigator.vibrate([250, 80, 250]);
+          showToast('⏰ Un tuo ordine è in ritardo');
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('🍕 Ordine Pronto!', {
+              body: 'Puoi andare a ritirare l\'ordine in pizzeria',
+              icon: 'https://i.imgur.com/nWLqs68.png'
+            });
+          }
+        }
         
         // Notifica: ordine assegnato a me (accettato dal gestionale)
         if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && order.status === 'preparing') {
@@ -633,7 +645,7 @@ function renderOrders() {
   Object.values(ordersCache).forEach(order => {
     // Scheda "disponibili": solo delivery non assegnati e in stato 'new'
     if (
-      order.status === 'new' &&
+      ['new','delayed'].includes(order.status) &&
       !order.assignedDriver &&
       order.type === 'delivery'
     ) {
@@ -643,7 +655,7 @@ function renderOrders() {
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
-      ['new','preparing','ready','picked','delivering','delivered'].includes(order.status)
+      ['new','preparing','delayed','ready','picked','delivering','delivered'].includes(order.status)
     ) {
       myOrders.push(order);
       if (order.status === 'delivered') completedCount++;
@@ -696,12 +708,14 @@ function renderOrders() {
     let statusMessage = '';
     let actions = '';
     
-    if (order.status === 'new' && !order.assignedDriver) {
+    if (['new','delayed'].includes(order.status) && !order.assignedDriver) {
       actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Accetta</button>`;
     } else if (order.status === 'new' && order.assignedDriver === currentDriver?.pin) {
       statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria metta in preparazione...</div>`;
     } else if (order.status === 'preparing') {
       statusMessage = `<div class="status-message status-preparing">🍕 La pizzeria sta preparando...</div>`;
+    } else if (order.status === 'delayed') {
+      statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo</div>`;
     } else if (order.status === 'ready') {
       statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro!</div>`;
       actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
