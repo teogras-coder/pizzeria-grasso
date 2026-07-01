@@ -129,6 +129,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-group-title { background: var(--gold-dark); color: var(--dark); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; margin: 15px 0 8px; display: flex; align-items: center; gap: 8px; }
 .orders-group-title.new { background: #f87171; color: white; }
 .orders-group-title.preparing { background: #fbbf24; color: var(--dark); }
+.orders-group-title.delayed { background: #f59e0b; color: white; }
 .orders-group-title.ready { background: #4ade80; color: var(--dark); }
 .orders-group-title.picked { background: #8b5cf6; color: white; }
 .orders-group-title.delivering { background: #ec4899; color: white; }
@@ -314,6 +315,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <div class="stats-row">
         <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">Nuovi</div></div>
         <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">In Prep</div></div>
+        <div class="stat-card"><div class="number" id="statDelayed">0</div><div class="label">In Ritardo</div></div>
         <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">Pronti</div></div>
         <div class="stat-card"><div class="number" id="statPicked">0</div><div class="label">Ritirati</div></div>
         <div class="stat-card"><div class="number" id="statDelivering">0</div><div class="label">In Consegna</div></div>
@@ -861,6 +863,10 @@ function setupOptimizedListeners() {
       if (order.status === 'preparing' && oldStatus === 'new') {
         playAdminNotification();
         showToast(`🛵 ${order.assignedName || 'Fattorino'} ha accettato l'ordine ${orderId}`);
+      } else if (order.status === 'delayed' && oldStatus !== 'delayed') {
+        playAdminNotification();
+        const delayMinutes = order.delayMinutes || 10;
+        showToast(`⏰ Ordine ${orderId} segnato come in ritardo (${delayMinutes} min)!`);
       } else if (order.status === 'ready' && oldStatus === 'preparing') {
         playAdminNotification();
         showToast(`✅ Ordine ${orderId} pronto!`);
@@ -915,7 +921,7 @@ function showSection(name, el) {
 
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
-  const gruppi = { new: [], preparing: [], ready: [], picked: [], delivering: [], delivered: [] };
+  const gruppi = { new: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [] };
   Object.entries(orders || {}).forEach(([id, o]) => {
     const st = o.status || 'new';
     if (gruppi[st]) gruppi[st].push([id, o]);
@@ -924,12 +930,13 @@ function renderOrders(orders) {
 
   document.getElementById('statNew').textContent = gruppi.new.length;
   document.getElementById('statPreparing').textContent = gruppi.preparing.length;
+  document.getElementById('statDelayed').textContent = gruppi.delayed.length;
   document.getElementById('statReady').textContent = gruppi.ready.length;
   document.getElementById('statPicked').textContent = gruppi.picked.length;
   document.getElementById('statDelivering').textContent = gruppi.delivering.length;
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
 
-  const activeOrders = gruppi.new.length + gruppi.preparing.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
+  const activeOrders = gruppi.new.length + gruppi.preparing.length + gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
   const totalOrders = activeOrders + gruppi.delivered.length;
   const deliveredOrders = gruppi.delivered.length;
   const dashboardActiveOrders = document.getElementById('dashboardActiveOrders');
@@ -952,6 +959,7 @@ function renderOrders(orders) {
   const titoli = { 
     new: 'Nuovi (in attesa fattorino)', 
     preparing: 'In Preparazione', 
+    delayed: 'In Ritardo', 
     ready: 'Pronti (ritiro fattorino)', 
     picked: 'Ritirati dal fattorino', 
     delivering: 'In Consegna', 
@@ -972,8 +980,10 @@ function renderOrders(orders) {
       
       let ah = '';
       if (stato === 'new') {
-        ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       } else if (stato === 'preparing') {
+        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (stato === 'delayed') {
         ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       } else if (stato === 'ready') {
         const isPickup = o.type === 'pickup';
@@ -1003,6 +1013,25 @@ function updateOrderStatus(id, st, orderType) {
   }
   db.ref('ordini/' + id + '/status').set(st);
   showToast('✅ Aggiornato');
+}
+
+async function setOrderDelayed(id) {
+  const value = await showPrompt('Imposta ritardo', 'Minuti di attesa (multipli di 10):', 'Es: 20', '10');
+  if (value === null) return;
+
+  const minutes = parseInt(String(value).trim(), 10);
+  if (!Number.isInteger(minutes) || minutes <= 0 || minutes % 10 !== 0) {
+    showToast('⚠️ Inserisci un valore valido, multiplo di 10');
+    return;
+  }
+
+  await db.ref('ordini/' + id).update({
+    status: 'delayed',
+    delayMinutes: minutes,
+    delayedAt: Date.now(),
+    delayUntil: Date.now() + (minutes * 60 * 1000)
+  });
+  showToast(`⏰ Ritardo impostato a ${minutes} minuti`);
 }
 
 async function rifiutaOrdine(id) {
