@@ -2127,36 +2127,30 @@ async function sendNotification() {
   showToast('📤 Invio in corso...');
   
   try {
-    const response = await fetch('https://onesignal.com/api/v1/notifications', {
+    const response = await fetch('/api/send-notification', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic os_v2_app_abefre4z65dvpktw36eorntxmy7yj3po3kzutte2agidatboa3m27ztq7ztu4mpq3uacxyowf2xcyk65lu6wjhdrogpx4tcsmnhvlcy'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        app_id: "00485893-99f7-4757-aa76-df88e8b67766",
-        included_segments: ["All"],
-        headings: { "it": title },
-        contents: { "it": body },
-        url: "https://pizzeriagrasso.vercel.app/",
-        small_icon: "https://i.imgur.com/nWLqs68.png",
-        large_icon: "https://i.imgur.com/nWLqs68.png"
+        title: title,
+        body: body,
+        destinatari: selectedNotifDest
       })
     });
     
     const result = await response.json();
     
-    if (result.id) {
-      showToast(`✅ Notifica inviata con successo!`);
+    if (result.success) {
+      showToast(`✅ ${result.message}`);
+      document.getElementById('notifTitle').value = '';
+      document.getElementById('notifBody').value = '';
     } else {
-      showToast(`❌ Errore: ${result.errors ? result.errors[0] : 'Errore sconosciuto'}`);
+      showToast(` Errore: ${result.error}`);
     }
-    
-    document.getElementById('notifTitle').value = '';
-    document.getElementById('notifBody').value = '';
   } catch(e) {
     console.error('Errore:', e);
-    showToast('❌ Errore: ' + e.message);
+    showToast('❌ Errore di connessione');
   }
 }
 
