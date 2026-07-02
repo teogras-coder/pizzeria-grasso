@@ -252,6 +252,18 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
 </style>
+<!-- OneSignal Push Notifications -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "00485893-99f7-4757-aa76-df88e8b67766",
+      serviceWorkerPath: "/OneSignalSDKWorker.js",
+      serviceWorkerScope: "/"
+    });
+  });
+</script>
 </head>
 <body>
 
