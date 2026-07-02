@@ -1084,24 +1084,16 @@ setInterval(()=>{
 
 setTimeout(updateNavLiveDotOld,500);
 </script>
-<!-- ✅ FIREBASE MESSAGING (aggiungi se non c'è) -->
+<!-- ✅ FIREBASE MESSAGING (assicurati che ci sia) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
-<!-- ✅ CODICE NOTIFICHE -->
+<!-- ✅ CODICE NOTIFICHE CORRETTO per Firebase v10 -->
 <script>
-// Aspetta che la pagina sia caricata
 window.addEventListener('load', async function() {
-  console.log('🔔 Setup notifiche avviato...');
+  console.log(' Setup notifiche avviato...');
   
-  // Verifica che Firebase esista
-  if (typeof firebase === 'undefined') {
-    console.error('❌ Firebase non caricato');
-    return;
-  }
-  
-  // Verifica che messaging esista
-  if (typeof firebase.messaging === 'undefined') {
-    console.error('❌ firebase-messaging-compat.js non caricato!');
+  if (typeof firebase === 'undefined' || typeof firebase.messaging === 'undefined') {
+    console.error('❌ Firebase Messaging non disponibile');
     return;
   }
   
@@ -1111,23 +1103,23 @@ window.addEventListener('load', async function() {
     console.log('✅ Service Worker registrato:', registration.scope);
     
     // 2. Inizializza Firebase Messaging
+    // ✅ CON FIREBASE v10 COMPAT: non serve useServiceWorker()
+    // Il SW viene rilevato automaticamente
     const messaging = firebase.messaging();
-    messaging.useServiceWorker(registration);
     
     // 3. Chiedi permesso notifiche
     const permission = await Notification.requestPermission();
-    console.log('🔔 Permesso notifiche:', permission);
+    console.log(' Permesso notifiche:', permission);
     
     if (permission === 'granted') {
       // 4. Ottieni token FCM
       const token = await messaging.getToken({
         vapidKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
       });
-      console.log('🔑 Token FCM:', token);
+      console.log(' Token FCM:', token);
       
       // 5. Salva token in Firebase Database
       if (token) {
-        // Prova a salvare sotto users se c'è un utente loggato
         if (firebase.auth && firebase.auth().currentUser) {
           const uid = firebase.auth().currentUser.uid;
           await firebase.database()
@@ -1135,7 +1127,6 @@ window.addEventListener('load', async function() {
             .set(token);
           console.log('✅ Token salvato per utente:', uid);
         } else {
-          // Altrimenti salva come token anonimo
           await firebase.database()
             .ref('fcmTokens/' + token)
             .set({
