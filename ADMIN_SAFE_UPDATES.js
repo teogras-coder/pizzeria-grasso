@@ -1,34 +1,56 @@
 /**
- * 🛡️ PROTEZIONE STAMPANTE + RISTAMPA
+ * 🛡️ ADMIN SAFE UPDATES - Antica Pizzeria Grasso
+ * Versione: 2.0 (2026-07-02)
  * 
- * Copia queste funzioni nel admin.html (dopo la riga ~1100)
+ * PROTEZIONE STAMPANTE + RISTAMPA
+ * Usa SEMPRE update() e MAI remove() o set()
  * 
- * IMPORTANTE: Usa sempre update() e NON remove() o set()
+ * DIPENDENZE NECESSARIE (devono essere definite prima):
+ * - db: istanza Firebase Realtime Database
+ * - ordersCache: oggetto con cache ordini { [id]: order }
+ * - showToast(msg): funzione per mostrare toast
+ * - showPrompt(title, label, placeholder, default): ritorna Promise<string|null>
+ * - showConfirm(title, msg): ritorna Promise<boolean>
+ * - sanitize(str): funzione sanitizzazione input
+ * - renderOrders(cache): funzione re-render ordini
  */
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ✅ FUNZIONE SAFE: Aggiorna Status Ordine
+// 🔍 CONTROLLO DIPENDENZE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function checkDependencies() {
+  const missing = [];
+  if (typeof db === 'undefined') missing.push('db');
+  if (typeof ordersCache === 'undefined') missing.push('ordersCache');
+  if (typeof showToast !== 'function') missing.push('showToast');
+  if (typeof showPrompt !== 'function') missing.push('showPrompt');
+  if (typeof showConfirm !== 'function') missing.push('showConfirm');
+  if (typeof sanitize !== 'function') missing.push('sanitize');
+  if (typeof renderOrders !== 'function') missing.push('renderOrders');
+  
+  if (missing.length > 0) {
+    console.error('[SAFE_UPDATES] Dipendenze mancanti:', missing);
+    showToast('❌ Errore configurazione: ' + missing.join(', '));
+    return false;
+  }
+  return true;
+}
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ✅ AGGIORNA STATUS ORDINE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function updateOrderStatus(id, st, orderType) {
   /**
    * Cambia lo status di un ordine IN SICUREZZA
-   * 
    * @param {string} id - ID Firebase dell'ordine
-   * @param {string} st - Nuovo status: 'new','preparing','ready','picked','delivering','delivered'
+   * @param {string} st - Nuovo status
    * @param {string} orderType - 'delivery' o 'pickup'
    */
+  if (!checkDependencies()) return;
   
-  // ✅ Lista di status validi
   const validStatus = [
-    'new',
-    'preparing',
-    'ready',
-    'picked',
-    'delivering',
-    'delivered',
-    'rifiutato',
-    'annullato'
+    'new', 'preparing', 'ready', 'picked', 
+    'delivering', 'delivered', 'rifiutato', 'annullato'
   ];
   
   if (!validStatus.includes(st)) {
@@ -36,246 +58,187 @@ function updateOrderStatus(id, st, orderType) {
     return;
   }
   
-  try {
-    // ✅ USO SEMPRE update() - mai remove() o set()
-    const safeUpdate = {
-      status: st,
-      timestamp_status_changed: Date.now()
-      // ⚠️ NON TOCCARE: stampato_cucina, stampato_annullato
-    };
-    
-    db.ref('ordini/' + id).update(safeUpdate)
-      .then(() => {
-        showToast('✅ Aggiornato');
-      })
-      .catch(err => {
-        showToast('❌ Errore: ' + err.message);
-        console.error('Errore update:', err);
-      });
-      
-  } catch(e) {
-    showToast('❌ Errore aggiornamento: ' + e.message);
-    console.error('Errore:', e);
-  }
+  const safeUpdate = {
+    status: st,
+    timestamp_status_changed: Date.now(),
+    timestamp_status_changed_iso: new Date().toISOString()
+    // ⚠️ NON TOCCARE: stampato_cucina, stampato_annullato
+  };
+  
+  db.ref('ordini/' + id).update(safeUpdate)
+    .then(() => {
+      showToast('✅ Aggiornato a: ' + st);
+      console.log(`[SAFE] Ordine ${id} → ${st}`);
+    })
+    .catch(err => {
+      showToast('❌ Errore: ' + err.message);
+      console.error('[SAFE] Errore update:', err);
+    });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🖨️ FUNZIONE: Ristampa Ordine
+// 🖨️ RISTAMPA ORDINE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 function ristampaOrdine(id) {
   /**
-   * Ristampa un ordine che è già stato stampato
-   * 
-   * Cosa fa:
-   * 1. Resetta i flag di stampa (stampato_cucina, stampato_annullato)
-   * 2. Il Raspberry vede che non è più "stampato"
-   * 3. Ristampa automaticamente il ticket
-   * 
+   * Ristampa un ordine resettando i flag di stampa
+   * Il Raspberry vedrà flag=false e ristamperà il ticket
    * @param {string} id - ID Firebase dell'ordine
    */
+  if (!checkDependencies()) return;
   
   const order = ordersCache[id];
   if (!order) {
-    showToast('❌ Ordine non trovato');
+    showToast('❌ Ordine non trovato in cache');
     return;
   }
   
-  const ok = confirm(`Ristampare ordine ${order.orderId || id}?`);
+  const orderNum = order.orderId || id;
+  const ok = confirm(`Ristampare ordine ${orderNum}?\n\nIl ticket verrà ristampato dalla stampante di cucina.`);
   if (!ok) return;
   
-  try {
-    // ✅ Reset dei flag di stampa
-    const resetUpdate = {
-      stampato_cucina: false,        // Resetta il flag
-      stampato_annullato: false      // Resetta il flag
-      // ⚠️ NON tocchiamo gli altri campi!
-    };
-    
-    db.ref('ordini/' + id).update(resetUpdate)
-      .then(() => {
-        showToast('🖨️ Ristampa richiesta! Il ticket arriverà tra pochi secondi...');
-        console.log(`Ristampa ordine ${order.orderId}: flag resettati`);
-      })
-      .catch(err => {
-        showToast('❌ Errore: ' + err.message);
-        console.error('Errore ristampa:', err);
-      });
-      
-  } catch(e) {
-    showToast('❌ Errore ristampa: ' + e.message);
-    console.error('Errore:', e);
-  }
+  const resetUpdate = {
+    stampato_cucina: false,
+    stampato_annullato: false,
+    reprint_requested_at: Date.now()
+  };
+  
+  db.ref('ordini/' + id).update(resetUpdate)
+    .then(() => {
+      showToast('🖨️ Ristampa richiesta! Ticket in arrivo...');
+      console.log(`[SAFE] Ristampa ordine ${orderNum}: flag resettati`);
+    })
+    .catch(err => {
+      showToast('❌ Errore: ' + err.message);
+      console.error('[SAFE] Errore ristampa:', err);
+    });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ✅ FUNZIONE SAFE: Rifiuta Ordine
+// ❌ RIFIUTA ORDINE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 async function rifiutaOrdine(id) {
   /**
    * Rifiuta un ordine con motivo
-   * La stampante vedrà status='rifiutato' e stamperà di nuovo? NO!
-   * Perché usiamo un flag separato 'stampato_annullato'
+   * @param {string} id - ID Firebase dell'ordine
    */
+  if (!checkDependencies()) return;
   
-  const motivo = await showPrompt(
-    'Rifiuta Ordine',
-    'Motivo del rifiuto:',
-    'Es: Troppi ordini in coda',
-    'Troppi ordini in coda'
-  );
+  let motivo;
+  try {
+    motivo = await showPrompt(
+      'Rifiuta Ordine',
+      'Motivo del rifiuto:',
+      'Es: Troppi ordini in coda',
+      'Troppi ordini in coda'
+    );
+  } catch (e) {
+    console.error('[SAFE] Errore showPrompt:', e);
+    return;
+  }
   
-  if (motivo === null) return;
+  if (motivo === null) return; // Annullato dall'utente
   if (!motivo.trim()) {
     showToast('⚠️ Scrivi un motivo');
     return;
   }
   
-  try {
-    // ✅ USO update() - preserva i flag di stampa
-    db.ref('ordini/' + id).update({
-      status: 'rifiutato',
-      motivoRifiuto: sanitize(motivo),
-      timestampRifiuto: Date.now()
-      // ✅ NON rimuovo stampato_cucina
-    })
-    .then(() => {
-      showToast('❌ Ordine rifiutato');
-      renderOrders(ordersCache);
-    })
-    .catch(err => showToast('❌ Errore: ' + err.message));
-    
-  } catch(e) {
-    showToast('❌ Errore: ' + e.message);
-  }
+  db.ref('ordini/' + id).update({
+    status: 'rifiutato',
+    motivoRifiuto: sanitize(motivo),
+    timestampRifiuto: Date.now(),
+    timestampRifiuto_iso: new Date().toISOString()
+    // ✅ NON rimuovo stampato_cucina
+  })
+  .then(() => {
+    showToast('❌ Ordine rifiutato');
+    renderOrders(ordersCache);
+  })
+  .catch(err => {
+    showToast('❌ Errore: ' + err.message);
+    console.error('[SAFE] Errore rifiuto:', err);
+  });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ✅ FUNZIONE SAFE: Cancella Ordine
+// 🗑️ ELIMINA ORDINE (soft delete)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 async function deleteOrder(id) {
   /**
-   * Cancella un ordine IN SICUREZZA
-   * 
-   * INVECE di: db.ref('ordini/' + id).remove()
-   * FACCIO:    Cambio status a 'deleted'
-   * 
-   * Questo mantiene i flag di stampa intatti!
+   * Cancella un ordine IN SICUREZZA (soft delete)
+   * Cambia status a 'deleted' invece di remove()
+   * @param {string} id - ID Firebase dell'ordine
    */
+  if (!checkDependencies()) return;
   
-  const ok = await showConfirm('Eliminare Ordine?', 'Questa azione non può essere annullata.');
+  let ok;
+  try {
+    ok = await showConfirm(
+      'Eliminare Ordine?', 
+      'Questa azione non può essere annullata. L\'ordine verrà marcato come eliminato.'
+    );
+  } catch (e) {
+    console.error('[SAFE] Errore showConfirm:', e);
+    return;
+  }
+  
   if (!ok) return;
   
-  try {
-    // ✅ USO update() - non remove()
-    db.ref('ordini/' + id).update({
-      status: 'deleted',
-      deleted_at: Date.now()
-      // ✅ Mantieni stampato_cucina e stampato_annullato
-    })
-    .then(() => {
-      showToast('🗑️ Eliminato');
-      renderOrders(ordersCache);
-    })
-    .catch(err => showToast('❌ Errore: ' + err.message));
-    
-  } catch(e) {
-    showToast('❌ Errore: ' + e.message);
-  }
+  db.ref('ordini/' + id).update({
+    status: 'deleted',
+    deleted_at: Date.now(),
+    deleted_at_iso: new Date().toISOString()
+    // ✅ Mantieni stampato_cucina e stampato_annullato
+  })
+  .then(() => {
+    showToast('🗑️ Eliminato');
+    renderOrders(ordersCache);
+  })
+  .catch(err => {
+    showToast('❌ Errore: ' + err.message);
+    console.error('[SAFE] Errore delete:', err);
+  });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ✅ FUNZIONE SAFE: Aggiungi Note
+// 📝 AGGIUNGI NOTA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 function addOrderNote(id, note) {
   /**
-   * Aggiungi una nota all'ordine
-   * Sicuro perché non tocca i flag di stampa
+   * Aggiunge una nota all'ordine senza toccare i flag
+   * @param {string} id - ID Firebase
+   * @param {string} note - Testo della nota
    */
+  if (!checkDependencies()) return;
   
   if (!note || !note.trim()) {
     showToast('⚠️ Scrivi una nota');
     return;
   }
   
-  try {
-    db.ref('ordini/' + id).update({
-      notes: sanitize(note),
-      updated_at: Date.now()
-    })
-    .then(() => {
-      showToast('✅ Nota aggiunta');
-    })
-    .catch(err => showToast('❌ Errore: ' + err.message));
-    
-  } catch(e) {
-    showToast('❌ Errore: ' + e.message);
-  }
+  db.ref('ordini/' + id).update({
+    notes: sanitize(note),
+    updated_at: Date.now(),
+    updated_at_iso: new Date().toISOString()
+  })
+  .then(() => {
+    showToast('✅ Nota aggiunta');
+  })
+  .catch(err => {
+    showToast('❌ Errore: ' + err.message);
+    console.error('[SAFE] Errore nota:', err);
+  });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📝 ISTRUZIONI HTML PER IL BOTTONE
+// 📋 ESPORTA FUNZIONI (se usi moduli)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+if (typeof window !== 'undefined') {
+  window.updateOrderStatus = updateOrderStatus;
+  window.ristampaOrdine = ristampaOrdine;
+  window.rifiutaOrdine = rifiutaOrdine;
+  window.deleteOrder = deleteOrder;
+  window.addOrderNote = addOrderNote;
+}
 
-/**
- * AGGIUNGI QUESTO BOTTONE NELLA SEZIONE .order-actions
- * (circa alla riga 983-999 del renderOrders)
- * 
- * <button class="btn-secondary" onclick="ristampaOrdine('${id}')">
- *   <i class="fas fa-print"></i> Ristampa
- * </button>
- * 
- * O se vuoi un pulsante più visibile per la ristampa:
- * 
- * <button class="btn-whatsapp" style="background:#7c3aed;color:white;" 
- *         onclick="ristampaOrdine('${id}')">
- *   <i class="fas fa-print"></i> Ristampa Ticket
- * </button>
- */
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ❌ FUNZIONI VIETATE - NON USARE MAI!
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-/*
- * ❌ PERICOLO #1: Cancellazione Completa
- * 
- * db.ref('ordini/' + id).remove();  // ← PERDI I FLAG DI STAMPA!
- * 
- * Causa: Il Raspberry non sa che è già stato stampato
- * Risultato: Ristampa lo stesso ordine!
- */
-
-/*
- * ❌ PERICOLO #2: Sovrascrittura Completa
- * 
- * db.ref('ordini/' + id).set({status: 'preparing'});  // ← PERDI TUTTO!
- * 
- * Causa: Sovrascrive TUTTI i campi, compresa data dell'ordine
- * Risultato: L'ordine perde informazioni critiche
- */
-
-/*
- * ❌ PERICOLO #3: Toccare Flag di Stampa (MALE)
- * 
- * db.ref('ordini/' + id + '/stampato_cucina').remove();  // ← SBAGLIATO!
- * 
- * ✅ GIUSTO - Usa update() come nella funzione ristampaOrdine()
- * 
- * db.ref('ordini/' + id).update({
- *   stampato_cucina: false,
- *   stampato_annullato: false
- * });
- */
-
-/*
- * ❌ PERICOLO #4: Cambiare orderId
- * 
- * db.ref('ordini/' + id).update({orderId: 'ORD-99999'});  // ← DOPO stampa!
- * 
- * Causa: Il ticket è già stampato con ORD-00001, ma Firebase dice ORD-99999
- * Risultato: Confusione tra cliente e cucina
- */
+console.log('[SAFE_UPDATES] ✅ Modulo caricato - v2.0');
