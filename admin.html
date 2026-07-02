@@ -2121,39 +2121,42 @@ async function sendNotification() {
   if (!title) { showToast('⚠️ Inserisci un titolo'); return; }
   if (!body) { showToast('⚠️ Inserisci un messaggio'); return; }
   
-  let tokens = [];
-  Object.entries(fcmTokensData).forEach(([id, t]) => {
-    if (selectedNotifDest === 'clients' && t.type === 'client') tokens.push(id);
-    else if (selectedNotifDest === 'drivers' && t.type === 'driver') tokens.push(id);
-    else if (selectedNotifDest === 'all') tokens.push(id);
-  });
-  
-  if (tokens.length === 0) {
-    showToast('⚠️ Nessun dispositivo registrato per questa categoria');
-    return;
-  }
-  
-  const ok = await showConfirm('Inviare Notifica?', `La notifica verrà inviata a ${tokens.length} dispositivi.`);
+  const ok = await showConfirm('Inviare Notifica?', 'La notifica verrà inviata a tutti gli utenti iscritti.');
   if (!ok) return;
   
-  showToast(' Invio in corso...');
+  showToast('📤 Invio in corso...');
   
   try {
-    const notifRef = db.ref('notifiche_push').push();
-    await notifRef.set({
-      title: title,
-      body: body,
-      destinatari: selectedNotifDest,
-      timestamp: Date.now(),
-      tokens: tokens,
-      letto: {}
+    const response = await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic os_v2_app_abefre4z65dvpktw36eorntxmy7yj3po3kzutte2agidatboa3m27ztq7ztu4mpq3uacxyowf2xcyk65lu6wjhdrogpx4tcsmnhvlcy'
+      },
+      body: JSON.stringify({
+        app_id: "00485893-99f7-4757-aa76-df88e8b67766",
+        included_segments: ["All"],
+        headings: { "it": title },
+        contents: { "it": body },
+        url: "https://pizzeriagrasso.vercel.app/",
+        small_icon: "https://i.imgur.com/nWLqs68.png",
+        large_icon: "https://i.imgur.com/nWLqs68.png"
+      })
     });
     
-    showToast(`✅ Notifica inviata a ${tokens.length} dispositivi!`);
+    const result = await response.json();
+    
+    if (result.id) {
+      showToast(`✅ Notifica inviata con successo!`);
+    } else {
+      showToast(`❌ Errore: ${result.errors ? result.errors[0] : 'Errore sconosciuto'}`);
+    }
+    
     document.getElementById('notifTitle').value = '';
     document.getElementById('notifBody').value = '';
   } catch(e) {
-    showToast('❌ Errore invio: ' + e.message);
+    console.error('Errore:', e);
+    showToast('❌ Errore: ' + e.message);
   }
 }
 
