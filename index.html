@@ -260,10 +260,77 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     await OneSignal.init({
       appId: "00485893-99f7-4757-aa76-df88e8b67766",
       serviceWorkerPath: "/OneSignalSDKWorker.js",
-      serviceWorkerScope: "/"
+      serviceWorkerScope: "/",
+      notifyButton: {
+        enable: false
+      },
+      promptOptions: {
+        slidedown: {
+          prompts: [
+            {
+              type: 'push',
+              autoPrompt: true,
+              text: {
+                actionMessage: "🔔 Ricevi notifiche da Antica Pizzeria Grasso!",
+                exampleNotificationTitle: "Nuova offerta!",
+                exampleNotificationMessage: "Oggi 2x1 sulla Margherita! 🍕",
+                exampleNotificationCaption: "Puoi disattivare in qualsiasi momento",
+                acceptButton: "Consenti",
+                cancelButton: "No grazie"
+              }
+            }
+          ]
+        }
+      }
     });
   });
 </script>
+
+<!-- Stile personalizzato popup OneSignal -->
+<style>
+  /* Popup OneSignal - stile personalizzato */
+  .onesignal-slidedown-container {
+    background: linear-gradient(145deg, #2a1e13 0%, #1a1209 100%) !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+    max-width: 320px !important;
+    padding: 20px !important;
+  }
+  
+  .onesignal-slidedown-container .message-container {
+    color: #f5e6c8 !important;
+    font-size: 14px !important;
+    font-family: 'Montserrat', sans-serif !important;
+  }
+  
+  .onesignal-slidedown-container .action-container {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 15px !important;
+  }
+  
+  .onesignal-slidedown-container .action-container button {
+    flex: 1 !important;
+    padding: 10px 16px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    border: none !important;
+  }
+  
+  .onesignal-slidedown-container .action-container .action-accept {
+    background: linear-gradient(180deg, #d4a84b 0%, #b8860b 100%) !important;
+    color: #1a1209 !important;
+  }
+  
+  .onesignal-slidedown-container .action-container .action-cancel {
+    background: transparent !important;
+    color: #f5e6c8 !important;
+    border: 1px solid #d4a84b !important;
+  }
+</style>
 </head>
 <body>
 
