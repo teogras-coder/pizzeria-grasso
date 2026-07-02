@@ -1084,5 +1084,65 @@ setInterval(()=>{
 
 setTimeout(updateNavLiveDotOld,500);
 </script>
+<!-- ✅ AGGIUNGI QUESTI SCRIPT FIREBASE (se non ci sono già) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
+<!-- ✅ SCRIPT NOTIFICHE -->
+<script>
+// Aspetta che Firebase sia pronto
+window.addEventListener('load', async function() {
+  console.log(' Setup notifiche avviato...');
+  
+  // 1. Verifica che Firebase messaging esista
+  if (typeof firebase === 'undefined' || typeof firebase.messaging === 'undefined') {
+    console.error('❌ Firebase Messaging non disponibile');
+    return;
+  }
+  
+  try {
+    // 2. Registra il Service Worker Firebase
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    console.log('✅ Service Worker registrato:', registration.scope);
+    
+    // 3. Inizializza messaging
+    const messaging = firebase.messaging();
+    messaging.useServiceWorker(registration);
+    
+    // 4. Chiedi permesso all'utente
+    const permission = await Notification.requestPermission();
+    console.log('🔔 Permesso:', permission);
+    
+    if (permission === 'granted') {
+      // 5. Ottieni il token FCM
+      const token = await messaging.getToken({
+        vapidKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+      });
+      console.log('🔑 Token FCM:', token);
+      
+      // 6. Salva il token nel database (se utente loggato)
+      if (token && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        const uid = firebase.auth().currentUser.uid;
+        await firebase.database()
+          .ref('users/' + uid + '/fcmToken')
+          .set(token);
+        console.log('✅ Token salvato in DB per utente:', uid);
+      } else if (token) {
+        // Salva come token anonimo
+        await firebase.database()
+          .ref('fcmTokens/' + token)
+          .set({
+            createdAt: Date.now(),
+            type: 'guest'
+          });
+        console.log('✅ Token guest salvato');
+      }
+    } else {
+      console.log('️ Permesso notifiche negato dall\'utente');
+    }
+  } catch (err) {
+    console.error('❌ Errore setup notifiche:', err);
+  }
+});
+</script>
 </body>
 </html>
