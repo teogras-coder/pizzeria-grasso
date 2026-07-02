@@ -20,8 +20,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<!-- 🔔 AGGIUNTO: Firebase Messaging per notifiche push -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -288,7 +286,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 
 <!-- Stile personalizzato popup OneSignal -->
 <style>
-  /* Popup OneSignal - stile personalizzato */
   .onesignal-slidedown-container {
     background: linear-gradient(145deg, #2a1e13 0%, #1a1209 100%) !important;
     border: 2px solid #ffffff !important;
@@ -297,19 +294,16 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     max-width: 320px !important;
     padding: 20px !important;
   }
-  
   .onesignal-slidedown-container .message-container {
     color: #f5e6c8 !important;
     font-size: 14px !important;
     font-family: 'Montserrat', sans-serif !important;
   }
-  
   .onesignal-slidedown-container .action-container {
     display: flex !important;
     gap: 10px !important;
     margin-top: 15px !important;
   }
-  
   .onesignal-slidedown-container .action-container button {
     flex: 1 !important;
     padding: 10px 16px !important;
@@ -319,12 +313,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     cursor: pointer !important;
     border: none !important;
   }
-  
   .onesignal-slidedown-container .action-container .action-accept {
     background: linear-gradient(180deg, #d4a84b 0%, #b8860b 100%) !important;
     color: #1a1209 !important;
   }
-  
   .onesignal-slidedown-container .action-container .action-cancel {
     background: transparent !important;
     color: #f5e6c8 !important;
@@ -708,127 +700,8 @@ function initApp(){
     startOrderStatusTracking();
     controllaRifiutiCliente();
     applyPaletteFromFirebase();
-    
-    // 🔥 AGGIUNTO: Ricarica quando l'app torna in primo piano
     setupVisibilityListener();
-    
-    // 🔔 AGGIUNTO: Setup notifiche push
-    setupPushNotifications();
 }
-
-// ─── 🔔 SETUP NOTIFICHE PUSH ─────────────────────────────────────────────
-async function setupPushNotifications(){
-    console.log('🔔 Setup notifiche avviato...');
-    
-    // Verifica che Firebase Messaging sia disponibile
-    if(typeof firebase === 'undefined' || typeof firebase.messaging === 'undefined'){
-        console.error('❌ Firebase Messaging non disponibile');
-        return;
-    }
-    
-    try{
-        // 1. Registra il Service Worker Firebase
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-        console.log('✅ Service Worker registrato:', registration.scope);
-        
-        // 2. Attendi che il Service Worker sia attivo
-        if(!registration.active){
-            console.log('⏳ Attendo attivazione Service Worker...');
-            await new Promise(resolve => {
-                const checkActive = () => {
-                    if(registration.active){
-                        console.log('✅ Service Worker ora attivo');
-                        resolve();
-                    } else {
-                        setTimeout(checkActive, 100);
-                    }
-                };
-                checkActive();
-            });
-        }
-        
-        // 3. Attendi che il Service Worker sia pronto
-        await navigator.serviceWorker.ready;
-        console.log('✅ Service Worker pronto');
-        
-        // 4. Inizializza Firebase Messaging
-        const messaging = firebase.messaging();
-        
-        // 5. Chiedi permesso notifiche (se non già concesso)
-        if(Notification.permission === 'default'){
-            const permission = await Notification.requestPermission();
-            console.log('🔔 Permesso notifiche:', permission);
-        }
-        
-        // 6. Se il permesso è concesso, ottieni il token
-        if(Notification.permission === 'granted'){
-            const token = await messaging.getToken({
-                vapidKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-            });
-            console.log('🔑 Token FCM:', token);
-            
-            // 7. Salva il token nel database
-            if(token){
-                if(firebase.auth().currentUser){
-                    // Utente loggato
-                    const uid = firebase.auth().currentUser.uid;
-                    await db.ref('users/' + uid + '/fcmToken').set(token);
-                    await db.ref('users/' + uid + '/fcmTokenUpdated').set(firebase.database.ServerValue.TIMESTAMP);
-                    console.log('✅ Token salvato per utente:', uid);
-                } else {
-                    // Utente guest/anonimo
-                    await db.ref('fcmTokens/' + token).set({
-                        createdAt: Date.now(),
-                        userAgent: navigator.userAgent,
-                        type: 'guest'
-                    });
-                    console.log('✅ Token guest salvato');
-                }
-            }
-        } else {
-            console.log('❌ Permesso notifiche negato');
-        }
-        
-        // 8. Ascolta messaggi in foreground (app aperta)
-        messaging.onMessage((payload) => {
-            console.log('🔔 Notifica ricevuta (app aperta):', payload);
-            const title = payload.notification?.title || 'Nuova notifica';
-            const body = payload.notification?.body || '';
-            showToast(title + ': ' + body);
-            
-            // Mostra anche notifica browser
-            if(Notification.permission === 'granted'){
-                new Notification(title, {
-                    body: body,
-                    icon: 'https://i.imgur.com/nWLqs68.png',
-                    badge: 'https://i.imgur.com/nWLqs68.png'
-                });
-            }
-        });
-        
-    } catch(err){
-        console.error('❌ Errore setup notifiche:', err);
-    }
-}
-
-// 🔔 AGGIORNAMENTO TOKEN QUANDO UTENTE FA LOGIN
-firebase.auth().onAuthStateChanged(async (user) => {
-    if(user && typeof firebase !== 'undefined' && typeof firebase.messaging !== 'undefined'){
-        try{
-            const messaging = firebase.messaging();
-            const token = await messaging.getToken({
-                vapidKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-            });
-            if(token){
-                await db.ref('users/' + user.uid + '/fcmToken').set(token);
-                await db.ref('users/' + user.uid + '/fcmTokenUpdated').set(firebase.database.ServerValue.TIMESTAMP);
-                console.log('✅ Token aggiornato per utente:', user.uid);
-            }
-        } catch(err){
-            console.log('⚠️ Token non ancora disponibile:', err.message);
-        }
-    }
-});
 
 // ─── 🔥 LISTENER PER RICARICA APP IN PRIMO PIANO ──────────────────────────
 function setupVisibilityListener(){
@@ -843,20 +716,14 @@ function setupVisibilityListener(){
                 return;
             }
             lastReload=now;
-            
             console.log('🔄 App riaperta, ricarico dati da Firebase...');
-            
-            // Ricarica tutto da Firebase
             loadFromFirebaseOptimized();
-            
-            // Aggiorna la vista corrente
             if(currentSearchCat){
                 const searchValue=document.getElementById('productSearch')?.value||'';
                 renderProductList(currentSearchCat,searchValue);
             }else{
                 renderCategories();
             }
-            
             renderPromotionsBanner();
             updateStatusBanner();
         }
@@ -866,7 +733,6 @@ function setupVisibilityListener(){
 // ─── CARICAMENTO DA FIREBASE ──────────────────────────────────────────────
 function loadFromFirebaseOptimized(){
     const now=Date.now();
-    
     db.ref('settings/menuVersion').once('value',snapshot=>{
         const newVersion=snapshot.val()||Date.now();
         if(newVersion!==menuVersion){
@@ -875,7 +741,6 @@ function loadFromFirebaseOptimized(){
             loadMenuFromFirebase();
         }
     });
-    
     db.ref('settings/categoriesVersion').once('value',snapshot=>{
         const newVersion=snapshot.val()||Date.now();
         if(newVersion!==categoriesVersion){
@@ -884,7 +749,6 @@ function loadFromFirebaseOptimized(){
             loadCategoriesFromFirebase();
         }
     });
-    
     db.ref('settings/promoVersion').once('value',snapshot=>{
         const newVersion=snapshot.val()||Date.now();
         if(newVersion!==promoVersion){
@@ -893,15 +757,12 @@ function loadFromFirebaseOptimized(){
             loadPromosFromFirebase();
         }
     });
-    
     db.ref('settings').once('value',s=>{
         if(s.exists()){appData.settings=s.val();localStorage.setItem('settingsCache',JSON.stringify(appData.settings));updateStatusBanner();updateFooter();updateServicesUI();}
     });
-    
     db.ref('branding').once('value',s=>{
         if(s.exists()){appData.branding=s.val();localStorage.setItem('brandingCache',JSON.stringify(appData.branding));applyBranding();}
     });
-    
     db.ref('images').once('value',s=>{
         if(s.exists()){appData.images=s.val();localStorage.setItem('imagesCache',JSON.stringify(appData.images));applyImages();}
     });
@@ -1044,7 +905,6 @@ function addPromoToCart(promoId){
     const promo=appData.promotions[promoId];
     if(!promo){showToast(t('promo_unavailable'));return;}
     if(promo.currentUses>=promo.maxUses){showToast(t('promo_exhausted'));return;}
-    
     const existing=cart.find(item=>item.isPromo&&item.promoId===promoId);
     if(existing){
         if(!confirm(t('add_another_promo')))return;
@@ -1052,17 +912,8 @@ function addPromoToCart(promoId){
         cart.splice(idx,1);
         db.ref('promotions/'+promoId+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));
     }
-    
     const totalPrice=promo.products.reduce((sum,p)=>sum+(p.price*p.qty),0);
-    
-    cart.push({
-        isPromo:true,
-        promoId:promoId,
-        promoTitle:promo.title,
-        products:promo.products,
-        totalPrice:totalPrice
-    });
-    
+    cart.push({isPromo:true,promoId:promoId,promoTitle:promo.title,products:promo.products,totalPrice:totalPrice});
     db.ref('promotions/'+promoId+'/currentUses').transaction(v=>(v||0)+1);
     updateCartBadge();
     showToast(`🎁 ${promo.title} aggiunta!`);
@@ -1146,12 +997,10 @@ function getOrderScheduledDate(order){
     const baseTime = Number(order?.timestamp || Date.now());
     const parsedBase = new Date(baseTime);
     const scheduledTime = order?.scheduledTime;
-
     if (order?.scheduledAt) {
         const scheduledAt = Number(order.scheduledAt);
         if (!Number.isNaN(scheduledAt)) return new Date(scheduledAt);
     }
-
     if (scheduledTime && scheduledTime !== 'Subito' && scheduledTime !== 'asap') {
         const parts = String(scheduledTime).split(':');
         if (parts.length >= 2) {
@@ -1165,23 +1014,19 @@ function getOrderScheduledDate(order){
             }
         }
     }
-
     return new Date(parsedBase.getTime() + 15 * 60 * 1000);
 }
 function puoAnnullareOrdine(order){
     if(!order || !['new','preparing'].includes(order.status || 'new')) return false;
     if(order.assignedDriver) return false;
-
     const scheduledTime = order?.scheduledTime;
     if (scheduledTime === 'Subito' || scheduledTime === 'asap' || !scheduledTime) {
         return false;
     }
-
     if (scheduledTime && scheduledTime !== 'Subito' && scheduledTime !== 'asap') {
         const cutoff = getOrderScheduledDate(order).getTime() - 15 * 60 * 1000;
         return Date.now() <= cutoff;
     }
-
     return false;
 }
 async function annullaOrdine(orderId){
