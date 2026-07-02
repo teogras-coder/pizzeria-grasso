@@ -2118,7 +2118,7 @@ async function sendNotification() {
   const title = sanitize(document.getElementById('notifTitle').value);
   const body = sanitize(document.getElementById('notifBody').value);
   
-  if (!title) { showToast('⚠️ Inserisci un titolo'); return; }
+  if (!title) { showToast('️ Inserisci un titolo'); return; }
   if (!body) { showToast('⚠️ Inserisci un messaggio'); return; }
   
   const ok = await showConfirm('Inviare Notifica?', 'La notifica verrà inviata a tutti gli utenti iscritti.');
@@ -2140,20 +2140,21 @@ async function sendNotification() {
     });
     
     const result = await response.json();
+    console.log('Risposta API:', result); // Aggiungi questo per debug
     
     if (result.success) {
       showToast(`✅ ${result.message}`);
       document.getElementById('notifTitle').value = '';
       document.getElementById('notifBody').value = '';
     } else {
-      showToast(` Errore: ${result.error}`);
+      showToast(`❌ Errore: ${result.error || 'Sconosciuto'}`);
+      console.error('Errore dettagliato:', result);
     }
   } catch(e) {
     console.error('Errore:', e);
     showToast('❌ Errore di connessione');
   }
 }
-
 // ✅ FUNZIONE AGGIORNAMENTO REMOTO APP CLIENTI
 async function forceAppUpdate() {
   const ok = await showConfirm('Forzare aggiornamento?', 'Tutti i clienti riceveranno la nuova versione e si aggiorneranno entro 2 secondi.');
