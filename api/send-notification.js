@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   // OneSignal credentials
   const ONE_SIGNAL_APP_ID = '00485893-99f7-4757-aa76-df88e8b67766';
-  const ONE_SIGNAL_API_KEY = 'os_v2_app_abefre4z65dvpktw36eorntxmyyqwb2kialuaueopi6ajpee7qjc7krc4pnr6ua7awavtsd5df3iis5uvtj4cqnjqjepkwiekqokl6i';
+  const ONE_SIGNAL_API_KEY = 'os_v2_app_abefre4z65dvpktw36eorntxm2ykzaroa6merq4cgpqvy2fwql4vbgup7atsxpapvspiittke3avr37t2t2vay5gikufml34q3x24zi';
 
   try {
     // Chiama OneSignal API
