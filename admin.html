@@ -281,9 +281,6 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <i class="fas fa-star"></i> Recensioni
         <span class="nav-badge" id="pendingReviewsBadge" style="display:none;">0</span>
       </div>
-      <div class="nav-item" onclick="showSection('notifications', this)" data-section="notifications">
-        <i class="fas fa-bell"></i> Notifiche
-      </div>
       <div class="nav-item" onclick="showSection('branding', this)" data-section="branding"><i class="fas fa-palette"></i> Brand</div>
       <div class="nav-item" onclick="showSection('promotions', this)" data-section="promotions"><i class="fas fa-gift"></i> Promozioni</div>
       <div class="nav-item" onclick="showSection('services', this)" data-section="services"><i class="fas fa-concierge-bell"></i> Servizi</div>
@@ -338,55 +335,6 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <button class="review-filter-tab" onclick="filterReviews('rejected', this)">Rifiutate</button>
       </div>
       <div id="reviewsList"></div>
-    </div>
-
-    <div class="section" id="section-notifications">
-      <div class="content-header">
-        <div>
-          <h1><i class="fas fa-bell"></i> Invia Notifiche</h1>
-          <div class="subtitle">Manda messaggi istantanei a clienti e fattorini (app aperta)</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><i class="fas fa-paper-plane"></i> Nuova Notifica</div>
-        <div class="form-group">
-          <label>A chi inviarla?</label>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;">
-            <div class="notif-dest-option selected" onclick="selectNotifDest('clients', this)" data-dest="clients" style="padding:15px;border-radius:10px;background:var(--gold);color:var(--dark);border:2px solid var(--gold);cursor:pointer;text-align:center;">
-              <i class="fas fa-users" style="font-size:1.5rem;display:block;margin-bottom:5px;"></i>
-              <div style="font-weight:700;">Clienti</div>
-              <div class="count" id="countClients" style="font-size:0.75rem;margin-top:3px;opacity:0.8;">0 registrati</div>
-            </div>
-            <div class="notif-dest-option" onclick="selectNotifDest('drivers', this)" data-dest="drivers" style="padding:15px;border-radius:10px;background:var(--card);border:2px solid var(--gold-dark);cursor:pointer;text-align:center;">
-              <i class="fas fa-motorcycle" style="font-size:1.5rem;display:block;margin-bottom:5px;color:var(--gold);"></i>
-              <div style="color:var(--cream);font-weight:700;">Fattorini</div>
-              <div class="count" id="countDrivers" style="color:#8a7a5a;font-size:0.75rem;margin-top:3px;">0 registrati</div>
-            </div>
-            <div class="notif-dest-option" onclick="selectNotifDest('all', this)" data-dest="all" style="padding:15px;border-radius:10px;background:var(--card);border:2px solid var(--gold-dark);cursor:pointer;text-align:center;">
-              <i class="fas fa-globe" style="font-size:1.5rem;display:block;margin-bottom:5px;color:var(--gold);"></i>
-              <div style="color:var(--cream);font-weight:700;">Tutti</div>
-              <div class="count" id="countAll" style="color:#8a7a5a;font-size:0.75rem;margin-top:3px;">0 totali</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Titolo notifica *</label>
-          <input type="text" class="form-input" id="notifTitle" placeholder="Es:  Nuova offerta speciale!">
-        </div>
-        <div class="form-group">
-          <label>Messaggio *</label>
-          <textarea class="form-input" id="notifBody" rows="3" placeholder="Es: Solo oggi 2x1 sulla Margherita! Ordina ora..."></textarea>
-        </div>
-        <button class="btn-primary" style="width:100%;padding:16px;font-size:1rem;" onclick="sendNotification()">
-          <i class="fas fa-paper-plane"></i> Invia Notifica
-        </button>
-      </div>
-      <div class="card">
-        <div class="card-title"><i class="fas fa-mobile-alt"></i> Dispositivi Registrati</div>
-        <div id="tokensList" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;max-height:200px;overflow-y:auto;">
-          <p style="color:#8a7a5a;text-align:center;padding:20px;">Caricamento...</p>
-        </div>
-      </div>
     </div>
 
     <div class="section" id="section-branding">
@@ -593,13 +541,10 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <div class="content-header">
         <div>
           <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
-          <div class="subtitle">Statistiche in tempo reale sui clienti e sugli ordini.</div>
+          <div class="subtitle">Statistiche in tempo reale sugli ordini.</div>
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat-card"><div class="number" id="dashboardClients">0</div><div class="label">Clienti registrati</div></div>
-        <div class="stat-card"><div class="number" id="dashboardDrivers">0</div><div class="label">Fattorini registrati</div></div>
-        <div class="stat-card"><div class="number" id="dashboardDevices">0</div><div class="label">Dispositivi totali</div></div>
         <div class="stat-card"><div class="number" id="dashboardActiveOrders">0</div><div class="label">Ordini attivi</div></div>
         <div class="stat-card"><div class="number" id="dashboardTotalOrders">0</div><div class="label">Ordini totali</div></div>
         <div class="stat-card"><div class="number" id="dashboardDeliveredOrders">0</div><div class="label">Consegnati</div></div>
@@ -610,6 +555,15 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
           I client si sincronizzano automaticamente: non è più necessario premere il pulsante di aggiornamento.
           Le modifiche a menu, prezzi e promozioni arrivano in tempo reale all'app del cliente.
         </p>
+      </div>
+      <div class="card" style="border: 2px solid var(--gold); margin-top: 15px;">
+        <div class="card-title"><i class="fas fa-bell"></i> Notifiche Push</div>
+        <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 15px;">
+          Per inviare notifiche push ai clienti, usa il <strong style="color:var(--gold);">Dashboard OneSignal</strong>.
+        </p>
+        <a href="https://dashboard.onesignal.com/apps/00485893-99f7-4757-aa76-df88e8b67766/messages" target="_blank" class="btn-primary" style="display:inline-block;text-decoration:none;text-align:center;">
+          <i class="fas fa-external-link-alt"></i> Apri OneSignal
+        </a>
       </div>
     </div>
 
@@ -640,7 +594,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// ─── CACHE OTTIMIZZATA ──────────────────────────────────────────────────────
 let ordersCache = {};
 let appData = {
   categories: {}, menu: {}, promotions: {},
@@ -652,8 +605,6 @@ let currentReviewFilter = 'all';
 let openCategories = new Set();
 let driversList = {};
 let notificationSound = null;
-let selectedNotifDest = 'clients';
-let fcmTokensData = {};
 let tempPromoProducts = [];
 let isFirstLoad = true;
 
@@ -777,10 +728,8 @@ function initApp() {
   loadAllData();
   setupOptimizedListeners();
   renderPalettes();
-  loadTokensList();
   applyCurrentPalette();
   
-  // ✅ REGISTRAZIONE SERVICE WORKER V3
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(reg => {
       reg.addEventListener('updatefound', () => {
@@ -828,9 +777,7 @@ async function loadAllData() {
   }
 }
 
-// ─── LISTENER OTTIMIZZATO PER ORDINI ──────────────────────────────────────
 function setupOptimizedListeners() {
-  // ✅ LIMITA AGLI ULTIMI 30 ORDINI PER PERFORMANCE
   db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
     snapshot.forEach(child => {
       ordersCache[child.key] = { id: child.key, ...child.val() };
@@ -896,14 +843,6 @@ function setupOptimizedListeners() {
       applyCurrentPalette();
     } 
   });
-  
-  db.ref('fcm_tokens').on('value', s => {
-    fcmTokensData = s.val() || {};
-    updateTokensCount();
-    if (document.getElementById('section-notifications').classList.contains('active')) {
-      loadTokensList();
-    }
-  });
 }
 
 function showSection(name, el) {
@@ -915,7 +854,6 @@ function showSection(name, el) {
   if (navItem) navItem.classList.add('active');
   if (window.innerWidth <= 768) toggleSidebar();
   
-  if (name === 'notifications') loadTokensList();
   if (name === 'promotions') populatePromoProductSelect();
 }
 
@@ -1061,7 +999,7 @@ async function clearOldOrders() {
   const scelta = await showPuliziaOrdini();
   if (!scelta) return;
   
-  showToast(' Pulizia in corso...');
+  showToast('🧹 Pulizia in corso...');
   
   try {
     const snap = await db.ref('ordini').once('value');
@@ -1090,7 +1028,7 @@ async function clearOldOrders() {
       }
     });
     
-    showToast(`🗑️ Eliminatti ${count} ordini`);
+    showToast(`🗑️ Eliminati ${count} ordini`);
   } catch(e) {
     showToast('❌ Errore: ' + e.message);
   }
@@ -1103,7 +1041,7 @@ function showPuliziaOrdini() {
     
     overlay.innerHTML = `
       <div style="background:linear-gradient(145deg,#3d2b1a,#2a1e13);padding:28px 24px;border-radius:20px;width:100%;max-width:450px;border:1px solid rgba(212,168,75,0.25);">
-        <h3 style="color:#d4a84b;font-family:'Playfair Display',serif;margin-bottom:15px;font-size:1.3rem;"> Pulizia Ordini</h3>
+        <h3 style="color:#d4a84b;font-family:'Playfair Display',serif;margin-bottom:15px;font-size:1.3rem;">🧹 Pulizia Ordini</h3>
         <p style="color:#f5e6c8;margin-bottom:20px;line-height:1.5;">Cosa vuoi eliminare?</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button class="btn-pulizia" data-opzione="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;font-size:0.9rem;">
@@ -1113,7 +1051,7 @@ function showPuliziaOrdini() {
             ❌ Solo Rifiutati
           </button>
           <button class="btn-pulizia" data-opzione="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;font-size:0.9rem;">
-             Solo Consegnati
+             🎉 Solo Consegnati
           </button>
           <button class="btn-pulizia" data-opzione="vecchi" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">
             📅 Più vecchi di 60 giorni (tutti gli stati)
@@ -1186,7 +1124,7 @@ async function deleteReview(id) {
   const ok = await showConfirm('Eliminare Recensione?', 'Questa azione non può essere annullata.');
   if (!ok) return;
   db.ref('recensioni/' + id).remove(); 
-  showToast('️ Eliminata'); 
+  showToast('🗑️ Eliminata'); 
   loadReviews(); 
 }
 
@@ -1266,7 +1204,7 @@ function addProductToPromo() {
   const price = parseFloat(document.getElementById('promoProductPrice').value);
   
   if (!select.value) { showToast('⚠️ Seleziona un prodotto'); return; }
-  if (!qty || qty < 1) { showToast('️ Quantità non valida'); return; }
+  if (!qty || qty < 1) { showToast('⚠️ Quantità non valida'); return; }
   if (isNaN(price) || price < 0) { showToast('⚠️ Prezzo non valido'); return; }
   
   const [catKey, idx] = select.value.split('|');
@@ -1328,10 +1266,10 @@ function createPromotion() {
   const e = document.getElementById('newPromoEnd').value;
   const mx = parseInt(document.getElementById('newPromoMaxUses').value);
   
-  if (!t || !s || !e || !mx) { showToast('️ Compila tutti i campi obbligatori'); return; }
+  if (!t || !s || !e || !mx) { showToast('⚠️ Compila tutti i campi obbligatori'); return; }
   if (s > e) { showToast('⚠️ Date errate'); return; }
   if (tempPromoProducts.length === 0) { showToast('⚠️ Aggiungi almeno un prodotto alla promo'); return; }
-  if (mx < 1) { showToast('️ Max utilizzi non valido'); return; }
+  if (mx < 1) { showToast('⚠️ Max utilizzi non valido'); return; }
   
   const today = new Date().toISOString().split('T')[0];
   if (s < today) {
@@ -1419,8 +1357,8 @@ function updateDeliveryInfo() {
 }
 
 async function getPizzeriaGPS() {
-  if (!navigator.geolocation) { showToast(' GPS non disponibile'); return; }
-  showToast(' Ottenendo posizione...');
+  if (!navigator.geolocation) { showToast('❌ GPS non disponibile'); return; }
+  showToast('📍 Ottenendo posizione...');
   try {
     const pos = await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 });
@@ -1510,7 +1448,7 @@ async function addCategory() {
   const key = sanitizeKey(k);
   
   if (!key || !/^[a-z][a-z0-9_]*$/.test(key)) { 
-    showToast(' Chiave non valida (solo lettere minuscole)'); 
+    showToast('⚠️ Chiave non valida (solo lettere minuscole)'); 
     return; 
   }
   if (appData.categories[key]) { 
@@ -1617,7 +1555,6 @@ async function translateProduct(cat, idx, btnElement) {
   }
 }
 
-// 🔥 RENDER MENU CON TENDINA FUNZIONANTE - UNA CATEGORIA ALLA VOLTA
 function renderMenu() {
   const container = document.getElementById('menuAccordion');
   const searchTerm = (document.getElementById('menuSearch')?.value || '').toLowerCase();
@@ -1687,12 +1624,10 @@ function renderMenu() {
   container.innerHTML = (h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto trovato</p>') + '<div style="height:200px;"></div>';
 }
 
-// 🔥 TOGGLE CATEGORY ACCORDION - CHIUDE TUTTE LE ALTRE
 function toggleCategoryAccordion(c) {
     const el = document.getElementById('accordion-' + c);
     if (!el) return;
     
-    // Chiudi tutte le altre categorie
     document.querySelectorAll('.admin-category-accordion').forEach(acc => {
         if (acc.id !== 'accordion-' + c) {
             acc.classList.remove('open');
@@ -1700,7 +1635,6 @@ function toggleCategoryAccordion(c) {
         }
     });
     
-    // Apri/Chiudi quella cliccata
     el.classList.toggle('open');
     if (el.classList.contains('open')) {
         openCategories.add(c);
@@ -1742,7 +1676,7 @@ async function deleteProduct(c, i) {
   if (!ok) return;
   appData.menu[c].splice(i, 1); 
   db.ref('menu').set(appData.menu); 
-  showToast('️ Eliminato'); 
+  showToast('🗑️ Eliminato'); 
   renderMenu(); 
   populatePromoProductSelect(); 
 }
@@ -1939,20 +1873,20 @@ function saveDrivers() {
     
     if (!n || !p) { showToast('⚠️ Compila nome e PIN'); err = true; return; }
     if (!/^\d{4,6}$/.test(p)) { showToast('⚠️ PIN deve essere 4-6 cifre'); err = true; return; }
-    if (pins.has(p)) { showToast('️ PIN duplicato tra fattorini: ' + p); err = true; return; }
-    if (p === adminPin) { showToast('️ PIN duplicato con admin'); err = true; return; }
+    if (pins.has(p)) { showToast('⚠️ PIN duplicato tra fattorini: ' + p); err = true; return; }
+    if (p === adminPin) { showToast('⚠️ PIN duplicato con admin'); err = true; return; }
     pins.add(p);
     dl[p] = n;
     if (phone) dl[p + '_phone'] = phone;
   });
   
   if (err) return;
-  if (!Object.keys(dl).length) { showToast('️ Aggiungi almeno 1 fattorino'); return; }
+  if (!Object.keys(dl).length) { showToast('⚠️ Aggiungi almeno 1 fattorino'); return; }
   
   db.ref('drivers').set(dl).then(() => { 
     showToast('✅ Fattorini salvati'); 
     driversList = dl; 
-  }).catch(err => showToast(' Errore: ' + err.message));
+  }).catch(err => showToast('❌ Errore: ' + err.message));
 }
 
 async function changePin() {
@@ -1972,7 +1906,7 @@ async function changePin() {
     const currentPin = snapshot.val() || "1234";
     
     if (cp !== currentPin) { 
-      showToast(" PIN attuale errato"); 
+      showToast("❌ PIN attuale errato"); 
       return; 
     }
     
@@ -2045,128 +1979,6 @@ function applyPalette(name) {
   root.style.setProperty('--card', c.card);
   root.style.setProperty('--card-light', c.cardLight);
   root.style.setProperty('--cream', c.cream);
-}
-
-function selectNotifDest(dest, el) {
-  selectedNotifDest = dest;
-  document.querySelectorAll('.notif-dest-option').forEach(o => {
-    o.style.background = 'var(--card)';
-    o.style.color = 'var(--cream)';
-    o.style.borderColor = 'var(--gold-dark)';
-    const icon = o.querySelector('i');
-    if (icon) icon.style.color = 'var(--gold)';
-    const count = o.querySelector('.count');
-    if (count) count.style.color = '#8a7a5a';
-  });
-  el.style.background = 'var(--gold)';
-  el.style.color = 'var(--dark)';
-  el.style.borderColor = 'var(--gold)';
-  const icon = el.querySelector('i');
-  if (icon) icon.style.color = 'var(--dark)';
-  const count = el.querySelector('.count');
-  if (count) count.style.color = 'rgba(0,0,0,0.6)';
-}
-
-function updateTokensCount() {
-  let clients = 0, drivers = 0;
-  Object.values(fcmTokensData).forEach(t => {
-    if (t.type === 'client') clients++;
-    else if (t.type === 'driver') drivers++;
-  });
-  const countClients = document.getElementById('countClients');
-  const countDrivers = document.getElementById('countDrivers');
-  const countAll = document.getElementById('countAll');
-  const dashboardClients = document.getElementById('dashboardClients');
-  const dashboardDrivers = document.getElementById('dashboardDrivers');
-  const dashboardDevices = document.getElementById('dashboardDevices');
-  if (countClients) countClients.textContent = clients + ' registrati';
-  if (countDrivers) countDrivers.textContent = drivers + ' registrati';
-  if (countAll) countAll.textContent = (clients + drivers) + ' totali';
-  if (dashboardClients) dashboardClients.textContent = clients;
-  if (dashboardDrivers) dashboardDrivers.textContent = drivers;
-  if (dashboardDevices) dashboardDevices.textContent = clients + drivers;
-}
-
-function loadTokensList() {
-  db.ref('fcm_tokens').once('value').then(s => {
-    fcmTokensData = s.val() || {};
-    updateTokensCount();
-    
-    const list = document.getElementById('tokensList');
-    const entries = Object.entries(fcmTokensData);
-    
-    if (entries.length === 0) {
-      list.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessun dispositivo registrato.<br>I dispositivi appariranno qui dopo aver aperto l\'app.</p>';
-      return;
-    }
-    
-    let html = '';
-    entries.forEach(([id, t]) => {
-      const typeLabel = t.type === 'client' ? ' Cliente' : '🛵 Fattorino';
-      const lastSeen = t.lastSeen ? new Date(t.lastSeen).toLocaleString('it-IT', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Mai';
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(212,168,75,0.1);font-size:0.8rem;">
-        <span style="color:var(--gold);font-weight:700;">${typeLabel}</span>
-        <span style="color:#8a7a5a;font-size:0.7rem;">${lastSeen}</span>
-      </div>`;
-    });
-    
-    list.innerHTML = html;
-  });
-}
-
-async function sendNotification() {
-  const title = sanitize(document.getElementById('notifTitle').value);
-  const body = sanitize(document.getElementById('notifBody').value);
-  
-  if (!title) { showToast('️ Inserisci un titolo'); return; }
-  if (!body) { showToast('⚠️ Inserisci un messaggio'); return; }
-  
-  const ok = await showConfirm('Inviare Notifica?', 'La notifica verrà inviata a tutti gli utenti iscritti.');
-  if (!ok) return;
-  
-  showToast('📤 Invio in corso...');
-  
-  try {
-    const response = await fetch('/api/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        title: title,
-        body: body,
-        destinatari: selectedNotifDest
-      })
-    });
-    
-    const result = await response.json();
-    console.log('Risposta API:', result); // Aggiungi questo per debug
-    
-    if (result.success) {
-      showToast(`✅ ${result.message}`);
-      document.getElementById('notifTitle').value = '';
-      document.getElementById('notifBody').value = '';
-    } else {
-      showToast(`❌ Errore: ${result.error || 'Sconosciuto'}`);
-      console.error('Errore dettagliato:', result);
-    }
-  } catch(e) {
-    console.error('Errore:', e);
-    showToast('❌ Errore di connessione');
-  }
-}
-// ✅ FUNZIONE AGGIORNAMENTO REMOTO APP CLIENTI
-async function forceAppUpdate() {
-  const ok = await showConfirm('Forzare aggiornamento?', 'Tutti i clienti riceveranno la nuova versione e si aggiorneranno entro 2 secondi.');
-  if (!ok) return;
-  
-  try {
-    const newVersion = Date.now();
-    await db.ref('settings/appClientVersion').set(newVersion);
-    showToast('✅ Segnale inviato! I client si aggiorneranno entro 2 secondi.');
-  } catch(e) {
-    showToast('❌ Errore: ' + e.message);
-  }
 }
 
 function showToast(msg) { 
