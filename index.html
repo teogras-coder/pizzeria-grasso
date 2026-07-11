@@ -91,6 +91,43 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .search-bar-3d input:focus{border-color:var(--gold)}
 .search-bar-3d i{position:absolute;left:15px;top:14px;color:var(--gold);z-index:2}
 .product-card-3d{background:linear-gradient(145deg,var(--card-light) 0%,var(--brown) 100%);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 0 var(--shadow);border:1px solid rgba(212,168,75,.1);min-height:72px}
+
+/* 🆕 STILE PER PRODOTTO ESAURITO */
+.product-card-3d.product-disabled {
+    opacity: 0.65;
+    filter: grayscale(0.4);
+    border-color: rgba(248,113,113,0.3);
+    background: linear-gradient(145deg, #2a1e13 0%, #1a1209 100%);
+}
+.product-card-3d.product-disabled .product-info h4 {
+    color: #8a7a5a;
+}
+.product-card-3d.product-disabled .product-price {
+    color: #8a7a5a;
+}
+.product-card-3d .product-availability-badge {
+    display: none;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #f87171;
+    background: rgba(248,113,113,0.15);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(248,113,113,0.3);
+    margin-top: 2px;
+}
+.product-card-3d.product-disabled .product-availability-badge {
+    display: inline-block;
+}
+.add-btn-3d.disabled-btn {
+    background: #555 !important;
+    color: #888 !important;
+    box-shadow: 0 3px 0 #333 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+/* 🆕 FINE STILE PRODOTTO ESAURITO */
+
 .product-img-square{width:52px;height:52px;border-radius:8px;object-fit:cover;margin-right:10px;border:1px solid rgba(212,168,75,.3);flex-shrink:0;background:var(--card)}
 .product-info{flex:1;min-width:0}
 .product-info h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -464,7 +501,10 @@ const translations = {
         promo_unavailable: "❌ Promo non disponibile", promo_exhausted: "❌ Promo esaurita",
         preparing: "🍕 In preparazione", ready: "✅ Pronto", picked: "📦 Ritirato", delivering: "🛵 In consegna!",
         delivered: "🎉 Consegnato!", rejected: "❌ Ordine rifiutato", review_btn: "⭐ Recensisci", already_reviewed: "✅ Già recensito",
-        annullato: "🗑️ Ordine annullato"
+        annullato: "🗑️ Ordine annullato",
+        // 🆕 Nuove traduzioni per prodotti esauriti
+        sold_out: "🍕 Esaurito",
+        product_not_available: "❌ Prodotto esaurito, scegli altro!"
     },
     en: {
         welcome_title: "🍕 Welcome to Grasso!", save_home_title: "📱 Save app to Home!",
@@ -507,7 +547,10 @@ const translations = {
         promo_unavailable: "❌ Promo unavailable", promo_exhausted: "❌ Promo exhausted",
         preparing: "🍕 Preparing", ready: "✅ Ready", picked: "📦 Picked up", delivering: "🛵 Delivering!",
         delivered: "🎉 Delivered!", rejected: "❌ Order rejected", review_btn: "⭐ Review", already_reviewed: "✅ Already reviewed",
-        annullato: "🗑️ Order cancelled"
+        annullato: "🗑️ Order cancelled",
+        // 🆕 Nuove traduzioni per prodotti esauriti
+        sold_out: "🍕 Sold Out",
+        product_not_available: "❌ Product sold out, choose another!"
     },
     de: {
         welcome_title: "🍕 Willkommen bei Grasso!", save_home_title: "📱 App zum Startbildschirm!",
@@ -550,7 +593,10 @@ const translations = {
         promo_unavailable: "❌ Aktion nicht verfügbar", promo_exhausted: "❌ Aktion ausgeschöpft",
         preparing: "🍕 In Zubereitung", ready: "✅ Fertig", picked: "📦 Abgeholt", delivering: "🛵 Wird geliefert!",
         delivered: "🎉 Geliefert!", rejected: "❌ Bestellung abgelehnt", review_btn: "⭐ Bewerten", already_reviewed: "✅ Bereits bewertet",
-        annullato: "🗑️ Bestellung storniert"
+        annullato: "🗑️ Bestellung storniert",
+        // 🆕 Nuove traduzioni per prodotti esauriti
+        sold_out: "🍕 Ausverkauft",
+        product_not_available: "❌ Produkt ausverkauft, wähle ein anderes!"
     }
 };
 
@@ -833,33 +879,85 @@ function showCategories(){renderCategories();document.getElementById('categories
 function renderCategories(){const l=document.getElementById('categoriesList');if(!l)return;l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return`<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="icon-circle"><i class="fas ${i.icon||'fa-utensils'}"></i></div><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div><div class="arrow"><i class="fas fa-chevron-right"></i></div></div></div>`}).join('')}
 function showCategory(c){if(!c||!appData.menu||!appData.menu[c]){showToast(t('not_available'));return}currentSearchCat=c;document.getElementById('productSearch').value='';document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);renderProductList(c);window.scrollTo(0,0)}
 
-// ─── LISTA PRODOTTI ──────────────────────────────────────────────────────
+// ─── 🆕 LISTA PRODOTTI CON GESTIONE ESAURITO ──────────────────────────────
 function renderProductList(cat,ft){
     if(!cat||!appData.menu||!appData.menu[cat])return;
     const term=(ft||'').toLowerCase();
     const list=document.getElementById('productList');
     if(!list)return;
-    const filtered=appData.menu[cat].filter(p=>p.name.toLowerCase().includes(term)||(p.desc&&p.desc.toLowerCase().includes(term)));
+    // 🆕 Filtra prodotti per ricerca (mantiene i disabled nella lista ma li marca come esauriti)
+    const filtered=appData.menu[cat].filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        (p.desc && p.desc.toLowerCase().includes(term))
+    );
     if(!filtered.length){list.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px;">${t('no_products')}</p>`;return;}
+    
     list.innerHTML=filtered.map((p,idx)=>{
         const originalIdx=appData.menu[cat].indexOf(p);
-        const qty=getCartQty(cat,p.name);
+        // 🆕 Controlla se il prodotto è esaurito
+        const isDisabled = p.disabled === true;
+        const qty = isDisabled ? 0 : getCartQty(cat,p.name);
+        
         let displayName=p.name,displayDesc=p.desc||'';
         if(currentLang==='en'){displayName=p.translations?.en?.name||p.name_en||p.name;displayDesc=p.translations?.en?.desc||p.desc_en||p.desc||''}
         else if(currentLang==='de'){displayName=p.translations?.de?.name||p.name_de||p.name;displayDesc=p.translations?.de?.desc||p.desc_de||p.desc||''}
+        
         const img=p.img?`<img src="${p.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'';
-        const ui=qty>0?`<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+</button></div>`:`<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;
-        return `<div class="product-card-3d">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)}</div></div>${ui}</div>`;
+        
+        // 🆕 Badge "Esaurito" accanto al prezzo
+        const soldOutBadge = isDisabled ? `<span class="product-availability-badge">${t('sold_out')}</span>` : '';
+        
+        // 🆕 UI diversa se esaurito
+        let actions;
+        if (isDisabled) {
+            actions = `<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`;
+        } else if (qty > 0) {
+            actions = `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+</button></div>`;
+        } else {
+            actions = `<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;
+        }
+        
+        // 🆕 Aggiungi classe product-disabled se esaurito
+        const disabledClass = isDisabled ? 'product-disabled' : '';
+        
+        return `<div class="product-card-3d ${disabledClass}">
+            ${img}
+            <div class="product-info" style="flex:1;">
+                <h4>${displayName}</h4>
+                <p>${displayDesc}</p>
+                <div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div>
+            </div>
+            ${actions}
+        </div>`;
     }).join('');
-    list.querySelectorAll('.qty-btn,.add-btn-3d').forEach(btn=>{
-        btn.onclick=function(e){e.preventDefault();e.stopPropagation();const cat=this.dataset.cat,idx=parseInt(this.dataset.idx,10),delta=parseInt(this.dataset.delta,10);if(cat&&!isNaN(idx)&&!isNaN(delta))changeProductQty(cat,idx,delta);}
+    
+    // 🆕 Gestione click per i pulsanti (anche quelli disabilitati non avranno effetto)
+    list.querySelectorAll('.qty-btn,.add-btn-3d:not(.disabled-btn)').forEach(btn=>{
+        btn.onclick=function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            const cat=this.dataset.cat;
+            const idx=parseInt(this.dataset.idx,10);
+            const delta=parseInt(this.dataset.delta,10);
+            if(cat&&!isNaN(idx)&&!isNaN(delta)){
+                changeProductQty(cat,idx,delta);
+            }
+        }
     });
 }
 
+// ─── 🆕 FUNZIONE MODIFICATA PER BLOCCARE AGGIUNTA PRODOTTI ESAURITI ──────
 function changeProductQty(c,i,d){
     if(!checkIfOpen()){showToast(t('closed_now'));return}
     if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('❌ Errore prodotto');return}
     const it=appData.menu[c][i];
+    
+    // 🆕 CONTROLLO: se il prodotto è esaurito, blocca l'aggiunta
+    if (it.disabled === true) {
+        showToast(t('product_not_available'));
+        return;
+    }
+    
     const ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);
     if(ex){
         ex.qty=(ex.qty||0)+d;
@@ -885,6 +983,7 @@ function updateStatusBanner(){const b=document.getElementById('statusBanner'),tx
 function updateServicesUI(){}
 
 // ─── CARRELLO ──────────────────────────────────────────────────────────────
+// 🆕 getCartQty rimane uguale ma esclude prodotti esauriti (non saranno nel carrello)
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}const fb=document.getElementById('floatingCartButton');const fbBadge=document.getElementById('floatingCartBadge');if(fb){fb.classList.toggle('hidden',n===0);}if(fbBadge){fbBadge.textContent=n;}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
 function setupFloatingCartDrag(){const btn=document.getElementById('floatingCartButton');if(!btn)return;let dragging=false;let pointerId=null;let startX=0;let startY=0;let origX=0;let origY=0;let moved=false;const margin=12;const clamp=(value,min,max)=>Math.min(Math.max(value,min),max);const updatePosition=(x,y)=>{const maxX=window.innerWidth-btn.offsetWidth-margin;const maxY=window.innerHeight-btn.offsetHeight-margin;btn.style.left=clamp(x,margin,maxX)+'px';btn.style.top=clamp(y,margin,maxY)+'px';btn.style.right='auto';btn.style.bottom='auto';btn.classList.remove('snapped')};const snapToEdge=(x,y)=>{const maxY=window.innerHeight-btn.offsetHeight-margin;const clampedY=clamp(y,margin,maxY);const closeToLeft=x < 100;const closeToRight=(window.innerWidth-(x+btn.offsetWidth)) < 100; if(closeToLeft){btn.style.left=margin+'px';btn.style.right='auto';btn.classList.add('snapped')}else if(closeToRight){btn.style.left='auto';btn.style.right=margin+'px';btn.classList.add('snapped')}else{btn.style.left=clamp(x,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.right='auto';btn.classList.remove('snapped')}btn.style.top=clampedY+'px';btn.style.bottom='auto'};const resetPosition=()=>{const rect=btn.getBoundingClientRect();btn.style.left=clamp(rect.left,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.top=clamp(rect.top,margin,window.innerHeight-btn.offsetHeight-margin)+'px';btn.style.right='auto';btn.style.bottom='auto'};btn.style.touchAction='none';btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;dragging=true;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;const rect=btn.getBoundingClientRect();origX=rect.left;origY=rect.top;moved=false;btn.setPointerCapture(e.pointerId);});btn.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;const dy=e.clientY-startY;if(!moved&&Math.hypot(dx,dy)>6)moved=true;if(moved)updatePosition(origX+dx,origY+dy);});const endDrag=e=>{if(!dragging||e.pointerId!==pointerId)return;dragging=false;btn.releasePointerCapture(e.pointerId);if(moved){const rect=btn.getBoundingClientRect();snapToEdge(rect.left,rect.top);}setTimeout(()=>{moved=false},0);};btn.addEventListener('pointerup',endDrag);btn.addEventListener('pointercancel',endDrag);btn.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();}else{openCart();}});window.addEventListener('resize',resetPosition);}
@@ -902,7 +1001,7 @@ async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!na
 function openCart(){const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');if(!cart.length){it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none'}else{let h='';cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`});cart.forEach(x=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`});it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex';const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe);if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType);selectTimeMode(timeMode);updateCartTotals()}m.classList.add('active')}
 function closeCart(){document.getElementById('cartModal').classList.remove('active')}
 
-// ─── 🔥 FUNZIONE AGGIUNTA: AGGIUNGI PROMOZIONE AL CARRELLO ───────────────
+// ─── FUNZIONE AGGIUNTA: AGGIUNGI PROMOZIONE AL CARRELLO ───────────────
 function addPromoToCart(promoId){
     const promo=appData.promotions[promoId];
     if(!promo){showToast(t('promo_unavailable'));return;}
@@ -934,6 +1033,7 @@ async function removePromoFromCartAtIndex(i){
 }
 
 // ─── INVIO ORDINE ──────────────────────────────────────────────────────────
+// 🆕 In fase di invio ordine, controlliamo che i prodotti non siano diventati esauriti nel frattempo
 async function confirmAndSendOrder(){
     if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(t('wait_minute'));return}
     const pc=document.getElementById('privacyConsent');if(!pc||!pc.checked){showToast(t('accept_privacy'));return}
@@ -942,6 +1042,22 @@ async function confirmAndSendOrder(){
     if(!n){showToast(t('fill_name'));return}
     const ph=p.replace(/[\s\-().+]/g,'');
     if(!/^(\+?39)?3[0-9]{9}$/.test(ph)&&!/^0[0-9]{6,9}$/.test(ph)){showToast(t('invalid_phone'));return}
+    
+    // 🆕 CONTROLLO: verifica se qualche prodotto nel carrello è diventato esaurito
+    const esauriti = cart.filter(item => !item.isPromo && appData.menu[item.cat] && appData.menu[item.cat][appData.menu[item.cat].findIndex(p => p.name === item.name)]?.disabled === true);
+    if (esauriti.length > 0) {
+        const nomiEsauriti = esauriti.map(item => item.name).join(', ');
+        showToast(`❌ Prodotti esauriti: ${nomiEsauriti}`);
+        // Rimuovi i prodotti esauriti dal carrello
+        esauriti.forEach(item => {
+            const idx = cart.indexOf(item);
+            if (idx > -1) cart.splice(idx, 1);
+        });
+        updateCartBadge();
+        if (document.getElementById('cartModal').classList.contains('active')) openCart();
+        return;
+    }
+    
     let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty)});
     let df=0;
     if(orderType==='delivery'&&appData.settings.deliveryEnabled!==false){
