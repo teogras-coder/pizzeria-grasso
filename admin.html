@@ -65,14 +65,23 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .card { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(212,168,75,0.15); }
 .card-title { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; }
-.stat-card { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(212,168,75,0.2); }
-.stat-card .number { font-size: 2rem; font-weight: 700; color: var(--gold); }
-.stat-card .label { color: #8a7a5a; font-size: 0.8rem; margin-top: 5px; text-transform: uppercase; }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; margin-bottom: 25px; }
+.stat-card { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 12px; padding: 15px 10px; text-align: center; border: 1px solid rgba(212,168,75,0.2); }
+.stat-card .number { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+.stat-card .label { color: #8a7a5a; font-size: 0.6rem; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-card.annullati .number { color: #f87171; }
+.stat-card.rifiutati .number { color: #ef4444; }
+.stat-card.delivered .number { color: #60a5fa; }
+.stat-card .stat-icon { font-size: 1.1rem; display: block; margin-bottom: 2px; }
 .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 .order-card { background: var(--card-light); border-radius: 12px; padding: 15px; border: 1px solid rgba(212,168,75,0.2); border-left: 4px solid var(--gold); }
+.order-card.annullati { border-left-color: #f87171; opacity: 0.8; }
+.order-card.rifiutati { border-left-color: #ef4444; opacity: 0.8; }
 .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(212,168,75,0.15); flex-wrap: wrap; gap: 5px; }
-.order-id { color: var(--gold); font-weight: 700; font-size: 1rem; }
+.order-id { color: var(--gold); font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.order-id .status-badge { font-size: 0.6rem; padding: 2px 10px; border-radius: 10px; font-weight: 700; }
+.order-id .status-badge.annullato { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+.order-id .status-badge.rifiutato { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
 .driver-badge { background: rgba(96,165,250,0.2); color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 8px; display: inline-block; }
 .order-time { color: #8a7a5a; font-size: 0.75rem; }
 .order-customer { color: var(--cream); font-weight: 600; margin-bottom: 5px; }
@@ -83,6 +92,8 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .order-total span:last-child { color: var(--gold); font-size: 1.1rem; }
 .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .order-actions button { flex: 1; min-width: 80px; padding: 10px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+.order-reject-message { margin-top: 8px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 6px; color: #fca5a5; font-size: 0.8rem; border-left: 3px solid #ef4444; }
+.order-reject-message strong { color: #ef4444; }
 .btn-preparing { background: #fbbf24; color: var(--dark); }
 .btn-ready { background: #4ade80; color: var(--dark); }
 .btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
@@ -134,6 +145,73 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-group-title.picked { background: #8b5cf6; color: white; }
 .orders-group-title.delivering { background: #ec4899; color: white; }
 .orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
+
+/* 🆕 STILE PER ACCORDION ANNULLATI/RIFIUTATI */
+.orders-accordion { 
+    background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%);
+    border-radius: 12px;
+    margin: 15px 0 8px;
+    border: 1px solid rgba(212,168,75,0.2);
+    overflow: hidden;
+}
+.orders-accordion-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+}
+.orders-accordion-header:hover {
+    background: rgba(212,168,75,0.05);
+}
+.orders-accordion-header .accordion-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.orders-accordion-header .accordion-left .icon {
+    font-size: 1.1rem;
+}
+.orders-accordion-header .accordion-left .count {
+    background: rgba(255,255,255,0.15);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+}
+.orders-accordion-header .accordion-arrow {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+    color: #8a7a5a;
+}
+.orders-accordion.open .accordion-arrow {
+    transform: rotate(180deg);
+}
+.orders-accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 16px;
+}
+.orders-accordion.open .orders-accordion-body {
+    max-height: 800px;
+    padding: 0 16px 16px;
+    overflow-y: auto;
+}
+.orders-accordion.annullati .orders-accordion-header {
+    border-left: 4px solid #f87171;
+}
+.orders-accordion.rifiutati .orders-accordion-header {
+    border-left: 4px solid #ef4444;
+}
+.orders-accordion-body .orders-grid {
+    margin-top: 10px;
+}
+/* 🆕 FINE STILE ACCORDION */
+
 .review-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
 .review-stat-card { background: var(--card); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(212,168,75,0.15); }
 .review-stat-card .number { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
@@ -317,7 +395,9 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">Pronti</div></div>
         <div class="stat-card"><div class="number" id="statPicked">0</div><div class="label">Ritirati</div></div>
         <div class="stat-card"><div class="number" id="statDelivering">0</div><div class="label">In Consegna</div></div>
-        <div class="stat-card"><div class="number" id="statDelivered">0</div><div class="label">Consegnati</div></div>
+        <div class="stat-card delivered"><div class="number" id="statDelivered">0</div><div class="label">Consegnati</div></div>
+        <div class="stat-card annullati"><div class="number" id="statAnnullati">0</div><div class="label">🗑️ Annullati</div></div>
+        <div class="stat-card rifiutati"><div class="number" id="statRifiutati">0</div><div class="label">❌ Rifiutati</div></div>
       </div>
       <div id="ordersList"></div>
     </div>
@@ -608,6 +688,7 @@ let driversList = {};
 let notificationSound = null;
 let tempPromoProducts = [];
 let isFirstLoad = true;
+let accordionState = { annullati: false, rifiutati: false };
 
 // ============================================================
 // 🔥 FUNZIONI PER INVIARE IL SEGNALE AI CLIENTI
@@ -847,6 +928,10 @@ function setupOptimizedListeners() {
       } else if (order.status === 'delivered' && oldStatus === 'delivering') {
         playAdminNotification();
         showToast(`🎉 Ordine ${orderId} consegnato!`);
+      } else if (order.status === 'annullato' && oldStatus !== 'annullato') {
+        showToast(`🗑️ Ordine ${orderId} ANNULLATO dal cliente`);
+      } else if (order.status === 'rifiutato' && oldStatus !== 'rifiutato') {
+        showToast(`❌ Ordine ${orderId} RIFIUTATO dalla pizzeria`);
       }
     }
   });
@@ -881,15 +966,40 @@ function showSection(name, el) {
   if (name === 'promotions') populatePromoProductSelect();
 }
 
+// ============================================================
+// 🔥 RENDER ORDINI CON ACCORDION PER ANNULLATI E RIFIUTATI
+// ============================================================
+
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
-  const gruppi = { new: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [] };
+  const gruppi = { 
+    new: [], 
+    preparing: [], 
+    delayed: [], 
+    ready: [], 
+    picked: [], 
+    delivering: [], 
+    delivered: [],
+    annullati: [],
+    rifiutati: []
+  };
+  
   Object.entries(orders || {}).forEach(([id, o]) => {
     const st = o.status || 'new';
-    if (gruppi[st]) gruppi[st].push([id, o]);
+    if (st === 'annullato') {
+      gruppi.annullati.push([id, o]);
+    } else if (st === 'rifiutato') {
+      gruppi.rifiutati.push([id, o]);
+    } else if (gruppi[st]) {
+      gruppi[st].push([id, o]);
+    }
   });
-  Object.keys(gruppi).forEach(k => gruppi[k].sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0)));
+  
+  Object.keys(gruppi).forEach(k => {
+    gruppi[k].sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+  });
 
+  // Statistiche
   document.getElementById('statNew').textContent = gruppi.new.length;
   document.getElementById('statPreparing').textContent = gruppi.preparing.length;
   document.getElementById('statDelayed').textContent = gruppi.delayed.length;
@@ -897,76 +1007,170 @@ function renderOrders(orders) {
   document.getElementById('statPicked').textContent = gruppi.picked.length;
   document.getElementById('statDelivering').textContent = gruppi.delivering.length;
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
+  document.getElementById('statAnnullati').textContent = gruppi.annullati.length;
+  document.getElementById('statRifiutati').textContent = gruppi.rifiutati.length;
 
   const activeOrders = gruppi.new.length + gruppi.preparing.length + gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
-  const totalOrders = activeOrders + gruppi.delivered.length;
+  const totalOrders = activeOrders + gruppi.delivered.length + gruppi.annullati.length + gruppi.rifiutati.length;
   const deliveredOrders = gruppi.delivered.length;
-  const dashboardActiveOrders = document.getElementById('dashboardActiveOrders');
-  const dashboardTotalOrders = document.getElementById('dashboardTotalOrders');
-  const dashboardDeliveredOrders = document.getElementById('dashboardDeliveredOrders');
-  if (dashboardActiveOrders) dashboardActiveOrders.textContent = activeOrders;
-  if (dashboardTotalOrders) dashboardTotalOrders.textContent = totalOrders;
-  if (dashboardDeliveredOrders) dashboardDeliveredOrders.textContent = deliveredOrders;
+  
+  document.getElementById('dashboardActiveOrders').textContent = activeOrders;
+  document.getElementById('dashboardTotalOrders').textContent = totalOrders;
+  document.getElementById('dashboardDeliveredOrders').textContent = deliveredOrders;
 
   const attivi = activeOrders;
   const badge = document.getElementById('newOrdersBadge');
   if (attivi > 0) { badge.textContent = attivi; badge.style.display = 'inline'; }
   else badge.style.display = 'none';
 
-  if (!attivi && !gruppi.delivered.length) {
+  // Se non ci sono ordini
+  if (!attivi && !gruppi.delivered.length && !gruppi.annullati.length && !gruppi.rifiutati.length) {
     list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox"></i><p>Nessun ordine</p></div>';
     return;
   }
 
   const titoli = { 
-    new: 'Nuovi (in attesa fattorino)', 
-    preparing: 'In Preparazione', 
-    delayed: 'In Ritardo', 
-    ready: 'Pronti (ritiro fattorino)', 
-    picked: 'Ritirati dal fattorino', 
-    delivering: 'In Consegna', 
-    delivered: 'Consegnati' 
+    new: '🆕 Nuovi (in attesa fattorino)', 
+    preparing: '🍕 In Preparazione', 
+    delayed: '⏰ In Ritardo', 
+    ready: '✅ Pronti (ritiro fattorino)', 
+    picked: '📦 Ritirati dal fattorino', 
+    delivering: '🛵 In Consegna', 
+    delivered: '🎉 Consegnati'
   };
+  
   let html = '';
 
-  Object.keys(gruppi).forEach(stato => {
+  // --- ORDINI ATTIVI (sempre visibili) ---
+  ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
     if (!gruppi[stato].length) return;
     html += '<div class="orders-group-title ' + stato + '">' + titoli[stato] + ' (' + gruppi[stato].length + ')</div>';
     html += '<div class="orders-grid">';
-    html += gruppi[stato].map(([id, o]) => {
-      const dt = new Date(o.timestamp || 0);
-      const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-      const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-      const items = o.items && Array.isArray(o.items) ? o.items.map(i => '<div>' + sanitize(i.name) + ' x' + i.qty + ' - €' + (i.price * i.qty).toFixed(2) + '</div>').join('') : '';
-      const driverBadge = o.assignedName ? '<span class="driver-badge">' + sanitize(o.assignedName) + '</span>' : '';
-      
-      let ah = '';
-      if (stato === 'new') {
+    html += renderOrderCards(gruppi[stato]);
+    html += '</div>';
+  });
+
+  // --- ANNULLATI (accordion) ---
+  if (gruppi.annullati.length > 0) {
+    const isOpen = accordionState.annullati;
+    html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('annullati')">
+        <div class="accordion-left">
+          <span class="icon">🗑️</span>
+          <span>ORDINI ANNULLATI DAL CLIENTE</span>
+          <span class="count">${gruppi.annullati.length}</span>
+        </div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="orders-accordion-body">
+        <div class="orders-grid">
+          ${renderOrderCards(gruppi.annullati, 'annullati')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // --- RIFIUTATI (accordion) ---
+  if (gruppi.rifiutati.length > 0) {
+    const isOpen = accordionState.rifiutati;
+    html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('rifiutati')">
+        <div class="accordion-left">
+          <span class="icon">❌</span>
+          <span>ORDINI RIFIUTATI DALLA PIZZERIA</span>
+          <span class="count">${gruppi.rifiutati.length}</span>
+        </div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="orders-accordion-body">
+        <div class="orders-grid">
+          ${renderOrderCards(gruppi.rifiutati, 'rifiutati')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  list.innerHTML = html;
+}
+
+// 🔥 Funzione per generare le card degli ordini
+function renderOrderCards(ordersList, tipo = '') {
+  return ordersList.map(([id, o]) => {
+    const dt = new Date(o.timestamp || 0);
+    const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+    const items = o.items && Array.isArray(o.items) ? o.items.map(i => '<div>' + sanitize(i.name) + ' x' + i.qty + ' - €' + (i.price * i.qty).toFixed(2) + '</div>').join('') : '';
+    const driverBadge = o.assignedName ? '<span class="driver-badge">' + sanitize(o.assignedName) + '</span>' : '';
+    
+    // Badge per annullati/rifiutati
+    let statusBadge = '';
+    let borderColor = 'var(--gold)';
+    let extraClass = '';
+    if (tipo === 'annullati') {
+      statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>';
+      borderColor = '#f87171';
+      extraClass = 'annullati';
+    } else if (tipo === 'rifiutati') {
+      statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>';
+      borderColor = '#ef4444';
+      extraClass = 'rifiutati';
+    }
+    
+    let ah = '';
+    let motivoMessage = '';
+    
+    // Per annullati e rifiutati mostra solo elimina + motivo
+    if (tipo === 'annullati' || tipo === 'rifiutati') {
+      ah = '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">🗑️ Elimina</button>';
+      if (o.motivoRifiuto) {
+        motivoMessage = '<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ' + sanitize(o.motivoRifiuto) + '</div>';
+      } else if (o.motivoAnnullamento) {
+        motivoMessage = '<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ' + sanitize(o.motivoAnnullamento) + '</div>';
+      }
+    } else {
+      // Pulsanti per ordini attivi
+      const st = o.status || 'new';
+      if (st === 'new') {
         ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      } else if (stato === 'preparing') {
+      } else if (st === 'preparing') {
         ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      } else if (stato === 'delayed') {
+      } else if (st === 'delayed') {
         ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      } else if (stato === 'ready') {
+      } else if (st === 'ready') {
         const isPickup = o.type === 'pickup';
         ah = isPickup 
           ? '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>'
           : '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      } else if (stato === 'picked') {
+      } else if (st === 'picked') {
         ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>';
-      } else if (stato === 'delivering') {
+      } else if (st === 'delivering') {
         ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>';
       } else {
         ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       }
+    }
 
-      return '<div class="order-card ' + stato + '"><div class="order-header"><span class="order-id">' + (o.orderId || id) + driverBadge + '</span><span class="order-time">' + ds + ' ' + ts + '</span></div><div class="order-customer">' + sanitize(o.customerName || 'N/A') + ' - ' + sanitize(o.customerPhone || 'N/A') + '</div><div class="order-details">' + (o.type === 'delivery' ? 'Consegna' : 'Ritiro') + (o.scheduledTime ? ' - ' + o.scheduledTime : '') + (o.type === 'delivery' && o.address ? '<br>' + sanitize(o.address) : '') + (o.notes ? '<br>Nota: ' + sanitize(o.notes) : '') + '</div><div class="order-items">' + items + '</div><div class="order-total"><span>Totale</span><span>€' + (o.finalTotal || 0).toFixed(2) + '</span></div><div class="order-actions">' + ah + '</div></div>';
-    }).join('');
-    html += '</div>';
-  });
-
-  list.innerHTML = html;
+    return '<div class="order-card ' + extraClass + '" style="border-left-color:' + borderColor + ';">' +
+      '<div class="order-header"><span class="order-id">' + (o.orderId || id) + ' ' + statusBadge + driverBadge + '</span><span class="order-time">' + ds + ' ' + ts + '</span></div>' +
+      '<div class="order-customer">' + sanitize(o.customerName || 'N/A') + ' - ' + sanitize(o.customerPhone || 'N/A') + '</div>' +
+      '<div class="order-details">' + (o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro') + (o.scheduledTime ? ' - ' + o.scheduledTime : '') + (o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : '') + (o.notes ? '<br>📝 ' + sanitize(o.notes) : '') + '</div>' +
+      '<div class="order-items">' + items + '</div>' +
+      '<div class="order-total"><span>Totale</span><span>€' + (o.finalTotal || 0).toFixed(2) + '</span></div>' +
+      '<div class="order-actions">' + ah + '</div>' +
+      motivoMessage +
+    '</div>';
+  }).join('');
 }
+
+// 🔥 Funzione per aprire/chiudere l'accordion
+function toggleAccordion(tipo) {
+  accordionState[tipo] = !accordionState[tipo];
+  renderOrders(ordersCache);
+}
+
+// ============================================================
+// FINE RENDER ORDINI
+// ============================================================
 
 function updateOrderStatus(id, st, orderType) {
   if (st === 'delivered' && orderType !== 'pickup') {
@@ -1037,13 +1241,15 @@ async function clearOldOrders() {
         elimina = true;
       } else if (scelta === 'rifiutati') {
         elimina = order.status === 'rifiutato';
+      } else if (scelta === 'annullati') {
+        elimina = order.status === 'annullato';
       } else if (scelta === 'consegnati') {
         elimina = order.status === 'delivered';
       } else if (scelta === 'vecchi') {
         const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
         elimina = (order.timestamp || 0) < cutoff;
       } else if (scelta === 'completati') {
-        elimina = ['delivered', 'rifiutato'].includes(order.status);
+        elimina = ['delivered', 'rifiutato', 'annullato'].includes(order.status);
       }
       
       if (elimina) {
@@ -1069,10 +1275,13 @@ function showPuliziaOrdini() {
         <p style="color:#f5e6c8;margin-bottom:20px;line-height:1.5;">Cosa vuoi eliminare?</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button class="btn-pulizia" data-opzione="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;font-size:0.9rem;">
-            ✅ Completati (consegnati + rifiutati)
+            ✅ Completati (consegnati + rifiutati + annullati)
           </button>
           <button class="btn-pulizia" data-opzione="rifiutati" style="padding:12px;border-radius:10px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#f87171;font-weight:600;cursor:pointer;font-size:0.9rem;">
             ❌ Solo Rifiutati
+          </button>
+          <button class="btn-pulizia" data-opzione="annullati" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">
+            🗑️ Solo Annullati
           </button>
           <button class="btn-pulizia" data-opzione="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;font-size:0.9rem;">
              🎉 Solo Consegnati
