@@ -609,6 +609,29 @@ let notificationSound = null;
 let tempPromoProducts = [];
 let isFirstLoad = true;
 
+// ============================================================
+// 🔥 FUNZIONI PER INVIARE IL SEGNALE AI CLIENTI
+// ============================================================
+
+function notifyClients() {
+    db.ref('settings/menuVersion').set(Date.now());
+    db.ref('settings/categoriesVersion').set(Date.now());
+    db.ref('settings/promoVersion').set(Date.now());
+    console.log('📨 Segnale inviato ai clienti');
+}
+
+let notifyTimeout = null;
+function debouncedNotify() {
+    clearTimeout(notifyTimeout);
+    notifyTimeout = setTimeout(() => {
+        notifyClients();
+    }, 2000);
+}
+
+// ============================================================
+// FINE FUNZIONI SEGNALE CLIENTI
+// ============================================================
+
 function showConfirm(title, message, isDanger = true) {
   return new Promise(resolve => {
     const overlay = document.getElementById('confirmModal');
@@ -1140,7 +1163,10 @@ function saveBranding() {
   const subtitle = sanitize(document.getElementById('brandSubtitle').value) || "Tradizione";
   const city = sanitize(document.getElementById('brandCity').value) || "Manfredonia";
   
-  db.ref('branding').update({ name, subtitle, city }).then(() => showToast('✅ Salvato'));
+  db.ref('branding').update({ name, subtitle, city }).then(() => {
+    showToast('✅ Salvato');
+    notifyClients();
+  });
 }
 
 function renderPromotions() {
@@ -1183,7 +1209,6 @@ function populatePromoProductSelect() {
     if (products.length > 0) {
       html += `<optgroup label="${sanitize(catName)}">`;
       products.forEach((prod, idx) => {
-        // Non mostrare prodotti disabilitati nella selezione promo
         if (!prod.disabled) {
             html += `<option value="${catKey}|${idx}" data-price="${prod.price}">${sanitize(prod.name)} - €${prod.price.toFixed(2)}</option>`;
         }
@@ -1302,12 +1327,14 @@ function createPromotion() {
     renderPromoProductsPreview();
     showToast('✅ Promo creata!');
     db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); });
+    notifyClients();
   });
 }
 
 function togglePromo(id) { 
   db.ref('promotions/' + id + '/active').set(!appData.promotions[id].active); 
   db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); 
+  notifyClients();
 }
 
 async function deletePromo(id) { 
@@ -1316,6 +1343,7 @@ async function deletePromo(id) {
   db.ref('promotions/' + id).remove(); 
   showToast('🗑️ Eliminata'); 
   db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); 
+  notifyClients();
 }
 
 function loadSettings() {
@@ -1413,6 +1441,7 @@ function saveDeliveryGPS() {
   }).then(() => {
     showToast('✅ Impostazioni GPS salvate!');
     updateDeliveryInfo();
+    notifyClients();
   }).catch(err => showToast('❌ Errore: ' + err.message));
 }
 
@@ -1423,7 +1452,10 @@ function saveServices() {
     minDeliveryOrder: minO, 
     deliveryEnabled: document.getElementById('deliveryToggle').classList.contains('on'), 
     pickupEnabled: document.getElementById('pickupToggle').classList.contains('on') 
-  }).then(() => showToast('✅ Salvato'));
+  }).then(() => {
+    showToast('✅ Salvato');
+    notifyClients();
+  });
 }
 
 function toggleSwitch(el) { el.classList.toggle('on'); }
@@ -1470,6 +1502,7 @@ async function addCategory() {
     renderCategories(); 
     renderMenu();
     populatePromoProductSelect();
+    notifyClients();
   } catch(e) {
     showToast('❌ Errore salvataggio');
   }
@@ -1477,7 +1510,8 @@ async function addCategory() {
 
 function updateCategory(k, f, v) { 
   appData.categories[k][f] = sanitize(v); 
-  db.ref('categories').set(appData.categories); 
+  db.ref('categories').set(appData.categories);
+  notifyClients();
 }
 
 async function deleteCategory(k) {
@@ -1491,6 +1525,7 @@ async function deleteCategory(k) {
   renderCategories(); 
   renderMenu();
   populatePromoProductSelect();
+  notifyClients();
 }
 
 async function translateText(text, langPair) {
@@ -1638,7 +1673,6 @@ function toggleProductAvailability(cat, idx, el) {
     
     appData.menu[cat][idx].disabled = newStatus;
     
-    // Update UI immediately
     if (newStatus) {
         el.classList.remove('on');
         el.classList.add('closed');
@@ -1647,10 +1681,9 @@ function toggleProductAvailability(cat, idx, el) {
         el.classList.add('on');
     }
     
-    // Save to DB
     db.ref(`menu/${cat}/${idx}/disabled`).set(newStatus);
-    
     showToast(newStatus ? '🚫 Articolo segnato come ESAURITO' : '✅ Articolo DISPONIBILE');
+    notifyClients();
 }
 
 function toggleCategoryAccordion(c) {
@@ -1695,6 +1728,7 @@ async function addProduct(c) {
     showToast('✅ Prodotto aggiunto! Clicca "Traduci" per le traduzioni automatiche.'); 
     renderMenu();
     populatePromoProductSelect();
+    notifyClients();
   } catch(e) {
     showToast('❌ Errore salvataggio');
   }
@@ -1707,7 +1741,8 @@ async function deleteProduct(c, i) {
   db.ref('menu').set(appData.menu); 
   showToast('🗑️ Eliminato'); 
   renderMenu(); 
-  populatePromoProductSelect(); 
+  populatePromoProductSelect();
+  notifyClients();
 }
 
 function updateProduct(c, i, f, v) { 
@@ -1716,6 +1751,7 @@ function updateProduct(c, i, f, v) {
   }
   appData.menu[c][i][f] = f === 'price' ? v : sanitize(v); 
   db.ref(`menu/${c}/${i}/${f}`).set(appData.menu[c][i][f]);
+  debouncedNotify();
 }
 
 async function compressImage(file) {
@@ -1740,6 +1776,7 @@ async function uploadProductImage(cat, idx, input) {
     await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
     showToast('✅ Foto caricata!');
     renderMenu();
+    notifyClients();
   } catch (err) {
     showToast('❌ Errore: ' + err.message);
   }
@@ -1752,6 +1789,7 @@ async function removeProductImage(cat, idx) {
   db.ref('menu/' + cat + '/' + idx + '/img').remove();
   showToast('🗑️ Foto rimossa');
   renderMenu();
+  notifyClients();
 }
 
 async function uploadHeroImage(input) {
@@ -1768,6 +1806,7 @@ async function uploadHeroImage(input) {
     appData.images.hero = u;
     await db.ref('images/hero').set(u);
     showToast('✅ Salvata');
+    notifyClients();
   } catch(err) {
     showToast('❌ Errore: ' + err.message);
   }
@@ -1792,6 +1831,7 @@ async function uploadCategoryImage(input) {
     appData.images.categories[c] = u;
     await db.ref('images/categories/' + c).set(u);
     showToast('✅ Salvata');
+    notifyClients();
   } catch(err) {
     showToast('❌ Errore: ' + err.message);
   }
@@ -1802,6 +1842,7 @@ function cycleManualStatus() {
   if (!e.classList.contains('on') && !e.classList.contains('closed')) { e.classList.add('on'); l.textContent = 'APERTO'; }
   else if (e.classList.contains('on')) { e.classList.remove('on'); e.classList.add('closed'); l.textContent = 'CHIUSO'; }
   else { e.classList.remove('closed'); l.textContent = 'Auto'; }
+  notifyClients();
 }
 
 function toggleDay(el) { el.classList.toggle('active'); }
@@ -1821,7 +1862,10 @@ function saveHours() {
     specialClosures: closures, 
     manualStatus: ms, 
     openDays: od 
-  }).then(() => showToast('✅ Salvato'));
+  }).then(() => {
+    showToast('✅ Salvato');
+    notifyClients();
+  });
 }
 
 function renderDrivers(data) {
@@ -1915,6 +1959,7 @@ function saveDrivers() {
   db.ref('drivers').set(dl).then(() => { 
     showToast('✅ Fattorini salvati'); 
     driversList = dl; 
+    notifyClients();
   }).catch(err => showToast('❌ Errore: ' + err.message));
 }
 
@@ -1982,6 +2027,7 @@ async function changePalette(name) {
     document.querySelector(`[data-palette="${name}"]`)?.classList.add('selected');
     applyPalette(name);
     showToast('✅ Palette aggiornata!');
+    notifyClients();
   } catch(e) {
     showToast('❌ Errore salvataggio');
   }
@@ -2024,6 +2070,7 @@ async function resetOrderCounter() {
   try {
     await db.ref('counter/ordini').set(0);
     showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001');
+    notifyClients();
   } catch(e) {
     showToast('❌ Errore: ' + e.message);
   }
