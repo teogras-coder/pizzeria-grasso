@@ -146,7 +146,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-group-title.delivering { background: #ec4899; color: white; }
 .orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
 
-/* 🆕 STILE PER ACCORDION ANNULLATI/RIFIUTATI */
+/* STILE PER ACCORDION ANNULLATI/RIFIUTATI */
 .orders-accordion { 
     background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%);
     border-radius: 12px;
@@ -210,7 +210,6 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-accordion-body .orders-grid {
     margin-top: 10px;
 }
-/* 🆕 FINE STILE ACCORDION */
 
 .review-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
 .review-stat-card { background: var(--card); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(212,168,75,0.15); }
@@ -703,18 +702,13 @@ let accordionState = { annullati: false, rifiutati: false };
 
 // ============================================================
 // 🔥 FUNZIONI PER INVIARE IL SEGNALE AI CLIENTI
-//    Il client è in modalità CACHE-ONLY e ascolta SOLO
-//    settings/appVersion. Quindi il bump di appVersion è
-//    l'unico modo per far aggiornare i clienti.
 // ============================================================
 
 function notifyClients() {
     const now = Date.now();
-    // Retrocompatibilità con eventuali client vecchi ancora in cache
     db.ref('settings/menuVersion').set(now);
     db.ref('settings/categoriesVersion').set(now);
     db.ref('settings/promoVersion').set(now);
-    // 🔥 NUOVO: incrementa la versione globale (transaction = sicuro contro scritture concorrenti)
     db.ref('settings/appVersion').transaction(v => (v || 0) + 1).then(() => {
         console.log('📨 Segnale inviato ai clienti (appVersion +1)');
     }).catch(e => console.error('Errore bump appVersion:', e));
@@ -728,7 +722,6 @@ function debouncedNotify() {
     }, 2000);
 }
 
-// 🔥 Forza aggiornamento manuale (pulsante Dashboard)
 async function bumpAppVersion() {
     try {
         const snap = await db.ref('settings/appVersion').once('value');
@@ -1604,15 +1597,28 @@ function loadSettings() {
   
   updateDeliveryInfo();
   
-  const mst = document.getElementById('manualStatusToggle'), msl = document.getElementById('manualStatusLabel');
+  // 🔥 GESTIONE CORRETTA DEL MANUAL STATUS
+  const mst = document.getElementById('manualStatusToggle');
+  const msl = document.getElementById('manualStatusLabel');
+  
+  // Resetta tutte le classi
   mst.classList.remove('on', 'closed');
-  if (appData.settings.manualStatus === 'open') { mst.classList.add('on'); msl.textContent = 'APERTO'; }
-  else if (appData.settings.manualStatus === 'closed') { mst.classList.add('closed'); msl.textContent = 'CHIUSO'; }
-  else msl.textContent = 'Auto';
+  
+  // Applica lo stato salvato
+  if (appData.settings.manualStatus === 'open') { 
+    mst.classList.add('on'); 
+    msl.textContent = 'APERTO'; 
+  } else if (appData.settings.manualStatus === 'closed') { 
+    mst.classList.add('closed'); 
+    msl.textContent = 'CHIUSO'; 
+  } else { 
+    msl.textContent = 'Auto'; 
+  }
+  
   const od = appData.settings.openDays ? appData.settings.openDays.split(',') : [];
   document.querySelectorAll('.day-btn').forEach(el => el.classList.toggle('active', od.includes(el.dataset.day)));
 
-  // 🔥 Aggiorna badge versione distribuita (Dashboard)
+  // Aggiorna badge versione distribuita (Dashboard)
   const verEl = document.getElementById('currentAppVersion');
   if (verEl) verEl.textContent = appData.settings.appVersion || 0;
 }
@@ -1888,7 +1894,7 @@ function renderMenu() {
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input type="text" value="${sanitize(p.desc || '')}" onchange="updateProduct('${c}',${originalIndex},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;">
-            <input type="text" value="${sanitize(p.desc_en || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_en',this.value)" placeholder="Description 🇬" style="flex:2;min-width:150px;">
+            <input type="text" value="${sanitize(p.desc_en || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_en',this.value)" placeholder="Description 🇬🇧" style="flex:2;min-width:150px;">
             <input type="text" value="${sanitize(p.desc_de || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪" style="flex:2;min-width:150px;">
           </div>
           <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${c}',${originalIndex},'price',parseFloat(this.value))" placeholder="Prezzo €">
@@ -2083,13 +2089,46 @@ async function uploadCategoryImage(input) {
   }
 }
 
+// ============================================================
+// 🔥 FUNZIONE CYCLE MANUAL STATUS CORRETTA
+// ============================================================
+
 function cycleManualStatus() {
-  const e = document.getElementById('manualStatusToggle'), l = document.getElementById('manualStatusLabel');
-  if (!e.classList.contains('on') && !e.classList.contains('closed')) { e.classList.add('on'); l.textContent = 'APERTO'; }
-  else if (e.classList.contains('on')) { e.classList.remove('on'); e.classList.add('closed'); l.textContent = 'CHIUSO'; }
-  else { e.classList.remove('closed'); l.textContent = 'Auto'; }
-  notifyClients();
+    const e = document.getElementById('manualStatusToggle');
+    const l = document.getElementById('manualStatusLabel');
+    
+    let newStatus = 'auto';
+    
+    // Cicla gli stati: Auto → Aperto → Chiuso → Auto
+    if (!e.classList.contains('on') && !e.classList.contains('closed')) {
+        // Auto → APERTO
+        e.classList.add('on');
+        e.classList.remove('closed');
+        l.textContent = 'APERTO';
+        newStatus = 'open';
+    } else if (e.classList.contains('on')) {
+        // APERTO → CHIUSO
+        e.classList.remove('on');
+        e.classList.add('closed');
+        l.textContent = 'CHIUSO';
+        newStatus = 'closed';
+    } else if (e.classList.contains('closed')) {
+        // CHIUSO → Auto
+        e.classList.remove('closed');
+        l.textContent = 'Auto';
+        newStatus = 'auto';
+    }
+    
+    // 🔥 SALVA SU FIREBASE
+    db.ref('settings/manualStatus').set(newStatus).then(() => {
+        showToast(`✅ Stato cambiato: ${newStatus.toUpperCase()}`);
+        notifyClients();
+    }).catch(err => {
+        showToast('❌ Errore: ' + err.message);
+    });
 }
+
+// ============================================================
 
 function toggleDay(el) { el.classList.toggle('active'); }
 
