@@ -631,11 +631,22 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <div class="stat-card"><div class="number" id="dashboardDeliveredOrders">0</div><div class="label">Consegnati</div></div>
       </div>
       <div class="card" style="border: 2px solid var(--gold);">
-        <div class="card-title"><i class="fas fa-sync-alt"></i> Sincronizzazione automatica</div>
+        <div class="card-title"><i class="fas fa-database"></i> Modalità Cache (Client)</div>
         <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 0;">
-          I client si sincronizzano automaticamente: non è più necessario premere il pulsante di aggiornamento.
-          Le modifiche a menu, prezzi e promozioni arrivano in tempo reale all'app del cliente.
+          L'app del cliente salva tutto in <strong style="color:var(--gold);">cache locale</strong> per massima velocità e zero consumo di connessioni Firebase.
+          Ogni volta che salvi una modifica qui, il sistema incrementa automaticamente il <strong style="color:var(--gold);">numero di versione</strong> e tutti i client si aggiornano entro 30 secondi.
         </p>
+      </div>
+      <div class="card" style="border: 2px solid #4ade80; margin-top: 15px;">
+        <div class="card-title" style="color:#4ade80;"><i class="fas fa-rocket"></i> Forza Aggiornamento Clienti</div>
+        <p style="color: #8a7a5a; font-size: 0.9rem; margin-bottom: 15px;">
+          Versione attualmente distribuita: <strong style="color:#4ade80;font-size:1.3rem;" id="currentAppVersion">0</strong><br>
+          Usa questo pulsante per forzare un aggiornamento <strong>immediato</strong> su tutti i dispositivi (es. dopo una modifica urgente a menu o prezzi).
+          Normalmente non serve: il bump avviene da solo ad ogni salvataggio.
+        </p>
+        <button class="btn-primary" style="background:linear-gradient(180deg,#4ade80 0%,#22c55e 100%);box-shadow:0 4px 0 #16a34a;width:100%;" onclick="bumpAppVersion()">
+          <i class="fas fa-bolt"></i> 🚀 Forza Aggiornamento Ora
+        </button>
       </div>
       <div class="card" style="border: 2px solid var(--gold); margin-top: 15px;">
         <div class="card-title"><i class="fas fa-bell"></i> Notifiche Push</div>
@@ -692,13 +703,21 @@ let accordionState = { annullati: false, rifiutati: false };
 
 // ============================================================
 // 🔥 FUNZIONI PER INVIARE IL SEGNALE AI CLIENTI
+//    Il client è in modalità CACHE-ONLY e ascolta SOLO
+//    settings/appVersion. Quindi il bump di appVersion è
+//    l'unico modo per far aggiornare i clienti.
 // ============================================================
 
 function notifyClients() {
-    db.ref('settings/menuVersion').set(Date.now());
-    db.ref('settings/categoriesVersion').set(Date.now());
-    db.ref('settings/promoVersion').set(Date.now());
-    console.log('📨 Segnale inviato ai clienti');
+    const now = Date.now();
+    // Retrocompatibilità con eventuali client vecchi ancora in cache
+    db.ref('settings/menuVersion').set(now);
+    db.ref('settings/categoriesVersion').set(now);
+    db.ref('settings/promoVersion').set(now);
+    // 🔥 NUOVO: incrementa la versione globale (transaction = sicuro contro scritture concorrenti)
+    db.ref('settings/appVersion').transaction(v => (v || 0) + 1).then(() => {
+        console.log('📨 Segnale inviato ai clienti (appVersion +1)');
+    }).catch(e => console.error('Errore bump appVersion:', e));
 }
 
 let notifyTimeout = null;
@@ -707,6 +726,20 @@ function debouncedNotify() {
     notifyTimeout = setTimeout(() => {
         notifyClients();
     }, 2000);
+}
+
+// 🔥 Forza aggiornamento manuale (pulsante Dashboard)
+async function bumpAppVersion() {
+    try {
+        const snap = await db.ref('settings/appVersion').once('value');
+        const newVersion = (snap.val() || 0) + 1;
+        await db.ref('settings/appVersion').set(newVersion);
+        const verEl = document.getElementById('currentAppVersion');
+        if (verEl) verEl.textContent = newVersion;
+        showToast('🚀 Aggiornamento forzato! Versione: ' + newVersion);
+    } catch(e) {
+        showToast('❌ Errore: ' + e.message);
+    }
 }
 
 // ============================================================
@@ -1578,6 +1611,10 @@ function loadSettings() {
   else msl.textContent = 'Auto';
   const od = appData.settings.openDays ? appData.settings.openDays.split(',') : [];
   document.querySelectorAll('.day-btn').forEach(el => el.classList.toggle('active', od.includes(el.dataset.day)));
+
+  // 🔥 Aggiorna badge versione distribuita (Dashboard)
+  const verEl = document.getElementById('currentAppVersion');
+  if (verEl) verEl.textContent = appData.settings.appVersion || 0;
 }
 
 function updateDeliveryInfo() {
@@ -1851,7 +1888,7 @@ function renderMenu() {
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input type="text" value="${sanitize(p.desc || '')}" onchange="updateProduct('${c}',${originalIndex},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;">
-            <input type="text" value="${sanitize(p.desc_en || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_en',this.value)" placeholder="Description 🇬🇧" style="flex:2;min-width:150px;">
+            <input type="text" value="${sanitize(p.desc_en || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_en',this.value)" placeholder="Description 🇬" style="flex:2;min-width:150px;">
             <input type="text" value="${sanitize(p.desc_de || '')}" onchange="updateProduct('${c}',${originalIndex},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪" style="flex:2;min-width:150px;">
           </div>
           <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${c}',${originalIndex},'price',parseFloat(this.value))" placeholder="Prezzo €">
