@@ -586,11 +586,13 @@ function initApp() {
     setInterval(updateStatusBanner, 30000);
 }
 
-// 🔥 DATI = solo polling, NESSUN listener .on() permanente
+// 🔥 DATI = ZERO polling, ZERO listener fissi.
+// L'app contatta Firebase SOLO all'apertura e quando il cliente torna sull'app
+// (questo secondo caso è gestito da setupVisibilityListener, che NON va toccato).
+// Il menu completo viene riscaricato SOLO se tu, da admin, hai bumpato la versione.
 function setupVersionListener() {
-    checkForUpdates();
-    if (versionCheckInterval) clearInterval(versionCheckInterval);
-    versionCheckInterval = setInterval(checkForUpdates, 600000);
+    checkForUpdates(); // 1 controllo leggero all'avvio: scarica tutto solo se c'è una novità
+    // nessun setInterval → l'app non "chiama casa" da sola mentre è aperta
 }
 
 async function checkForUpdates() {
