@@ -142,7 +142,9 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .type-option i{display:block;font-size:1.3rem;margin-bottom:6px;color:var(--gold)}
 .type-option.active{background:linear-gradient(145deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border-color:var(--gold-light)}
 .type-option.active i{color:var(--dark)}
-.type-option.disabled{opacity:.4;cursor:not-allowed}
+.type-option.disabled{opacity:.35 !important;cursor:not-allowed !important;pointer-events:none !important;border-color:#555 !important;background:var(--card) !important;filter:grayscale(0.8)}
+.type-option.disabled i{color:#555 !important}
+.type-option.disabled span{color:#555 !important}
 .customer-form{margin-top:20px;padding-top:20px;border-top:2px solid rgba(212,168,75,.3)}
 .form-group{margin-bottom:15px}
 .form-group label{display:block;color:var(--cream);font-size:.85rem;margin-bottom:6px;font-weight:600}
@@ -251,6 +253,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .lang-selector{margin-bottom:15px;background:rgba(212,168,75,.1);padding:15px;border-radius:15px;border:1px solid rgba(212,168,75,.3);width:100%;max-width:380px}
 .lang-selector label{color:var(--gold);font-weight:600;margin-bottom:8px;display:block}
 .lang-selector select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--gold);background:var(--brown);color:var(--cream);font-size:1rem}
+.lang-selector select option{padding:5px}
 .welcome-buttons{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
 .btn-register{background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
@@ -279,7 +282,14 @@ OneSignalDeferred.push(async function(OneSignal){await OneSignal.init({appId:"00
     <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
     <h1 class="welcome-title" data-i18n="welcome_title">🍕 Benvenuto da Grasso!</h1>
     <div class="home-instructions"><h3 data-i18n="save_home_title">📱 Salva l'app sulla Home!</h3><ol><li><span data-i18n="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li><li><span data-i18n="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li><li><span data-i18n="save_home_step3">Ordina con un tocco! 🚀</span></li></ol></div>
-    <div class="lang-selector"><label data-i18n="language_label">🌍 Lingua / Language</label><select id="langSelect" onchange="changeLanguage(this.value)"><option value="it">🇮 Italiano</option><option value="en">🇬🇧 English</option><option value="de">🇩🇪 Deutsch</option></select></div>
+    <div class="lang-selector">
+        <label data-i18n="language_label">🌍 Lingua / Language</label>
+        <select id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
+        </select>
+    </div>
     <div class="welcome-buttons"><button class="btn-register" onclick="showRegisterModal()" data-i18n="register_btn">👤 Registrati</button><button class="btn-guest" onclick="enterAsGuest()" data-i18n="guest_btn">👻 Continua come Ospite</button></div>
     <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
 </div>
@@ -401,7 +411,9 @@ const translations = {
         thanks_review: "⭐ Grazie per la recensione!", no_reviews: "Nessuna recensione.<br>Sii il primo! 🌟",
         no_orders: "Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕", not_available: "❌ Non disponibile",
         no_products: "Nessun prodotto trovato 🍕", closed_now: "⚠️ Siamo chiusi. Puoi consultare il menu, ma non ordinare.",
-        no_delivery: "🚫 No delivery", no_pickup: "🚫 No ritiro", wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
+        no_delivery: "🚫 Consegna non disponibile",
+        no_pickup: "🚫 Ritiro non disponibile",
+        wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
         fill_name: "⚠️ Nome", invalid_phone: "❌ Telefono non valido", out_of_range: "❌ Fuori raggio",
         fill_address: "⚠️ Completa indirizzo", min_order: "⚠️ Minimo: €", empty_cart_confirm: "Vuoi svuotare il carrello?",
         clear_history_confirm: "Cancellare tutto lo storico?", add_another_promo: "Hai già questa promo. Aggiungerne un'altra?",
@@ -445,7 +457,9 @@ const translations = {
         thanks_review: "⭐ Thanks for the review!", no_reviews: "No reviews yet.<br>Be the first! 🌟",
         no_orders: "No recent orders.<br>Place your first order! 🍕", not_available: "❌ Not available",
         no_products: "No products found 🍕", closed_now: "⚠️ We are closed. Menu is view-only, ordering is disabled.",
-        no_delivery: "🚫 No delivery", no_pickup: "🚫 No pickup", wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
+        no_delivery: "🚫 Delivery not available",
+        no_pickup: "🚫 Pickup not available",
+        wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
         fill_name: "⚠️ Name", invalid_phone: "❌ Invalid phone", out_of_range: "❌ Out of range",
         fill_address: "⚠️ Complete address", min_order: "⚠️ Minimum: €", empty_cart_confirm: "Empty the cart?",
         clear_history_confirm: "Clear all history?", add_another_promo: "You already have this promo. Add another?",
@@ -489,7 +503,9 @@ const translations = {
         thanks_review: "⭐ Danke für die Bewertung!", no_reviews: "Noch keine Bewertungen.<br>Seien Sie der Erste! 🌟",
         no_orders: "Keine aktuellen Bestellungen.<br>Geben Sie Ihre erste Bestellung auf! 🍕", not_available: "❌ Nicht verfügbar",
         no_products: "Keine Produkte gefunden 🍕", closed_now: "⚠️ Wir sind geschlossen. Nur Menüansicht, keine Bestellungen möglich.",
-        no_delivery: "🚫 Keine Lieferung", no_pickup: "🚫 Keine Abholung", wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
+        no_delivery: "🚫 Keine Lieferung",
+        no_pickup: "🚫 Keine Abholung",
+        wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
         fill_name: "⚠️ Name", invalid_phone: "❌ Ungültiges Telefon", out_of_range: "❌ Außerhalb des Bereichs",
         fill_address: "⚠️ Adresse vervollständigen", min_order: "⚠️ Mindestbestellwert: €", empty_cart_confirm: "Warenkorb leeren?",
         clear_history_confirm: "Gesamten Verlauf löschen?", add_another_promo: "Sie haben diese Aktion bereits. Eine weitere hinzufügen?",
@@ -775,17 +791,122 @@ function calculateDistance(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*M
 function computeDeliveryFee(dist){const bf=parseFloat(appData.settings.deliveryBaseFee)||3,mr=parseFloat(appData.settings.deliveryMaxRadius)||4,er=parseFloat(appData.settings.deliveryExtraRadius)||6,ef=parseFloat(appData.settings.deliveryExtraFee)||2;if(dist===null)return{fee:bf,outOfRange:false,withExtra:false};if(dist>er)return{fee:0,outOfRange:true,withExtra:false};if(dist>mr)return{fee:bf+ef,outOfRange:false,withExtra:true};return{fee:bf,outOfRange:false,withExtra:false}}
 function updateDeliveryFeeDisplay(fee,dist,oor,we){const fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue'),di=document.getElementById('distanceInfo'),dt=document.getElementById('distanceText'),cb=document.getElementById('checkoutBtn');if(oor){fr.style.display='none';di.style.display='block';dt.textContent='📍 Fuori dal raggio di consegna';dt.style.color='#ef4444';if(cb)cb.disabled=true}else{fr.style.display='flex';fv.textContent='€'+fee.toFixed(2);di.style.display=dist!==null?'block':'none';if(dist!==null){dt.textContent=we?`📍 ${dist.toFixed(1)} km (+supplemento)`:`📍 ${dist.toFixed(1)} km`;dt.style.color=we?'#fbbf24':'#3498db'}if(cb)cb.disabled=false}let tot=0;cart.forEach(i=>{if(i.isPromo)tot+=i.totalPrice;else tot+=(i.price*i.qty)});document.getElementById('totalAmount').textContent='€'+(oor?tot:tot+fee).toFixed(2)}
 function updateCartTotals(){let tot=0;cart.forEach(i=>{if(i.isPromo)tot+=i.totalPrice;else tot+=(i.price*i.qty)});if(orderType==='delivery'&&appData.settings.deliveryEnabled!==false&&cart.length>0){if(window.customerGPSLat&&window.customerGPSLng&&appData.settings.pizzeriaLat&&appData.settings.pizzeriaLng){const d=calculateDistance(appData.settings.pizzeriaLat,appData.settings.pizzeriaLng,window.customerGPSLat,window.customerGPSLng);const{fee,outOfRange,withExtra}=computeDeliveryFee(d);updateDeliveryFeeDisplay(fee,d,outOfRange,withExtra)}else{const{fee}=computeDeliveryFee(null);updateDeliveryFeeDisplay(fee,null,false,false)}}else{document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';document.getElementById('totalAmount').textContent='€'+tot.toFixed(2)}}
-function selectOrderType(typ){orderType=typ;document.getElementById('typeDelivery').classList.toggle('active',typ==='delivery');document.getElementById('typePickup').classList.toggle('active',typ==='pickup');document.getElementById('timeTypeLabel').textContent=typ==='delivery'?t('delivery_short'):t('pickup_short');if(typ==='delivery')document.getElementById('addressGroup').style.display='block';else{document.getElementById('addressGroup').style.display='none';document.getElementById('customerStreet').value='';document.getElementById('customerNumber').value='';window.customerGPSLat=null;window.customerGPSLng=null}updateCartTotals()}
+
+// 🔥 MODIFICATA: ora blocca la selezione se disabilitato
+function selectOrderType(typ){
+    // 🔥 BLOCCA LA SELEZIONE SE DISABILITATO
+    if(typ === 'delivery' && appData.settings.deliveryEnabled === false){
+        showToast(t('no_delivery'));
+        return;
+    }
+    if(typ === 'pickup' && appData.settings.pickupEnabled === false){
+        showToast(t('no_pickup'));
+        return;
+    }
+    
+    orderType = typ;
+    document.getElementById('typeDelivery').classList.toggle('active', typ === 'delivery');
+    document.getElementById('typePickup').classList.toggle('active', typ === 'pickup');
+    document.getElementById('timeTypeLabel').textContent = typ === 'delivery' ? t('delivery_short') : t('pickup_short');
+    
+    if(typ === 'delivery'){
+        document.getElementById('addressGroup').style.display = 'block';
+    } else {
+        document.getElementById('addressGroup').style.display = 'none';
+        document.getElementById('customerStreet').value = '';
+        document.getElementById('customerNumber').value = '';
+        window.customerGPSLat = null;
+        window.customerGPSLng = null;
+    }
+    updateCartTotals();
+}
+
 function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classList.toggle('active',m==='asap');document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');if(m==='scheduled')setupMinTime()}
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`}
 async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
 
+// 🔥 MODIFICATA: controllo corretto per opzioni disabilitate
 function openCart(){
     const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
-    if(!cart.length){it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none'}
-    else{let h='';cart.forEach((x,i)=>{if(x.isPromo)h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`});cart.forEach(x=>{if(!x.isPromo)h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`});it.innerHTML=h;ts.style.display='flex';cb.style.display='block';cl.style.display='flex';cf.style.display='block';tt.style.display='flex';const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe);if(!de&&pe)selectOrderType('pickup');else if(de&&!pe)selectOrderType('delivery');else selectOrderType(orderType);selectTimeMode(timeMode);updateCartTotals()}
-    m.classList.add('active')
+    if(!cart.length){
+        it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;
+        ts.style.display='none';
+        cb.style.display='none';
+        cl.style.display='none';
+        cf.style.display='none';
+        tt.style.display='none';
+        document.getElementById('deliveryFeeRow').style.display='none';
+        document.getElementById('distanceInfo').style.display='none';
+    } else {
+        let h='';
+        cart.forEach((x,i)=>{
+            if(x.isPromo) h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;
+        });
+        cart.forEach(x=>{
+            if(!x.isPromo) h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`;
+        });
+        it.innerHTML=h;
+        ts.style.display='flex';
+        cb.style.display='block';
+        cl.style.display='flex';
+        cf.style.display='block';
+        tt.style.display='flex';
+        
+        const de = appData.settings.deliveryEnabled !== false;
+        const pe = appData.settings.pickupEnabled !== false;
+        
+        // Applica classe disabled alle opzioni
+        document.getElementById('typeDelivery').classList.toggle('disabled', !de);
+        document.getElementById('typePickup').classList.toggle('disabled', !pe);
+        
+        // 🔥🔥🔥 CONTROLLO CORRETTO: se l'opzione attiva è disabilitata, cambia automaticamente
+        if(!de && !pe){
+            // Entrambi disabilitati → disabilita pulsante
+            document.getElementById('checkoutBtn').disabled = true;
+            document.getElementById('checkoutBtn').innerHTML = '🚫 Servizio non disponibile';
+            document.getElementById('typeDelivery').classList.remove('active');
+            document.getElementById('typePickup').classList.remove('active');
+        } else if(!de && orderType === 'delivery'){
+            // Delivery disabilitato e attivo → passa a Pickup
+            selectOrderType('pickup');
+        } else if(!pe && orderType === 'pickup'){
+            // Pickup disabilitato e attivo → passa a Delivery
+            selectOrderType('delivery');
+        } else {
+            // Nessun problema, mantieni l'opzione attuale
+            document.getElementById('checkoutBtn').disabled = false;
+            document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order');
+            
+            // Assicura che l'opzione attiva sia evidenziata
+            document.getElementById('typeDelivery').classList.toggle('active', orderType === 'delivery');
+            document.getElementById('typePickup').classList.toggle('active', orderType === 'pickup');
+            
+            // Se entrambi sono disponibili ma nessuno è attivo (caso raro), attiva delivery
+            if(!document.getElementById('typeDelivery').classList.contains('active') && 
+               !document.getElementById('typePickup').classList.contains('active')){
+                selectOrderType('delivery');
+            }
+        }
+        
+        // Aggiorna UI per l'indirizzo
+        if(orderType === 'delivery' && de){
+            document.getElementById('addressGroup').style.display = 'block';
+        } else {
+            document.getElementById('addressGroup').style.display = 'none';
+            if(orderType === 'pickup'){
+                document.getElementById('customerStreet').value = '';
+                document.getElementById('customerNumber').value = '';
+                window.customerGPSLat = null;
+                window.customerGPSLng = null;
+            }
+        }
+        
+        // Aggiorna totale
+        updateCartTotals();
+    }
+    m.classList.add('active');
 }
+
 function closeCart(){document.getElementById('cartModal').classList.remove('active')}
 
 // ─── PROMOZIONI ────────────────────────────────────────────────────────────
