@@ -519,7 +519,6 @@ let currentUser=null,currentLang='it',userType='none',cart=[],orderType='deliver
 let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null;
 let orderStatusListeners={},ordersData={};
 let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:{}};
-let versionCheckInterval = null;
 
 // ─── TRADUZIONI ────────────────────────────────────────────────────────────
 function t(key){return(translations[currentLang]&&translations[currentLang][key])||translations.it[key]||key}
@@ -559,7 +558,7 @@ function loginWithGoogle(){const pr=new firebase.auth.GoogleAuthProvider();fireb
 function logout(){firebase.auth().signOut();userType='none';localStorage.removeItem('grasso_user_type');const fl=document.getElementById('footerLogout');if(fl)fl.style.display='none';showToast('👋 Arrivederci!');location.reload()}
 function updateUIForLoggedInUser(u){const fl=document.getElementById('footerLogout');if(fl)fl.style.display='block'}
 
-// ─── INIT ────────────────────────────────────────────────────────────────
+// ─── INIT ───────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
     if(!localStorage.getItem('cookies_accepted'))document.getElementById('cookieBanner').style.display='block';
     const lang=detectBrowserLanguage();currentLang=lang;document.getElementById('langSelect').value=lang;applyTranslations();
@@ -576,23 +575,22 @@ function initApp() {
     try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
     setupFloatingCartDrag();
     if (!localStorage.getItem('cacheTimestamp')) loadFromCache();
-    setupVersionListener();
-    setupVisibilityListener();
+    setupVersionListener();      // menu/dati: 1 controllo all'avvio, niente polling
+    setupVisibilityListener();   // riallinea al ritorno in primo piano + gestisce il canale emergenza
+    startEmergencyPolling();     // 🚨 canale emergenza (stato/consegna/ritiro) attivo a schermo aperto
     loadReviewsPublic();
     renderMyOrders();
-    startOrderStatusTracking();
+    startOrderStatusTracking();  // ordini: listener SOLO su ordini attivi
     controllaRifiutiCliente();
     applyPaletteFromFirebase();
     setInterval(updateStatusBanner, 30000);
 }
 
-// 🔥 DATI = ZERO polling, ZERO listener fissi.
-// L'app contatta Firebase SOLO all'apertura e quando il cliente torna sull'app
-// (questo secondo caso è gestito da setupVisibilityListener, che NON va toccato).
-// Il menu completo viene riscaricato SOLO se tu, da admin, hai bumpato la versione.
+// 🔥 MENU/DATI = 1 controllo all'avvio. NIENTE polling, NIENTE listener fissi.
+// Il menu completo si riscarica SOLO se tu, da admin, hai cambiato qualcosa
+// (bump di appVersion). L'apertura fa solo un controllo leggerissimo del numerino.
 function setupVersionListener() {
-    checkForUpdates(); // 1 controllo leggero all'avvio: scarica tutto solo se c'è una novità
-    // nessun setInterval → l'app non "chiama casa" da sola mentre è aperta
+    checkForUpdates();
 }
 
 async function checkForUpdates() {
@@ -628,12 +626,57 @@ async function forceUpdateFromServer() {
     } catch(e) { console.error('❌ Errore aggiornamento:', e); }
 }
 
-// 🔥 al ritorno sull'app, riallinea dati E ordini
+// 🔥🚨 CANALE DI EMERGENZA: tiene allineati STATO aperto/chiuso, CONSEGNA e RITIRO
+// anche a chi ha l'app GIÀ APERTA, entro ~2 secondi. Usa SOLO .once() (letture lampo),
+// quindi NON tocca il limite delle 100 connessioni. In BACKGROUND è SPENTO (zero consumo).
+let emergencyInterval = null;
+const EMERGENCY_MS = 2000; // 2s = minimo consigliato (a 1s il modem resta acceso quasi in continuo a schermo aperto)
+
+function startEmergencyPolling() {
+    stopEmergencyPolling();
+    if (document.hidden) return;                 // non partire se l'app è in tasca
+    checkLiveFlags();                            // allinea subito
+    emergencyInterval = setInterval(checkLiveFlags, EMERGENCY_MS);
+}
+function stopEmergencyPolling() {
+    if (emergencyInterval) { clearInterval(emergencyInterval); emergencyInterval = null; }
+}
+async function checkLiveFlags() {
+    if (document.hidden) return;                 // in tasca non chiamo nulla
+    try {
+        const snap = await db.ref('settings').once('value');
+        if (!snap.exists()) return;
+        const s = snap.val() || {};
+        const cur = appData.settings || {};
+        const newMs = (s.manualStatus !== undefined) ? s.manualStatus : cur.manualStatus;
+        const newDe = (s.deliveryEnabled !== undefined) ? s.deliveryEnabled : cur.deliveryEnabled;
+        const newPe = (s.pickupEnabled !== undefined) ? s.pickupEnabled : cur.pickupEnabled;
+        const changedStatus = (newMs !== cur.manualStatus);
+        const changedDe = (newDe !== cur.deliveryEnabled);
+        const changedPe = (newPe !== cur.pickupEnabled);
+        if (!changedStatus && !changedDe && !changedPe) return;   // nessuna emergenza → non faccio nulla
+        appData.settings.manualStatus = newMs;
+        appData.settings.deliveryEnabled = newDe;
+        appData.settings.pickupEnabled = newPe;
+        try { localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); } catch(e) {}
+        updateStatusBanner();
+        if (changedStatus) { showToast(checkIfOpen() ? '🟢 Ora siamo APERTI' : '🔴 Ora siamo CHIUSI'); }
+        if ((changedDe || changedPe) && document.getElementById('cartModal').classList.contains('active')) {
+            openCart();   // ridisegna consegna/ritiro nel carrello già aperto
+        }
+    } catch(e) { /* offline o errore: riprovo al prossimo giro */ }
+}
+
+// 🔥 al ritorno sull'app, riallinea tutto; in tasca SPEGNE il canale emergenza
 function setupVisibilityListener() {
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             checkForUpdates();
+            checkLiveFlags();
             startOrderStatusTracking();
+            startEmergencyPolling();
+        } else {
+            stopEmergencyPolling();
         }
     });
 }
