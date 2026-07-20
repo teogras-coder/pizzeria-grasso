@@ -650,13 +650,9 @@ let isFirstLoad = true;
 let accordionState = { annullati: false, rifiutati: false };
 
 // ============================================================
-// 🔥 SEGNALE AI CLIENTI: bump di appVersion (transaction = sicuro)
+// 🔥 SEGNALE AI CLIENTI - ATOMICO
 // ============================================================
 function notifyClients() {
-    const now = Date.now();
-    db.ref('settings/menuVersion').set(now);
-    db.ref('settings/categoriesVersion').set(now);
-    db.ref('settings/promoVersion').set(now);
     db.ref('settings/appVersion').transaction(v => (v || 0) + 1).then(() => {
         console.log('📨 Segnale inviato ai clienti (appVersion +1)');
     }).catch(e => console.error('Errore bump appVersion:', e));
@@ -847,50 +843,99 @@ async function loadAllData() {
   }
 }
 
+// ============================================================
+// 🔥 LISTENER UNICO OTTIMIZZATO
+// ============================================================
 function setupOptimizedListeners() {
-  db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
-    snapshot.forEach(child => { ordersCache[child.key] = { id: child.key, ...child.val() }; });
-    renderOrders(ordersCache);
-  });
-  db.ref('ordini').orderByChild('timestamp').startAt(Date.now() - 60000).on('child_added', (snapshot) => {
-    const order = snapshot.val(); order.id = snapshot.key;
-    if (!ordersCache[order.id]) {
-      ordersCache[order.id] = order; renderOrders(ordersCache); playAdminNotification();
-      showToast(`🆕 Nuovo ordine ${order.orderId || order.id} da ${order.customerName}`);
-    }
-  });
-  db.ref('ordini').on('child_changed', (snapshot) => {
-    const order = snapshot.val(); order.id = snapshot.key;
-    const oldStatus = ordersCache[order.id]?.status;
-    ordersCache[order.id] = order;
-    if (oldStatus !== order.status) {
+  // Caricamento iniziale
+  db.ref('ordini')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .once('value')
+    .then(snapshot => {
+      snapshot.forEach(child => {
+        ordersCache[child.key] = { id: child.key, ...child.val() };
+      });
       renderOrders(ordersCache);
-      const orderId = order.orderId || order.id;
-      if (order.status === 'accettato' && oldStatus === 'new') {
+    });
+
+  // UN SOLO listener per ordini
+  db.ref('ordini')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .on('value', snapshot => {
+      const newOrders = {};
+      const changed = [];
+      const added = [];
+
+      snapshot.forEach(child => {
+        const order = { id: child.key, ...child.val() };
+        newOrders[child.key] = order;
+        const old = ordersCache[child.key];
+        if (!old) {
+          added.push(order);
+        } else if (old.status !== order.status || old.delayMinutes !== order.delayMinutes) {
+          changed.push({ old, new: order });
+        }
+      });
+
+      added.forEach(o => {
         playAdminNotification();
-        showToast(`✅ Ordine ${orderId} ACCETTATO!`);
-      } else if (order.status === 'preparing' && oldStatus === 'accettato') {
-        playAdminNotification();
-        showToast(`🍕 Ordine ${orderId} in preparazione`);
-      } else if (order.status === 'delayed' && oldStatus !== 'delayed') {
-        playAdminNotification(); const delayMinutes = order.delayMinutes || 10; showToast(`⏰ Ordine ${orderId} segnato come in ritardo (${delayMinutes} min)!`);
-      } else if (order.status === 'ready' && oldStatus === 'preparing') {
-        playAdminNotification(); showToast(`✅ Ordine ${orderId} pronto!`);
-      } else if (order.status === 'picked' && oldStatus === 'ready') {
-        playAdminNotification(); showToast(`📦 Fattorino ha ritirato l'ordine ${orderId}`);
-      } else if (order.status === 'delivered' && oldStatus === 'delivering') {
-        playAdminNotification(); showToast(`🎉 Ordine ${orderId} consegnato!`);
-      } else if (order.status === 'annullato' && oldStatus !== 'annullato') { showToast(`🗑️ Ordine ${orderId} ANNULLATO dal cliente`); }
-      else if (order.status === 'rifiutato' && oldStatus !== 'rifiutato') { showToast(`❌ Ordine ${orderId} RIFIUTATO dalla pizzeria`); }
+        showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
+      });
+
+      changed.forEach(({ old, new: o }) => {
+        const orderId = o.orderId || o.id;
+        const messages = {
+          'accettato': `✅ Ordine ${orderId} ACCETTATO!`,
+          'preparing': `🍕 Ordine ${orderId} in preparazione`,
+          'delayed': `⏰ Ordine ${orderId} in ritardo (${o.delayMinutes || 10} min)`,
+          'ready': `✅ Ordine ${orderId} pronto!`,
+          'picked': `📦 Fattorino ha ritirato ${orderId}`,
+          'delivering': `🛵 Ordine ${orderId} in consegna`,
+          'delivered': `🎉 Ordine ${orderId} consegnato!`,
+          'annullato': `🗑️ Ordine ${orderId} ANNULLATO dal cliente`,
+          'rifiutato': `❌ Ordine ${orderId} RIFIUTATO`
+        };
+        if (messages[o.status]) {
+          showToast(messages[o.status]);
+          playAdminNotification();
+        }
+      });
+
+      ordersCache = newOrders;
+      renderOrders(ordersCache);
+    });
+
+  // Recensioni con limite
+  db.ref('recensioni')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .on('value', s => loadReviews());
+
+  // Settings
+  db.ref('settings').on('value', s => {
+    if (s.exists()) {
+      appData.settings = { ...appData.settings, ...s.val() };
+      loadSettings();
+      applyCurrentPalette();
     }
   });
-  db.ref('ordini').on('child_removed', (snapshot) => {
-    const id = snapshot.key;
-    if (ordersCache[id]) { delete ordersCache[id]; renderOrders(ordersCache); }
-  });
-  db.ref('recensioni').on('value', s => loadReviews());
-  db.ref('settings').on('value', s => {
-    if (s.exists()) { appData.settings = { ...appData.settings, ...s.val() }; loadSettings(); applyCurrentPalette(); }
+}
+
+// ============================================================
+// 🔥 FUNZIONE ACCETTA ORDINE
+// ============================================================
+async function accettaOrdine(id) {
+  const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
+  if (!ok) return;
+  db.ref('ordini/' + id).update({ 
+    status: 'accettato', 
+    accettatoIl: Date.now()
+  }).then(() => {
+    showToast('✅ Ordine accettato!');
+    renderOrders(ordersCache);
+    notifyClients();
   });
 }
 
@@ -905,23 +950,24 @@ function showSection(name, el) {
   if (name === 'promotions') populatePromoProductSelect();
 }
 
-// ==== 🔥 FUNZIONE ACCETTA ORDINE ====
-async function accettaOrdine(id) {
-  const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
-  if (!ok) return;
-  db.ref('ordini/' + id).update({ 
-    status: 'accettato', 
-    accettatoIl: Date.now()
-  }).then(() => {
-    showToast('✅ Ordine accettato!');
-    renderOrders(ordersCache);
-    notifyClients();
-  });
-}
-
+// ============================================================
+// 🔥 RENDER ORDINI CON STATO ACCETTATO
+// ============================================================
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
-  const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [], annullati: [], rifiutati: [] };
+  const gruppi = { 
+    new: [], 
+    accettato: [], 
+    preparing: [], 
+    delayed: [], 
+    ready: [], 
+    picked: [], 
+    delivering: [], 
+    delivered: [], 
+    annullati: [], 
+    rifiutati: [] 
+  };
+  
   Object.entries(orders || {}).forEach(([id, o]) => {
     const st = o.status || 'new';
     if (st === 'annullato') gruppi.annullati.push([id, o]);
@@ -929,7 +975,11 @@ function renderOrders(orders) {
     else if (gruppi[st]) gruppi[st].push([id, o]);
     else gruppi.new.push([id, o]);
   });
-  Object.keys(gruppi).forEach(k => { gruppi[k].sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0)); });
+  
+  Object.keys(gruppi).forEach(k => {
+    gruppi[k].sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+  });
+
   document.getElementById('statNew').textContent = gruppi.new.length;
   document.getElementById('statAccettati').textContent = gruppi.accettato.length;
   document.getElementById('statPreparing').textContent = gruppi.preparing.length;
@@ -940,33 +990,67 @@ function renderOrders(orders) {
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
   document.getElementById('statAnnullati').textContent = gruppi.annullati.length;
   document.getElementById('statRifiutati').textContent = gruppi.rifiutati.length;
-  const activeOrders = gruppi.new.length + gruppi.accettato.length + gruppi.preparing.length + gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
+
+  const activeOrders = gruppi.new.length + gruppi.accettato.length + gruppi.preparing.length + 
+                       gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + 
+                       gruppi.delivering.length;
   const totalOrders = activeOrders + gruppi.delivered.length + gruppi.annullati.length + gruppi.rifiutati.length;
   const deliveredOrders = gruppi.delivered.length;
+  
   document.getElementById('dashboardActiveOrders').textContent = activeOrders;
   document.getElementById('dashboardTotalOrders').textContent = totalOrders;
   document.getElementById('dashboardDeliveredOrders').textContent = deliveredOrders;
+
   const attivi = activeOrders;
   const badge = document.getElementById('newOrdersBadge');
-  if (attivi > 0) { badge.textContent = attivi; badge.style.display = 'inline'; } else badge.style.display = 'none';
+  if (attivi > 0) { badge.textContent = attivi; badge.style.display = 'inline'; }
+  else badge.style.display = 'none';
+
   if (!attivi && !gruppi.delivered.length && !gruppi.annullati.length && !gruppi.rifiutati.length) {
-    list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox"></i><p>Nessun ordine</p></div>'; return;
+    list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox"></i><p>Nessun ordine</p></div>';
+    return;
   }
-  const titoli = { new: '🆕 Nuovi (in attesa)', accettato: '✅ ACCETTATO', preparing: '🍕 In Preparazione', delayed: '⏰ In Ritardo', ready: '✅ Pronti (ritiro fattorino)', picked: '📦 Ritirati dal fattorino', delivering: '🛵 In Consegna', delivered: '🎉 Consegnati' };
+
+  const titoli = { 
+    new: '🆕 Nuovi (in attesa)', 
+    accettato: '✅ ACCETTATO', 
+    preparing: '🍕 In Preparazione', 
+    delayed: '⏰ In Ritardo', 
+    ready: '✅ Pronti (ritiro fattorino)', 
+    picked: '📦 Ritirati dal fattorino', 
+    delivering: '🛵 In Consegna', 
+    delivered: '🎉 Consegnati' 
+  };
+  
   let html = '';
   ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
     if (!gruppi[stato].length) return;
     html += '<div class="orders-group-title ' + stato + '">' + titoli[stato] + ' (' + gruppi[stato].length + ')</div>';
     html += '<div class="orders-grid">' + renderOrderCards(gruppi[stato]) + '</div>';
   });
+
   if (gruppi.annullati.length > 0) {
     const isOpen = accordionState.annullati;
-    html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}"><div class="orders-accordion-header" onclick="toggleAccordion('annullati')"><div class="accordion-left"><span class="icon">🗑️</span><span>ORDINI ANNULLATI DAL CLIENTE</span><span class="count">${gruppi.annullati.length}</span></div><span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span></div><div class="orders-accordion-body"><div class="orders-grid">${renderOrderCards(gruppi.annullati, 'annullati')}</div></div></div>`;
+    html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('annullati')">
+        <div class="accordion-left"><span class="icon">🗑️</span><span>ORDINI ANNULLATI DAL CLIENTE</span><span class="count">${gruppi.annullati.length}</span></div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="orders-accordion-body"><div class="orders-grid">${renderOrderCards(gruppi.annullati, 'annullati')}</div></div>
+    </div>`;
   }
+
   if (gruppi.rifiutati.length > 0) {
     const isOpen = accordionState.rifiutati;
-    html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}"><div class="orders-accordion-header" onclick="toggleAccordion('rifiutati')"><div class="accordion-left"><span class="icon">❌</span><span>ORDINI RIFIUTATI DALLA PIZZERIA</span><span class="count">${gruppi.rifiutati.length}</span></div><span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span></div><div class="orders-accordion-body"><div class="orders-grid">${renderOrderCards(gruppi.rifiutati, 'rifiutati')}</div></div></div>`;
+    html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('rifiutati')">
+        <div class="accordion-left"><span class="icon">❌</span><span>ORDINI RIFIUTATI DALLA PIZZERIA</span><span class="count">${gruppi.rifiutati.length}</span></div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="orders-accordion-body"><div class="orders-grid">${renderOrderCards(gruppi.rifiutati, 'rifiutati')}</div></div>
+    </div>`;
   }
+
   list.innerHTML = html;
 }
 
@@ -975,31 +1059,66 @@ function renderOrderCards(ordersList, tipo = '') {
     const dt = new Date(o.timestamp || 0);
     const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
     const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-    const items = o.items && Array.isArray(o.items) ? o.items.map(i => '<div>' + sanitize(i.name) + ' x' + i.qty + ' - €' + (i.price * i.qty).toFixed(2) + '</div>').join('') : '';
+    const items = o.items && Array.isArray(o.items) ? 
+      o.items.map(i => '<div>' + sanitize(i.name) + ' x' + i.qty + ' - €' + (i.price * i.qty).toFixed(2) + '</div>').join('') : '';
     const driverBadge = o.assignedName ? '<span class="driver-badge">' + sanitize(o.assignedName) + '</span>' : '';
+    
     let statusBadge = '', borderColor = 'var(--gold)', extraClass = '';
-    if (tipo === 'annullati') { statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; borderColor = '#f87171'; extraClass = 'annullati'; }
-    else if (tipo === 'rifiutati') { statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; borderColor = '#ef4444'; extraClass = 'rifiutati'; }
+    if (tipo === 'annullati') { 
+      statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; 
+      borderColor = '#f87171'; 
+      extraClass = 'annullati'; 
+    } else if (tipo === 'rifiutati') { 
+      statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; 
+      borderColor = '#ef4444'; 
+      extraClass = 'rifiutati'; 
+    }
+    
     let ah = '', motivoMessage = '';
+    
     if (tipo === 'annullati' || tipo === 'rifiutati') {
       ah = '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">🗑️ Elimina</button>';
-      if (o.motivoRifiuto) motivoMessage = '<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ' + sanitize(o.motivoRifiuto) + '</div>';
-      else if (o.motivoAnnullamento) motivoMessage = '<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ' + sanitize(o.motivoAnnullamento) + '</div>';
+      if (o.motivoRifiuto) {
+        motivoMessage = '<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ' + sanitize(o.motivoRifiuto) + '</div>';
+      } else if (o.motivoAnnullamento) {
+        motivoMessage = '<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ' + sanitize(o.motivoAnnullamento) + '</div>';
+      }
     } else {
       const st = o.status || 'new';
       if (st === 'new') {
-        ah = '<button class="btn-accept" onclick="accettaOrdine(\''+id+'\')">✅ Accetta</button><button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<button class="btn-accept" onclick="accettaOrdine(\''+id+'\')">✅ Accetta</button>' +
+             '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button>' +
+             '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
+             '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       } else if (st === 'accettato') {
-        ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button>' +
+             '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
+             '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       } else if (st === 'preparing') {
-        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button>' +
+             '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
+             '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
       } else if (st === 'delayed') {
-        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      } else if (st === 'ready') { const isPickup = o.type === 'pickup'; ah = isPickup ? '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' : '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>'; }
-      else if (st === 'picked') ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>';
-      else if (st === 'delivering') ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>';
-      else ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button>' +
+             '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'ready') { 
+        const isPickup = o.type === 'pickup'; 
+        ah = isPickup ? 
+          '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' : 
+          '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'picked') {
+        ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>';
+      } else if (st === 'delivering') {
+        ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>';
+      } else {
+        ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      }
     }
+
     return '<div class="order-card ' + extraClass + '" style="border-left-color:' + borderColor + ';">' +
       '<div class="order-header"><span class="order-id">' + (o.orderId || id) + ' ' + statusBadge + driverBadge + '</span><span class="order-time">' + ds + ' ' + ts + '</span></div>' +
       '<div class="order-customer">' + sanitize(o.customerName || 'N/A') + ' - ' + sanitize(o.customerPhone || 'N/A') + '</div>' +
@@ -1024,7 +1143,12 @@ async function setOrderDelayed(id) {
   if (value === null) return;
   const minutes = parseInt(String(value).trim(), 10);
   if (!Number.isInteger(minutes) || minutes <= 0 || minutes % 10 !== 0) { showToast('⚠️ Inserisci un valore valido, multiplo di 10'); return; }
-  await db.ref('ordini/' + id).update({ status: 'delayed', delayMinutes: minutes, delayedAt: Date.now(), delayUntil: Date.now() + (minutes * 60 * 1000) });
+  await db.ref('ordini/' + id).update({ 
+    status: 'delayed', 
+    delayMinutes: minutes, 
+    delayedAt: Date.now(), 
+    delayUntil: Date.now() + (minutes * 60 * 1000) 
+  });
   showToast(`⏰ Ritardo impostato a ${minutes} minuti`);
   notifyClients();
 }
@@ -1033,29 +1157,58 @@ async function rifiutaOrdine(id) {
     const motivo = await showPrompt('Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
     if (motivo === null) return;
     if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
-    db.ref('ordini/' + id).update({ status: 'rifiutato', motivoRifiuto: sanitize(motivo), timestampRifiuto: Date.now(), stampato: true }).then(() => { showToast('❌ Ordine rifiutato'); renderOrders(ordersCache); notifyClients(); });
+    db.ref('ordini/' + id).update({ 
+      status: 'rifiutato', 
+      motivoRifiuto: sanitize(motivo), 
+      timestampRifiuto: Date.now(), 
+      stampato: true 
+    }).then(() => { 
+      showToast('❌ Ordine rifiutato'); 
+      renderOrders(ordersCache); 
+      notifyClients();
+    });
 }
 
 async function deleteOrder(id) {
   const ok = await showConfirm('Eliminare Ordine?', 'Questa azione non può essere annullata.');
   if (!ok) return;
-  db.ref('ordini/' + id).remove(); showToast('🗑️ Eliminato');
+  if (ordersCache[id]) {
+    delete ordersCache[id];
+    renderOrders(ordersCache);
+  }
+  try {
+    await db.ref('ordini/' + id).remove();
+    showToast('🗑️ Eliminato');
+  } catch(e) {
+    showToast('❌ Errore eliminazione');
+    console.error(e);
+  }
 }
+
+// ============================================================
+// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC.
+// ============================================================
 
 async function clearOldOrders() {
   const scelta = await showPuliziaOrdini();
   if (!scelta) return;
   showToast('🧹 Pulizia in corso...');
   try {
-    const snap = await db.ref('ordini').once('value'); let count = 0;
+    const snap = await db.ref('ordini').once('value');
+    let count = 0;
     snap.forEach(child => {
-      const order = child.val(); let elimina = false;
+      const order = child.val();
+      let elimina = false;
       if (scelta === 'tutti') elimina = true;
       else if (scelta === 'rifiutati') elimina = order.status === 'rifiutato';
       else if (scelta === 'annullati') elimina = order.status === 'annullato';
       else if (scelta === 'consegnati') elimina = order.status === 'delivered';
-      else if (scelta === 'vecchi') { const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000); elimina = (order.timestamp || 0) < cutoff; }
-      else if (scelta === 'completati') elimina = ['delivered', 'rifiutato', 'annullato'].includes(order.status);
+      else if (scelta === 'vecchi') { 
+        const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000); 
+        elimina = (order.timestamp || 0) < cutoff; 
+      } else if (scelta === 'completati') {
+        elimina = ['delivered', 'rifiutato', 'annullato'].includes(order.status);
+      }
       if (elimina) { child.ref.remove(); count++; }
     });
     showToast(`🗑️ Eliminati ${count} ordini`);
@@ -1071,32 +1224,42 @@ function showPuliziaOrdini() {
         <h3 style="color:#d4a84b;font-family:'Playfair Display',serif;margin-bottom:15px;font-size:1.3rem;">🧹 Pulizia Ordini</h3>
         <p style="color:#f5e6c8;margin-bottom:20px;line-height:1.5;">Cosa vuoi eliminare?</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <button class="btn-pulizia" data-opzione="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;font-size:0.9rem;">✅ Completati (consegnati + rifiutati + annullati)</button>
+          <button class="btn-pulizia" data-opzione="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;font-size:0.9rem;">✅ Completati</button>
           <button class="btn-pulizia" data-opzione="rifiutati" style="padding:12px;border-radius:10px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#f87171;font-weight:600;cursor:pointer;font-size:0.9rem;">❌ Solo Rifiutati</button>
           <button class="btn-pulizia" data-opzione="annullati" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">🗑️ Solo Annullati</button>
           <button class="btn-pulizia" data-opzione="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;font-size:0.9rem;">🎉 Solo Consegnati</button>
-          <button class="btn-pulizia" data-opzione="vecchi" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">📅 Più vecchi di 60 giorni (tutti gli stati)</button>
-          <button class="btn-pulizia" data-opzione="tutti" style="padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.2);color:#ef4444;font-weight:700;cursor:pointer;font-size:0.9rem;">⚠️ TUTTI GLI ORDINI (pericoloso!)</button>
+          <button class="btn-pulizia" data-opzione="vecchi" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">📅 Più vecchi di 60 giorni</button>
+          <button class="btn-pulizia" data-opzione="tutti" style="padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.2);color:#ef4444;font-weight:700;cursor:pointer;font-size:0.9rem;">⚠️ TUTTI GLI ORDINI</button>
           <button id="btnAnnullaPulizia" style="padding:12px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card-light);color:var(--cream);font-weight:600;cursor:pointer;font-size:0.9rem;margin-top:10px;">Annulla</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
-    overlay.querySelectorAll('.btn-pulizia').forEach(btn => { btn.onclick = () => { document.body.removeChild(overlay); resolve(btn.dataset.opzione); }; });
+    overlay.querySelectorAll('.btn-pulizia').forEach(btn => { 
+      btn.onclick = () => { document.body.removeChild(overlay); resolve(btn.dataset.opzione); }; 
+    });
     document.getElementById('btnAnnullaPulizia').onclick = () => { document.body.removeChild(overlay); resolve(null); };
   });
 }
 
 function loadReviews() {
-  db.ref('recensioni').orderByChild('timestamp').once('value', s => {
-    const reviews = []; let totalStars = 0, count = 0, pendingCount = 0;
-    s.forEach(c => { const r = c.val(); reviews.push({ id: c.key, ...r }); totalStars += r.stars; count++; if (r.status === 'pending') pendingCount++; });
+  db.ref('recensioni').orderByChild('timestamp').limitToLast(50).once('value', s => {
+    const reviews = [];
+    let totalStars = 0, count = 0, pendingCount = 0;
+    s.forEach(c => { 
+      const r = c.val(); 
+      reviews.push({ id: c.key, ...r }); 
+      totalStars += r.stars; 
+      count++; 
+      if (r.status === 'pending') pendingCount++; 
+    });
     reviews.sort((a, b) => b.timestamp - a.timestamp);
     const avg = count > 0 ? (totalStars / count).toFixed(1) : '0';
     document.getElementById('reviewTotal').textContent = count;
     document.getElementById('reviewAvg').textContent = avg;
     document.getElementById('reviewPending').textContent = pendingCount;
     const badge = document.getElementById('pendingReviewsBadge');
-    if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline'; } else badge.style.display = 'none';
+    if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline'; } 
+    else badge.style.display = 'none';
     let filtered = reviews;
     if (currentReviewFilter !== 'all') filtered = reviews.filter(r => r.status === currentReviewFilter);
     const list = document.getElementById('reviewsList');
@@ -1108,9 +1271,27 @@ function loadReviews() {
   });
 }
 
-function filterReviews(filter, el) { currentReviewFilter = filter; document.querySelectorAll('.review-filter-tab').forEach(t => t.classList.remove('active')); if (el) el.classList.add('active'); loadReviews(); }
-function updateReviewStatus(id, status) { db.ref('recensioni/' + id).update({ status: status }).then(() => { showToast(status === 'approved' ? '✅ Approvata' : '❌ Rifiutata'); loadReviews(); }); }
-async function deleteReview(id) { const ok = await showConfirm('Eliminare Recensione?', 'Questa azione non può essere annullata.'); if (!ok) return; db.ref('recensioni/' + id).remove(); showToast('🗑️ Eliminata'); loadReviews(); }
+function filterReviews(filter, el) { 
+  currentReviewFilter = filter; 
+  document.querySelectorAll('.review-filter-tab').forEach(t => t.classList.remove('active')); 
+  if (el) el.classList.add('active'); 
+  loadReviews(); 
+}
+
+function updateReviewStatus(id, status) { 
+  db.ref('recensioni/' + id).update({ status: status }).then(() => { 
+    showToast(status === 'approved' ? '✅ Approvata' : '❌ Rifiutata'); 
+    loadReviews(); 
+  }); 
+}
+
+async function deleteReview(id) { 
+  const ok = await showConfirm('Eliminare Recensione?', 'Questa azione non può essere annullata.');
+  if (!ok) return;
+  db.ref('recensioni/' + id).remove(); 
+  showToast('🗑️ Eliminata'); 
+  loadReviews(); 
+}
 
 function loadBranding() {
   document.getElementById('brandName').value = appData.branding.name || '';
@@ -1122,7 +1303,10 @@ function saveBranding() {
   const name = sanitize(document.getElementById('brandName').value) || "Antica Pizzeria Grasso";
   const subtitle = sanitize(document.getElementById('brandSubtitle').value) || "Tradizione";
   const city = sanitize(document.getElementById('brandCity').value) || "Manfredonia";
-  db.ref('branding').update({ name, subtitle, city }).then(() => { showToast('✅ Salvato'); notifyClients(); });
+  db.ref('branding').update({ name, subtitle, city }).then(() => { 
+    showToast('✅ Salvato'); 
+    notifyClients(); 
+  });
 }
 
 function renderPromotions() {
@@ -1141,7 +1325,9 @@ function renderPromotions() {
     let productsHtml = '';
     if (p.products && p.products.length > 0) {
       productsHtml = '<div class="promo-products-list">';
-      p.products.forEach(prod => { productsHtml += `<div class="promo-product-item"><span>${sanitize(prod.name)} x${prod.qty}</span><span style="color:var(--gold);">€${prod.price.toFixed(2)}</span></div>`; });
+      p.products.forEach(prod => { 
+        productsHtml += `<div class="promo-product-item"><span>${sanitize(prod.name)} x${prod.qty}</span><span style="color:var(--gold);">€${prod.price.toFixed(2)}</span></div>`; 
+      });
       productsHtml += '</div>';
     }
     return '<div class="promo-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:5px;"><div style="color:var(--gold-light);font-weight:700;">' + sanitize(p.title) + '</div><span class="promo-status ' + sc + '">' + st + '</span></div>' + productsHtml + '<div style="display:flex;gap:10px;font-size:0.85rem;color:var(--gold);margin-bottom:10px;flex-wrap:wrap;"><span>Usati: ' + u + '</span><span>Rimasti: ' + lf + '</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-secondary" style="flex:1;" onclick="togglePromo(\''+id+'\')">' + (p.active ? 'Disattiva' : 'Attiva') + '</button><button class="btn-danger" onclick="deletePromo(\''+id+'\')">Elimina</button></div></div>';
@@ -1149,18 +1335,29 @@ function renderPromotions() {
 }
 
 function populatePromoProductSelect() {
-  const select = document.getElementById('promoProductSelect'); if (!select) return;
+  const select = document.getElementById('promoProductSelect'); 
+  if (!select) return;
   let html = '<option value="">-- Scegli un prodotto --</option>';
   Object.keys(appData.categories).forEach(catKey => {
-    const catName = appData.categories[catKey].name; const products = appData.menu[catKey] || [];
+    const catName = appData.categories[catKey].name; 
+    const products = appData.menu[catKey] || [];
     if (products.length > 0) {
       html += `<optgroup label="${sanitize(catName)}">`;
-      products.forEach((prod, idx) => { if (!prod.disabled) { html += `<option value="${catKey}|${idx}" data-price="${prod.price}">${sanitize(prod.name)} - €${prod.price.toFixed(2)}</option>`; } });
+      products.forEach((prod, idx) => { 
+        if (!prod.disabled) { 
+          html += `<option value="${catKey}|${idx}" data-price="${prod.price}">${sanitize(prod.name)} - €${prod.price.toFixed(2)}</option>`; 
+        } 
+      });
       html += '</optgroup>';
     }
   });
   select.innerHTML = html;
-  select.onchange = function() { const selected = this.options[this.selectedIndex]; if (selected.dataset.price) { document.getElementById('promoProductPrice').value = selected.dataset.price; } };
+  select.onchange = function() { 
+    const selected = this.options[this.selectedIndex]; 
+    if (selected.dataset.price) { 
+      document.getElementById('promoProductPrice').value = selected.dataset.price; 
+    } 
+  };
 }
 
 function addProductToPromo() {
@@ -1174,8 +1371,10 @@ function addProductToPromo() {
   const product = appData.menu[catKey][parseInt(idx)];
   if (!product) { showToast('❌ Prodotto non trovato'); return; }
   tempPromoProducts.push({ cat: catKey, name: product.name, qty: qty, price: price, img: product.img || '' });
-  renderPromoProductsPreview(); showToast(`✅ ${product.name} aggiunto alla promo`);
-  select.value = ''; document.getElementById('promoProductQty').value = '1';
+  renderPromoProductsPreview(); 
+  showToast(`✅ ${product.name} aggiunto alla promo`);
+  select.value = ''; 
+  document.getElementById('promoProductQty').value = '1';
 }
 
 function renderPromoProductsPreview() {
@@ -1191,7 +1390,10 @@ function renderPromoProductsPreview() {
   container.innerHTML = html;
 }
 
-function removePromoProduct(index) { tempPromoProducts.splice(index, 1); renderPromoProductsPreview(); }
+function removePromoProduct(index) { 
+  tempPromoProducts.splice(index, 1); 
+  renderPromoProductsPreview(); 
+}
 
 function createPromotion() {
   const t = sanitize(document.getElementById('newPromoTitle').value);
@@ -1206,18 +1408,37 @@ function createPromotion() {
   const today = new Date().toISOString().split('T')[0];
   if (s < today) { showToast('⚠️ La data di inizio non può essere nel passato'); return; }
   const id = 'promo_' + Date.now();
-  db.ref('promotions/' + id).set({ title: t, message: m, startDate: s, endDate: e, maxUses: mx, currentUses: 0, active: true, products: tempPromoProducts, createdAt: Date.now() }).then(() => {
-    document.getElementById('newPromoTitle').value = ''; document.getElementById('newPromoMessage').value = '';
-    document.getElementById('newPromoStart').value = ''; document.getElementById('newPromoEnd').value = '';
-    document.getElementById('newPromoMaxUses').value = '10'; tempPromoProducts = []; renderPromoProductsPreview();
+  db.ref('promotions/' + id).set({ 
+    title: t, message: m, startDate: s, endDate: e, maxUses: mx, 
+    currentUses: 0, active: true, products: tempPromoProducts, createdAt: Date.now() 
+  }).then(() => {
+    document.getElementById('newPromoTitle').value = ''; 
+    document.getElementById('newPromoMessage').value = '';
+    document.getElementById('newPromoStart').value = ''; 
+    document.getElementById('newPromoEnd').value = '';
+    document.getElementById('newPromoMaxUses').value = '10'; 
+    tempPromoProducts = []; 
+    renderPromoProductsPreview();
     showToast('✅ Promo creata!');
     db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); });
     notifyClients();
   });
 }
 
-function togglePromo(id) { db.ref('promotions/' + id + '/active').set(!appData.promotions[id].active); db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); notifyClients(); }
-async function deletePromo(id) { const ok = await showConfirm('Eliminare Promozione?', 'Questa azione non può essere annullata.'); if (!ok) return; db.ref('promotions/' + id).remove(); showToast('🗑️ Eliminata'); db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); notifyClients(); }
+function togglePromo(id) { 
+  db.ref('promotions/' + id + '/active').set(!appData.promotions[id].active); 
+  db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); 
+  notifyClients(); 
+}
+
+async function deletePromo(id) { 
+  const ok = await showConfirm('Eliminare Promozione?', 'Questa azione non può essere annullata.');
+  if (!ok) return;
+  db.ref('promotions/' + id).remove(); 
+  showToast('🗑️ Eliminata'); 
+  db.ref('promotions').once('value').then(s => { appData.promotions = s.val() || {}; renderPromotions(); }); 
+  notifyClients(); 
+}
 
 function loadSettings() {
   document.getElementById('minDeliveryInput').value = appData.settings.minDeliveryOrder || 15;
@@ -1263,7 +1484,9 @@ async function getPizzeriaGPS() {
   if (!navigator.geolocation) { showToast('❌ GPS non disponibile'); return; }
   showToast('📍 Ottenendo posizione...');
   try {
-    const pos = await new Promise((resolve, reject) => { navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 }); });
+    const pos = await new Promise((resolve, reject) => { 
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 }); 
+    });
     document.getElementById('pizzeriaLat').value = pos.coords.latitude.toFixed(6);
     document.getElementById('pizzeriaLng').value = pos.coords.longitude.toFixed(6);
     showToast('✅ Posizione ottenuta!');
@@ -1280,25 +1503,44 @@ function saveDeliveryGPS() {
   if (isNaN(lat) || isNaN(lng)) { showToast('❌ Coordinate non valide'); return; }
   if (extraRadius <= maxRadius) { showToast('❌ Il raggio supplemento deve essere maggiore del raggio base'); return; }
   if (maxRadius <= 0 || extraRadius <= 0) { showToast('❌ I raggi devono essere positivi'); return; }
-  db.ref('settings').update({ pizzeriaLat: lat, pizzeriaLng: lng, deliveryBaseFee: isNaN(baseFee) ? 3.00 : baseFee, deliveryMaxRadius: isNaN(maxRadius) ? 4 : maxRadius, deliveryExtraRadius: isNaN(extraRadius) ? 6 : extraRadius, deliveryExtraFee: isNaN(extraFee) ? 2.00 : extraFee }).then(() => { showToast('✅ Impostazioni GPS salvate!'); updateDeliveryInfo(); notifyClients(); }).catch(err => showToast('❌ Errore: ' + err.message));
+  db.ref('settings').update({ 
+    pizzeriaLat: lat, pizzeriaLng: lng, 
+    deliveryBaseFee: isNaN(baseFee) ? 3.00 : baseFee, 
+    deliveryMaxRadius: isNaN(maxRadius) ? 4 : maxRadius, 
+    deliveryExtraRadius: isNaN(extraRadius) ? 6 : extraRadius, 
+    deliveryExtraFee: isNaN(extraFee) ? 2.00 : extraFee 
+  }).then(() => { 
+    showToast('✅ Impostazioni GPS salvate!'); 
+    updateDeliveryInfo(); 
+    notifyClients(); 
+  }).catch(err => showToast('❌ Errore: ' + err.message));
 }
 
 function saveServices() {
   const minOv = parseFloat(document.getElementById('minDeliveryInput').value);
   const minO = isNaN(minOv) || minOv < 0 ? 0 : minOv;
-  db.ref('settings').update({ minDeliveryOrder: minO, deliveryEnabled: document.getElementById('deliveryToggle').classList.contains('on'), pickupEnabled: document.getElementById('pickupToggle').classList.contains('on') }).then(() => { showToast('✅ Salvato'); notifyClients(); });
+  db.ref('settings').update({ 
+    minDeliveryOrder: minO, 
+    deliveryEnabled: document.getElementById('deliveryToggle').classList.contains('on'), 
+    pickupEnabled: document.getElementById('pickupToggle').classList.contains('on') 
+  }).then(() => { showToast('✅ Salvato'); notifyClients(); });
 }
 
-// 🚨 toggleSwitch: salva SUBITO consegna/ritiro al click (canale emergenza li propaga in ~2s)
 function toggleSwitch(el) {
   el.classList.toggle('on');
   const isOn = el.classList.contains('on');
   if (el.id === 'deliveryToggle') {
     appData.settings.deliveryEnabled = isOn;
-    db.ref('settings/deliveryEnabled').set(isOn).then(()=>{ showToast(isOn?'🛵 Consegna ATTIVA':'🚫 Consegna DISATTIVATA'); notifyClients(); }).catch(e=>showToast('❌ '+e.message));
+    db.ref('settings/deliveryEnabled').set(isOn).then(() => {
+      showToast(isOn ? '🛵 Consegna ATTIVA' : '🚫 Consegna DISATTIVATA'); 
+      notifyClients(); 
+    });
   } else if (el.id === 'pickupToggle') {
     appData.settings.pickupEnabled = isOn;
-    db.ref('settings/pickupEnabled').set(isOn).then(()=>{ showToast(isOn?'🏪 Ritiro ATTIVO':'🚫 Ritiro DISATTIVATO'); notifyClients(); }).catch(e=>showToast('❌ '+e.message));
+    db.ref('settings/pickupEnabled').set(isOn).then(() => {
+      showToast(isOn ? '🏪 Ritiro ATTIVO' : '🚫 Ritiro DISATTIVATO'); 
+      notifyClients(); 
+    });
   }
 }
 
@@ -1314,36 +1556,55 @@ function renderCategories() {
 
 async function addCategory() {
   const n = await showPrompt('Nuova Categoria', 'Nome della categoria:', 'Es: Pizze');
-  if (!n || !n.trim()) return; const name = sanitize(n);
+  if (!n || !n.trim()) return; 
+  const name = sanitize(n);
   const i = await showPrompt('Icona', 'Nome icona FontAwesome (senza fa-):', 'Es: pizza-slice', 'utensils');
-  if (i === null) return; const icon = sanitize(i) || 'utensils';
+  if (i === null) return; 
+  const icon = sanitize(i) || 'utensils';
   const k = await showPrompt('Chiave', 'Chiave univoca (solo lettere minuscole):', 'Es: pizze');
-  if (!k) return; const key = sanitizeKey(k);
+  if (!k) return; 
+  const key = sanitizeKey(k);
   if (!key || !/^[a-z][a-z0-9_]*$/.test(key)) { showToast('⚠️ Chiave non valida (solo lettere minuscole)'); return; }
   if (appData.categories[key]) { showToast('❌ Chiave già esistente'); return; }
   appData.categories[key] = { name: name, icon: 'fa-' + icon };
   if (!appData.menu[key]) appData.menu[key] = [];
   try {
-    await db.ref('categories').set(appData.categories); await db.ref('menu').set(appData.menu);
-    showToast('✅ Categoria aggiunta'); renderCategories(); renderMenu(); populatePromoProductSelect(); notifyClients();
+    await db.ref('categories').set(appData.categories); 
+    await db.ref('menu').set(appData.menu);
+    showToast('✅ Categoria aggiunta'); 
+    renderCategories(); 
+    renderMenu(); 
+    populatePromoProductSelect(); 
+    notifyClients();
   } catch(e) { showToast('❌ Errore salvataggio'); }
 }
 
-function updateCategory(k, f, v) { appData.categories[k][f] = sanitize(v); db.ref('categories').set(appData.categories); notifyClients(); }
+function updateCategory(k, f, v) { 
+  appData.categories[k][f] = sanitize(v); 
+  db.ref('categories').set(appData.categories);
+  notifyClients(); 
+}
 
 async function deleteCategory(k) {
   const ok = await showConfirm('Eliminare Categoria?', 'Verranno eliminati anche tutti i prodotti di questa categoria!');
   if (!ok) return;
-  delete appData.categories[k]; delete appData.menu[k];
-  db.ref('categories').set(appData.categories); db.ref('menu').set(appData.menu);
-  showToast('🗑️ Eliminata'); renderCategories(); renderMenu(); populatePromoProductSelect(); notifyClients();
+  delete appData.categories[k]; 
+  delete appData.menu[k];
+  db.ref('categories').set(appData.categories); 
+  db.ref('menu').set(appData.menu);
+  showToast('🗑️ Eliminata'); 
+  renderCategories(); 
+  renderMenu();
+  populatePromoProductSelect();
+  notifyClients();
 }
 
 async function translateText(text, langPair) {
   if (!text || !text.trim()) return '';
   try {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-    const res = await fetch(url); const data = await res.json();
+    const res = await fetch(url); 
+    const data = await res.json();
     if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
     return '';
   } catch(e) { console.error('Errore traduzione:', e); return ''; }
@@ -1352,9 +1613,15 @@ async function translateText(text, langPair) {
 async function translateProduct(cat, idx, btnElement) {
   const product = appData.menu[cat][idx];
   if (!product) { showToast('❌ Prodotto non trovato'); return; }
-  if (btnElement) { btnElement.disabled = true; const icon = btnElement.querySelector('i'); if (icon) icon.classList.add('spinning'); btnElement.innerHTML = '<i class="fas fa-spinner spinning"></i> Traduco...'; }
+  if (btnElement) { 
+    btnElement.disabled = true; 
+    const icon = btnElement.querySelector('i'); 
+    if (icon) icon.classList.add('spinning'); 
+    btnElement.innerHTML = '<i class="fas fa-spinner spinning"></i> Traduco...'; 
+  }
   try {
-    const nameIt = product.name || ''; const descIt = product.desc || '';
+    const nameIt = product.name || ''; 
+    const descIt = product.desc || '';
     const [nameEn, nameDe, descEn, descDe] = await Promise.all([
       nameIt ? translateText(nameIt, 'it|en') : Promise.resolve(''),
       nameIt ? translateText(nameIt, 'it|de') : Promise.resolve(''),
@@ -1366,12 +1633,20 @@ async function translateProduct(cat, idx, btnElement) {
     if (descEn) appData.menu[cat][idx].desc_en = descEn;
     if (descDe) appData.menu[cat][idx].desc_de = descDe;
     const updates = {};
-    if (nameEn) updates['name_en'] = nameEn; if (nameDe) updates['name_de'] = nameDe;
-    if (descEn) updates['desc_en'] = descEn; if (descDe) updates['desc_de'] = descDe;
+    if (nameEn) updates['name_en'] = nameEn; 
+    if (nameDe) updates['name_de'] = nameDe;
+    if (descEn) updates['desc_en'] = descEn; 
+    if (descDe) updates['desc_de'] = descDe;
     if (Object.keys(updates).length > 0) await db.ref(`menu/${cat}/${idx}`).update(updates);
-    showToast('✅ Tradotto in EN e DE!'); renderMenu();
+    showToast('✅ Tradotto in EN e DE!'); 
+    renderMenu();
   } catch(e) { showToast('❌ Errore traduzione: ' + e.message); }
-  finally { if (btnElement) { btnElement.disabled = false; btnElement.innerHTML = '<i class="fas fa-language"></i> Traduci 🌐'; } }
+  finally { 
+    if (btnElement) { 
+      btnElement.disabled = false; 
+      btnElement.innerHTML = '<i class="fas fa-language"></i> Traduci 🌐'; 
+    } 
+  }
 }
 
 function renderMenu() {
@@ -1391,7 +1666,8 @@ function renderMenu() {
     h += '</div><div class="admin-category-body">';
     const productsToShow = searchTerm ? filteredProducts : pr;
     h += productsToShow.map((p, i) => {
-      const originalIndex = pr.indexOf(p); const isDisabled = p.disabled === true;
+      const originalIndex = pr.indexOf(p); 
+      const isDisabled = p.disabled === true;
       return `<div class="admin-product-item ${isDisabled ? 'disabled' : ''}">
         <div class="admin-product-header">
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1404,7 +1680,7 @@ function renderMenu() {
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input type="text" value="${sanitize(p.name)}" onchange="updateProduct('${c}',${originalIndex},'name',this.value)" placeholder="Nome 🇮🇹" style="flex:2;min-width:150px;">
             <input type="text" value="${sanitize(p.name_en || '')}" onchange="updateProduct('${c}',${originalIndex},'name_en',this.value)" placeholder="Name 🇬🇧" style="flex:2;min-width:150px;">
-            <input type="text" value="${sanitize(p.name_de || '')}" onchange="updateProduct('${c}',${originalIndex},'name_de',this.value)" placeholder="Name 🇩" style="flex:2;min-width:150px;">
+            <input type="text" value="${sanitize(p.name_de || '')}" onchange="updateProduct('${c}',${originalIndex},'name_de',this.value)" placeholder="Name 🇩🇪" style="flex:2;min-width:150px;">
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input type="text" value="${sanitize(p.desc || '')}" onchange="updateProduct('${c}',${originalIndex},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;">
@@ -1427,26 +1703,37 @@ function renderMenu() {
 }
 
 function toggleProductAvailability(cat, idx, el) {
-    const currentStatus = appData.menu[cat][idx].disabled === true; const newStatus = !currentStatus;
+    const currentStatus = appData.menu[cat][idx].disabled === true; 
+    const newStatus = !currentStatus;
     appData.menu[cat][idx].disabled = newStatus;
-    if (newStatus) { el.classList.remove('on'); el.classList.add('closed'); } else { el.classList.remove('closed'); el.classList.add('on'); }
+    if (newStatus) { el.classList.remove('on'); el.classList.add('closed'); } 
+    else { el.classList.remove('closed'); el.classList.add('on'); }
     db.ref(`menu/${cat}/${idx}/disabled`).set(newStatus);
     showToast(newStatus ? '🚫 Articolo segnato come ESAURITO' : '✅ Articolo DISPONIBILE');
     notifyClients();
 }
 
 function toggleCategoryAccordion(c) {
-    const el = document.getElementById('accordion-' + c); if (!el) return;
-    document.querySelectorAll('.admin-category-accordion').forEach(acc => { if (acc.id !== 'accordion-' + c) { acc.classList.remove('open'); openCategories.delete(acc.id.replace('accordion-', '')); } });
+    const el = document.getElementById('accordion-' + c); 
+    if (!el) return;
+    document.querySelectorAll('.admin-category-accordion').forEach(acc => { 
+      if (acc.id !== 'accordion-' + c) { 
+        acc.classList.remove('open'); 
+        openCategories.delete(acc.id.replace('accordion-', '')); 
+      } 
+    });
     el.classList.toggle('open');
-    if (el.classList.contains('open')) openCategories.add(c); else openCategories.delete(c);
+    if (el.classList.contains('open')) openCategories.add(c); 
+    else openCategories.delete(c);
 }
 
 async function addProduct(c) {
   const n = await showPrompt('Nuovo Prodotto', 'Nome del prodotto (🇮🇹 Italiano):', 'Es: Margherita');
-  if (!n || !n.trim()) return; const name = sanitize(n);
+  if (!n || !n.trim()) return; 
+  const name = sanitize(n);
   const pStr = await showPrompt('Prezzo', 'Prezzo del prodotto (€):', 'Es: 7.00', '5.00');
-  if (pStr === null) return; const p = parseFloat(pStr.replace(',', '.'));
+  if (pStr === null) return; 
+  const p = parseFloat(pStr.replace(',', '.'));
   if (isNaN(p) || p < 0) { showToast('❌ Prezzo non valido'); return; }
   const dStr = await showPrompt('Descrizione', 'Descrizione (🇮🇹 opzionale):', 'Es: Pomodoro, mozzarella, basilico', '');
   const desc = dStr ? sanitize(dStr) : '';
@@ -1455,15 +1742,21 @@ async function addProduct(c) {
   try {
     await db.ref('menu').set(appData.menu);
     showToast('✅ Prodotto aggiunto! Clicca "Traduci" per le traduzioni automatiche.');
-    renderMenu(); populatePromoProductSelect(); notifyClients();
+    renderMenu(); 
+    populatePromoProductSelect(); 
+    notifyClients();
   } catch(e) { showToast('❌ Errore salvataggio'); }
 }
 
 async function deleteProduct(c, i) {
   const ok = await showConfirm('Eliminare Prodotto?', 'Questa azione non può essere annullata.');
   if (!ok) return;
-  appData.menu[c].splice(i, 1); db.ref('menu').set(appData.menu);
-  showToast('🗑️ Eliminato'); renderMenu(); populatePromoProductSelect(); notifyClients();
+  appData.menu[c].splice(i, 1); 
+  db.ref('menu').set(appData.menu);
+  showToast('🗑️ Eliminato'); 
+  renderMenu(); 
+  populatePromoProductSelect(); 
+  notifyClients();
 }
 
 function updateProduct(c, i, f, v) {
@@ -1474,55 +1767,105 @@ function updateProduct(c, i, f, v) {
 }
 
 async function compressImage(file) {
-  try { const options = { maxSizeMB: 0.15, maxWidthOrHeight: 800, useWebWorker: true, fileType: 'image/webp' }; return await imageCompression(file, options); } catch (e) { return file; }
+  try { 
+    const options = { maxSizeMB: 0.15, maxWidthOrHeight: 800, useWebWorker: true, fileType: 'image/webp' }; 
+    return await imageCompression(file, options); 
+  } catch (e) { return file; }
 }
 
 async function uploadProductImage(cat, idx, input) {
-  const file = input.files[0]; if (!file) return; showToast('🗜️ Compressione...');
+  const file = input.files[0]; 
+  if (!file) return; 
+  showToast('🗜️ Compressione...');
   try {
     const compressed = await compressImage(file);
-    const fileName = `products/${cat}_${idx}_${Date.now()}.webp`; const storageRef = storage.ref(fileName);
-    showToast('📤 Caricamento...'); const snapshot = await storageRef.put(compressed); const url = await snapshot.ref.getDownloadURL();
-    appData.menu[cat][idx].img = url; await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
-    showToast('✅ Foto caricata!'); renderMenu(); notifyClients();
+    const fileName = `products/${cat}_${idx}_${Date.now()}.webp`; 
+    const storageRef = storage.ref(fileName);
+    showToast('📤 Caricamento...'); 
+    const snapshot = await storageRef.put(compressed); 
+    const url = await snapshot.ref.getDownloadURL();
+    appData.menu[cat][idx].img = url; 
+    await db.ref('menu/' + cat + '/' + idx + '/img').set(url);
+    showToast('✅ Foto caricata!'); 
+    renderMenu(); 
+    notifyClients();
   } catch (err) { showToast('❌ Errore: ' + err.message); }
 }
 
 async function removeProductImage(cat, idx) {
-  const ok = await showConfirm('Rimuovere Foto?', 'La foto verrà eliminata definitivamente.'); if (!ok) return;
-  delete appData.menu[cat][idx].img; db.ref('menu/' + cat + '/' + idx + '/img').remove();
-  showToast('🗑️ Foto rimossa'); renderMenu(); notifyClients();
+  const ok = await showConfirm('Rimuovere Foto?', 'La foto verrà eliminata definitivamente.');
+  if (!ok) return;
+  delete appData.menu[cat][idx].img; 
+  db.ref('menu/' + cat + '/' + idx + '/img').remove();
+  showToast('🗑️ Foto rimossa'); 
+  renderMenu(); 
+  notifyClients();
 }
 
 async function uploadHeroImage(input) {
-  if (!input.files[0]) return; showToast('🗜️ Compressione...');
+  if (!input.files[0]) return; 
+  showToast('🗜️ Compressione...');
   try {
     const compressed = await compressImage(input.files[0]);
-    const reader = new FileReader(); reader.onload = e => { document.getElementById('heroPreview').src = e.target.result; document.getElementById('heroPreview').style.display = 'block'; }; reader.readAsDataURL(compressed);
-    showToast('📤 Caricamento...'); const r = await storage.ref('images/hero_' + Date.now()).put(compressed); const u = await r.ref.getDownloadURL();
-    appData.images.hero = u; await db.ref('images/hero').set(u); showToast('✅ Salvata'); notifyClients();
+    const reader = new FileReader(); 
+    reader.onload = e => { 
+      document.getElementById('heroPreview').src = e.target.result; 
+      document.getElementById('heroPreview').style.display = 'block'; 
+    }; 
+    reader.readAsDataURL(compressed);
+    showToast('📤 Caricamento...'); 
+    const r = await storage.ref('images/hero_' + Date.now()).put(compressed); 
+    const u = await r.ref.getDownloadURL();
+    appData.images.hero = u; 
+    await db.ref('images/hero').set(u); 
+    showToast('✅ Salvata'); 
+    notifyClients();
   } catch(err) { showToast('❌ Errore: ' + err.message); }
 }
 
-function loadCategoryImageInput() { document.getElementById('categoryImageArea').style.display = document.getElementById('categorySelect').value ? 'block' : 'none'; }
+function loadCategoryImageInput() { 
+  document.getElementById('categoryImageArea').style.display = document.getElementById('categorySelect').value ? 'block' : 'none'; 
+}
 
 async function uploadCategoryImage(input) {
-  const c = document.getElementById('categorySelect').value; if (!c || !input.files[0]) return; showToast('🗜️ Compressione...');
+  const c = document.getElementById('categorySelect').value; 
+  if (!c || !input.files[0]) return; 
+  showToast('🗜️ Compressione...');
   try {
     const compressed = await compressImage(input.files[0]);
-    const reader = new FileReader(); reader.onload = e => { document.getElementById('catPreview').src = e.target.result; document.getElementById('catPreview').style.display = 'block'; }; reader.readAsDataURL(compressed);
-    showToast('📤 Caricamento...'); const r = await storage.ref('images/cat_' + c + '_' + Date.now()).put(compressed); const u = await r.ref.getDownloadURL();
-    appData.images.categories[c] = u; await db.ref('images/categories/' + c).set(u); showToast('✅ Salvata'); notifyClients();
+    const reader = new FileReader(); 
+    reader.onload = e => { 
+      document.getElementById('catPreview').src = e.target.result; 
+      document.getElementById('catPreview').style.display = 'block'; 
+    }; 
+    reader.readAsDataURL(compressed);
+    showToast('📤 Caricamento...'); 
+    const r = await storage.ref('images/cat_' + c + '_' + Date.now()).put(compressed); 
+    const u = await r.ref.getDownloadURL();
+    appData.images.categories[c] = u; 
+    await db.ref('images/categories/' + c).set(u); 
+    showToast('✅ Salvata'); 
+    notifyClients();
   } catch(err) { showToast('❌ Errore: ' + err.message); }
 }
 
-// 🚨 cycleManualStatus: salva SUBITO lo stato al click (niente più rimbalzo su "Auto")
 function cycleManualStatus() {
   const e = document.getElementById('manualStatusToggle'), l = document.getElementById('manualStatusLabel');
   let newMs;
-  if (!e.classList.contains('on') && !e.classList.contains('closed')) { e.classList.add('on'); l.textContent = 'APERTO'; newMs = 'open'; }
-  else if (e.classList.contains('on')) { e.classList.remove('on'); e.classList.add('closed'); l.textContent = 'CHIUSO'; newMs = 'closed'; }
-  else { e.classList.remove('closed'); l.textContent = 'Auto'; newMs = 'auto'; }
+  if (!e.classList.contains('on') && !e.classList.contains('closed')) { 
+    e.classList.add('on'); 
+    l.textContent = 'APERTO'; 
+    newMs = 'open'; 
+  } else if (e.classList.contains('on')) { 
+    e.classList.remove('on'); 
+    e.classList.add('closed'); 
+    l.textContent = 'CHIUSO'; 
+    newMs = 'closed'; 
+  } else { 
+    e.classList.remove('closed'); 
+    l.textContent = 'Auto'; 
+    newMs = 'auto'; 
+  }
   appData.settings.manualStatus = newMs;
   db.ref('settings/manualStatus').set(newMs).then(() => {
     showToast('✅ Stato: ' + (newMs === 'open' ? 'APERTO' : newMs === 'closed' ? 'CHIUSO' : 'AUTO'));
@@ -1544,7 +1887,8 @@ function saveHours() {
 }
 
 function renderDrivers(data) {
-  driversList = data; const list = document.getElementById('driversList');
+  driversList = data; 
+  const list = document.getElementById('driversList');
   list.innerHTML = Object.entries(data).map(([p, n]) => {
     const phone = data[p + '_phone'] || '';
     return `<div class="driver-row" data-pin="${p}" style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -1558,7 +1902,9 @@ function renderDrivers(data) {
 }
 
 function addDriverRow() {
-  const list = document.getElementById('driversList'); const r = document.createElement('div'); r.className = 'driver-row';
+  const list = document.getElementById('driversList'); 
+  const r = document.createElement('div'); 
+  r.className = 'driver-row';
   r.style.cssText = 'background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;';
   r.innerHTML = '<input type="text" class="driver-name" placeholder="Nome" style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><input type="text" class="driver-pin" placeholder="PIN" maxlength="6" style="flex:1; min-width:80px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><input type="tel" class="driver-phone" placeholder="📱 +39 333..." style="flex:2; min-width:150px; padding:8px; border-radius:6px; border:1px solid var(--gold-dark); background:var(--card); color:var(--cream);"><button class="btn-whatsapp" onclick="sendWhatsAppToDriver(this.parentElement.dataset.pin)"><i class="fab fa-whatsapp"></i> WhatsApp</button><button class="btn-delete" onclick="this.parentElement.remove()" style="background:#f87171; color:white; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>';
   list.appendChild(r);
@@ -1566,46 +1912,71 @@ function addDriverRow() {
 
 function sendWhatsAppToDriver(pin) {
   const driverRow = document.querySelector(`.driver-row[data-pin="${pin}"]`);
-  const phoneInput = driverRow.querySelector('.driver-phone'); const nameInput = driverRow.querySelector('.driver-name');
-  const phone = phoneInput.value.trim().replace(/\D/g, ''); const name = nameInput.value.trim();
+  const phoneInput = driverRow.querySelector('.driver-phone'); 
+  const nameInput = driverRow.querySelector('.driver-name');
+  const phone = phoneInput.value.trim().replace(/\D/g, ''); 
+  const name = nameInput.value.trim();
   if (!phone) { showToast('⚠️ Inserisci il numero di telefono'); phoneInput.focus(); return; }
   if (phone.length < 10) { showToast('⚠️ Numero di telefono non valido'); return; }
   const message = `🍕 *Antica Pizzeria Grasso*\n\nCiao ${name || 'Fattorino'}!\nC'è un nuovo ordine disponibile.\n\nApri l'app per accettare! 🛵`;
   const formattedPhone = phone.startsWith('39') ? phone : '39' + phone;
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
   db.ref('drivers/' + pin + '_phone').set(phone);
-  const link = document.createElement('a'); link.href = whatsappUrl; link.target = '_blank'; link.rel = 'noopener noreferrer';
-  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  const link = document.createElement('a'); 
+  link.href = whatsappUrl; 
+  link.target = '_blank'; 
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link); 
+  link.click(); 
+  document.body.removeChild(link);
   showToast('📱 Apertura WhatsApp...');
 }
 
 function saveDrivers() {
-  const dl = {}; let err = false; const pins = new Set(); const adminPin = appData.settings.adminPin || "1234";
+  const dl = {}; 
+  let err = false; 
+  const pins = new Set(); 
+  const adminPin = appData.settings.adminPin || "1234";
   document.querySelectorAll('.driver-row').forEach(r => {
-    const n = sanitize(r.querySelector('.driver-name').value); const p = r.querySelector('.driver-pin').value.trim(); const phone = r.querySelector('.driver-phone').value.trim();
+    const n = sanitize(r.querySelector('.driver-name').value); 
+    const p = r.querySelector('.driver-pin').value.trim(); 
+    const phone = r.querySelector('.driver-phone').value.trim();
     if (!n || !p) { showToast('⚠️ Compila nome e PIN'); err = true; return; }
     if (!/^\d{4,6}$/.test(p)) { showToast('⚠️ PIN deve essere 4-6 cifre'); err = true; return; }
     if (pins.has(p)) { showToast('⚠️ PIN duplicato tra fattorini: ' + p); err = true; return; }
     if (p === adminPin) { showToast('⚠️ PIN duplicato con admin'); err = true; return; }
-    pins.add(p); dl[p] = n; if (phone) dl[p + '_phone'] = phone;
+    pins.add(p); 
+    dl[p] = n; 
+    if (phone) dl[p + '_phone'] = phone;
   });
   if (err) return;
   if (!Object.keys(dl).length) { showToast('⚠️ Aggiungi almeno 1 fattorino'); return; }
-  db.ref('drivers').set(dl).then(() => { showToast('✅ Fattorini salvati'); driversList = dl; notifyClients(); }).catch(err => showToast('❌ Errore: ' + err.message));
+  db.ref('drivers').set(dl).then(() => { 
+    showToast('✅ Fattorini salvati'); 
+    driversList = dl; 
+    notifyClients(); 
+  }).catch(err => showToast('❌ Errore: ' + err.message));
 }
 
 async function changePin() {
-  const cp = document.getElementById('currentPin').value; const np = document.getElementById('newPin').value.trim(); const cf = document.getElementById('confirmPin').value;
+  const cp = document.getElementById('currentPin').value; 
+  const np = document.getElementById('newPin').value.trim(); 
+  const cf = document.getElementById('confirmPin').value;
   if (!cp) { showToast("⚠️ Inserisci PIN attuale"); return; }
   if (!np) { showToast("⚠️ Inserisci nuovo PIN"); return; }
   if (!cf) { showToast("⚠️ Conferma nuovo PIN"); return; }
   if (np !== cf) { showToast("❌ I PIN non coincidono"); return; }
   if (!/^\d{4,}$/.test(np)) { showToast("⚠️ Minimo 4 cifre"); return; }
   try {
-    const snapshot = await db.ref('settings/adminPin').once('value'); const currentPin = snapshot.val() || "1234";
+    const snapshot = await db.ref('settings/adminPin').once('value'); 
+    const currentPin = snapshot.val() || "1234";
     if (cp !== currentPin) { showToast("❌ PIN attuale errato"); return; }
-    await db.ref('settings/adminPin').set(np); appData.settings.adminPin = np;
-    showToast("✅ PIN cambiato"); document.getElementById('currentPin').value = ''; document.getElementById('newPin').value = ''; document.getElementById('confirmPin').value = '';
+    await db.ref('settings/adminPin').set(np); 
+    appData.settings.adminPin = np;
+    showToast("✅ PIN cambiato"); 
+    document.getElementById('currentPin').value = ''; 
+    document.getElementById('newPin').value = ''; 
+    document.getElementById('confirmPin').value = '';
   } catch(err) { showToast('❌ Errore: ' + err.message); }
 }
 
@@ -1621,8 +1992,14 @@ const palettes = {
 
 function renderPalettes() {
   const grid = document.getElementById('paletteGrid');
-  grid.innerHTML = Object.entries(palettes).map(([name, p]) => { const c = p.colors; return `<div class="palette-item" onclick="changePalette('${name}')" style="background:linear-gradient(135deg, ${c.gold} 0%, ${c.dark} 100%);" data-palette="${name}"><i class="fas ${p.icon}"></i>${name.replace('_', ' ')}</div>`; }).join('');
-  db.ref('settings/colorPalette').once('value').then(s => { const current = s.val() || 'autunno'; document.querySelector(`[data-palette="${current}"]`)?.classList.add('selected'); });
+  grid.innerHTML = Object.entries(palettes).map(([name, p]) => { 
+    const c = p.colors; 
+    return `<div class="palette-item" onclick="changePalette('${name}')" style="background:linear-gradient(135deg, ${c.gold} 0%, ${c.dark} 100%);" data-palette="${name}"><i class="fas ${p.icon}"></i>${name.replace('_', ' ')}</div>`; 
+  }).join('');
+  db.ref('settings/colorPalette').once('value').then(s => { 
+    const current = s.val() || 'autunno'; 
+    document.querySelector(`[data-palette="${current}"]`)?.classList.add('selected'); 
+  });
 }
 
 async function changePalette(name) {
@@ -1631,33 +2008,60 @@ async function changePalette(name) {
     await db.ref('settings/colorPalette').set(name);
     document.querySelectorAll('.palette-item').forEach(p => p.classList.remove('selected'));
     document.querySelector(`[data-palette="${name}"]`)?.classList.add('selected');
-    applyPalette(name); showToast('✅ Palette aggiornata!'); notifyClients();
+    applyPalette(name); 
+    showToast('✅ Palette aggiornata!'); 
+    notifyClients();
   } catch(e) { showToast('❌ Errore salvataggio'); }
 }
 
 function applyCurrentPalette() {
-  const current = appData.settings.colorPalette || 'autunno'; applyPalette(current);
+  const current = appData.settings.colorPalette || 'autunno'; 
+  applyPalette(current);
   document.querySelectorAll('.palette-item').forEach(p => p.classList.remove('selected'));
   document.querySelector(`[data-palette="${current}"]`)?.classList.add('selected');
 }
 
 function applyPalette(name) {
-  const palette = palettes[name]; if (!palette) return; const c = palette.colors; const root = document.documentElement;
-  root.style.setProperty('--gold', c.gold); root.style.setProperty('--gold-light', c.goldLight); root.style.setProperty('--gold-dark', c.goldDark);
-  root.style.setProperty('--dark', c.dark); root.style.setProperty('--brown', c.brown); root.style.setProperty('--brown-light', c.brownLight);
-  root.style.setProperty('--card', c.card); root.style.setProperty('--card-light', c.cardLight); root.style.setProperty('--cream', c.cream);
+  const palette = palettes[name]; 
+  if (!palette) return; 
+  const c = palette.colors; 
+  const root = document.documentElement;
+  root.style.setProperty('--gold', c.gold); 
+  root.style.setProperty('--gold-light', c.goldLight); 
+  root.style.setProperty('--gold-dark', c.goldDark);
+  root.style.setProperty('--dark', c.dark); 
+  root.style.setProperty('--brown', c.brown); 
+  root.style.setProperty('--brown-light', c.brownLight);
+  root.style.setProperty('--card', c.card); 
+  root.style.setProperty('--card-light', c.cardLight); 
+  root.style.setProperty('--cream', c.cream);
 }
 
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+function showToast(msg) { 
+  const t = document.getElementById('toast'); 
+  t.textContent = msg; 
+  t.classList.add('show'); 
+  setTimeout(() => t.classList.remove('show'), 2500); 
+}
 
 async function resetOrderCounter() {
   const ok = await showConfirm('⚠️ SEI SICURO?\n\nIl contatore ordini verrà azzerato.\nIl prossimo ordine sarà ORD-00001.');
   if (!ok) return;
-  try { await db.ref('counter/ordini').set(0); showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001'); notifyClients(); } catch(e) { showToast('❌ Errore: ' + e.message); }
+  try { 
+    await db.ref('counter/ordini').set(0); 
+    showToast('✅ Contatore azzerato! Prossimo ordine: ORD-00001'); 
+    notifyClients(); 
+  } catch(e) { showToast('❌ Errore: ' + e.message); }
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) { setTimeout(() => { if (!document.body || document.body.innerHTML.trim() === '') { window.location.reload(); } }, 500); }
+  if (!document.hidden) { 
+    setTimeout(() => { 
+      if (!document.body || document.body.innerHTML.trim() === '') { 
+        window.location.reload(); 
+      } 
+    }, 500); 
+  }
 });
 </script>
 </body>
