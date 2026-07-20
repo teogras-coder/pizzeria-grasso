@@ -94,6 +94,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .order-actions button { flex: 1; min-width: 80px; padding: 10px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
 .order-reject-message { margin-top: 8px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 6px; color: #fca5a5; font-size: 0.8rem; border-left: 3px solid #ef4444; }
 .order-reject-message strong { color: #ef4444; }
+.btn-accept { background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%); color: #052e16; box-shadow: 0 3px 0 #16a34a; }
 .btn-preparing { background: #fbbf24; color: var(--dark); }
 .btn-ready { background: #4ade80; color: var(--dark); }
 .btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
@@ -139,6 +140,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-empty i { font-size: 3rem; margin-bottom: 15px; }
 .orders-group-title { background: var(--gold-dark); color: var(--dark); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; margin: 15px 0 8px; display: flex; align-items: center; gap: 8px; }
 .orders-group-title.new { background: #f87171; color: white; }
+.orders-group-title.accettato { background: #4ade80; color: #052e16; }
 .orders-group-title.preparing { background: #fbbf24; color: var(--dark); }
 .orders-group-title.delayed { background: #f59e0b; color: white; }
 .orders-group-title.ready { background: #4ade80; color: var(--dark); }
@@ -328,7 +330,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       <div class="content-header">
         <div>
           <h1><i class="fas fa-receipt"></i> Ordini in Tempo Reale</h1>
-          <div class="subtitle">Il fattorino accetta → Tu prepari → Fattorino ritira e consegna</div>
+          <div class="subtitle">Accetta → Prepara → Pronto → Consegna</div>
         </div>
         <div class="header-actions">
           <button class="btn-secondary" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci</button>
@@ -336,6 +338,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
       </div>
       <div class="stats-row">
         <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">Nuovi</div></div>
+        <div class="stat-card"><div class="number" id="statAccettati">0</div><div class="label">✅ Accettati</div></div>
         <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">In Prep</div></div>
         <div class="stat-card"><div class="number" id="statDelayed">0</div><div class="label">In Ritardo</div></div>
         <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">Pronti</div></div>
@@ -863,12 +866,21 @@ function setupOptimizedListeners() {
     if (oldStatus !== order.status) {
       renderOrders(ordersCache);
       const orderId = order.orderId || order.id;
-      if (order.status === 'preparing' && oldStatus === 'new') { playAdminNotification(); showToast(`🛵 ${order.assignedName || 'Fattorino'} ha accettato l'ordine ${orderId}`); }
-      else if (order.status === 'delayed' && oldStatus !== 'delayed') { playAdminNotification(); const delayMinutes = order.delayMinutes || 10; showToast(`⏰ Ordine ${orderId} segnato come in ritardo (${delayMinutes} min)!`); }
-      else if (order.status === 'ready' && oldStatus === 'preparing') { playAdminNotification(); showToast(`✅ Ordine ${orderId} pronto!`); }
-      else if (order.status === 'picked' && oldStatus === 'ready') { playAdminNotification(); showToast(`📦 Fattorino ha ritirato l'ordine ${orderId}`); }
-      else if (order.status === 'delivered' && oldStatus === 'delivering') { playAdminNotification(); showToast(`🎉 Ordine ${orderId} consegnato!`); }
-      else if (order.status === 'annullato' && oldStatus !== 'annullato') { showToast(`🗑️ Ordine ${orderId} ANNULLATO dal cliente`); }
+      if (order.status === 'accettato' && oldStatus === 'new') {
+        playAdminNotification();
+        showToast(`✅ Ordine ${orderId} ACCETTATO!`);
+      } else if (order.status === 'preparing' && oldStatus === 'accettato') {
+        playAdminNotification();
+        showToast(`🍕 Ordine ${orderId} in preparazione`);
+      } else if (order.status === 'delayed' && oldStatus !== 'delayed') {
+        playAdminNotification(); const delayMinutes = order.delayMinutes || 10; showToast(`⏰ Ordine ${orderId} segnato come in ritardo (${delayMinutes} min)!`);
+      } else if (order.status === 'ready' && oldStatus === 'preparing') {
+        playAdminNotification(); showToast(`✅ Ordine ${orderId} pronto!`);
+      } else if (order.status === 'picked' && oldStatus === 'ready') {
+        playAdminNotification(); showToast(`📦 Fattorino ha ritirato l'ordine ${orderId}`);
+      } else if (order.status === 'delivered' && oldStatus === 'delivering') {
+        playAdminNotification(); showToast(`🎉 Ordine ${orderId} consegnato!`);
+      } else if (order.status === 'annullato' && oldStatus !== 'annullato') { showToast(`🗑️ Ordine ${orderId} ANNULLATO dal cliente`); }
       else if (order.status === 'rifiutato' && oldStatus !== 'rifiutato') { showToast(`❌ Ordine ${orderId} RIFIUTATO dalla pizzeria`); }
     }
   });
@@ -893,17 +905,33 @@ function showSection(name, el) {
   if (name === 'promotions') populatePromoProductSelect();
 }
 
+// ==== 🔥 FUNZIONE ACCETTA ORDINE ====
+async function accettaOrdine(id) {
+  const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
+  if (!ok) return;
+  db.ref('ordini/' + id).update({ 
+    status: 'accettato', 
+    accettatoIl: Date.now()
+  }).then(() => {
+    showToast('✅ Ordine accettato!');
+    renderOrders(ordersCache);
+    notifyClients();
+  });
+}
+
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
-  const gruppi = { new: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [], annullati: [], rifiutati: [] };
+  const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [], annullati: [], rifiutati: [] };
   Object.entries(orders || {}).forEach(([id, o]) => {
     const st = o.status || 'new';
     if (st === 'annullato') gruppi.annullati.push([id, o]);
     else if (st === 'rifiutato') gruppi.rifiutati.push([id, o]);
     else if (gruppi[st]) gruppi[st].push([id, o]);
+    else gruppi.new.push([id, o]);
   });
   Object.keys(gruppi).forEach(k => { gruppi[k].sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0)); });
   document.getElementById('statNew').textContent = gruppi.new.length;
+  document.getElementById('statAccettati').textContent = gruppi.accettato.length;
   document.getElementById('statPreparing').textContent = gruppi.preparing.length;
   document.getElementById('statDelayed').textContent = gruppi.delayed.length;
   document.getElementById('statReady').textContent = gruppi.ready.length;
@@ -912,7 +940,7 @@ function renderOrders(orders) {
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
   document.getElementById('statAnnullati').textContent = gruppi.annullati.length;
   document.getElementById('statRifiutati').textContent = gruppi.rifiutati.length;
-  const activeOrders = gruppi.new.length + gruppi.preparing.length + gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
+  const activeOrders = gruppi.new.length + gruppi.accettato.length + gruppi.preparing.length + gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + gruppi.delivering.length;
   const totalOrders = activeOrders + gruppi.delivered.length + gruppi.annullati.length + gruppi.rifiutati.length;
   const deliveredOrders = gruppi.delivered.length;
   document.getElementById('dashboardActiveOrders').textContent = activeOrders;
@@ -924,9 +952,9 @@ function renderOrders(orders) {
   if (!attivi && !gruppi.delivered.length && !gruppi.annullati.length && !gruppi.rifiutati.length) {
     list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox"></i><p>Nessun ordine</p></div>'; return;
   }
-  const titoli = { new: '🆕 Nuovi (in attesa fattorino)', preparing: '🍕 In Preparazione', delayed: '⏰ In Ritardo', ready: '✅ Pronti (ritiro fattorino)', picked: '📦 Ritirati dal fattorino', delivering: '🛵 In Consegna', delivered: '🎉 Consegnati' };
+  const titoli = { new: '🆕 Nuovi (in attesa)', accettato: '✅ ACCETTATO', preparing: '🍕 In Preparazione', delayed: '⏰ In Ritardo', ready: '✅ Pronti (ritiro fattorino)', picked: '📦 Ritirati dal fattorino', delivering: '🛵 In Consegna', delivered: '🎉 Consegnati' };
   let html = '';
-  ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
+  ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
     if (!gruppi[stato].length) return;
     html += '<div class="orders-group-title ' + stato + '">' + titoli[stato] + ' (' + gruppi[stato].length + ')</div>';
     html += '<div class="orders-grid">' + renderOrderCards(gruppi[stato]) + '</div>';
@@ -959,10 +987,15 @@ function renderOrderCards(ordersList, tipo = '') {
       else if (o.motivoAnnullamento) motivoMessage = '<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ' + sanitize(o.motivoAnnullamento) + '</div>';
     } else {
       const st = o.status || 'new';
-      if (st === 'new') ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      else if (st === 'preparing') ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      else if (st === 'delayed') ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
-      else if (st === 'ready') { const isPickup = o.type === 'pickup'; ah = isPickup ? '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' : '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>'; }
+      if (st === 'new') {
+        ah = '<button class="btn-accept" onclick="accettaOrdine(\''+id+'\')">✅ Accetta</button><button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'accettato') {
+        ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'preparing') {
+        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'delayed') {
+        ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+      } else if (st === 'ready') { const isPickup = o.type === 'pickup'; ah = isPickup ? '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' : '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>'; }
       else if (st === 'picked') ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>';
       else if (st === 'delivering') ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>';
       else ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
@@ -981,7 +1014,9 @@ function toggleAccordion(tipo) { accordionState[tipo] = !accordionState[tipo]; r
 
 function updateOrderStatus(id, st, orderType) {
   if (st === 'delivered' && orderType !== 'pickup') { showToast('Solo il fattorino può confermare la consegna!'); return; }
-  db.ref('ordini/' + id + '/status').set(st); showToast('✅ Aggiornato');
+  db.ref('ordini/' + id + '/status').set(st);
+  showToast('✅ Aggiornato a: ' + st);
+  notifyClients();
 }
 
 async function setOrderDelayed(id) {
@@ -991,13 +1026,14 @@ async function setOrderDelayed(id) {
   if (!Number.isInteger(minutes) || minutes <= 0 || minutes % 10 !== 0) { showToast('⚠️ Inserisci un valore valido, multiplo di 10'); return; }
   await db.ref('ordini/' + id).update({ status: 'delayed', delayMinutes: minutes, delayedAt: Date.now(), delayUntil: Date.now() + (minutes * 60 * 1000) });
   showToast(`⏰ Ritardo impostato a ${minutes} minuti`);
+  notifyClients();
 }
 
 async function rifiutaOrdine(id) {
     const motivo = await showPrompt('Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
     if (motivo === null) return;
     if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
-    db.ref('ordini/' + id).update({ status: 'rifiutato', motivoRifiuto: sanitize(motivo), timestampRifiuto: Date.now(), stampato: true }).then(() => { showToast('❌ Ordine rifiutato'); renderOrders(ordersCache); });
+    db.ref('ordini/' + id).update({ status: 'rifiutato', motivoRifiuto: sanitize(motivo), timestampRifiuto: Date.now(), stampato: true }).then(() => { showToast('❌ Ordine rifiutato'); renderOrders(ordersCache); notifyClients(); });
 }
 
 async function deleteOrder(id) {
