@@ -539,6 +539,10 @@ let currentUser=null,currentLang='it',userType='none',cart=[],orderType='deliver
 let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null;
 let orderStatusListeners={},ordersData={};
 let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:{}};
+let settingsListener=null;
+let lastSettingsHash=null;
+let orderPollingInterval=null;
+const ORDER_POLL_MS=30000;
 
 // ─── TRADUZIONI ────────────────────────────────────────────────────────────
 function t(key){return(translations[currentLang]&&translations[currentLang][key])||translations.it[key]||key}
@@ -584,7 +588,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const lang=detectBrowserLanguage();currentLang=lang;document.getElementById('langSelect').value=lang;applyTranslations();
     document.getElementById('categoriesSkeletons').style.display='grid';
     const hasCache = localStorage.getItem('cacheTimestamp') !== null;
-    if (hasCache && loadFromCache()) { console.log('📦 Usata cache'); }
+    if (hasCache && loadFromCache()) { console.log('📦 Usata cache locale, controllo aggiornamenti in background...'); }
     else { console.log('📡 Primo caricamento da Firebase...'); forceUpdateFromServer(); }
     initApp();
     firebase.auth().onAuthStateChanged(u=>{if(u){currentUser=u;userType='registered';localStorage.setItem('grasso_user_type','registered');hideWelcomeScreen();updateUIForLoggedInUser(u)}else showWelcomeScreen()});
@@ -595,108 +599,124 @@ function initApp() {
     try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
     setupFloatingCartDrag();
     if (!localStorage.getItem('cacheTimestamp')) loadFromCache();
-    setupVersionListener();      // menu/dati: 1 controllo all'avvio, niente polling
-    setupVisibilityListener();   // riallinea al ritorno in primo piano + gestisce il canale emergenza
-    startEmergencyPolling();     // 🚨 canale emergenza (stato/consegna/ritiro) attivo a schermo aperto
+    setupVersionListener();
+    setupVisibilityListener();
+    startSettingsListener();
     loadReviewsPublic();
     renderMyOrders();
-    startOrderStatusTracking();  // ordini: listener SOLO su ordini attivi
+    startOrderStatusTracking();
     controllaRifiutiCliente();
     applyPaletteFromFirebase();
     setInterval(updateStatusBanner, 30000);
 }
 
-// 🔥 MENU/DATI = 1 controllo all'avvio. NIENTE polling, NIENTE listener fissi.
-// Il menu completo si riscarica SOLO se tu, da admin, hai cambiato qualcosa
-// (bump di appVersion). L'apertura fa solo un controllo leggerissimo del numerino.
-function setupVersionListener() {
-    checkForUpdates();
+// ─── SETTINGS LISTENER (UNICO WEBSOCKET PERSISTENTE) ──────────────────────
+function startSettingsListener() {
+    if (settingsListener) return;
+    settingsListener = db.ref('settings').on('value', snap => {
+        if (!snap.exists()) return;
+        const newSettings = snap.val();
+        const prev = appData.settings || {};
+        const newHash = JSON.stringify({
+            ms: newSettings.manualStatus,
+            de: newSettings.deliveryEnabled,
+            pe: newSettings.pickupEnabled,
+            av: newSettings.appVersion
+        });
+        if (newHash === lastSettingsHash) return;
+        lastSettingsHash = newHash;
+        const changedStatus = newSettings.manualStatus !== prev.manualStatus;
+        const changedDelivery = newSettings.deliveryEnabled !== prev.deliveryEnabled;
+        const changedPickup = newSettings.pickupEnabled !== prev.pickupEnabled;
+        const changedVersion = newSettings.appVersion !== prev.appVersion;
+        appData.settings = { ...appData.settings, ...newSettings };
+        try { localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); } catch(e) {}
+        if (changedStatus && prev.manualStatus !== undefined) {
+            updateStatusBanner();
+            const isOpen = checkIfOpen();
+            showToast(isOpen ? '🟢 Ora siamo APERTI' : '🔴 Ora siamo CHIUSI');
+            playNotificationSound();
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+        if (changedDelivery || changedPickup) {
+            if (document.getElementById('cartModal').classList.contains('active')) openCart();
+            if (changedDelivery) {
+                showToast(newSettings.deliveryEnabled !== false ? '🛵 Consegna ATTIVATA' : '🚫 Consegna DISATTIVATA');
+            }
+            if (changedPickup) {
+                showToast(newSettings.pickupEnabled !== false ? '🏪 Ritiro ATTIVATO' : '🚫 Ritiro DISATTIVATO');
+            }
+        }
+        if (changedVersion && prev.appVersion !== undefined) {
+            console.log('🔄 Nuova versione rilevata:', newSettings.appVersion);
+            forceUpdateFromServer().then(() => { showToast(t('app_updated')); });
+        }
+    }, error => {
+        console.error('Errore listener settings:', error);
+        setTimeout(() => { stopSettingsListener(); startSettingsListener(); }, 5000);
+    });
 }
+
+function stopSettingsListener() {
+    if (settingsListener) {
+        db.ref('settings').off('value', settingsListener);
+        settingsListener = null;
+        lastSettingsHash = null;
+    }
+}
+
+// ─── VERSION LISTENER ──────────────────────────────────────────────────────
+function setupVersionListener() { checkForUpdates(); }
 
 async function checkForUpdates() {
     try {
         const snapshot = await db.ref('settings/appVersion').once('value');
         const newVersion = snapshot.val() || 0;
-        const cachedVersion = localStorage.getItem('appVersion') || 0;
-        if (parseInt(newVersion) > parseInt(cachedVersion)) {
+        const cachedVersion = parseInt(localStorage.getItem('appVersion')) || 0;
+        if (newVersion > cachedVersion) {
             console.log('🔄 Nuova versione rilevata, aggiorno...');
-            forceUpdateFromServer();
+            await forceUpdateFromServer();
+            return true;
         }
-    } catch(e) { console.log('Offline o errore controllo versione'); }
+        return false;
+    } catch(e) { console.log('Offline o errore controllo versione'); return false; }
 }
 
 async function forceUpdateFromServer() {
     try {
-        const [menu, categories, promotions, settings, images, branding] = await Promise.all([
-            db.ref('menu').once('value'), db.ref('categories').once('value'),
-            db.ref('promotions').once('value'), db.ref('settings').once('value'),
-            db.ref('images').once('value'), db.ref('branding').once('value')
+        const [menuSnap, catsSnap, promosSnap, settingsSnap, imagesSnap, brandingSnap] = await Promise.all([
+            db.ref('menu').once('value'),
+            db.ref('categories').once('value'),
+            db.ref('promotions').once('value'),
+            db.ref('settings').once('value'),
+            db.ref('images').once('value'),
+            db.ref('branding').once('value')
         ]);
-        if (menu.exists()) { appData.menu = menu.val(); localStorage.setItem('menuCache', JSON.stringify(appData.menu)); }
-        if (categories.exists()) { appData.categories = categories.val(); localStorage.setItem('categoriesCache', JSON.stringify(appData.categories)); }
-        if (promotions.exists()) { appData.promotions = promotions.val(); localStorage.setItem('promoCache', JSON.stringify(appData.promotions)); }
-        if (settings.exists()) { appData.settings = settings.val(); localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); }
-        if (images.exists()) { appData.images = images.val(); localStorage.setItem('imagesCache', JSON.stringify(appData.images)); }
-        if (branding.exists()) { appData.branding = branding.val(); localStorage.setItem('brandingCache', JSON.stringify(appData.branding)); }
+        if (menuSnap.exists()) { appData.menu = menuSnap.val(); localStorage.setItem('menuCache', JSON.stringify(appData.menu)); }
+        if (catsSnap.exists()) { appData.categories = catsSnap.val(); localStorage.setItem('categoriesCache', JSON.stringify(appData.categories)); }
+        if (promosSnap.exists()) { appData.promotions = promosSnap.val(); localStorage.setItem('promoCache', JSON.stringify(appData.promotions)); }
+        if (settingsSnap.exists()) { appData.settings = { ...appData.settings, ...settingsSnap.val() }; localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); }
+        if (imagesSnap.exists()) { appData.images = imagesSnap.val(); localStorage.setItem('imagesCache', JSON.stringify(appData.images)); }
+        if (brandingSnap.exists()) { appData.branding = brandingSnap.val(); localStorage.setItem('brandingCache', JSON.stringify(appData.branding)); }
         const appVersion = await db.ref('settings/appVersion').once('value');
         localStorage.setItem('appVersion', appVersion.val() || 0);
         localStorage.setItem('cacheTimestamp', Date.now());
         showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); updateStatusBanner(); updateFooter(); applyPaletteFromFirebase();
-        showToast(t('app_updated'));
+        if (currentSearchCat) renderProductList(currentSearchCat, document.getElementById('productSearch')?.value || '');
+        console.log('✅ Dati aggiornati alla versione:', appVersion.val());
     } catch(e) { console.error('❌ Errore aggiornamento:', e); }
 }
 
-// 🔥🚨 CANALE DI EMERGENZA: tiene allineati STATO aperto/chiuso, CONSEGNA e RITIRO
-// anche a chi ha l'app GIÀ APERTA, entro ~2 secondi. Usa SOLO .once() (letture lampo),
-// quindi NON tocca il limite delle 100 connessioni. In BACKGROUND è SPENTO (zero consumo).
-let emergencyInterval = null;
-const EMERGENCY_MS = 2000; // 2s = minimo consigliato (a 1s il modem resta acceso quasi in continuo a schermo aperto)
-
-function startEmergencyPolling() {
-    stopEmergencyPolling();
-    if (document.hidden) return;                 // non partire se l'app è in tasca
-    checkLiveFlags();                            // allinea subito
-    emergencyInterval = setInterval(checkLiveFlags, EMERGENCY_MS);
-}
-function stopEmergencyPolling() {
-    if (emergencyInterval) { clearInterval(emergencyInterval); emergencyInterval = null; }
-}
-async function checkLiveFlags() {
-    if (document.hidden) return;                 // in tasca non chiamo nulla
-    try {
-        const snap = await db.ref('settings').once('value');
-        if (!snap.exists()) return;
-        const s = snap.val() || {};
-        const cur = appData.settings || {};
-        const newMs = (s.manualStatus !== undefined) ? s.manualStatus : cur.manualStatus;
-        const newDe = (s.deliveryEnabled !== undefined) ? s.deliveryEnabled : cur.deliveryEnabled;
-        const newPe = (s.pickupEnabled !== undefined) ? s.pickupEnabled : cur.pickupEnabled;
-        const changedStatus = (newMs !== cur.manualStatus);
-        const changedDe = (newDe !== cur.deliveryEnabled);
-        const changedPe = (newPe !== cur.pickupEnabled);
-        if (!changedStatus && !changedDe && !changedPe) return;   // nessuna emergenza → non faccio nulla
-        appData.settings.manualStatus = newMs;
-        appData.settings.deliveryEnabled = newDe;
-        appData.settings.pickupEnabled = newPe;
-        try { localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); } catch(e) {}
-        updateStatusBanner();
-        if (changedStatus) { showToast(checkIfOpen() ? '🟢 Ora siamo APERTI' : '🔴 Ora siamo CHIUSI'); }
-        if ((changedDe || changedPe) && document.getElementById('cartModal').classList.contains('active')) {
-            openCart();   // ridisegna consegna/ritiro nel carrello già aperto
-        }
-    } catch(e) { /* offline o errore: riprovo al prossimo giro */ }
-}
-
-// 🔥 al ritorno sull'app, riallinea tutto; in tasca SPEGNE il canale emergenza
+// ─── VISIBILITY LISTENER ──────────────────────────────────────────────────
 function setupVisibilityListener() {
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
+            startSettingsListener();
             checkForUpdates();
-            checkLiveFlags();
             startOrderStatusTracking();
-            startEmergencyPolling();
         } else {
-            stopEmergencyPolling();
+            stopSettingsListener();
+            stopOrderStatusTracking();
         }
     });
 }
@@ -706,6 +726,10 @@ function loadFromCache() {
     try {
         const cacheTime = localStorage.getItem('cacheTimestamp');
         if (!cacheTime) { console.log('📦 Nessuna cache trovata'); return false; }
+        if (Date.now() - parseInt(cacheTime) > 7 * 24 * 60 * 60 * 1000) {
+            console.log('📦 Cache troppo vecchia, ricarico');
+            return false;
+        }
         console.log('📦 Usando cache locale');
         const cachedMenu = localStorage.getItem('menuCache'); if (cachedMenu) appData.menu = JSON.parse(cachedMenu);
         const cachedCats = localStorage.getItem('categoriesCache'); if (cachedCats) appData.categories = JSON.parse(cachedCats);
@@ -715,8 +739,9 @@ function loadFromCache() {
         const cachedSettings = localStorage.getItem('settingsCache'); if (cachedSettings) appData.settings = JSON.parse(cachedSettings);
         if (Object.keys(appData.categories).length === 0 && Object.keys(appData.menu).length === 0) { console.log('⚠️ Cache vuota'); return false; }
         showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); updateStatusBanner(); updateFooter();
+        console.log('📦 Cache caricata, versione:', appData.settings?.appVersion || 'unknown');
         return true;
-    } catch(e) { console.log('Cache errore:', e); return false; }
+    } catch(e) { console.error('Cache errore:', e); return false; }
 }
 
 function updateFooter() { const footerInfo = document.getElementById('footerInfo'); if (footerInfo) { const city = appData.branding?.city || "Manfredonia"; const phone = appData.settings?.visiblePhone || "0884660377"; footerInfo.innerHTML = `${city} • Tel. <span id="footerPhone">${phone}</span>`; } }
@@ -769,7 +794,7 @@ function filterProducts(term){if(currentSearchCat)renderProductList(currentSearc
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat=''}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
 
-// ─── STATUS (non si blocca più su "auto") ────────────────────────
+// ─── STATUS ──────────────────────────────────────────────────────────────
 function checkIfOpen(){
     const s = appData.settings || {};
     if(s.manualStatus === 'open') return true;
@@ -796,9 +821,8 @@ function computeDeliveryFee(dist){const bf=parseFloat(appData.settings.deliveryB
 function updateDeliveryFeeDisplay(fee,dist,oor,we){const fr=document.getElementById('deliveryFeeRow'),fv=document.getElementById('deliveryFeeValue'),di=document.getElementById('distanceInfo'),dt=document.getElementById('distanceText'),cb=document.getElementById('checkoutBtn');if(oor){fr.style.display='none';di.style.display='block';dt.textContent='📍 Fuori dal raggio di consegna';dt.style.color='#ef4444';if(cb)cb.disabled=true}else{fr.style.display='flex';fv.textContent='€'+fee.toFixed(2);di.style.display=dist!==null?'block':'none';if(dist!==null){dt.textContent=we?`📍 ${dist.toFixed(1)} km (+supplemento)`:`📍 ${dist.toFixed(1)} km`;dt.style.color=we?'#fbbf24':'#3498db'}if(cb)cb.disabled=false}let tot=0;cart.forEach(i=>{if(i.isPromo)tot+=i.totalPrice;else tot+=(i.price*i.qty)});document.getElementById('totalAmount').textContent='€'+(oor?tot:tot+fee).toFixed(2)}
 function updateCartTotals(){let tot=0;cart.forEach(i=>{if(i.isPromo)tot+=i.totalPrice;else tot+=(i.price*i.qty)});if(orderType==='delivery'&&appData.settings.deliveryEnabled!==false&&cart.length>0){if(window.customerGPSLat&&window.customerGPSLng&&appData.settings.pizzeriaLat&&appData.settings.pizzeriaLng){const d=calculateDistance(appData.settings.pizzeriaLat,appData.settings.pizzeriaLng,window.customerGPSLat,window.customerGPSLng);const{fee,outOfRange,withExtra}=computeDeliveryFee(d);updateDeliveryFeeDisplay(fee,d,outOfRange,withExtra)}else{const{fee}=computeDeliveryFee(null);updateDeliveryFeeDisplay(fee,null,false,false)}}else{document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';document.getElementById('totalAmount').textContent='€'+tot.toFixed(2)}}
 
-// 🔥 MODIFICATA: ora blocca la selezione se disabilitato
+// ─── ORDER TYPE ────────────────────────────────────────────────────────────
 function selectOrderType(typ){
-    // 🔥 BLOCCA LA SELEZIONE SE DISABILITATO
     if(typ === 'delivery' && appData.settings.deliveryEnabled === false){
         showToast(t('no_delivery'));
         return;
@@ -807,12 +831,10 @@ function selectOrderType(typ){
         showToast(t('no_pickup'));
         return;
     }
-    
     orderType = typ;
     document.getElementById('typeDelivery').classList.toggle('active', typ === 'delivery');
     document.getElementById('typePickup').classList.toggle('active', typ === 'pickup');
     document.getElementById('timeTypeLabel').textContent = typ === 'delivery' ? t('delivery_short') : t('pickup_short');
-    
     if(typ === 'delivery'){
         document.getElementById('addressGroup').style.display = 'block';
     } else {
@@ -829,7 +851,6 @@ function selectTimeMode(m){timeMode=m;document.getElementById('timeAsap').classL
 function setupMinTime(){const i=document.getElementById('scheduledTime'),n=new Date();n.setMinutes(Math.ceil(n.getMinutes()/5)*5,0,0);if(!i.value)i.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`}
 async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
 
-// 🔥 MODIFICATA: controllo corretto per opzioni disabilitate
 function openCart(){
     const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
     if(!cart.length){
@@ -859,40 +880,28 @@ function openCart(){
         const de = appData.settings.deliveryEnabled !== false;
         const pe = appData.settings.pickupEnabled !== false;
         
-        // Applica classe disabled alle opzioni
         document.getElementById('typeDelivery').classList.toggle('disabled', !de);
         document.getElementById('typePickup').classList.toggle('disabled', !pe);
         
-        // 🔥🔥🔥 CONTROLLO CORRETTO: se l'opzione attiva è disabilitata, cambia automaticamente
         if(!de && !pe){
-            // Entrambi disabilitati → disabilita pulsante
             document.getElementById('checkoutBtn').disabled = true;
             document.getElementById('checkoutBtn').innerHTML = '🚫 Servizio non disponibile';
             document.getElementById('typeDelivery').classList.remove('active');
             document.getElementById('typePickup').classList.remove('active');
         } else if(!de && orderType === 'delivery'){
-            // Delivery disabilitato e attivo → passa a Pickup
             selectOrderType('pickup');
         } else if(!pe && orderType === 'pickup'){
-            // Pickup disabilitato e attivo → passa a Delivery
             selectOrderType('delivery');
         } else {
-            // Nessun problema, mantieni l'opzione attuale
             document.getElementById('checkoutBtn').disabled = false;
             document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order');
-            
-            // Assicura che l'opzione attiva sia evidenziata
             document.getElementById('typeDelivery').classList.toggle('active', orderType === 'delivery');
             document.getElementById('typePickup').classList.toggle('active', orderType === 'pickup');
-            
-            // Se entrambi sono disponibili ma nessuno è attivo (caso raro), attiva delivery
             if(!document.getElementById('typeDelivery').classList.contains('active') && 
                !document.getElementById('typePickup').classList.contains('active')){
                 selectOrderType('delivery');
             }
         }
-        
-        // Aggiorna UI per l'indirizzo
         if(orderType === 'delivery' && de){
             document.getElementById('addressGroup').style.display = 'block';
         } else {
@@ -904,8 +913,6 @@ function openCart(){
                 window.customerGPSLng = null;
             }
         }
-        
-        // Aggiorna totale
         updateCartTotals();
     }
     m.classList.add('active');
@@ -916,6 +923,60 @@ function closeCart(){document.getElementById('cartModal').classList.remove('acti
 // ─── PROMOZIONI ────────────────────────────────────────────────────────────
 function addPromoToCart(promoId){const promo=appData.promotions[promoId];if(!promo){showToast(t('promo_unavailable'));return;}if(promo.currentUses>=promo.maxUses){showToast(t('promo_exhausted'));return;}const existing=cart.find(item=>item.isPromo&&item.promoId===promoId);if(existing){if(!confirm(t('add_another_promo')))return;const idx=cart.indexOf(existing);cart.splice(idx,1);db.ref('promotions/'+promoId+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));}const totalPrice=promo.products.reduce((sum,p)=>sum+(p.price*p.qty),0);cart.push({isPromo:true,promoId:promoId,promoTitle:promo.title,products:promo.products,totalPrice:totalPrice});db.ref('promotions/'+promoId+'/currentUses').transaction(v=>(v||0)+1);updateCartBadge();showToast(`🎁 ${promo.title} aggiunta!`);if(document.getElementById('cartModal').classList.contains('active'))openCart();}
 async function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){const pid=cart[i].promoId;db.ref('promotions/'+pid+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));cart.splice(i,1);updateCartBadge();openCart();showToast(t('promo_removed'));}}
+
+// ─── ORDER TRACKING (POLLING OTTIMIZZATO) ─────────────────────────────────
+function stopOrderStatusTracking() {
+    if (orderPollingInterval) {
+        clearInterval(orderPollingInterval);
+        orderPollingInterval = null;
+    }
+}
+
+function isOrderActive(status, type) {
+    if (!status) return true;
+    if (['delivered','rifiutato','annullato'].includes(status)) return false;
+    if (type === 'pickup' && status === 'picked') return false;
+    return true;
+}
+
+function startOrderStatusTracking() {
+    stopOrderStatusTracking();
+    const lo = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+    const activeOrders = lo.filter(o => {
+        if (!o.orderId) return false;
+        return isOrderActive(o.status, o.type);
+    });
+    if (!activeOrders.length) { updateNavLiveDot(false); return; }
+    pollOrderStatuses(activeOrders);
+    orderPollingInterval = setInterval(() => {
+        const freshLo = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
+        const freshActive = freshLo.filter(o => {
+            if (!o.orderId) return false;
+            return isOrderActive(o.status, o.type);
+        });
+        if (!freshActive.length) { stopOrderStatusTracking(); updateNavLiveDot(false); return; }
+        pollOrderStatuses(freshActive);
+    }, ORDER_POLL_MS);
+}
+
+async function pollOrderStatuses(orders) {
+    for (const o of orders) {
+        try {
+            const snap = await db.ref('ordini')
+                .orderByChild('orderId')
+                .equalTo(o.orderId)
+                .once('value');
+            snap.forEach(child => {
+                const d = child.val();
+                if (d) {
+                    updateLocalOrderStatus(o.orderId, d.status, d.motivoRifiuto || d.motivoAnnullamento, d.delayMinutes);
+                }
+            });
+        } catch(e) {}
+    }
+}
+
+function updateLocalOrderStatus(oid,ns,mr,delayMinutes){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let ch=false;o=o.map(x=>{if(x.orderId===oid){const prevDelay=x.delayMinutes;const nextDelay=delayMinutes??prevDelay;const changed=x.status!==ns||(ns==='delayed'&&prevDelay!==nextDelay);if(changed){ch=true;x.status=ns;x.delayMinutes=nextDelay;if((ns==='rifiutato'||ns==='annullato')&&mr){if(ns==='rifiutato')x.motivoRifiuto=mr;else x.motivoAnnullamento=mr;}const sn={'accettato':t('accettato'),'preparing':t('preparing'),'delayed':'⏰ Ordine in ritardo','ready':t('ready'),'picked':t('picked'),'delivering':t('delivering'),'delivered':t('delivered'),'rifiutato':'❌ Ordine rifiutato','annullato':'🗑️ Ordine annullato'};if(sn[ns]){if(ns==='delayed'){const message=nextDelay?`⏰ Ordine in ritardo (${nextDelay} min)`:'⏰ Ordine in ritardo';showToast(message);playNotificationSound();if(navigator.vibrate)navigator.vibrate([250,80,250]);if('Notification' in window&&Notification.permission==='granted'){new Notification('⏰ Ritardo ordine',{body:message,icon:'https://i.imgur.com/nWLqs68.png'});}}else{showToast(sn[ns]);}if(ns==='delivering'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([200,100,200]);}if(ns==='rifiutato'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500]);mostraModalRifiuto(mr||'La pizzeria non può accettare il tuo ordine.');}if(ns==='annullato'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([300,200,300]);}}}}return x;});if(ch){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld();}}catch(e){console.log('Errore aggiornamento stato:',e);}}
 
 // ─── INVIO ORDINE ──────────────────────────────────────────────────────────
 async function confirmAndSendOrder(){
@@ -979,45 +1040,7 @@ function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementByI
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
 function loadReviewsPublic(){db.ref('recensioni').orderByChild('status').equalTo('approved').limitToLast(10).once('value',s=>{const rv=[];let totalApproved=0;db.ref('recensioni').orderByChild('status').equalTo('approved').once('value',countSnap=>{totalApproved=countSnap.numChildren()||0;s.forEach(c=>{const r=c.val();rv.push({id:c.key,...r});});rv.sort((a,b)=>b.timestamp-a.timestamp);const l=document.getElementById('reviewsPublicList');if(!l)return;if(!rv.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}const maxToShow=5,recensioniDaMostrare=rv.slice(0,maxToShow),rimanenti=totalApproved-maxToShow;let html=`<div style="text-align:center;margin-bottom:20px;padding:15px;background:rgba(212,168,75,0.1);border-radius:12px;border:1px solid rgba(212,168,75,0.3);"><div style="color:var(--gold);font-size:1.8rem;font-weight:700;">⭐ ${totalApproved}</div><div style="color:var(--cream);font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Recensioni totali</div></div>`;html+=recensioniDaMostrare.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`}).join('');if(rimanenti>0){html+=`<div style="text-align:center;color:#8a7a5a;padding:20px;font-size:0.9rem;font-weight:600;"><i class="fas fa-chevron-down"></i> ...e altre ${rimanenti} recensioni</div>`;}l.innerHTML=html;});})}
 
-// 🔥 ORDINI = listener SOLO su ordini attivi, auto-distacco
-function isOrderActive(status, type) {
-    if (!status) return true;
-    if (['delivered','rifiutato','annullato'].includes(status)) return false;
-    if (type === 'pickup' && status === 'picked') return false;
-    return true;
-}
-
-function startOrderStatusTracking() {
-    try {
-        Object.keys(orderStatusListeners).forEach(id => { try { orderStatusListeners[id].off('value'); } catch(e) {} });
-        orderStatusListeners = {};
-        const lo = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-        if (!lo.length) return;
-        lo.forEach(o => {
-            if (!o.orderId) return;
-            if (!isOrderActive(o.status, o.type)) return;
-            const q = db.ref('ordini').orderByChild('orderId').equalTo(o.orderId);
-            orderStatusListeners[o.orderId] = q;
-            q.on('value', s => {
-                s.forEach(c => {
-                    const d = c.val();
-                    if (d) {
-                        ordersData[c.key] = d;
-                        updateLocalOrderStatus(o.orderId, d.status, d.motivoRifiuto || d.motivoAnnullamento, d.delayMinutes);
-                        if (!isOrderActive(d.status, o.type)) {
-                            try { q.off('value'); } catch(e) {}
-                            delete orderStatusListeners[o.orderId];
-                        }
-                    }
-                });
-            });
-        });
-    } catch(e) { console.log('Errore tracking:', e); }
-}
-
-function updateLocalOrderStatus(oid,ns,mr,delayMinutes){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');let ch=false;o=o.map(x=>{if(x.orderId===oid){const prevDelay=x.delayMinutes;const nextDelay=delayMinutes??prevDelay;const changed=x.status!==ns||(ns==='delayed'&&prevDelay!==nextDelay);if(changed){ch=true;x.status=ns;x.delayMinutes=nextDelay;if((ns==='rifiutato'||ns==='annullato')&&mr){if(ns==='rifiutato')x.motivoRifiuto=mr;else x.motivoAnnullamento=mr;}const sn={'accettato':t('accettato'),'preparing':t('preparing'),'delayed':'⏰ Ordine in ritardo','ready':t('ready'),'picked':t('picked'),'delivering':t('delivering'),'delivered':t('delivered'),'rifiutato':'❌ Ordine rifiutato','annullato':'🗑️ Ordine annullato'};if(sn[ns]){if(ns==='delayed'){const message=nextDelay?`⏰ Ordine in ritardo (${nextDelay} min)`:'⏰ Ordine in ritardo';showToast(message);playNotificationSound();if(navigator.vibrate)navigator.vibrate([250,80,250]);if('Notification' in window&&Notification.permission==='granted'){new Notification('⏰ Ritardo ordine',{body:message,icon:'https://i.imgur.com/nWLqs68.png'});}}else{showToast(sn[ns]);}if(ns==='delivering'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([200,100,200]);}if(ns==='rifiutato'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500]);mostraModalRifiuto(mr||'La pizzeria non può accettare il tuo ordine.');}if(ns==='annullato'){playNotificationSound();if(navigator.vibrate)navigator.vibrate([300,200,300]);}}}}return x;});if(ch){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld();}}catch(e){console.log('Errore aggiornamento stato:',e);}}
-
-// ─── CONTROLLO RIFIUTI (una tantum, .once) ─────────────────────
+// ─── CONTROLLO RIFIUTI ──────────────────────────────────────────────────
 function controllaRifiutiCliente(){try{const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).once('value').then(s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})}).catch(e=>console.log("Errore controllo rifiuti", e));}catch(e){}}
 
 // ─── UTILITY ──────────────────────────────────────────────────────────────
