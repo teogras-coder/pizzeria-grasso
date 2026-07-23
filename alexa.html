@@ -2,32 +2,307 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>📋 Ordini - Pizzeria</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
-  /* Stile essenziale - scuro e leggibile */
-  body { background: #1a1209; color: #f5e6c8; font-family: sans-serif; padding: 10px; margin: 0; }
-  .order { background: #2a1e13; border-left: 4px solid #d4a84b; padding: 12px; margin-bottom: 10px; border-radius: 8px; }
-  .order.new { border-left-color: #ff6b6b; }
-  .order.accettato { border-left-color: #4ade80; }
-  .order-header { display: flex; justify-content: space-between; font-weight: bold; }
-  .order-items { font-size: 0.9rem; color: #a08b6d; margin: 5px 0; }
-  .order-total { color: #d4a84b; font-weight: bold; }
-  .badge { background: #ff6b6b; color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.7rem; }
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #d4a84b; color: #1a1209; padding: 15px 25px; border-radius: 10px; font-weight: bold; opacity: 0; transition: 0.3s; }
-  .toast.show { opacity: 1; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { 
+  background: #1a1209; 
+  color: #f5e6c8; 
+  font-family: 'Segoe UI', sans-serif; 
+  padding: 10px; 
+  padding-bottom: 100px;
+  min-height: 100vh;
+}
+h1 { 
+  color: #d4a84b; 
+  font-size: 1.8rem; 
+  margin-bottom: 10px; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  border-bottom: 2px solid rgba(212,168,75,0.3);
+  padding-bottom: 10px;
+}
+h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 6px;
+  margin-bottom: 15px;
+}
+.stat-card {
+  background: #2a1e13;
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid rgba(212,168,75,0.2);
+}
+.stat-card .number { font-size: 1.2rem; font-weight: 700; color: #d4a84b; }
+.stat-card .label { font-size: 0.55rem; color: #8a7a5a; text-transform: uppercase; }
+.stat-card.annullati .number { color: #f87171; }
+.stat-card.rifiutati .number { color: #ef4444; }
+.stat-card.delivered .number { color: #60a5fa; }
+.order-card {
+  background: #2a1e13;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #d4a84b;
+  border: 1px solid rgba(212,168,75,0.15);
+}
+.order-card.new { border-left-color: #ff6b6b; }
+.order-card.accettato { border-left-color: #4ade80; }
+.order-card.preparing { border-left-color: #fbbf24; }
+.order-card.delayed { border-left-color: #f59e0b; }
+.order-card.ready { border-left-color: #4ade80; }
+.order-card.picked { border-left-color: #8b5cf6; }
+.order-card.delivering { border-left-color: #ec4899; }
+.order-card.delivered { border-left-color: #60a5fa; opacity: 0.7; }
+.order-card.annullati { border-left-color: #f87171; opacity: 0.7; }
+.order-card.rifiutati { border-left-color: #ef4444; opacity: 0.7; }
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.order-id { color: #d4a84b; font-weight: 700; font-size: 0.95rem; }
+.order-id .status-badge {
+  font-size: 0.55rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.order-id .status-badge.annullato { background: rgba(248,113,113,0.2); color: #f87171; }
+.order-id .status-badge.rifiutato { background: rgba(239,68,68,0.2); color: #ef4444; }
+.order-time { color: #8a7a5a; font-size: 0.7rem; }
+.order-customer { font-weight: 600; margin-bottom: 3px; font-size: 0.9rem; }
+.order-details { color: #a08b6d; font-size: 0.8rem; margin-bottom: 5px; }
+.order-items { background: rgba(0,0,0,0.2); border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; }
+.order-items div { padding: 2px 0; }
+.order-total { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 10px; }
+.order-total span:last-child { color: #d4a84b; font-size: 1rem; }
+.order-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.order-actions button {
+  flex: 1;
+  min-width: 60px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.order-reject-message {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(239,68,68,0.1);
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 0.75rem;
+  border-left: 3px solid #ef4444;
+}
+.btn-accept { background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%); color: #052e16; }
+.btn-preparing { background: #fbbf24; color: #1a1209; }
+.btn-ready { background: #4ade80; color: #052e16; }
+.btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
+.btn-delete { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3) !important; }
+.btn-picked { background: #8b5cf6; color: white; }
+.btn-delivering { background: #ec4899; color: white; }
+.btn-delivered { background: #60a5fa; color: white; }
+.orders-empty { text-align: center; color: #8a7a5a; padding: 40px 20px; }
+.orders-empty i { font-size: 3rem; margin-bottom: 15px; display: block; }
+.toast { 
+  position: fixed; 
+  bottom: 20px; 
+  left: 50%; 
+  transform: translateX(-50%) translateY(100px); 
+  background: #2a1e13; 
+  color: #d4a84b; 
+  padding: 12px 20px; 
+  border-radius: 10px; 
+  font-weight: 600; 
+  z-index: 9999; 
+  opacity: 0; 
+  transition: all 0.3s; 
+  border: 1px solid rgba(212,168,75,0.3);
+  max-width: 90%;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.orders-group-title {
+  background: #d4a84b;
+  color: #1a1209;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin: 12px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.orders-group-title.new { background: #ff6b6b; color: white; }
+.orders-group-title.accettato { background: #4ade80; color: #052e16; }
+.orders-group-title.preparing { background: #fbbf24; color: #1a1209; }
+.orders-group-title.delayed { background: #f59e0b; color: white; }
+.orders-group-title.ready { background: #4ade80; color: #052e16; }
+.orders-group-title.picked { background: #8b5cf6; color: white; }
+.orders-group-title.delivering { background: #ec4899; color: white; }
+.orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
+.orders-accordion {
+  background: #2a1e13;
+  border-radius: 10px;
+  margin: 10px 0 6px;
+  border: 1px solid rgba(212,168,75,0.2);
+  overflow: hidden;
+}
+.orders-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.orders-accordion-header .accordion-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.orders-accordion-header .accordion-left .count {
+  background: rgba(255,255,255,0.15);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+}
+.orders-accordion-header .accordion-arrow { transition: transform 0.3s; font-size: 0.7rem; color: #8a7a5a; }
+.orders-accordion.open .accordion-arrow { transform: rotate(180deg); }
+.orders-accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding: 0 14px;
+}
+.orders-accordion.open .orders-accordion-body {
+  max-height: 2000px;
+  padding: 0 14px 14px;
+  overflow-y: auto;
+}
+.orders-accordion.annullati .orders-accordion-header { border-left: 4px solid #f87171; }
+.orders-accordion.rifiutati .orders-accordion-header { border-left: 4px solid #ef4444; }
+.orders-accordion-body .order-card { margin-bottom: 8px; }
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10001;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: #2a1e13;
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid rgba(212,168,75,0.25);
+}
+.modal-box h3 { color: #d4a84b; margin-bottom: 12px; }
+.modal-box p { color: #f5e6c8; margin-bottom: 15px; line-height: 1.5; }
+.modal-box input, .modal-box textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #b8860b;
+  background: #1a1209;
+  color: #f5e6c8;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  font-family: inherit;
+}
+.modal-box input:focus, .modal-box textarea:focus { outline: none; border-color: #d4a84b; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.modal-btn-confirm { background: linear-gradient(180deg, #d4a84b 0%, #b8860b 100%); color: #1a1209; }
+.modal-btn-cancel { background: #3d2b1a; color: #f5e6c8; border: 1px solid #b8860b !important; }
+.modal-btn-danger { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); color: white; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1a1209; }
+::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
 </style>
 </head>
 <body>
 
-<h1>🍕 ORDINI</h1>
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3 id="confirmTitle">Conferma</h3>
+    <p id="confirmText"></p>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" id="confirmBtnNo">Annulla</button>
+      <button class="modal-btn-danger" id="confirmBtnYes">Conferma</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="promptModal">
+  <div class="modal-box">
+    <h3 id="promptTitle">Inserisci</h3>
+    <p id="promptText"></p>
+    <input type="text" id="promptInput" placeholder="">
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" id="promptBtnNo">Annulla</button>
+      <button class="modal-btn-confirm" id="promptBtnYes">OK</button>
+    </div>
+  </div>
+</div>
+
+<h1>
+  🍕 ORDINI
+  <small id="clock">--:--</small>
+</h1>
+
+<div class="stats-row" id="statsRow">
+  <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">Nuovi</div></div>
+  <div class="stat-card"><div class="number" id="statAccettati">0</div><div class="label">Accettati</div></div>
+  <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">Prep</div></div>
+  <div class="stat-card"><div class="number" id="statDelayed">0</div><div class="label">Ritardo</div></div>
+  <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">Pronti</div></div>
+  <div class="stat-card"><div class="number" id="statPicked">0</div><div class="label">Ritirati</div></div>
+  <div class="stat-card"><div class="number" id="statDelivering">0</div><div class="label">Consegna</div></div>
+  <div class="stat-card delivered"><div class="number" id="statDelivered">0</div><div class="label">Consegnati</div></div>
+  <div class="stat-card annullati"><div class="number" id="statAnnullati">0</div><div class="label">Annullati</div></div>
+  <div class="stat-card rifiutati"><div class="number" id="statRifiutati">0</div><div class="label">Rifiutati</div></div>
+</div>
+
 <div id="ordersList"></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// Config Firebase (uguale al tuo)
+// ============================================================
+// FIREBASE CONFIG (LA TUA)
+// ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
   authDomain: "teogra-c8cf5.firebaseapp.com",
@@ -40,8 +315,28 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// 🎵 Suono per nuovi ordini
-function playSound() {
+// ============================================================
+// STATO
+// ============================================================
+let ordersCache = {};
+let accordionState = { annullati: false, rifiutati: false };
+let lastOrderIds = new Set();
+let notificationSound = null;
+
+// ============================================================
+// OROLOGIO
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============================================================
+// SUONO NOTIFICA
+// ============================================================
+function playNotificationSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
@@ -50,6 +345,7 @@ function playSound() {
     gain.connect(ctx.destination);
     osc.frequency.setValueAtTime(880, ctx.currentTime);
     osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
     gain.gain.setValueAtTime(0.3, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
     osc.start(ctx.currentTime);
@@ -57,23 +353,380 @@ function playSound() {
   } catch(e) {}
 }
 
-let lastOrderIds = new Set();
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-// 📡 Ascolta solo gli ordini
+// ============================================================
+// MODAL CONFERMA
+// ============================================================
+function showConfirm(title, message, isDanger = true) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirmModal');
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmText').textContent = message;
+    const yesBtn = document.getElementById('confirmBtnYes');
+    const noBtn = document.getElementById('confirmBtnNo');
+    yesBtn.className = isDanger ? 'modal-btn-danger' : 'modal-btn-confirm';
+    overlay.classList.add('active');
+    const cleanup = () => { overlay.classList.remove('active'); yesBtn.onclick = null; noBtn.onclick = null; };
+    yesBtn.onclick = () => { cleanup(); resolve(true); };
+    noBtn.onclick = () => { cleanup(); resolve(false); };
+  });
+}
+
+// ============================================================
+// MODAL PROMPT
+// ============================================================
+function showPrompt(title, message, placeholder = '', defaultValue = '') {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('promptModal');
+    const input = document.getElementById('promptInput');
+    document.getElementById('promptTitle').textContent = title;
+    document.getElementById('promptText').textContent = message;
+    input.placeholder = placeholder;
+    input.value = defaultValue;
+    overlay.classList.add('active');
+    setTimeout(() => input.focus(), 100);
+    const yesBtn = document.getElementById('promptBtnYes');
+    const noBtn = document.getElementById('promptBtnNo');
+    const cleanup = () => { overlay.classList.remove('active'); yesBtn.onclick = null; noBtn.onclick = null; };
+    yesBtn.onclick = () => { cleanup(); resolve(input.value); };
+    noBtn.onclick = () => { cleanup(); resolve(null); };
+    input.onkeypress = (e) => { if (e.key === 'Enter') { cleanup(); resolve(input.value); } };
+  });
+}
+
+// ============================================================
+// NOTIFICA AI CLIENTI (bump versione)
+// ============================================================
+function notifyClients() {
+  db.ref('settings/appVersion').transaction(v => (v || 0) + 1);
+}
+
+// ============================================================
+// AZIONI ORDINI (TUTTI I COMANDI)
+// ============================================================
+
+// ✅ ACCETTA
+async function accettaOrdine(id) {
+  const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
+  if (!ok) return;
+  db.ref('ordini/' + id).update({ 
+    status: 'accettato', 
+    accettatoIl: Date.now() 
+  }).then(() => {
+    showToast('✅ Ordine accettato!');
+    notifyClients();
+  });
+}
+
+// 🍕 PREPARA
+function preparaOrdine(id) {
+  db.ref('ordini/' + id + '/status').set('preparing');
+  showToast('🍕 In preparazione');
+  notifyClients();
+}
+
+// ✅ PRONTO
+function prontoOrdine(id) {
+  db.ref('ordini/' + id + '/status').set('ready');
+  showToast('✅ Ordine pronto!');
+  notifyClients();
+}
+
+// ⏰ RITARDO
+async function setOrderDelayed(id) {
+  const value = await showPrompt('⏰ Imposta ritardo', 'Minuti di attesa (multipli di 10):', 'Es: 20', '10');
+  if (value === null) return;
+  const minutes = parseInt(String(value).trim(), 10);
+  if (!Number.isInteger(minutes) || minutes <= 0 || minutes % 10 !== 0) { 
+    showToast('⚠️ Inserisci un valore valido, multiplo di 10'); 
+    return; 
+  }
+  db.ref('ordini/' + id).update({ 
+    status: 'delayed', 
+    delayMinutes: minutes, 
+    delayedAt: Date.now(), 
+    delayUntil: Date.now() + (minutes * 60 * 1000) 
+  }).then(() => {
+    showToast(`⏰ Ritardo impostato a ${minutes} minuti`);
+    notifyClients();
+  });
+}
+
+// ❌ RIFIUTA (con motivo)
+async function rifiutaOrdine(id) {
+  const motivo = await showPrompt('❌ Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
+  if (motivo === null) return;
+  if (!motivo.trim()) { showToast('⚠️ Scrivi un motivo'); return; }
+  db.ref('ordini/' + id).update({ 
+    status: 'rifiutato', 
+    motivoRifiuto: motivo.trim(), 
+    timestampRifiuto: Date.now() 
+  }).then(() => { 
+    showToast('❌ Ordine rifiutato'); 
+    notifyClients();
+  });
+}
+
+// 🗑️ ELIMINA
+async function deleteOrder(id) {
+  const ok = await showConfirm('🗑️ Eliminare Ordine?', 'Questa azione non può essere annullata.');
+  if (!ok) return;
+  if (ordersCache[id]) delete ordersCache[id];
+  db.ref('ordini/' + id).remove().then(() => {
+    showToast('🗑️ Eliminato');
+    notifyClients();
+  });
+}
+
+// 📦 RITIRATO (per pickup)
+function pickupRitirato(id) {
+  db.ref('ordini/' + id).update({ status: 'delivered', deliveredAt: Date.now() });
+  showToast('📦 Ritirato dal cliente');
+  notifyClients();
+}
+
+// 📦 RITIRATO DAL FATTORINO
+function pickedByDriver(id) {
+  db.ref('ordini/' + id + '/status').set('picked');
+  showToast('📦 Ritirato dal fattorino');
+  notifyClients();
+}
+
+// 🛵 IN CONSEGNA
+function startDelivery(id) {
+  db.ref('ordini/' + id + '/status').set('delivering');
+  showToast('🛵 In consegna');
+  notifyClients();
+}
+
+// 🎉 CONSEGNATO (solo per delivery)
+function consegnato(id) {
+  db.ref('ordini/' + id).update({ status: 'delivered', deliveredAt: Date.now() });
+  showToast('🎉 Consegna completata!');
+  notifyClients();
+}
+
+// ============================================================
+// RENDER ORDINI
+// ============================================================
+function renderOrders() {
+  const list = document.getElementById('ordersList');
+  const gruppi = { 
+    new: [], accettato: [], preparing: [], delayed: [], 
+    ready: [], picked: [], delivering: [], delivered: [], 
+    annullati: [], rifiutati: [] 
+  };
+  
+  Object.entries(ordersCache).forEach(([id, o]) => {
+    const st = o.status || 'new';
+    if (gruppi[st]) gruppi[st].push({ id, ...o });
+    else gruppi.new.push({ id, ...o });
+  });
+  
+  Object.keys(gruppi).forEach(k => {
+    gruppi[k].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  });
+
+  // Statistiche
+  document.getElementById('statNew').textContent = gruppi.new.length;
+  document.getElementById('statAccettati').textContent = gruppi.accettato.length;
+  document.getElementById('statPreparing').textContent = gruppi.preparing.length;
+  document.getElementById('statDelayed').textContent = gruppi.delayed.length;
+  document.getElementById('statReady').textContent = gruppi.ready.length;
+  document.getElementById('statPicked').textContent = gruppi.picked.length;
+  document.getElementById('statDelivering').textContent = gruppi.delivering.length;
+  document.getElementById('statDelivered').textContent = gruppi.delivered.length;
+  document.getElementById('statAnnullati').textContent = gruppi.annullati.length;
+  document.getElementById('statRifiutati').textContent = gruppi.rifiutati.length;
+
+  const totalActive = gruppi.new.length + gruppi.accettato.length + gruppi.preparing.length + 
+                      gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + 
+                      gruppi.delivering.length;
+
+  if (totalActive === 0 && gruppi.delivered.length === 0 && gruppi.annullati.length === 0 && gruppi.rifiutati.length === 0) {
+    list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-family:FontAwesome;">📭</i><p>Nessun ordine</p></div>';
+    return;
+  }
+
+  const titoli = { 
+    new: '🆕 NUOVI (in attesa)', 
+    accettato: '✅ ACCETTATI', 
+    preparing: '🍕 IN PREPARAZIONE', 
+    delayed: '⏰ IN RITARDO', 
+    ready: '✅ PRONTI (ritiro fattorino)', 
+    picked: '📦 RITIRATI DAL FATTORINO', 
+    delivering: '🛵 IN CONSEGNA', 
+    delivered: '🎉 CONSEGNATI' 
+  };
+  
+  let html = '';
+  ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
+    if (gruppi[stato].length === 0) return;
+    html += `<div class="orders-group-title ${stato}">${titoli[stato]} (${gruppi[stato].length})</div>`;
+    html += gruppi[stato].map(o => renderOrderCard(o)).join('');
+  });
+
+  // Annullati (accordion)
+  if (gruppi.annullati.length > 0) {
+    const isOpen = accordionState.annullati;
+    html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('annullati')">
+        <div class="accordion-left"><span>🗑️</span><span>ANNULLATI</span><span class="count">${gruppi.annullati.length}</span></div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down" style="font-family:FontAwesome;">▼</i></span>
+      </div>
+      <div class="orders-accordion-body">${gruppi.annullati.map(o => renderOrderCard(o, 'annullati')).join('')}</div>
+    </div>`;
+  }
+
+  // Rifiutati (accordion)
+  if (gruppi.rifiutati.length > 0) {
+    const isOpen = accordionState.rifiutati;
+    html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}">
+      <div class="orders-accordion-header" onclick="toggleAccordion('rifiutati')">
+        <div class="accordion-left"><span>❌</span><span>RIFIUTATI</span><span class="count">${gruppi.rifiutati.length}</span></div>
+        <span class="accordion-arrow"><i class="fas fa-chevron-down" style="font-family:FontAwesome;">▼</i></span>
+      </div>
+      <div class="orders-accordion-body">${gruppi.rifiutati.map(o => renderOrderCard(o, 'rifiutati')).join('')}</div>
+    </div>`;
+  }
+
+  list.innerHTML = html;
+}
+
+// ============================================================
+// RENDER SINGOLO ORDINE
+// ============================================================
+function renderOrderCard(o, tipo = '') {
+  const dt = new Date(o.timestamp || 0);
+  const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+  const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+  
+  const items = o.items && Array.isArray(o.items) ? 
+    o.items.map(i => `<div>${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('') : '';
+
+  let statusBadge = '', borderClass = 'new', extraClass = '';
+  
+  if (tipo === 'annullati') { 
+    statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; 
+    borderClass = 'annullati'; 
+    extraClass = 'annullati'; 
+  } else if (tipo === 'rifiutati') { 
+    statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; 
+    borderClass = 'rifiutati'; 
+    extraClass = 'rifiutati'; 
+  }
+
+  let actions = '';
+  let motivoMessage = '';
+
+  if (tipo === 'annullati' || tipo === 'rifiutati') {
+    actions = `<button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️ Elimina</button>`;
+    if (o.motivoRifiuto) {
+      motivoMessage = `<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ${o.motivoRifiuto}</div>`;
+    } else if (o.motivoAnnullamento) {
+      motivoMessage = `<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ${o.motivoAnnullamento}</div>`;
+    }
+  } else {
+    const st = o.status || 'new';
+    if (st === 'new') {
+      actions = `
+        <button class="btn-accept" onclick="accettaOrdine('${o.id}')">✅ Accetta</button>
+        <button class="btn-preparing" onclick="preparaOrdine('${o.id}')">🍕 Prep</button>
+        <button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${o.id}')">⏰ Ritardo</button>
+        <button class="btn-rifiuta" onclick="rifiutaOrdine('${o.id}')">❌ Rifiuta</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
+    } else if (st === 'accettato') {
+      actions = `
+        <button class="btn-preparing" onclick="preparaOrdine('${o.id}')">🍕 Prep</button>
+        <button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${o.id}')">⏰ Ritardo</button>
+        <button class="btn-rifiuta" onclick="rifiutaOrdine('${o.id}')">❌ Rifiuta</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
+    } else if (st === 'preparing' || st === 'delayed') {
+      actions = `
+        <button class="btn-ready" onclick="prontoOrdine('${o.id}')">✅ Pronto</button>
+        <button class="btn-rifiuta" onclick="rifiutaOrdine('${o.id}')">❌ Rifiuta</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
+    } else if (st === 'ready') {
+      if (o.type === 'pickup') {
+        actions = `
+          <button class="btn-picked" onclick="pickupRitirato('${o.id}')">📦 Ritirato</button>
+          <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+        `;
+      } else {
+        actions = `
+          <button class="btn-picked" onclick="pickedByDriver('${o.id}')">📦 Ritirato</button>
+          <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+        `;
+      }
+    } else if (st === 'picked') {
+      actions = `
+        <button class="btn-delivering" onclick="startDelivery('${o.id}')">🛵 In Consegna</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
+    } else if (st === 'delivering') {
+      actions = `
+        <button class="btn-delivered" onclick="consegnato('${o.id}')">🎉 Consegnato</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
+    } else if (st === 'delivered') {
+      actions = `<button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>`;
+    }
+  }
+
+  return `
+    <div class="order-card ${borderClass}">
+      <div class="order-header">
+        <span class="order-id">${o.orderId || o.id} ${statusBadge}</span>
+        <span class="order-time">${ds} ${ts}</span>
+      </div>
+      <div class="order-customer">${o.customerName || 'N/A'} - ${o.customerPhone || ''}</div>
+      <div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.address ? ' - ' + o.address : ''}${o.notes ? ' 📝 ' + o.notes : ''}</div>
+      <div class="order-items">${items}</div>
+      <div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div>
+      <div class="order-actions">${actions}</div>
+      ${motivoMessage}
+    </div>
+  `;
+}
+
+// ============================================================
+// ACCORDION
+// ============================================================
+function toggleAccordion(tipo) {
+  accordionState[tipo] = !accordionState[tipo];
+  renderOrders();
+}
+
+// ============================================================
+// ASCOLTO ORDINI IN TEMPO REALE
+// ============================================================
 db.ref('ordini')
   .orderByChild('timestamp')
   .limitToLast(50)
   .on('value', snapshot => {
-    const orders = [];
+    const newCache = {};
     const currentIds = new Set();
     
     snapshot.forEach(child => {
       const order = { id: child.key, ...child.val() };
-      orders.push(order);
+      newCache[child.key] = order;
       currentIds.add(child.key);
     });
 
-    // 🔔 Controlla se ci sono nuovi ordini (non visti prima)
+    // 🔔 Controlla nuovi ordini
     let newOrders = 0;
     currentIds.forEach(id => {
       if (!lastOrderIds.has(id)) {
@@ -81,78 +734,42 @@ db.ref('ordini')
       }
     });
     if (newOrders > 0) {
-      playSound();
+      playNotificationSound();
       showToast(`🆕 ${newOrders} nuovo/i ordine/i!`);
     }
     lastOrderIds = currentIds;
 
-    // 📋 Renderizza gli ordini (solo quelli attivi)
-    renderOrders(orders);
+    ordersCache = newCache;
+    renderOrders();
   });
 
-function renderOrders(orders) {
-  const list = document.getElementById('ordersList');
-  
-  // Filtra solo ordini attivi (escludi consegnati/annullati/rifiutati)
-  const attivi = orders.filter(o => 
-    !['delivered', 'annullato', 'rifiutato'].includes(o.status)
-  );
-  
-  if (attivi.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:40px;">📭 Nessun ordine in corso</p>';
-    return;
-  }
-
-  // Raggruppa per stato
-  const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [] };
-  attivi.forEach(o => {
-    const st = o.status || 'new';
-    if (gruppi[st]) gruppi[st].push(o);
-  });
-
-  // Ordina: prima i nuovi, poi gli altri
-  const ordineStati = ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering'];
-  let html = '';
-  ordineStati.forEach(stato => {
-    if (gruppi[stato].length === 0) return;
-    const titoli = {
-      new: '🆕 NUOVI',
-      accettato: '✅ ACCETTATI',
-      preparing: '🍕 IN PREPARAZIONE',
-      delayed: '⏰ IN RITARDO',
-      ready: '✅ PRONTI',
-      picked: '📦 RITIRATI',
-      delivering: '🛵 IN CONSEGNA'
-    };
-    html += `<h3 style="color:#d4a84b;margin:15px 0 5px;">${titoli[stato]} (${gruppi[stato].length})</h3>`;
-    gruppi[stato].forEach(o => {
-      html += `
-        <div class="order ${stato}">
-          <div class="order-header">
-            <span>${o.orderId || o.id}</span>
-            <span>${new Date(o.timestamp).toLocaleTimeString('it-IT')}</span>
-          </div>
-          <div><strong>${o.customerName || 'N/A'}</strong> - ${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}</div>
-          <div class="order-items">${(o.items || []).map(i => `${i.name} x${i.qty}`).join(', ')}</div>
-          <div class="order-total">€${(o.finalTotal || 0).toFixed(2)}</div>
-        </div>
-      `;
-    });
-  });
-
-  list.innerHTML = html;
-}
-
-// 🔥 KEEP-ALIVE (non invia dati a Firebase!)
+// ============================================================
+// 🔥 KEEP-ALIVE (NON invia dati a Firebase!)
+// ============================================================
 setInterval(() => {
   document.body.dispatchEvent(new Event('touchstart'));
+  window.scrollBy(0, 1);
+  window.scrollBy(0, -1);
 }, 30000);
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+// ============================================================
+// RICARICA SE LA PAGINA SI CONGELA
+// ============================================================
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    setTimeout(() => {
+      if (!document.body || document.body.innerHTML.trim() === '') {
+        window.location.reload();
+      }
+    }, 500);
+  }
+});
+
+// ============================================================
+// REGISTRA SERVICE WORKER (se esiste)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 </script>
 </body>
