@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 Ordini - Pizzeria</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+  /* Stile essenziale - scuro e leggibile */
+  body { background: #1a1209; color: #f5e6c8; font-family: sans-serif; padding: 10px; margin: 0; }
+  .order { background: #2a1e13; border-left: 4px solid #d4a84b; padding: 12px; margin-bottom: 10px; border-radius: 8px; }
+  .order.new { border-left-color: #ff6b6b; }
+  .order.accettato { border-left-color: #4ade80; }
+  .order-header { display: flex; justify-content: space-between; font-weight: bold; }
+  .order-items { font-size: 0.9rem; color: #a08b6d; margin: 5px 0; }
+  .order-total { color: #d4a84b; font-weight: bold; }
+  .badge { background: #ff6b6b; color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.7rem; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #d4a84b; color: #1a1209; padding: 15px 25px; border-radius: 10px; font-weight: bold; opacity: 0; transition: 0.3s; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>🍕 ORDINI</h1>
+<div id="ordersList"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Config Firebase (uguale al tuo)
+const firebaseConfig = {
+  apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
+  authDomain: "teogra-c8cf5.firebaseapp.com",
+  databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "teogra-c8cf5",
+  storageBucket: "teogra-c8cf5.firebasestorage.app",
+  messagingSenderId: "686300112893",
+  appId: "1:686300112893:web:e147b82f91374f12db1b94"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 🎵 Suono per nuovi ordini
+function playSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+let lastOrderIds = new Set();
+
+// 📡 Ascolta solo gli ordini
+db.ref('ordini')
+  .orderByChild('timestamp')
+  .limitToLast(50)
+  .on('value', snapshot => {
+    const orders = [];
+    const currentIds = new Set();
+    
+    snapshot.forEach(child => {
+      const order = { id: child.key, ...child.val() };
+      orders.push(order);
+      currentIds.add(child.key);
+    });
+
+    // 🔔 Controlla se ci sono nuovi ordini (non visti prima)
+    let newOrders = 0;
+    currentIds.forEach(id => {
+      if (!lastOrderIds.has(id)) {
+        newOrders++;
+      }
+    });
+    if (newOrders > 0) {
+      playSound();
+      showToast(`🆕 ${newOrders} nuovo/i ordine/i!`);
+    }
+    lastOrderIds = currentIds;
+
+    // 📋 Renderizza gli ordini (solo quelli attivi)
+    renderOrders(orders);
+  });
+
+function renderOrders(orders) {
+  const list = document.getElementById('ordersList');
+  
+  // Filtra solo ordini attivi (escludi consegnati/annullati/rifiutati)
+  const attivi = orders.filter(o => 
+    !['delivered', 'annullato', 'rifiutato'].includes(o.status)
+  );
+  
+  if (attivi.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:#8a7a5a;padding:40px;">📭 Nessun ordine in corso</p>';
+    return;
+  }
+
+  // Raggruppa per stato
+  const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [] };
+  attivi.forEach(o => {
+    const st = o.status || 'new';
+    if (gruppi[st]) gruppi[st].push(o);
+  });
+
+  // Ordina: prima i nuovi, poi gli altri
+  const ordineStati = ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering'];
+  let html = '';
+  ordineStati.forEach(stato => {
+    if (gruppi[stato].length === 0) return;
+    const titoli = {
+      new: '🆕 NUOVI',
+      accettato: '✅ ACCETTATI',
+      preparing: '🍕 IN PREPARAZIONE',
+      delayed: '⏰ IN RITARDO',
+      ready: '✅ PRONTI',
+      picked: '📦 RITIRATI',
+      delivering: '🛵 IN CONSEGNA'
+    };
+    html += `<h3 style="color:#d4a84b;margin:15px 0 5px;">${titoli[stato]} (${gruppi[stato].length})</h3>`;
+    gruppi[stato].forEach(o => {
+      html += `
+        <div class="order ${stato}">
+          <div class="order-header">
+            <span>${o.orderId || o.id}</span>
+            <span>${new Date(o.timestamp).toLocaleTimeString('it-IT')}</span>
+          </div>
+          <div><strong>${o.customerName || 'N/A'}</strong> - ${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}</div>
+          <div class="order-items">${(o.items || []).map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+          <div class="order-total">€${(o.finalTotal || 0).toFixed(2)}</div>
+        </div>
+      `;
+    });
+  });
+
+  list.innerHTML = html;
+}
+
+// 🔥 KEEP-ALIVE (non invia dati a Firebase!)
+setInterval(() => {
+  document.body.dispatchEvent(new Event('touchstart'));
+}, 30000);
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
