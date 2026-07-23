@@ -283,16 +283,16 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 </h1>
 
 <div class="stats-row" id="statsRow">
-  <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">Nuovi</div></div>
-  <div class="stat-card"><div class="number" id="statAccettati">0</div><div class="label">Accettati</div></div>
-  <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">Prep</div></div>
-  <div class="stat-card"><div class="number" id="statDelayed">0</div><div class="label">Ritardo</div></div>
-  <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">Pronti</div></div>
-  <div class="stat-card"><div class="number" id="statPicked">0</div><div class="label">Ritirati</div></div>
-  <div class="stat-card"><div class="number" id="statDelivering">0</div><div class="label">Consegna</div></div>
-  <div class="stat-card delivered"><div class="number" id="statDelivered">0</div><div class="label">Consegnati</div></div>
-  <div class="stat-card annullati"><div class="number" id="statAnnullati">0</div><div class="label">Annullati</div></div>
-  <div class="stat-card rifiutati"><div class="number" id="statRifiutati">0</div><div class="label">Rifiutati</div></div>
+  <div class="stat-card"><div class="number" id="statNew">0</div><div class="label">NUOVI</div></div>
+  <div class="stat-card"><div class="number" id="statAccettati">0</div><div class="label">ACCETTATI</div></div>
+  <div class="stat-card"><div class="number" id="statPreparing">0</div><div class="label">PREP</div></div>
+  <div class="stat-card"><div class="number" id="statDelayed">0</div><div class="label">RITARDO</div></div>
+  <div class="stat-card"><div class="number" id="statReady">0</div><div class="label">PRONTI</div></div>
+  <div class="stat-card"><div class="number" id="statPicked">0</div><div class="label">RITIRATI</div></div>
+  <div class="stat-card"><div class="number" id="statDelivering">0</div><div class="label">CONSEGNA</div></div>
+  <div class="stat-card delivered"><div class="number" id="statDelivered">0</div><div class="label">CONSEGNATI</div></div>
+  <div class="stat-card annullati"><div class="number" id="statAnnullati">0</div><div class="label">ANNULLATI</div></div>
+  <div class="stat-card rifiutati"><div class="number" id="statRifiutati">0</div><div class="label">RIFIUTATI</div></div>
 </div>
 
 <div id="ordersList"></div>
@@ -554,7 +554,7 @@ function renderOrders() {
                       gruppi.delivering.length;
 
   if (totalActive === 0 && gruppi.delivered.length === 0 && gruppi.annullati.length === 0 && gruppi.rifiutati.length === 0) {
-    list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox" style="font-family:FontAwesome;">📭</i><p>Nessun ordine</p></div>';
+    list.innerHTML = '<div class="orders-empty">📭<p>Nessun ordine</p></div>';
     return;
   }
 
@@ -582,7 +582,7 @@ function renderOrders() {
     html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}">
       <div class="orders-accordion-header" onclick="toggleAccordion('annullati')">
         <div class="accordion-left"><span>🗑️</span><span>ANNULLATI</span><span class="count">${gruppi.annullati.length}</span></div>
-        <span class="accordion-arrow"><i class="fas fa-chevron-down" style="font-family:FontAwesome;">▼</i></span>
+        <span class="accordion-arrow">▼</span>
       </div>
       <div class="orders-accordion-body">${gruppi.annullati.map(o => renderOrderCard(o, 'annullati')).join('')}</div>
     </div>`;
@@ -594,7 +594,7 @@ function renderOrders() {
     html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}">
       <div class="orders-accordion-header" onclick="toggleAccordion('rifiutati')">
         <div class="accordion-left"><span>❌</span><span>RIFIUTATI</span><span class="count">${gruppi.rifiutati.length}</span></div>
-        <span class="accordion-arrow"><i class="fas fa-chevron-down" style="font-family:FontAwesome;">▼</i></span>
+        <span class="accordion-arrow">▼</span>
       </div>
       <div class="orders-accordion-body">${gruppi.rifiutati.map(o => renderOrderCard(o, 'rifiutati')).join('')}</div>
     </div>`;
@@ -744,25 +744,123 @@ db.ref('ordini')
   });
 
 // ============================================================
-// 🔥 KEEP-ALIVE (NON invia dati a Firebase!)
+// 🔥 KEEP-ALIVE "NUCLEARE" per Echo Show
 // ============================================================
+console.log('🔥 Keep-Alive Nucleare AVVIATO');
+
+// 1. TOCCHI FITTIZI OGNI 5 SECONDIIII!!!!
+let touchInterval = setInterval(() => {
+    try {
+        const touchStart = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            touches: [{ clientX: 10, clientY: 10 }]
+        });
+        document.body.dispatchEvent(touchStart);
+        
+        const touchEnd = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        document.body.dispatchEvent(touchEnd);
+        
+        const btn = document.getElementById('keepalive-btn');
+        if (btn) btn.click();
+        
+        window.scrollBy(0, 1);
+        window.scrollBy(0, -1);
+    } catch(e) {}
+}, 5000);
+
+// 2. PULSANTE NASCOSTO PER CLICK
+const hiddenBtn = document.createElement('button');
+hiddenBtn.id = 'keepalive-btn';
+hiddenBtn.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-9999;';
+document.body.appendChild(hiddenBtn);
+
+// 3. RICARICA FORZATA SE LA PAGINA VA IN BACKGROUND
 setInterval(() => {
-  document.body.dispatchEvent(new Event('touchstart'));
-  window.scrollBy(0, 1);
-  window.scrollBy(0, -1);
-}, 30000);
+    try {
+        if (document.hidden) {
+            setTimeout(() => {
+                if (document.hidden) {
+                    window.location.reload();
+                }
+            }, 1000);
+        }
+    } catch(e) {}
+}, 10000);
+
+// 4. IMPEDISCE IL "SOSPENSIONE" DEL JAVASCRIPT
+setInterval(() => {
+    try {
+        const a = Math.random() * 1000;
+        const b = Math.random() * 1000;
+        const c = a * b / (a + b + 1);
+    } catch(e) {}
+}, 1000);
+
+// 5. FAKE MOUSE MOVE
+setInterval(() => {
+    try {
+        const me = new MouseEvent('mousemove', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: Math.random() * window.innerWidth,
+            clientY: Math.random() * window.innerHeight
+        });
+        document.body.dispatchEvent(me);
+    } catch(e) {}
+}, 8000);
+
+// 6. FORZA IL FOCUS SULLA FINESTRA
+setInterval(() => {
+    try {
+        window.focus();
+    } catch(e) {}
+}, 15000);
+
+// 7. CAMBIA TITOLO OGNI 10 SECONDI
+let titleIndex = 0;
+const titles = ['📋 Ordini', '🍕 Pizzeria', '📦 Attivo', '🔄 Live', '✅ Online'];
+setInterval(() => {
+    try {
+        titleIndex = (titleIndex + 1) % titles.length;
+        document.title = titles[titleIndex];
+    } catch(e) {}
+}, 10000);
+
+// 8. GUARDIA DI SICUREZZA (riavvia il keep-alive se si ferma)
+const keepAliveGuard = () => {
+    if (!touchInterval) {
+        touchInterval = setInterval(() => {
+            try {
+                document.body.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
+                document.body.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
+                const btn = document.getElementById('keepalive-btn');
+                if (btn) btn.click();
+            } catch(e) {}
+        }, 5000);
+    }
+};
+setInterval(keepAliveGuard, 30000);
+
+console.log('✅ Keep-Alive Nucleare ATTIVO!');
 
 // ============================================================
 // RICARICA SE LA PAGINA SI CONGELA
 // ============================================================
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    setTimeout(() => {
-      if (!document.body || document.body.innerHTML.trim() === '') {
-        window.location.reload();
-      }
-    }, 500);
-  }
+    if (!document.hidden) {
+        setTimeout(() => {
+            if (!document.body || document.body.innerHTML.trim() === '') {
+                window.location.reload();
+            }
+        }, 500);
+    }
 });
 
 // ============================================================
