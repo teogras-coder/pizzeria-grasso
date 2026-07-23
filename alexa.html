@@ -250,14 +250,33 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #1a1209; }
 ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
+
+/* 🔥 VIDEO INVISIBILE - NASCOSTO MA ATTIVO */
+#keepAliveVideo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0.01;
+  pointer-events: none;
+  z-index: -9999;
+  background: transparent;
+}
 </style>
 </head>
 <body>
 
-<!-- AUDIO SILENZIOSO PER INGANNARE IL TIMEOUT DI SILK -->
-<audio id="keepAliveAudio" loop style="display:none;" preload="auto">
-  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-</audio>
+<!-- 🎬 VIDEO INVISIBILE PER KEEP-ALIVE (NON BLOCCA LA MUSICA) -->
+<video id="keepAliveVideo" 
+       autoplay 
+       loop 
+       muted 
+       playsinline 
+       webkit-playsinline
+       style="position:fixed;bottom:0;left:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-9999;background:transparent;">
+  <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAQxtZGF0AAAAMgAAACh3cnZrbG9n" type="video/mp4">
+</video>
 
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
@@ -303,6 +322,7 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 <div id="ordersList"></div>
 
 <div class="toast" id="toast"></div>
+
 <script>
 // ============================================================
 // FIREBASE CONFIG
@@ -717,52 +737,61 @@ db.ref('ordini')
   });
 
 // ============================================================
-// 🔊 KEEP-ALIVE HARDWARE PER ECHO SHOW (AUDIO & WAKE LOCK)
+// 🎬 KEEP-ALIVE CON VIDEO INVISIBILE (NON BLOCCA LA MUSICA!)
 // ============================================================
-console.log('🔥 Keep-Alive Hardware AVVIATO');
+console.log('🎬 Keep-Alive con Video Invisibile AVVIATO');
 
-const audioEl = document.getElementById('keepAliveAudio');
-let wakeLock = null;
+const videoEl = document.getElementById('keepAliveVideo');
+let keepAliveInterval = null;
 
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release', () => {
-        setTimeout(requestWakeLock, 1000);
-      });
-    }
-  } catch (err) {}
-}
-
-function startSilentAudio() {
-  if (audioEl && audioEl.paused) {
-    audioEl.play().then(() => {
-      console.log('🔊 Audio silenzioso in corso: Timeout Silk disattivato!');
+function startVideoKeepAlive() {
+  // Avvia il video silenzioso (muted)
+  if (videoEl && videoEl.paused) {
+    videoEl.play().then(() => {
+      console.log('🎬 Video Keep-Alive attivo (non blocca la musica!)');
     }).catch(() => {});
+  }
+  
+  // Wake Lock (se supportato)
+  if ('wakeLock' in navigator) {
+    navigator.wakeLock.request('screen').catch(() => {});
   }
 }
 
-function enableKeepAlive() {
-  startSilentAudio();
-  requestWakeLock();
-}
+// Attiva al caricamento della pagina
+document.addEventListener('DOMContentLoaded', () => {
+  startVideoKeepAlive();
+});
 
-// Attiva al primo tocco sullo schermo (richiesto da Silk)
-document.addEventListener('click', enableKeepAlive, { once: true });
-document.addEventListener('touchstart', enableKeepAlive, { once: true });
+// Riavvia il video se si ferma (ogni 30 secondi)
+setInterval(() => {
+  if (videoEl && videoEl.paused) {
+    videoEl.play().catch(() => {});
+  }
+}, 30000);
 
+// Ricarica il video se la pagina torna visibile
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    requestWakeLock();
-    startSilentAudio();
+    startVideoKeepAlive();
   }
 });
 
+// ============================================================
+// KEEP-ALIVE AGGIUNTIVO (TOUCH + SCROLL)
+// ============================================================
 setInterval(() => {
-  startSilentAudio();
-}, 60000);
+  try {
+    document.body.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
+    document.body.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
+    window.scrollBy(0, 1);
+    window.scrollBy(0, -1);
+  } catch(e) {}
+}, 10000);
 
+// ============================================================
+// REGISTRA SERVICE WORKER (se esiste)
+// ============================================================
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
