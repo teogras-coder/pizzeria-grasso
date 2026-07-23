@@ -254,6 +254,11 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 </head>
 <body>
 
+<!-- AUDIO SILENZIOSO PER INGANNARE IL TIMEOUT DI SILK -->
+<audio id="keepAliveAudio" loop style="display:none;" preload="auto">
+  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+</audio>
+
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <h3 id="confirmTitle">Conferma</h3>
@@ -298,10 +303,9 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 <div id="ordersList"></div>
 
 <div class="toast" id="toast"></div>
-
 <script>
 // ============================================================
-// FIREBASE CONFIG (LA TUA)
+// FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
@@ -321,7 +325,6 @@ const db = firebase.database();
 let ordersCache = {};
 let accordionState = { annullati: false, rifiutati: false };
 let lastOrderIds = new Set();
-let notificationSound = null;
 
 // ============================================================
 // OROLOGIO
@@ -412,10 +415,8 @@ function notifyClients() {
 }
 
 // ============================================================
-// AZIONI ORDINI (TUTTI I COMANDI)
+// AZIONI ORDINI
 // ============================================================
-
-// ✅ ACCETTA
 async function accettaOrdine(id) {
   const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
   if (!ok) return;
@@ -428,21 +429,18 @@ async function accettaOrdine(id) {
   });
 }
 
-// 🍕 PREPARA
 function preparaOrdine(id) {
   db.ref('ordini/' + id + '/status').set('preparing');
   showToast('🍕 In preparazione');
   notifyClients();
 }
 
-// ✅ PRONTO
 function prontoOrdine(id) {
   db.ref('ordini/' + id + '/status').set('ready');
   showToast('✅ Ordine pronto!');
   notifyClients();
 }
 
-// ⏰ RITARDO
 async function setOrderDelayed(id) {
   const value = await showPrompt('⏰ Imposta ritardo', 'Minuti di attesa (multipli di 10):', 'Es: 20', '10');
   if (value === null) return;
@@ -462,7 +460,6 @@ async function setOrderDelayed(id) {
   });
 }
 
-// ❌ RIFIUTA (con motivo)
 async function rifiutaOrdine(id) {
   const motivo = await showPrompt('❌ Rifiuta Ordine', 'Motivo del rifiuto:', 'Es: Troppi ordini in coda', 'Troppi ordini in coda');
   if (motivo === null) return;
@@ -477,7 +474,6 @@ async function rifiutaOrdine(id) {
   });
 }
 
-// 🗑️ ELIMINA
 async function deleteOrder(id) {
   const ok = await showConfirm('🗑️ Eliminare Ordine?', 'Questa azione non può essere annullata.');
   if (!ok) return;
@@ -488,28 +484,24 @@ async function deleteOrder(id) {
   });
 }
 
-// 📦 RITIRATO (per pickup)
 function pickupRitirato(id) {
   db.ref('ordini/' + id).update({ status: 'delivered', deliveredAt: Date.now() });
   showToast('📦 Ritirato dal cliente');
   notifyClients();
 }
 
-// 📦 RITIRATO DAL FATTORINO
 function pickedByDriver(id) {
   db.ref('ordini/' + id + '/status').set('picked');
   showToast('📦 Ritirato dal fattorino');
   notifyClients();
 }
 
-// 🛵 IN CONSEGNA
 function startDelivery(id) {
   db.ref('ordini/' + id + '/status').set('delivering');
   showToast('🛵 In consegna');
   notifyClients();
 }
 
-// 🎉 CONSEGNATO (solo per delivery)
 function consegnato(id) {
   db.ref('ordini/' + id).update({ status: 'delivered', deliveredAt: Date.now() });
   showToast('🎉 Consegna completata!');
@@ -537,7 +529,6 @@ function renderOrders() {
     gruppi[k].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   });
 
-  // Statistiche
   document.getElementById('statNew').textContent = gruppi.new.length;
   document.getElementById('statAccettati').textContent = gruppi.accettato.length;
   document.getElementById('statPreparing').textContent = gruppi.preparing.length;
@@ -576,7 +567,6 @@ function renderOrders() {
     html += gruppi[stato].map(o => renderOrderCard(o)).join('');
   });
 
-  // Annullati (accordion)
   if (gruppi.annullati.length > 0) {
     const isOpen = accordionState.annullati;
     html += `<div class="orders-accordion annullati ${isOpen ? 'open' : ''}">
@@ -588,7 +578,6 @@ function renderOrders() {
     </div>`;
   }
 
-  // Rifiutati (accordion)
   if (gruppi.rifiutati.length > 0) {
     const isOpen = accordionState.rifiutati;
     html += `<div class="orders-accordion rifiutati ${isOpen ? 'open' : ''}">
@@ -603,9 +592,6 @@ function renderOrders() {
   list.innerHTML = html;
 }
 
-// ============================================================
-// RENDER SINGOLO ORDINE
-// ============================================================
 function renderOrderCard(o, tipo = '') {
   const dt = new Date(o.timestamp || 0);
   const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -614,16 +600,14 @@ function renderOrderCard(o, tipo = '') {
   const items = o.items && Array.isArray(o.items) ? 
     o.items.map(i => `<div>${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('') : '';
 
-  let statusBadge = '', borderClass = 'new', extraClass = '';
+  let statusBadge = '', borderClass = 'new';
   
   if (tipo === 'annullati') { 
     statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; 
     borderClass = 'annullati'; 
-    extraClass = 'annullati'; 
   } else if (tipo === 'rifiutati') { 
     statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; 
     borderClass = 'rifiutati'; 
-    extraClass = 'rifiutati'; 
   }
 
   let actions = '';
@@ -660,17 +644,10 @@ function renderOrderCard(o, tipo = '') {
         <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
       `;
     } else if (st === 'ready') {
-      if (o.type === 'pickup') {
-        actions = `
-          <button class="btn-picked" onclick="pickupRitirato('${o.id}')">📦 Ritirato</button>
-          <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
-        `;
-      } else {
-        actions = `
-          <button class="btn-picked" onclick="pickedByDriver('${o.id}')">📦 Ritirato</button>
-          <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
-        `;
-      }
+      actions = `
+        <button class="btn-picked" onclick="${o.type === 'pickup' ? `pickupRitirato('${o.id}')` : `pickedByDriver('${o.id}')`}">📦 Ritirato</button>
+        <button class="btn-delete" onclick="deleteOrder('${o.id}')">🗑️</button>
+      `;
     } else if (st === 'picked') {
       actions = `
         <button class="btn-delivering" onclick="startDelivery('${o.id}')">🛵 In Consegna</button>
@@ -702,16 +679,13 @@ function renderOrderCard(o, tipo = '') {
   `;
 }
 
-// ============================================================
-// ACCORDION
-// ============================================================
 function toggleAccordion(tipo) {
   accordionState[tipo] = !accordionState[tipo];
   renderOrders();
 }
 
 // ============================================================
-// ASCOLTO ORDINI IN TEMPO REALE
+// ASCOLTO ORDINI FIREBASE
 // ============================================================
 db.ref('ordini')
   .orderByChild('timestamp')
@@ -726,7 +700,6 @@ db.ref('ordini')
       currentIds.add(child.key);
     });
 
-    // 🔔 Controlla nuovi ordini
     let newOrders = 0;
     currentIds.forEach(id => {
       if (!lastOrderIds.has(id)) {
@@ -744,128 +717,52 @@ db.ref('ordini')
   });
 
 // ============================================================
-// 🔥 KEEP-ALIVE "NUCLEARE" per Echo Show
+// 🔊 KEEP-ALIVE HARDWARE PER ECHO SHOW (AUDIO & WAKE LOCK)
 // ============================================================
-console.log('🔥 Keep-Alive Nucleare AVVIATO');
+console.log('🔥 Keep-Alive Hardware AVVIATO');
 
-// 1. TOCCHI FITTIZI OGNI 5 SECONDIIII!!!!
-let touchInterval = setInterval(() => {
-    try {
-        const touchStart = new TouchEvent('touchstart', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            touches: [{ clientX: 10, clientY: 10 }]
-        });
-        document.body.dispatchEvent(touchStart);
-        
-        const touchEnd = new TouchEvent('touchend', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-        });
-        document.body.dispatchEvent(touchEnd);
-        
-        const btn = document.getElementById('keepalive-btn');
-        if (btn) btn.click();
-        
-        window.scrollBy(0, 1);
-        window.scrollBy(0, -1);
-    } catch(e) {}
-}, 5000);
+const audioEl = document.getElementById('keepAliveAudio');
+let wakeLock = null;
 
-// 2. PULSANTE NASCOSTO PER CLICK
-const hiddenBtn = document.createElement('button');
-hiddenBtn.id = 'keepalive-btn';
-hiddenBtn.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-9999;';
-document.body.appendChild(hiddenBtn);
-
-// 3. RICARICA FORZATA SE LA PAGINA VA IN BACKGROUND
-setInterval(() => {
-    try {
-        if (document.hidden) {
-            setTimeout(() => {
-                if (document.hidden) {
-                    window.location.reload();
-                }
-            }, 1000);
-        }
-    } catch(e) {}
-}, 10000);
-
-// 4. IMPEDISCE IL "SOSPENSIONE" DEL JAVASCRIPT
-setInterval(() => {
-    try {
-        const a = Math.random() * 1000;
-        const b = Math.random() * 1000;
-        const c = a * b / (a + b + 1);
-    } catch(e) {}
-}, 1000);
-
-// 5. FAKE MOUSE MOVE
-setInterval(() => {
-    try {
-        const me = new MouseEvent('mousemove', {
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            clientX: Math.random() * window.innerWidth,
-            clientY: Math.random() * window.innerHeight
-        });
-        document.body.dispatchEvent(me);
-    } catch(e) {}
-}, 8000);
-
-// 6. FORZA IL FOCUS SULLA FINESTRA
-setInterval(() => {
-    try {
-        window.focus();
-    } catch(e) {}
-}, 15000);
-
-// 7. CAMBIA TITOLO OGNI 10 SECONDI
-let titleIndex = 0;
-const titles = ['📋 Ordini', '🍕 Pizzeria', '📦 Attivo', '🔄 Live', '✅ Online'];
-setInterval(() => {
-    try {
-        titleIndex = (titleIndex + 1) % titles.length;
-        document.title = titles[titleIndex];
-    } catch(e) {}
-}, 10000);
-
-// 8. GUARDIA DI SICUREZZA (riavvia il keep-alive se si ferma)
-const keepAliveGuard = () => {
-    if (!touchInterval) {
-        touchInterval = setInterval(() => {
-            try {
-                document.body.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
-                document.body.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
-                const btn = document.getElementById('keepalive-btn');
-                if (btn) btn.click();
-            } catch(e) {}
-        }, 5000);
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        setTimeout(requestWakeLock, 1000);
+      });
     }
-};
-setInterval(keepAliveGuard, 30000);
+  } catch (err) {}
+}
 
-console.log('✅ Keep-Alive Nucleare ATTIVO!');
+function startSilentAudio() {
+  if (audioEl && audioEl.paused) {
+    audioEl.play().then(() => {
+      console.log('🔊 Audio silenzioso in corso: Timeout Silk disattivato!');
+    }).catch(() => {});
+  }
+}
 
-// ============================================================
-// RICARICA SE LA PAGINA SI CONGELA
-// ============================================================
+function enableKeepAlive() {
+  startSilentAudio();
+  requestWakeLock();
+}
+
+// Attiva al primo tocco sullo schermo (richiesto da Silk)
+document.addEventListener('click', enableKeepAlive, { once: true });
+document.addEventListener('touchstart', enableKeepAlive, { once: true });
+
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        setTimeout(() => {
-            if (!document.body || document.body.innerHTML.trim() === '') {
-                window.location.reload();
-            }
-        }, 500);
-    }
+  if (document.visibilityState === 'visible') {
+    requestWakeLock();
+    startSilentAudio();
+  }
 });
 
-// ============================================================
-// REGISTRA SERVICE WORKER (se esiste)
-// ============================================================
+setInterval(() => {
+  startSilentAudio();
+}, 60000);
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
