@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>📋 Ordini - Pizzeria</title>
+<title>📋 Ordini - Antica Pizzeria</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
@@ -250,9 +250,25 @@ h1 small { font-size: 1rem; color: #8a7a5a; font-weight: normal; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #1a1209; }
 ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
+
+/* Keep-alive elementi invisibili */
+.keepalive-element {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0.01;
+  pointer-events: none;
+  z-index: -9999;
+}
 </style>
 </head>
 <body>
+
+<!-- Elementi Hardware Keep-Alive -->
+<video id="keepAliveVideo" class="keepalive-element" muted loop playsinline src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhibWRhdAAAAAAYbXZoZAAAAADOHB1A3hwdQAAAAAAA6AAAAYAAAAABAAEAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAEAACABAAAAAAAN0cmFrAAAAXHRraGQAAAAAzitdQ04rXUIAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACBtZGlhAAAAIG1kaGQAAAAAzitdQ04rXUIAAAAAAAAAYAAAAAAAACBoZGxyAAAAAAB2aWRlAAAAAAAAAAAAAAAAR3JhcGhpY3MAAAAAbWluZgAAABR2bWhkAAAAAQAAAAAAAAAAAAAAJGRpbmYAAAAcY3R0cwAAAAABAAAAAQAAAAAAAABzcmRzAAAAA2cMm"></video>
+<canvas id="keepAliveCanvas" class="keepalive-element" width="2" height="2"></canvas>
 
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
@@ -404,7 +420,7 @@ function showPrompt(title, message, placeholder = '', defaultValue = '') {
 }
 
 // ============================================================
-// NOTIFICA AI CLIENTI (bump versione)
+// NOTIFICA AI CLIENTI
 // ============================================================
 function notifyClients() {
   db.ref('settings/appVersion').transaction(v => (v || 0) + 1);
@@ -713,99 +729,62 @@ db.ref('ordini')
   });
 
 // ============================================================
-// 🔥 KEEP-ALIVE "NUCLEARE" - MASSIMA FREQUENZA
+// 🎬 SILK / ECHO SHOW KEEP-ALIVE DEFINITIVO
 // ============================================================
-console.log('🔥 Keep-Alive Nucleare AVVIATO');
+console.log('⚡ Keep-Alive Echo Show Avviato');
 
-// 1. TOCCHE FITTIZIE OGNI 3 SECONDIIII!!!!
-setInterval(() => {
-    try {
-        // Touch start
-        const touchStart = new TouchEvent('touchstart', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            touches: [{ clientX: 10, clientY: 10 }]
-        });
-        document.body.dispatchEvent(touchStart);
-        
-        // Touch end
-        const touchEnd = new TouchEvent('touchend', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-        });
-        document.body.dispatchEvent(touchEnd);
-        
-        // Scroll 1 pixel
-        window.scrollBy(0, 1);
-        window.scrollBy(0, -1);
-        
-        // Click su pulsante nascosto
-        const btn = document.getElementById('keepalive-btn');
-        if (btn) btn.click();
-        
-        // Mouse move falso
-        const me = new MouseEvent('mousemove', {
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            clientX: Math.random() * window.innerWidth,
-            clientY: Math.random() * window.innerHeight
-        });
-        document.body.dispatchEvent(me);
-        
-    } catch(e) {}
-}, 3000); // OGNI 3 SECONDI!
+const videoEl = document.getElementById('keepAliveVideo');
+const canvasEl = document.getElementById('keepAliveCanvas');
+const ctx = canvasEl ? canvasEl.getContext('2d') : null;
 
-// 2. PULSANTE NASCOSTO PER CLICK
-const hiddenBtn = document.createElement('button');
-hiddenBtn.id = 'keepalive-btn';
-hiddenBtn.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-9999;';
-document.body.appendChild(hiddenBtn);
+// 1. Canvas Rendering attivo (forza il GPU Compositor ad essere sempre attivo)
+let colorToggle = false;
+function renderCanvasLoop() {
+  if (ctx) {
+    colorToggle = !colorToggle;
+    ctx.fillStyle = colorToggle ? '#1a1209' : '#2a1e13';
+    ctx.fillRect(0, 0, 2, 2);
+  }
+  requestAnimationFrame(renderCanvasLoop);
+}
+renderCanvasLoop();
 
-// 3. CAMBIA TITOLO OGNI 5 SECONDI (inganna il browser)
-let titleIndex = 0;
-const titles = ['📋 Ordini', '🍕 Pizzeria', '📦 Attivo', '🔄 Live', '✅ Online'];
-setInterval(() => {
-    try {
-        titleIndex = (titleIndex + 1) % titles.length;
-        document.title = titles[titleIndex];
-    } catch(e) {}
-}, 5000);
-
-// 4. RICARICA SE LA PAGINA VA IN BACKGROUND
-setInterval(() => {
-    try {
-        if (document.hidden) {
-            setTimeout(() => {
-                if (document.hidden) {
-                    window.location.reload();
-                }
-            }, 1000);
-        }
-    } catch(e) {}
-}, 8000);
-
-// 5. WAKE LOCK (se supportato)
-if ('wakeLock' in navigator) {
-    navigator.wakeLock.request('screen').catch(() => {});
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-            navigator.wakeLock.request('screen').catch(() => {});
-        }
-    });
+// 2. Video Muted Loop (Non interferisce con l'audio di sistema o la musica)
+function startKeepAliveVideo() {
+  if (videoEl && videoEl.paused) {
+    videoEl.play().catch(() => {});
+  }
 }
 
-// 6. GUARDIA DI SICUREZZA
-setInterval(() => {
-    try {
-        document.body.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
-        document.body.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
-    } catch(e) {}
-}, 5000);
+// 3. Screen Wake Lock API
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      await navigator.wakeLock.request('screen');
+    }
+  } catch(e) {}
+}
 
-console.log('✅ Keep-Alive Nucleare ATTIVO!');
+function initKeepAlive() {
+  startKeepAliveVideo();
+  requestWakeLock();
+}
+
+// Sblocca al primo tocco
+document.addEventListener('click', initKeepAlive, { once: true });
+document.addEventListener('touchstart', initKeepAlive, { once: true });
+
+// Controllo e ripristino ogni 15 secondi
+setInterval(() => {
+  startKeepAliveVideo();
+  requestWakeLock();
+}, 15000);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    initKeepAlive();
+  }
+});
 
 // ============================================================
 // SERVICE WORKER
