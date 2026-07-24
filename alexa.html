@@ -729,7 +729,7 @@ db.ref('ordini')
   });
 
 // ============================================================
-// 🎬 SILK / ECHO SHOW KEEP-ALIVE DEFINITIVO
+// 🎬 SILK / ECHO SHOW KEEP-ALIVE DEFINITIVO (ANTI-CHIUSURA)
 // ============================================================
 console.log('⚡ Keep-Alive Echo Show Avviato');
 
@@ -737,7 +737,7 @@ const videoEl = document.getElementById('keepAliveVideo');
 const canvasEl = document.getElementById('keepAliveCanvas');
 const ctx = canvasEl ? canvasEl.getContext('2d') : null;
 
-// 1. Canvas Rendering attivo (forza il GPU Compositor ad essere sempre attivo)
+// 1. Render continuo su Canvas per forzare la GPU
 let colorToggle = false;
 function renderCanvasLoop() {
   if (ctx) {
@@ -749,36 +749,69 @@ function renderCanvasLoop() {
 }
 renderCanvasLoop();
 
-// 2. Video Muted Loop (Non interferisce con l'audio di sistema o la musica)
+// 2. Audio Silenzioso tramite AudioContext (Mantiene Silk "Media Active" per Fire OS)
+let audioCtx = null;
+function playSilentHiss() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    // Genera un impulso impercettibile a volume 0.001
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 15; // Infrasuono
+    gain.gain.value = 0.001;  // Impercettibile
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  } catch(e) {}
+}
+
+// 3. Video Muted Loop
 function startKeepAliveVideo() {
   if (videoEl && videoEl.paused) {
     videoEl.play().catch(() => {});
   }
 }
 
-// 3. Screen Wake Lock API
+// 4. WakeLock API
+let wakeLockObj = null;
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
-      await navigator.wakeLock.request('screen');
+      wakeLockObj = await navigator.wakeLock.request('screen');
     }
   } catch(e) {}
 }
 
+// 5. Scroll Fittizio per ingannare i sensori di inattività
+function triggerFakeInteraction() {
+  window.scrollBy(0, 1);
+  window.scrollBy(0, -1);
+}
+
+// Inizializzazione globale al primo tocco
 function initKeepAlive() {
   startKeepAliveVideo();
   requestWakeLock();
+  playSilentHiss();
 }
 
-// Sblocca al primo tocco
 document.addEventListener('click', initKeepAlive, { once: true });
 document.addEventListener('touchstart', initKeepAlive, { once: true });
 
-// Controllo e ripristino ogni 15 secondi
+// Loop di mantenimento ogni 10 secondi
 setInterval(() => {
   startKeepAliveVideo();
   requestWakeLock();
-}, 15000);
+  playSilentHiss();
+  triggerFakeInteraction();
+}, 10000);
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
