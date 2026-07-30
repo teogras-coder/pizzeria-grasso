@@ -258,7 +258,8 @@ let recognition = null;
 let isListening = false;
 let drawerTab = 'banco';
 let appOrdersListener = null;
-let voiceTimeout = null;
+let lastProcessedText = '';
+let processingTimeout = null;
 
 // ============================================================
 // CARICAMENTO DATI
@@ -486,7 +487,7 @@ function updateCartUI() {
 }
 
 // ============================================================
-// RICONOSCIMENTO VOCALE (COMPLETO)
+// RICONOSCIMENTO VOCALE
 // ============================================================
 function initVoiceRecognition() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -501,9 +502,6 @@ function initVoiceRecognition() {
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.maxAlternatives = 5;
-    
-    let lastProcessedText = '';
-    let processingTimeout = null;
     
     recognition.onresult = function(event) {
         let finalText = '';
@@ -521,7 +519,6 @@ function initVoiceRecognition() {
         
         if (finalText) {
             const textLower = finalText.toLowerCase();
-            // 🔥 Se dice "invia" → ferma e invia
             if (textLower.includes('invia') || textLower.includes('stampa') || textLower.includes('manda')) {
                 stopListening();
                 document.getElementById('voiceStatus').textContent = '📨 Invio ordine per voce...';
@@ -533,20 +530,13 @@ function initVoiceRecognition() {
                 return;
             }
             
-            // 🔥 Evita duplicati: se il testo è uguale all'ultimo processato, aspetta
-            if (textLower === lastProcessedText) {
-                return;
-            }
+            if (textLower === lastProcessedText) return;
             lastProcessedText = textLower;
             
-            // 🔥 Debounce: aspetta 500ms prima di processare
             clearTimeout(processingTimeout);
             processingTimeout = setTimeout(() => {
                 processVoiceCommand(textLower);
-                // Reset dopo 2 secondi per permettere nuovi comandi
-                setTimeout(() => {
-                    lastProcessedText = '';
-                }, 2000);
+                setTimeout(() => { lastProcessedText = ''; }, 2000);
             }, 500);
         }
     };
@@ -555,37 +545,26 @@ function initVoiceRecognition() {
         console.error('Errore voce:', event.error);
         if (event.error === 'not-allowed') {
             document.getElementById('voiceStatus').textContent = '❌ Permesso microfono negato. Autorizza dal browser.';
-        } else if (event.error === 'no-speech') {
-            // Silenzio, non fare nulla
-        } else {
+        } else if (event.error !== 'no-speech') {
             document.getElementById('voiceStatus').textContent = '❌ Errore: ' + event.error;
+            document.getElementById('voiceStatus').className = 'voice-status error';
         }
-        document.getElementById('voiceStatus').className = 'voice-status error';
         stopListening();
     };
     
     recognition.onend = function() {
         if (isListening) {
-            try {
-                recognition.start();
-            } catch(e) {}
+            try { recognition.start(); } catch(e) {}
         }
     };
 }
 
 function toggleVoiceRecognition() {
-    if (isListening) {
-        stopListening();
-    } else {
-        startListening();
-    }
+    if (isListening) { stopListening(); } else { startListening(); }
 }
 
 function startListening() {
-    if (!recognition) {
-        document.getElementById('voiceStatus').textContent = '❌ Voce non disponibile';
-        return;
-    }
+    if (!recognition) { document.getElementById('voiceStatus').textContent = '❌ Voce non disponibile'; return; }
     try {
         recognition.start();
         isListening = true;
@@ -593,16 +572,12 @@ function startListening() {
         document.getElementById('micBtn').innerHTML = '<i class="fas fa-stop"></i><span class="mic-text">Stop</span>';
         document.getElementById('voiceStatus').textContent = '🎤 Ascolto... parla ora! (dì "invia" per stampare)';
         document.getElementById('voiceStatus').className = 'voice-status active';
-    } catch(e) {
-        console.error('Errore avvio:', e);
-    }
+    } catch(e) { console.error('Errore avvio:', e); }
 }
 
 function stopListening() {
     isListening = false;
-    try {
-        if (recognition) recognition.stop();
-    } catch(e) {}
+    try { if (recognition) recognition.stop(); } catch(e) {}
     document.getElementById('micBtn').classList.remove('listening');
     document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="mic-text">Voce</span>';
     if (document.getElementById('voiceStatus').textContent.includes('Ascolto') || 
@@ -612,17 +587,13 @@ function stopListening() {
     }
 }
 
-// ============================================================
-// PROCESSO COMANDI VOCALI
-// ============================================================
 function processVoiceCommand(text) {
     let added = 0;
     let foundProducts = [];
     let categoriesFound = [];
     let hasData = false;
     
-    // 🔥 RICONOSCI NOME: cerca parole che sembrano nomi (almeno 2 caratteri, lettere)
-    // Cerca pattern come "nome Mario" o "per Mario" o "Mario"
+    // RICONOSCI NOME
     const namePatterns = [
         text.match(/(?:nome|per|chiama|cliente)\s+([a-zA-ZÀ-ù\s]{2,25})/i),
         text.match(/(?:^|\s)([A-Z][a-zà-ù]+(?:\s+[A-Z][a-zà-ù]+){0,2})(?=\s|$)/)
@@ -639,7 +610,7 @@ function processVoiceCommand(text) {
         }
     }
     
-    // 🔥 RICONOSCI TELEFONO: cerca numeri di telefono
+    // RICONOSCI TELEFONO
     const phonePatterns = [
         text.match(/(3[0-9]{8,9})/),
         text.match(/(\d{10,11})/),
@@ -657,7 +628,7 @@ function processVoiceCommand(text) {
         }
     }
     
-    // 🔥 RICONOSCI NOTE: cerca dopo "note", "citofono", "piano", "allergie"
+    // RICONOSCI NOTE
     const noteMatch = text.match(/(?:note|citofono|piano|allergie|intolleranze|avvertenze)\s+([a-zA-Z0-9\s,\.]{3,50})/i);
     if (noteMatch) {
         const note = noteMatch[1].trim();
@@ -668,7 +639,7 @@ function processVoiceCommand(text) {
         }
     }
     
-    // 🔍 CERCA CATEGORIE
+    // CERCA CATEGORIE
     const categoryNames = Object.keys(menuData.categories).map(key => ({
         key: key,
         name: menuData.categories[key].name.toLowerCase()
@@ -679,8 +650,7 @@ function processVoiceCommand(text) {
         }
     });
     
-    // 🔍 CERCA PRODOTTI
-    let productsToCheck = [];
+    // CERCA PRODOTTI
     if (categoriesFound.length > 0) {
         categoriesFound.forEach(catKey => {
             const products = menuData.products[catKey] || [];
@@ -714,7 +684,6 @@ function processVoiceCommand(text) {
         foundProducts = foundProducts.slice(0, 5);
     }
     
-    // 🔥 AGGIUNGI PRODOTTI (senza duplicati)
     foundProducts.forEach(p => {
         const existing = cart.find(item => item.name === p.name && item.cat === p.catKey);
         if (existing) {
@@ -765,7 +734,7 @@ function getAllProducts() {
 }
 
 // ============================================================
-// INVIO ORDINE (stampa automatica via Firebase)
+// INVIO ORDINE
 // ============================================================
 async function sendOrderBanco() {
     if (!cart.length) {
@@ -828,10 +797,10 @@ async function sendOrderBanco() {
             status: 'new',
             timestamp: Date.now(),
             source: source,
-            printer: 'auto'
+            printer: 'auto',
+            printNow: true
         });
         
-        // Salva storico
         const orderData = {
             orderId, customerName: name, customerPhone: phone || 'N/A',
             scheduledTime, items, finalTotal, notes: notes || 'Nessuna',
@@ -851,7 +820,9 @@ async function sendOrderBanco() {
         
         document.getElementById('statusMsg').textContent = `✅ Ordine ${orderId} inviato! Stampa in corso...`;
         
-        // 🔥 STAMPA AUTOMATICA VIA FIREBASE - non si apre finestra!
+        // 🔥 STAMPA DIRETTA VIA FIREBASE (senza anteprima)
+        printOrder(orderData);
+        
         playNotificationSound();
         updateDrawerBadges();
         updateHistoryBadge();
@@ -866,52 +837,68 @@ async function sendOrderBanco() {
 }
 
 // ============================================================
-// STAMPA (solo per ristampe manuali)
+// STAMPA DIRETTA VIA FIREBASE (senza anteprima)
 // ============================================================
 function printOrder(order) {
     const sourceEmoji = { 'CASSA': '🏪', 'TELEFONO': '📞', 'BANCO': '🍕', 'TAVOLO': '🍽️' };
     const emoji = sourceEmoji[order.source] || '📦';
+    
+    // COSTRUISCI SCONTRINO
+    const maxWidth = 48;
+    const line = '═'.repeat(maxWidth);
+    const thinLine = '─'.repeat(maxWidth);
+    
+    let itemsFormatted = '';
+    let total = 0;
+    order.items.forEach(i => {
+        const subtotal = i.price * i.qty;
+        total += subtotal;
+        const name = `${i.name} ×${i.qty}`;
+        const price = `€${subtotal.toFixed(2)}`;
+        const spaces = maxWidth - name.length - price.length - 2;
+        itemsFormatted += `  ${name}${' '.repeat(spaces > 0 ? spaces : 1)}${price}\n`;
+    });
+    
     const printContent = `
-        ════════════════════════════════════
-           🍕 ANTICA PIZZERIA GRASSO
-           ORDINE #${order.orderId}
-           📅 ${new Date().toLocaleString()}
-        ════════════════════════════════════
-        ${emoji} Fonte:      ${order.source || 'CASSA'}
-        👤 Cliente:   ${order.customerName}
-        📞 Telefono:  ${order.customerPhone}
-        📦 Tipo:      📦 RITIRO
-        🕐 Orario:    ${order.scheduledTime}
-        ════════════════════════════════════
-        📋 PRODOTTI:
-        ${order.items.map(i => `  ${i.name}  ×${i.qty}  €${(i.price * i.qty).toFixed(2)}`).join('\n')}
-        ════════════════════════════════════
-        Totale:          €${order.finalTotal.toFixed(2)}
-        ════════════════════════════════
-        📝 Note: ${order.notes || 'Nessuna'}
-        ════════════════════════════════════
-        Data: ${new Date().toLocaleString()}
-        ════════════════════════════════
+╔${line}╗
+║           🍕 ANTICA PIZZERIA GRASSO          ║
+║                   ${order.orderId}                   ║
+║              📅 ${new Date(order.timestamp).toLocaleString()}              ║
+╠${line}╣
+║ ${emoji} Fonte:      ${(order.source || 'CASSA').padEnd(30)}║
+║ 👤 Cliente:   ${(order.customerName || 'N/A').padEnd(30)}║
+║ 📞 Telefono:  ${(order.customerPhone || 'N/A').padEnd(30)}║
+║ 📦 Tipo:      📦 RITIRO${' '.repeat(28)}║
+║ 🕐 Orario:    ${(order.scheduledTime || 'Prima possibile').padEnd(30)}║
+╠${line}╣
+║                    📋 PRODOTTI                    ║
+║${thinLine}║
+${itemsFormatted.split('\n').filter(l => l.trim()).map(l => `║ ${l.padEnd(maxWidth-2)}║`).join('\n')}
+╠${line}╣
+║ Totale:${' '.repeat(maxWidth - 8 - total.toFixed(2).length)}€${total.toFixed(2)} ║
+╠${line}╣
+║ 📝 Note: ${(order.notes || 'Nessuna').padEnd(30)}║
+╚${line}╝
     `;
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    if (!printWindow) { alert('Permetti i popup per la stampa!'); return; }
-    printWindow.document.write(`
-        <html><head><title>Stampa Ordine #${order.orderId}</title>
-        <style>
-            body { font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; white-space: pre; background: white; color: black; }
-            @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
-        </style>
-        </head>
-        <body>
-            <pre>${printContent}</pre>
-            <div class="no-print" style="margin-top:20px;text-align:center;">
-                <button onclick="window.print()" style="padding:12px 30px;font-size:16px;cursor:pointer;background:#d4a84b;border:none;border-radius:10px;font-weight:700;">🖨️ Stampa</button>
-                <button onclick="window.close()" style="padding:12px 30px;font-size:16px;cursor:pointer;margin-left:10px;background:#333;color:white;border:none;border-radius:10px;">Chiudi</button>
-            </div>
-        </body>
-        </html>
-    `);
-    printWindow.document.close();
+    
+    // 🔥 INVIA A FIREBASE PER STAMPA AUTOMATICA
+    const printJob = {
+        orderId: order.orderId,
+        content: printContent,
+        timestamp: Date.now(),
+        printer: 'auto',
+        source: order.source || 'CASSA'
+    };
+    
+    db.ref('print_jobs').push(printJob)
+        .then(() => {
+            console.log('📨 Stampa inviata a Firebase:', order.orderId);
+            showToast('🖨️ Stampa inviata alla stampante di rete');
+        })
+        .catch(err => {
+            console.error('❌ Errore invio stampa:', err);
+            showToast('❌ Errore invio stampa');
+        });
 }
 
 // ============================================================
@@ -991,7 +978,13 @@ function closeDrawer() {
 function reprintOrder(orderId) {
     let order = orderHistory.find(o => o.orderId === orderId);
     if (!order) order = appOrders.find(o => o.orderId === orderId);
-    if (order) { printOrder(order); showToast('🖨️ Ristampa inviata'); } else { showToast('❌ Ordine non trovato'); }
+    if (order) {
+        // 🔥 Stampa diretta via Firebase
+        printOrder(order);
+        showToast('🖨️ Ristampa inviata alla stampante');
+    } else {
+        showToast('❌ Ordine non trovato');
+    }
 }
 
 function reprintAllOrders() {
