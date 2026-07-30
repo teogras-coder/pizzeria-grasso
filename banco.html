@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestionale Bancone - Grasso</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: #1a1209; color: #f5e6c8; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px; }
+        .app-container { max-width: 1400px; width: 100%; display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        
+        /* PANNELLO SINISTRO */
+        .left-panel { background: #2a1e13; border-radius: 20px; padding: 20px; border: 1px solid #d4a84b33; }
+        .header-banco { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .header-banco h1 { font-size: 1.6rem; color: #d4a84b; font-weight: 800; }
+        .header-banco h1 i { margin-right: 10px; }
+        .header-banco .printer-status { color: #a08b6d; font-size: 0.8rem; }
+        .header-banco .printer-status i { color: #4ade80; }
+        
+        /* RICERCA */
+        .search-bar { position: relative; margin-bottom: 15px; }
+        .search-bar input { width: 100%; padding: 14px 20px 14px 50px; border-radius: 12px; border: 2px solid #d4a84b44; background: #1a1209; color: #f5e6c8; font-size: 1rem; }
+        .search-bar input:focus { border-color: #d4a84b; outline: none; box-shadow: 0 0 20px #d4a84b33; }
+        .search-bar i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #d4a84b; font-size: 1.2rem; }
+        .search-bar .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #a08b6d; cursor: pointer; display: none; }
+        .search-bar .clear-search.show { display: block; }
+        
+        /* CATEGORIE */
+        .categorie-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 15px; scrollbar-width: none; }
+        .categorie-scroll::-webkit-scrollbar { display: none; }
+        .cat-btn { background: #3d2b1a; border: 2px solid transparent; color: #a08b6d; padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+        .cat-btn.active { background: #d4a84b; color: #1a1209; border-color: #f0d78c; box-shadow: 0 0 20px #d4a84b55; }
+        .cat-btn:hover { border-color: #d4a84b; }
+        
+        /* PRODOTTI */
+        .prodotti-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; max-height: 55vh; overflow-y: auto; padding-right: 5px; }
+        .prodotti-grid::-webkit-scrollbar { width: 6px; }
+        .prodotti-grid::-webkit-scrollbar-thumb { background: #d4a84b; border-radius: 10px; }
+        .prod-item { background: #3d2b1a; border-radius: 16px; padding: 12px 8px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .prod-item:hover { border-color: #d4a84b; transform: translateY(-3px); }
+        .prod-item:active { transform: scale(0.95); }
+        .prod-item .prod-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #1a1209; border: 1px solid #d4a84b44; }
+        .prod-item .price { color: #d4a84b; font-weight: 800; font-size: 1.1rem; }
+        .prod-item .name { font-weight: 600; font-size: 0.85rem; line-height: 1.2; min-height: 2.4rem; }
+        .prod-item.disabled { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+        .prod-item .badge-esaurito { background: #dc2626; color: white; font-size: 0.6rem; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+        
+        /* PANNELLO DESTRO (Carrello + Dati) */
+        .right-panel { background: #2a1e13; border-radius: 20px; padding: 20px; border: 1px solid #d4a84b33; display: flex; flex-direction: column; height: fit-content; max-height: 95vh; position: relative; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #d4a84b33; padding-bottom: 15px; }
+        .cart-header h2 { color: #d4a84b; font-size: 1.2rem; }
+        .cart-header .totale { background: #d4a84b; color: #1a1209; padding: 5px 15px; border-radius: 30px; font-weight: 800; }
+        .cart-items { flex: 1; overflow-y: auto; max-height: 250px; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #ffffff11; }
+        .cart-item .qty-control { display: flex; align-items: center; gap: 10px; }
+        .cart-item .qty-btn { background: #3d2b1a; border: none; color: #d4a84b; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 1.1rem; }
+        .cart-item .qty-btn:hover { background: #d4a84b; color: #1a1209; }
+        
+        .dati-cliente { background: #1a1209; border-radius: 16px; padding: 15px; margin: 10px 0; }
+        .dati-cliente input, .dati-cliente textarea { width: 100%; background: transparent; border: 1px solid #d4a84b44; border-radius: 10px; padding: 12px; color: #f5e6c8; margin-bottom: 10px; font-size: 0.9rem; }
+        .dati-cliente input:focus, .dati-cliente textarea:focus { border-color: #d4a84b; outline: none; }
+        .dati-cliente .row { display: flex; gap: 10px; }
+        .dati-cliente .row * { flex: 1; }
+        .dati-cliente .row-data { display: flex; gap: 10px; }
+        .dati-cliente .row-data input[type="date"] { flex: 2; }
+        .dati-cliente .row-data input[type="time"] { flex: 1; }
+        
+        .actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-primary-banco { background: #d4a84b; color: #1a1209; border: none; padding: 15px; border-radius: 16px; font-weight: 800; font-size: 1rem; width: 100%; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-primary-banco:hover { background: #f0d78c; transform: scale(1.02); }
+        .btn-primary-banco:active { transform: scale(0.95); }
+        .btn-secondary-banco { background: #3d2b1a; color: #f5e6c8; border: 1px solid #d4a84b44; padding: 15px; border-radius: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-secondary-banco:hover { background: #4a3728; }
+        .status-msg { text-align: center; margin-top: 10px; font-size: 0.8rem; color: #a08b6d; min-height: 1.5rem; }
+        
+        /* PULSANTE STORICO (in basso a destra) */
+        .btn-history-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #d4a84b;
+            color: #1a1209;
+            border: none;
+            border-radius: 60px;
+            padding: 15px 25px;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: 0 8px 25px rgba(212, 168, 75, 0.3);
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+        }
+        .btn-history-float:hover { background: #f0d78c; transform: scale(1.05); }
+        .btn-history-float .badge {
+            background: #dc2626;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        
+        /* CASSETTO STORICO (Drawer) */
+        .drawer { position: fixed; top: 0; right: -450px; width: 420px; height: 100%; background: #2a1e13; border-left: 2px solid #d4a84b; padding: 20px; overflow-y: auto; transition: right 0.3s ease; z-index: 2000; box-shadow: -10px 0 40px rgba(0,0,0,0.8); }
+        .drawer.open { right: 0; }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #d4a84b33; }
+        .drawer-header h2 { color: #d4a84b; font-size: 1.3rem; }
+        .drawer-header h2 i { margin-right: 10px; }
+        .drawer-close { background: none; border: none; color: #a08b6d; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        .drawer-close:hover { color: #f5e6c8; }
+        .drawer-actions { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .drawer-actions button { background: #3d2b1a; border: 1px solid #d4a84b44; color: #f5e6c8; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: 0.2s; flex: 1; }
+        .drawer-actions button:hover { background: #d4a84b22; border-color: #d4a84b; }
+        .drawer-actions .btn-danger { color: #f87171; border-color: #f8717144; }
+        .drawer-actions .btn-danger:hover { background: #f8717122; border-color: #f87171; }
+        .order-history-item { background: #1a1209; border-radius: 12px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #d4a84b; }
+        .order-history-item .oh-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 5px; }
+        .order-history-item .oh-id { color: #d4a84b; font-weight: 700; font-size: 0.9rem; }
+        .order-history-item .oh-date { color: #a08b6d; font-size: 0.7rem; }
+        .order-history-item .oh-customer { color: #f5e6c8; font-weight: 600; }
+        .order-history-item .oh-total { color: #d4a84b; font-weight: 800; }
+        .order-history-item .oh-items { color: #a08b6d; font-size: 0.8rem; margin: 5px 0; }
+        .order-history-item .oh-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .order-history-item .oh-actions button { background: #3d2b1a; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 0.7rem; cursor: pointer; transition: 0.2s; }
+        .order-history-item .oh-actions .btn-print { color: #4ade80; }
+        .order-history-item .oh-actions .btn-print:hover { background: #4ade8022; }
+        .order-history-item .oh-actions .btn-delete { color: #f87171; }
+        .order-history-item .oh-actions .btn-delete:hover { background: #f8717122; }
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1999; display: none; backdrop-filter: blur(3px); }
+        .drawer-overlay.show { display: block; }
+        
+        @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } .drawer { width: 100%; right: -100%; } .btn-history-float { bottom: 20px; right: 20px; padding: 12px 18px; font-size: 0.8rem; } }
+    </style>
+</head>
+<body>
+
+<!-- OVERLAY PER CHIUDERE IL CASSETTO -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- CASSETTO STORICO ORDINI -->
+<div class="drawer" id="orderDrawer">
+    <div class="drawer-header">
+        <h2><i class="fas fa-history"></i> Storico Ordini</h2>
+        <button class="drawer-close" onclick="closeDrawer()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="drawer-actions">
+        <button onclick="reprintAllOrders()"><i class="fas fa-print"></i> Ristampa Tutti</button>
+        <button class="btn-danger" onclick="deleteAllOrders()"><i class="fas fa-trash-alt"></i> Elimina Tutti</button>
+    </div>
+    <div id="orderHistoryList">
+        <div style="text-align:center; color:#a08b6d; padding:30px;">Nessun ordine registrato</div>
+    </div>
+</div>
+
+<!-- PULSANTE STORICO (Flottante) -->
+<button class="btn-history-float" onclick="openDrawer()">
+    <i class="fas fa-history" style="font-size:1.3rem;"></i> Storico
+    <span class="badge" id="historyBadge">0</span>
+</button>
+
+<!-- APP PRINCIPALE -->
+<div class="app-container" id="appBanco">
+    <!-- PANNELLO SINISTRO -->
+    <div class="left-panel">
+        <div class="header-banco">
+            <h1><i class="fas fa-tachometer-alt"></i> Bancone</h1>
+            <span class="printer-status"><i class="fas fa-circle"></i> Stampante: Pronta</span>
+        </div>
+        
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="🔍 Cerca nel menu..." oninput="filterProducts(this.value)">
+            <span class="clear-search" id="clearSearch" onclick="clearSearch()"><i class="fas fa-times-circle"></i></span>
+        </div>
+        
+        <div class="categorie-scroll" id="categoryList"></div>
+        <div class="prodotti-grid" id="productList"></div>
+    </div>
+
+    <!-- PANNELLO DESTRO (Carrello) -->
+    <div class="right-panel">
+        <div class="cart-header">
+            <h2><i class="fas fa-shopping-cart"></i> Comanda</h2>
+            <span class="totale" id="cartTotal">€0.00</span>
+        </div>
+        
+        <div class="cart-items" id="cartItems"></div>
+
+        <div class="dati-cliente">
+            <div class="row">
+                <input type="text" id="customerName" placeholder="Nome Cliente *">
+                <input type="tel" id="customerPhone" placeholder="Telefono (opzionale)">
+            </div>
+            <div class="row-data">
+                <input type="date" id="orderDate">
+                <input type="time" id="orderTime" step="300">
+            </div>
+            <input type="text" id="customerNotes" placeholder="Note (piano, citofono, ecc.)">
+        </div>
+
+        <div class="actions">
+            <button class="btn-secondary-banco" onclick="clearCart()" style="flex:1;"><i class="fas fa-trash-alt"></i> Svuota</button>
+            <button class="btn-primary-banco" onclick="sendOrderBanco()" style="flex:2;"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
+        </div>
+        <div id="statusMsg" class="status-msg">Pronto per prendere l'ordine</div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// FIREBASE CONFIG
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
+    authDomain: "teogra-c8cf5.firebaseapp.com",
+    databaseURL: "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "teogra-c8cf5",
+    storageBucket: "teogra-c8cf5.firebasestorage.app",
+    messagingSenderId: "686300112893",
+    appId: "1:686300112893:web:e147b82f91374f12db1b94"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ============================================================
+// STATO GLOBALE
+// ============================================================
+let cart = [];
+let currentCategory = null;
+let menuData = { categories: {}, products: {} };
+let imagesData = { categories: {} };
+let orderHistory = [];
+let searchTerm = '';
+
+// ============================================================
+// CARICAMENTO DATI
+// ============================================================
+async function loadData() {
+    try {
+        const [catsSnap, menuSnap, settingsSnap, imagesSnap] = await Promise.all([
+            db.ref('categories').once('value'),
+            db.ref('menu').once('value'),
+            db.ref('settings').once('value'),
+            db.ref('images/categories').once('value')
+        ]);
+        
+        if (catsSnap.exists()) menuData.categories = catsSnap.val();
+        if (menuSnap.exists()) menuData.products = menuSnap.val();
+        if (imagesSnap.exists()) imagesData.categories = imagesSnap.val();
+        
+        renderCategories();
+        if (Object.keys(menuData.categories).length > 0) {
+            const firstCat = Object.keys(menuData.categories)[0];
+            selectCategory(firstCat);
+        }
+        setDefaultDateTime();
+        loadOrderHistory();
+    } catch (e) {
+        console.error('Errore caricamento dati:', e);
+        document.getElementById('statusMsg').textContent = '❌ Errore caricamento menu';
+    }
+}
+
+// ============================================================
+// RENDER CATEGORIE E PRODOTTI
+// ============================================================
+function renderCategories() {
+    const container = document.getElementById('categoryList');
+    container.innerHTML = Object.keys(menuData.categories).map(key => {
+        const cat = menuData.categories[key];
+        return `<button class="cat-btn" data-cat="${key}" onclick="selectCategory('${key}')">${cat.icon ? `<i class="fas ${cat.icon}"></i>` : ''} ${cat.name}</button>`;
+    }).join('');
+}
+
+function selectCategory(key) {
+    currentCategory = key;
+    document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.cat-btn[data-cat="${key}"]`)?.classList.add('active');
+    document.getElementById('searchInput').value = '';
+    searchTerm = '';
+    document.getElementById('clearSearch').classList.remove('show');
+    renderProducts(key);
+}
+
+function renderProducts(catKey) {
+    const container = document.getElementById('productList');
+    let products = menuData.products[catKey] || [];
+    
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        products = products.filter(p => 
+            p.name.toLowerCase().includes(term) || 
+            (p.desc && p.desc.toLowerCase().includes(term))
+        );
+    }
+    
+    if (!products.length) {
+        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#a08b6d; padding:30px;">' + 
+            (searchTerm ? 'Nessun prodotto trovato' : 'Nessun prodotto in questa categoria') + 
+            '</div>';
+        return;
+    }
+    
+    container.innerHTML = products.map((p, idx) => {
+        const isDisabled = p.disabled === true;
+        const imgUrl = p.img || '';
+        const catImg = imagesData.categories[catKey] || '';
+        const displayImg = imgUrl || catImg;
+        const realIdx = menuData.products[catKey].indexOf(p);
+        
+        return `<div class="prod-item ${isDisabled ? 'disabled' : ''}" onclick="${isDisabled ? '' : `addToCart('${catKey}', ${realIdx})`}">
+            ${displayImg ? `<img class="prod-img" src="${displayImg}" alt="${p.name}" onerror="this.style.display='none'">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#1a1209;color:#d4a84b44;font-size:2rem;"><i class="fas fa-pizza-slice"></i></div>`}
+            <span class="name">${p.name}</span>
+            <span class="price">€${p.price.toFixed(2)}</span>
+            ${isDisabled ? '<span class="badge-esaurito">ESAURITO</span>' : ''}
+        </div>`;
+    }).join('');
+}
+
+// ============================================================
+// RICERCA
+// ============================================================
+function filterProducts(term) {
+    searchTerm = term.trim();
+    const clearBtn = document.getElementById('clearSearch');
+    if (searchTerm) {
+        clearBtn.classList.add('show');
+        const allProducts = [];
+        Object.keys(menuData.products).forEach(catKey => {
+            const products = menuData.products[catKey] || [];
+            products.forEach(p => {
+                if (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                    (p.desc && p.desc.toLowerCase().includes(searchTerm.toLowerCase()))) {
+                    allProducts.push({ ...p, catKey: catKey, originalIndex: products.indexOf(p) });
+                }
+            });
+        });
+        
+        const container = document.getElementById('productList');
+        if (!allProducts.length) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#a08b6d; padding:30px;">Nessun prodotto trovato</div>';
+            return;
+        }
+        container.innerHTML = allProducts.map(p => {
+            const isDisabled = p.disabled === true;
+            const imgUrl = p.img || '';
+            const catImg = imagesData.categories[p.catKey] || '';
+            const displayImg = imgUrl || catImg;
+            
+            return `<div class="prod-item ${isDisabled ? 'disabled' : ''}" onclick="${isDisabled ? '' : `addToCart('${p.catKey}', ${p.originalIndex})`}">
+                ${displayImg ? `<img class="prod-img" src="${displayImg}" alt="${p.name}" onerror="this.style.display='none'">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#1a1209;color:#d4a84b44;font-size:2rem;"><i class="fas fa-pizza-slice"></i></div>`}
+                <span class="name">${p.name}</span>
+                <span class="price">€${p.price.toFixed(2)}</span>
+                ${isDisabled ? '<span class="badge-esaurito">ESAURITO</span>' : ''}
+                <span style="font-size:0.6rem;color:#a08b6d;">${menuData.categories[p.catKey]?.name || ''}</span>
+            </div>`;
+        }).join('');
+        
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+    } else {
+        clearBtn.classList.remove('show');
+        if (currentCategory) {
+            renderProducts(currentCategory);
+            document.querySelector(`.cat-btn[data-cat="${currentCategory}"]`)?.classList.add('active');
+        }
+    }
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    filterProducts('');
+}
+
+// ============================================================
+// CARRELLO
+// ============================================================
+function addToCart(catKey, idx) {
+    const product = menuData.products[catKey][idx];
+    if (!product || product.disabled) return;
+    
+    const existing = cart.find(item => item.name === product.name && item.cat === catKey);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ ...product, cat: catKey, qty: 1 });
+    }
+    updateCartUI();
+}
+
+function updateCartQty(index, delta) {
+    if (!cart[index]) return;
+    cart[index].qty += delta;
+    if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+    }
+    updateCartUI();
+}
+
+function clearCart() {
+    if (!cart.length) return;
+    if (confirm('Svuotare il carrello?')) {
+        cart = [];
+        updateCartUI();
+    }
+}
+
+function updateCartUI() {
+    const container = document.getElementById('cartItems');
+    const totalEl = document.getElementById('cartTotal');
+    let total = 0;
+    
+    if (!cart.length) {
+        container.innerHTML = '<div style="text-align:center; color:#a08b6d; padding:20px;">Nessun prodotto aggiunto</div>';
+        totalEl.textContent = '€0.00';
+        return;
+    }
+    
+    container.innerHTML = cart.map((item, idx) => {
+        total += item.price * item.qty;
+        return `<div class="cart-item">
+            <span>${item.name} x${item.qty}</span>
+            <span>€${(item.price * item.qty).toFixed(2)}</span>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="updateCartQty(${idx}, -1)">−</button>
+                <span>${item.qty}</span>
+                <button class="qty-btn" onclick="updateCartQty(${idx}, 1)">+</button>
+            </div>
+        </div>`;
+    }).join('');
+    
+    totalEl.textContent = `€${total.toFixed(2)}`;
+}
+
+// ============================================================
+// INVIO ORDINE
+// ============================================================
+async function sendOrderBanco() {
+    if (!cart.length) {
+        document.getElementById('statusMsg').textContent = '⚠️ Aggiungi almeno un prodotto';
+        return;
+    }
+    
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+    const date = document.getElementById('orderDate').value;
+    const time = document.getElementById('orderTime').value;
+    const notes = document.getElementById('customerNotes').value.trim();
+    
+    if (!name) {
+        document.getElementById('statusMsg').textContent = '⚠️ Inserisci il Nome del Cliente';
+        return;
+    }
+    
+    let scheduledTime = 'Prima possibile';
+    if (date && time) {
+        const dateObj = new Date(date + 'T' + time);
+        scheduledTime = dateObj.toLocaleString('it-IT', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    } else if (date) {
+        const dateObj = new Date(date);
+        scheduledTime = dateObj.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } else if (time) {
+        scheduledTime = time;
+    }
+    
+    const btn = document.querySelector('.btn-primary-banco');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+    btn.disabled = true;
+    document.getElementById('statusMsg').textContent = '⏳ Invio ordine...';
+    
+    try {
+        let productsTotal = 0;
+        const items = cart.map(item => {
+            const price = item.price * item.qty;
+            productsTotal += price;
+            return { name: item.name, qty: item.qty, price: item.price, cat: item.cat };
+        });
+        
+        const finalTotal = productsTotal;
+        
+        const snap = await db.ref('counter/ordini').transaction(c => (c || 0) + 1);
+        const orderNum = snap.snapshot.val();
+        const orderId = 'ORD-' + String(orderNum).padStart(5, '0');
+        
+        const orderRef = db.ref('ordini').push();
+        await orderRef.set({
+            orderId: orderId,
+            customerName: name,
+            customerPhone: phone || '',
+            address: '',
+            notes: notes,
+            type: 'pickup',
+            scheduledTime: scheduledTime,
+            items: items,
+            productsTotal: productsTotal,
+            deliveryFee: 0,
+            finalTotal: finalTotal,
+            status: 'new',
+            timestamp: Date.now(),
+            source: 'banco'
+        });
+        
+        // Salva nello storico locale
+        const orderData = {
+            orderId, customerName: name, customerPhone: phone || 'N/A',
+            scheduledTime, items, finalTotal, notes: notes || 'Nessuna',
+            timestamp: Date.now()
+        };
+        orderHistory.unshift(orderData);
+        if (orderHistory.length > 100) orderHistory.pop();
+        localStorage.setItem('banco_orders', JSON.stringify(orderHistory));
+        
+        cart = [];
+        updateCartUI();
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerPhone').value = '';
+        document.getElementById('customerNotes').value = '';
+        setDefaultDateTime();
+        
+        document.getElementById('statusMsg').textContent = `✅ Ordine ${orderId} inviato!`;
+        
+        printOrder(orderData);
+        playNotificationSound();
+        updateHistoryBadge();
+        
+    } catch (e) {
+        console.error(e);
+        document.getElementById('statusMsg').textContent = '❌ Errore invio ordine';
+    } finally {
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invia Ordine';
+        btn.disabled = false;
+    }
+}
+
+// ============================================================
+// STAMPA
+// ============================================================
+function printOrder(order) {
+    const printContent = `
+        ════════════════════════════════════
+           🍕 ANTICA PIZZERIA GRASSO
+           ORDINE #${order.orderId}
+           📅 ${new Date().toLocaleString()}
+        ════════════════════════════════════
+        
+        👤 Cliente:   ${order.customerName}
+        📞 Telefono:  ${order.customerPhone}
+        📦 Tipo:      📦 RITIRO
+        🕐 Orario:    ${order.scheduledTime}
+        
+        ════════════════════════════════════
+        📋 PRODOTTI:
+        ${order.items.map(i => `  ${i.name}  ×${i.qty}  €${(i.price * i.qty).toFixed(2)}`).join('\n')}
+        ════════════════════════════════════
+        
+        Totale:          €${order.finalTotal.toFixed(2)}
+        ════════════════════════════════════
+        
+        📝 Note: ${order.notes || 'Nessuna'}
+        
+        ════════════════════════════════════
+        Data: ${new Date().toLocaleString()}
+        ════════════════════════════════════
+    `;
+    
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        alert('Permetti i popup per la stampa!');
+        return;
+    }
+    printWindow.document.write(`
+        <html><head><title>Stampa Ordine #${order.orderId}</title>
+        <style>
+            body { font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; white-space: pre; background: white; color: black; }
+            @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
+        </style>
+        </head>
+        <body>
+            <pre>${printContent}</pre>
+            <div class="no-print" style="margin-top:20px;text-align:center;">
+                <button onclick="window.print()" style="padding:12px 30px;font-size:16px;cursor:pointer;background:#d4a84b;border:none;border-radius:10px;font-weight:700;">🖨️ Stampa</button>
+                <button onclick="window.close()" style="padding:12px 30px;font-size:16px;cursor:pointer;margin-left:10px;background:#333;color:white;border:none;border-radius:10px;">Chiudi</button>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// ============================================================
+// STORICO ORDINI (CASSETTO)
+// ============================================================
+function loadOrderHistory() {
+    try {
+        const data = localStorage.getItem('banco_orders');
+        if (data) orderHistory = JSON.parse(data);
+    } catch(e) { orderHistory = []; }
+    renderHistory();
+    updateHistoryBadge();
+}
+
+function renderHistory() {
+    const container = document.getElementById('orderHistoryList');
+    if (!orderHistory.length) {
+        container.innerHTML = '<div style="text-align:center; color:#a08b6d; padding:30px;">Nessun ordine registrato</div>';
+        return;
+    }
+    
+    container.innerHTML = orderHistory.map(o => `
+        <div class="order-history-item">
+            <div class="oh-header">
+                <span class="oh-id">📦 ${o.orderId}</span>
+                <span class="oh-date">${new Date(o.timestamp).toLocaleString()}</span>
+            </div>
+            <div class="oh-customer">👤 ${o.customerName} ${o.customerPhone && o.customerPhone !== 'N/A' ? '📞 ' + o.customerPhone : ''}</div>
+            <div class="oh-items">${o.items.map(i => `${i.name} ×${i.qty}`).join(', ')}</div>
+            <div class="oh-total">Totale: €${o.finalTotal.toFixed(2)}</div>
+            <div class="oh-actions">
+                <button class="btn-print" onclick="reprintOrder('${o.orderId}')"><i class="fas fa-print"></i> Ristampa</button>
+                <button class="btn-delete" onclick="deleteOrder('${o.orderId}')"><i class="fas fa-trash"></i> Elimina</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateHistoryBadge() {
+    const badge = document.getElementById('historyBadge');
+    if (badge) badge.textContent = orderHistory.length;
+}
+
+function openDrawer() {
+    document.getElementById('orderDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('show');
+    renderHistory();
+}
+
+function closeDrawer() {
+    document.getElementById('orderDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('show');
+}
+
+function reprintOrder(orderId) {
+    const order = orderHistory.find(o => o.orderId === orderId);
+    if (order) {
+        printOrder(order);
+        showToast('🖨️ Ristampa inviata');
+    } else {
+        showToast('❌ Ordine non trovato');
+    }
+}
+
+function reprintAllOrders() {
+    if (!orderHistory.length) {
+        showToast('❌ Nessun ordine da ristampare');
+        return;
+    }
+    if (!confirm('Ristampare TUTTI gli ordini?')) return;
+    orderHistory.forEach(o => printOrder(o));
+    showToast('🖨️ Ristampa di tutti gli ordini avviata');
+}
+
+function deleteOrder(orderId) {
+    if (!confirm(`Eliminare l'ordine ${orderId}?`)) return;
+    orderHistory = orderHistory.filter(o => o.orderId !== orderId);
+    localStorage.setItem('banco_orders', JSON.stringify(orderHistory));
+    renderHistory();
+    updateHistoryBadge();
+    showToast(`🗑️ Ordine ${orderId} eliminato`);
+}
+
+function deleteAllOrders() {
+    if (!orderHistory.length) {
+        showToast('❌ Nessun ordine da eliminare');
+        return;
+    }
+    if (!confirm('⚠️ Eliminare TUTTI gli ordini dallo storico?')) return;
+    orderHistory = [];
+    localStorage.setItem('banco_orders', JSON.stringify(orderHistory));
+    renderHistory();
+    updateHistoryBadge();
+    showToast('🗑️ Tutti gli ordini eliminati');
+}
+
+// ============================================================
+// UTILITY
+// ============================================================
+function showToast(msg) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg;
+    setTimeout(() => {
+        if (el.textContent === msg) el.textContent = 'Pronto per prendere l\'ordine';
+    }, 3000);
+}
+
+function playNotificationSound() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = 880; gain.gain.value = 0.3;
+        osc.start();
+        setTimeout(() => { osc.frequency.value = 1100; }, 100);
+        setTimeout(() => { osc.frequency.value = 880; }, 200);
+        setTimeout(() => { osc.stop(); }, 400);
+    } catch(e) {}
+}
+
+function setDefaultDateTime() {
+    const now = new Date();
+    const dateInput = document.getElementById('orderDate');
+    const timeInput = document.getElementById('orderTime');
+    
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    dateInput.value = `${year}-${month}-${day}`;
+    
+    now.setMinutes(Math.ceil(now.getMinutes() / 15) * 15, 0, 0);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    timeInput.value = `${hours}:${minutes}`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
