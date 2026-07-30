@@ -518,7 +518,7 @@ function updateCartUI() {
 }
 
 // ============================================================
-// RICONOSCIMENTO VOCALE (con stop automatico su "invia")
+// RICONOSCIMENTO VOCALE (CONTINUO + RICONOSCIMENTO DATI)
 // ============================================================
 function initVoiceRecognition() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -531,7 +531,7 @@ function initVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.lang = 'it-IT';
-    recognition.continuous = false;
+    recognition.continuous = true;  // 🔥 NON si ferma dopo ogni parola!
     recognition.interimResults = true;
     recognition.maxAlternatives = 5;
     
@@ -556,7 +556,7 @@ function initVoiceRecognition() {
             
             // 🔥 Se dice "invia" o "stampa" → ferma microfono e invia ordine
             if (textLower.includes('invia') || textLower.includes('stampa') || textLower.includes('manda')) {
-                stopListening(); // Ferma il microfono
+                stopListening();
                 document.getElementById('voiceStatus').textContent = '📨 Invio ordine per voce...';
                 document.getElementById('voiceStatus').className = 'voice-status success';
                 sendOrderBanco();
@@ -572,14 +572,22 @@ function initVoiceRecognition() {
     
     recognition.onerror = function(event) {
         console.error('Errore voce:', event.error);
-        document.getElementById('voiceStatus').textContent = '❌ Errore: ' + event.error;
+        if (event.error === 'not-allowed') {
+            document.getElementById('voiceStatus').textContent = '❌ Permesso microfono negato. Autorizza dal browser.';
+        } else {
+            document.getElementById('voiceStatus').textContent = '❌ Errore: ' + event.error;
+        }
         document.getElementById('voiceStatus').className = 'voice-status error';
         stopListening();
     };
     
     recognition.onend = function() {
-        // Il microfono si ferma da solo quando smette di parlare
-        stopListening();
+        // Se siamo ancora in ascolto, riavvia (perché continuous=true)
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {}
+        }
     };
 }
 
@@ -610,10 +618,10 @@ function startListening() {
 }
 
 function stopListening() {
+    isListening = false;
     try {
         if (recognition) recognition.stop();
     } catch(e) {}
-    isListening = false;
     document.getElementById('micBtn').classList.remove('listening');
     document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="mic-text">Voce</span>';
     if (document.getElementById('voiceStatus').textContent.includes('Ascolto') || 
@@ -623,11 +631,46 @@ function stopListening() {
     }
 }
 
+// ============================================================
+// PROCESSO COMANDI VOCALI (con riconoscimento nome, telefono, note)
+// ============================================================
 function processVoiceCommand(text) {
     let added = 0;
     let foundProducts = [];
     let categoriesFound = [];
+    let hasData = false;
     
+    // 🔥 RICONOSCI NOME
+    const nameMatch = text.match(/(?:nome|per|chiama)\s+([a-zA-ZÀ-ù\s]{2,30})/i);
+    if (nameMatch) {
+        const name = nameMatch[1].trim();
+        if (name.length > 2) {
+            document.getElementById('customerName').value = name;
+            document.getElementById('voiceStatus').textContent += ' 👤 Nome: ' + name;
+            hasData = true;
+        }
+    }
+    
+    // 🔥 RICONOSCI TELEFONO (cerca numeri di telefono)
+    const phoneMatch = text.match(/(3[0-9]{8,9})/);
+    if (phoneMatch) {
+        document.getElementById('customerPhone').value = phoneMatch[1];
+        document.getElementById('voiceStatus').textContent += ' 📞 Telefono: ' + phoneMatch[1];
+        hasData = true;
+    }
+    
+    // 🔥 RICONOSCI NOTE (dopo "note" o "citofono" o "piano")
+    const noteMatch = text.match(/(?:note|citofono|piano|allergie|intolleranze)\s+([a-zA-Z0-9\s,\.]{3,50})/i);
+    if (noteMatch) {
+        const note = noteMatch[1].trim();
+        if (note.length > 2) {
+            document.getElementById('customerNotes').value = note;
+            document.getElementById('voiceStatus').textContent += ' 📝 Note: ' + note;
+            hasData = true;
+        }
+    }
+    
+    // 🔍 CERCA CATEGORIE
     const categoryNames = Object.keys(menuData.categories).map(key => ({
         key: key,
         name: menuData.categories[key].name.toLowerCase()
@@ -639,6 +682,7 @@ function processVoiceCommand(text) {
         }
     });
     
+    // 🔍 CERCA PRODOTTI
     if (categoriesFound.length > 0) {
         categoriesFound.forEach(catKey => {
             const products = menuData.products[catKey] || [];
@@ -668,33 +712,23 @@ function processVoiceCommand(text) {
         });
     }
     
+    // Limita a max 5 prodotti
     if (foundProducts.length > 5) {
         foundProducts = foundProducts.slice(0, 5);
     }
     
+    // 🔥 AGGIUNGI PRODOTTI (senza duplicati)
     foundProducts.forEach(p => {
         const existing = cart.find(item => item.name === p.name && item.cat === p.catKey);
         if (existing) {
-            existing.qty += 1;
+            existing.qty += 1;  // Aumenta quantità
         } else {
             cart.push({ ...p, cat: p.catKey, qty: 1 });
         }
         added++;
     });
     
-    const phoneMatch = text.match(/(3[0-9]{9})/);
-    if (phoneMatch) {
-        document.getElementById('customerPhone').value = phoneMatch[1];
-    }
-    
-    const nameMatch = text.match(/(?:nome|per|chiama)\s+([a-zA-ZÀ-ù\s]{2,20})/i);
-    if (nameMatch) {
-        const name = nameMatch[1].trim();
-        if (name.length > 2) {
-            document.getElementById('customerName').value = name;
-        }
-    }
-    
+    // Aggiorna UI se ci sono cambiamenti
     if (added > 0) {
         updateCartUI();
         const catInfo = categoriesFound.length > 0 ? ' (categoria: ' + categoriesFound.map(k => menuData.categories[k].name).join(', ') + ')' : '';
@@ -708,13 +742,20 @@ function processVoiceCommand(text) {
                 document.getElementById('voiceStatus').className = 'voice-status';
             }
         }, 3000);
-    } else {
+    } else if (!hasData) {
         document.getElementById('voiceStatus').textContent = '❌ Nessun prodotto riconosciuto. Riprova! (es. "Pizze Margherita")';
         document.getElementById('voiceStatus').className = 'voice-status error';
         setTimeout(() => {
             document.getElementById('voiceStatus').textContent = '🎤 Premi il microfono e parla (es. "Pizze Margherita")';
             document.getElementById('voiceStatus').className = 'voice-status';
         }, 4000);
+    } else {
+        // Se ha riconosciuto solo dati (nome, telefono, note)
+        document.getElementById('voiceStatus').className = 'voice-status success';
+        setTimeout(() => {
+            document.getElementById('voiceStatus').textContent = '💡 Dì "invia" per stampare l\'ordine';
+            document.getElementById('voiceStatus').className = 'voice-status';
+        }, 2000);
     }
 }
 
@@ -730,7 +771,7 @@ function getAllProducts() {
 }
 
 // ============================================================
-// INVIO ORDINE
+// INVIO ORDINE (con stampa automatica via Firebase)
 // ============================================================
 async function sendOrderBanco() {
     if (!cart.length) {
@@ -798,9 +839,11 @@ async function sendOrderBanco() {
             finalTotal: finalTotal,
             status: 'new',
             timestamp: Date.now(),
-            source: source
+            source: source,
+            printer: 'auto'  // 🔥 Segnale per la stampa automatica
         });
         
+        // Salva storico locale
         const orderData = {
             orderId, customerName: name, customerPhone: phone || 'N/A',
             scheduledTime, items, finalTotal, notes: notes || 'Nessuna',
@@ -811,6 +854,7 @@ async function sendOrderBanco() {
         if (orderHistory.length > 100) orderHistory.pop();
         localStorage.setItem('banco_orders', JSON.stringify(orderHistory));
         
+        // Svuota carrello
         cart = [];
         updateCartUI();
         document.getElementById('customerName').value = '';
@@ -818,10 +862,10 @@ async function sendOrderBanco() {
         document.getElementById('customerNotes').value = '';
         setDefaultDateTime();
         
-        document.getElementById('statusMsg').textContent = `✅ Ordine ${orderId} inviato da ${source}!`;
+        document.getElementById('statusMsg').textContent = `✅ Ordine ${orderId} inviato! Stampa automatica in corso...`;
         
-        // 🔥 STAMPA: usa la stessa logica della tua webapp
-        printOrder(orderData);
+        // 🔥 NON apriamo la finestra di stampa qui!
+        // La stampa avviene tramite Firebase → stampante collegata (come nella webapp)
         playNotificationSound();
         updateDrawerBadges();
         updateHistoryBadge();
@@ -836,7 +880,7 @@ async function sendOrderBanco() {
 }
 
 // ============================================================
-// STAMPA (stessa logica della webapp)
+// STAMPA (solo per ristampe manuali)
 // ============================================================
 function printOrder(order) {
     const sourceEmoji = {
@@ -872,7 +916,7 @@ function printOrder(order) {
         
         ════════════════════════════════════
         Data: ${new Date().toLocaleString()}
-        ════════════════════════════════════
+        ════════════════════════════════
     `;
     
     const printWindow = window.open('', '_blank', 'width=400,height=600');
