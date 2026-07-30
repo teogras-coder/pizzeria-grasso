@@ -315,20 +315,17 @@ function startAppOrdersListener() {
             const newOrders = [];
             snapshot.forEach(child => {
                 const order = { id: child.key, ...child.val() };
-                // Solo ordini dall'app (source diverso da 'banco' o non presente)
                 if (order.source !== 'banco') {
                     newOrders.push(order);
                 }
             });
             
-            // Ordina per timestamp decrescente
             newOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             appOrders = newOrders;
             renderHistory();
             updateDrawerBadges();
             updateHistoryBadge();
             
-            // Notifica se ci sono nuovi ordini
             if (newOrders.length > 0) {
                 const lastOrder = newOrders[0];
                 if (lastOrder.status === 'new') {
@@ -450,7 +447,7 @@ function clearSearch() {
 }
 
 // ============================================================
-// CARRELLO (con eliminazione singolo prodotto)
+// CARRELLO
 // ============================================================
 function addToCart(catKey, idx) {
     const product = menuData.products[catKey][idx];
@@ -521,7 +518,7 @@ function updateCartUI() {
 }
 
 // ============================================================
-// RICONOSCIMENTO VOCALE
+// RICONOSCIMENTO VOCALE (con stop automatico su "invia")
 // ============================================================
 function initVoiceRecognition() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -555,7 +552,21 @@ function initVoiceRecognition() {
         document.getElementById('voiceStatus').className = 'voice-status active';
         
         if (finalText) {
-            processVoiceCommand(finalText.toLowerCase());
+            const textLower = finalText.toLowerCase();
+            
+            // 🔥 Se dice "invia" o "stampa" → ferma microfono e invia ordine
+            if (textLower.includes('invia') || textLower.includes('stampa') || textLower.includes('manda')) {
+                stopListening(); // Ferma il microfono
+                document.getElementById('voiceStatus').textContent = '📨 Invio ordine per voce...';
+                document.getElementById('voiceStatus').className = 'voice-status success';
+                sendOrderBanco();
+                setTimeout(() => {
+                    document.getElementById('voiceStatus').textContent = '✅ Ordine inviato!';
+                }, 500);
+                return;
+            }
+            
+            processVoiceCommand(textLower);
         }
     };
     
@@ -567,6 +578,7 @@ function initVoiceRecognition() {
     };
     
     recognition.onend = function() {
+        // Il microfono si ferma da solo quando smette di parlare
         stopListening();
     };
 }
@@ -590,7 +602,7 @@ function startListening() {
         isListening = true;
         document.getElementById('micBtn').classList.add('listening');
         document.getElementById('micBtn').innerHTML = '<i class="fas fa-stop"></i><span class="mic-text">Stop</span>';
-        document.getElementById('voiceStatus').textContent = '🎤 Ascolto... parla ora!';
+        document.getElementById('voiceStatus').textContent = '🎤 Ascolto... parla ora! (dì "invia" per stampare)';
         document.getElementById('voiceStatus').className = 'voice-status active';
     } catch(e) {
         console.error('Errore avvio:', e);
@@ -604,37 +616,14 @@ function stopListening() {
     isListening = false;
     document.getElementById('micBtn').classList.remove('listening');
     document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="mic-text">Voce</span>';
-    if (document.getElementById('voiceStatus').textContent.includes('Ascolto')) {
+    if (document.getElementById('voiceStatus').textContent.includes('Ascolto') || 
+        document.getElementById('voiceStatus').textContent.includes('parla')) {
         document.getElementById('voiceStatus').textContent = '🎤 Premi il microfono e parla (es. "Pizze Margherita")';
         document.getElementById('voiceStatus').className = 'voice-status';
     }
 }
 
 function processVoiceCommand(text) {
-    if (text.includes('invia') || text.includes('stampa') || text.includes('manda')) {
-        document.getElementById('voiceStatus').textContent = '📨 Invio ordine per voce...';
-        document.getElementById('voiceStatus').className = 'voice-status success';
-        sendOrderBanco();
-        setTimeout(() => {
-            document.getElementById('voiceStatus').textContent = '✅ Ordine inviato!';
-        }, 500);
-        return;
-    }
-    
-    if (text.includes('svuota') || text.includes('cancella') || text.includes('vuota')) {
-        if (cart.length > 0) {
-            cart = [];
-            updateCartUI();
-            document.getElementById('voiceStatus').textContent = '🗑️ Carrello svuotato!';
-            document.getElementById('voiceStatus').className = 'voice-status success';
-            setTimeout(() => {
-                document.getElementById('voiceStatus').textContent = '🎤 Premi il microfono e parla';
-                document.getElementById('voiceStatus').className = 'voice-status';
-            }, 2000);
-        }
-        return;
-    }
-    
     let added = 0;
     let foundProducts = [];
     let categoriesFound = [];
@@ -831,6 +820,7 @@ async function sendOrderBanco() {
         
         document.getElementById('statusMsg').textContent = `✅ Ordine ${orderId} inviato da ${source}!`;
         
+        // 🔥 STAMPA: usa la stessa logica della tua webapp
         printOrder(orderData);
         playNotificationSound();
         updateDrawerBadges();
@@ -846,7 +836,7 @@ async function sendOrderBanco() {
 }
 
 // ============================================================
-// STAMPA
+// STAMPA (stessa logica della webapp)
 // ============================================================
 function printOrder(order) {
     const sourceEmoji = {
@@ -910,7 +900,7 @@ function printOrder(order) {
 }
 
 // ============================================================
-// STORICO ORDINI (con tab per app e banco)
+// STORICO ORDINI
 // ============================================================
 function loadOrderHistory() {
     try {
@@ -1008,7 +998,6 @@ function closeDrawer() {
 }
 
 function reprintOrder(orderId) {
-    // Cerca prima nel banco poi nell'app
     let order = orderHistory.find(o => o.orderId === orderId);
     if (!order) {
         order = appOrders.find(o => o.orderId === orderId);
@@ -1053,8 +1042,6 @@ function deleteAllOrders() {
         orderHistory = [];
         localStorage.setItem('banco_orders', JSON.stringify(orderHistory));
     } else {
-        // Per gli ordini dell'app, non possiamo eliminarli da Firebase qui
-        // ma possiamo nasconderli dalla vista
         showToast('ℹ️ Gli ordini dall\'app possono essere eliminati solo dal pannello admin');
         return;
     }
