@@ -539,6 +539,9 @@ let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=nul
 let orderStatusListeners={},ordersData={};
 let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:{}};
 
+// 🔥 AGGIUNTA FONDAMENTALE
+const ORDER_POLL_MS = 30000;
+
 // ============================================================
 // 🔥 LISTENER OTTIMIZZATI (SOLO APERTURA, SERVIZI E VERSIONE)
 // ============================================================
@@ -907,6 +910,8 @@ async function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){const 
 // ============================================================
 // ORDER TRACKING
 // ============================================================
+let orderPollingInterval = null;
+
 function stopOrderStatusTracking() {
     if (orderPollingInterval) {
         clearInterval(orderPollingInterval);
@@ -1049,6 +1054,30 @@ function showToast(m){const el=document.getElementById('toast');el.textContent=m
 function mostraModalRifiuto(m){const md=document.getElementById('modalRifiutoOrdine'),el=document.getElementById('motivoRifiutoModal');if(el)el.textContent=m||t('order_rejected_default');if(md){md.style.display='flex';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500])}}
 function chiudiModalRifiuto(){const m=document.getElementById('modalRifiutoOrdine');if(m)m.style.display='none'}
 function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.display='none'}
+function updateDeliveryPickupUI() {
+    const isDeliveryEnabled = appData.settings.deliveryEnabled !== false;
+    const isPickupEnabled = appData.settings.pickupEnabled !== false;
+    
+    if (document.getElementById('cartModal').classList.contains('active')) {
+        const delBtn = document.getElementById('typeDelivery');
+        const pickBtn = document.getElementById('typePickup');
+        
+        delBtn.classList.toggle('disabled', !isDeliveryEnabled);
+        pickBtn.classList.toggle('disabled', !isPickupEnabled);
+
+        if (orderType === 'delivery' && !isDeliveryEnabled && isPickupEnabled) {
+            selectOrderType('pickup');
+        } else if (orderType === 'pickup' && !isPickupEnabled && isDeliveryEnabled) {
+            selectOrderType('delivery');
+        } else if (!isDeliveryEnabled && !isPickupEnabled) {
+            document.getElementById('checkoutBtn').disabled = true;
+            document.getElementById('checkoutBtn').innerHTML = '🚫 Servizio non disponibile';
+        } else {
+            document.getElementById('checkoutBtn').disabled = false;
+            document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order');
+        }
+    }
+}
 
 // ============================================================
 // RENDER FUNCTIONS (Categorie, Menu, ecc.)
