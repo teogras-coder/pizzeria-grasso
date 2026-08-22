@@ -79,6 +79,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .btn-pick { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
 .btn-deliver { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); color: white; }
 .btn-view { background: var(--card); color: var(--gold); border: 2px solid var(--gold) !important; }
+.btn-abandon { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); color: white; }
 
 .offline-banner { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(90deg, var(--danger) 0%, #dc2626 100%); color: white; padding: 12px; text-align: center; font-weight: 700; z-index: 9999; display: none; }
 .notification-banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); padding: 15px 30px; border-radius: 12px; font-weight: 900; z-index: 9998; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 90%; text-align: center; }
@@ -105,6 +106,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .status-waiting { background: rgba(251,191,36,0.2); color: var(--warning); }
 .status-preparing { background: rgba(212,136,6,0.2); color: var(--gold); }
 .status-ready { background: rgba(168,85,247,0.2); color: #a855f7; }
+.status-delayed { background: rgba(239,68,68,0.2); color: #ef4444; }
 
 .logout-btn { position: fixed; top: 10px; right: 10px; background: rgba(248,113,113,0.2); color: #f87171; border: 2px solid #f87171; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; z-index: 1001; display: none; }
 .logout-btn.show { display: block; }
@@ -491,94 +493,121 @@ function saveOrdersToCache() {
   localStorage.setItem('driverOrdersCache', JSON.stringify(toSave));
 }
 
-// ─── LISTENER OTTIMIZZATO PER ORDINI (FATTORINI - FIX COMPLETO) ──────────
+// ─── 🔥 LISTENER OTTIMIZZATO PER ORDINI (FATTORINI - SYNCHRONIZED) ──────
 function setupOptimizedListeners() {
-  // 1. Carica gli ordini all'avvio - SOLO quelli rilevanti
-  db.ref('ordini').orderByChild('timestamp').limitToLast(30).once('value', (snapshot) => {
-    snapshot.forEach(child => {
-      const order = child.val();
-      order.id = child.key;
-      
-      // Salva in cache SOLO se rilevante per il fattorino
-      if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
-        ordersCache[order.id] = order;
-      }
+  // 1. 🔥 CARICA ORDINI ALL'AVVIO (solo quelli rilevanti)
+  db.ref('ordini')
+    .orderByChild('timestamp')
+    .limitToLast(30)
+    .once('value', (snapshot) => {
+      snapshot.forEach(child => {
+        const order = child.val();
+        order.id = child.key;
+        
+        // Salva in cache se rilevante per il fattorino
+        if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
+          ordersCache[order.id] = order;
+        }
+      });
+      firstLoad = false;
+      renderOrders();
+      saveOrdersToCache();
     });
-    firstLoad = false;
-    renderOrders();
-    saveOrdersToCache();
-  });
 
-  // 2. Ascolta i NUOVI ordini (child_added)
+  // 2. 🔥 ASCALTA NUOVI ORDINI (child_added)
   db.ref('ordini').on('child_added', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    // Se è un ordine disponibile (non assegnato) o assegnato a me
+    // Se è un ordine disponibile o assegnato a me
     if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
-      if (!ordersCache[order.id]) {
+      const isNew = !ordersCache[order.id];
+      if (isNew) {
         ordersCache[order.id] = order;
         renderOrders();
         saveOrdersToCache();
         
-        // Suono per nuovo ordine disponibile
-        if (!order.assignedDriver && order.type === 'delivery' && order.status === 'new') {
+        // 🔔 Notifica per nuovo ordine disponibile
+        if (!order.assignedDriver && order.type === 'delivery' && ['new', 'delayed'].includes(order.status)) {
           playNotificationSound();
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-          showNotification(1);
+          if (navigator.vibrate) {
+            navigator.vibrate([200, 100, 200]);
+          }
+          // Conta quanti ordini disponibili
+          const available = Object.values(ordersCache).filter(o => 
+            ['new', 'delayed'].includes(o.status) && 
+            !o.assignedDriver && 
+            o.type === 'delivery'
+          );
+          showNotification(available.length);
         }
       }
     }
   });
 
-  // 3. Ascolta i CAMBIAMENTI DI STATO (child_changed)
+  // 3. 🔥 ASCALTA CAMBIAMENTI DI STATO (child_changed) - SINCRONIZZAZIONE
   db.ref('ordini').on('child_changed', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     const oldStatus = ordersCache[order.id]?.status;
     
-    // Aggiorna solo se l'ordine è rilevante per il driver
+    // Aggiorna se ordine rilevante per il driver
     if (!order.assignedDriver || order.assignedDriver === currentDriver?.pin) {
+      const wasAvailable = !ordersCache[order.id]?.assignedDriver;
       ordersCache[order.id] = order;
       saveOrdersToCache();
       
       if (oldStatus !== order.status) {
         renderOrders();
         
-        // Notifica: ordine pronto per il ritiro
+        // 🔔 Notifica: ordine pronto per il ritiro
         if (order.assignedDriver === currentDriver?.pin && order.status === 'ready' && oldStatus !== 'ready') {
           playNotificationSound();
           if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
           showToast('✅ Un tuo ordine è PRONTO per il ritiro!');
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('🍕 Ordine Pronto!', {
-              body: 'Puoi andare a ritirare l\'ordine in pizzeria',
-              icon: 'https://i.imgur.com/nWLqs68.png'
-            });
-          }
-        }
-
-        if (order.assignedDriver === currentDriver?.pin && order.status === 'delayed' && oldStatus !== 'delayed') {
-          playNotificationSound();
-          if (navigator.vibrate) navigator.vibrate([250, 80, 250]);
-          showToast('⏰ Un tuo ordine è in ritardo');
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('🍕 Ordine Pronto!', {
-              body: 'Puoi andare a ritirare l\'ordine in pizzeria',
+              body: `Ordine ${order.orderId || order.id} pronto per il ritiro`,
               icon: 'https://i.imgur.com/nWLqs68.png'
             });
           }
         }
         
-        // Notifica: ordine assegnato a me (accettato dal gestionale)
+        // 🔔 Notifica: ordine in ritardo
+        if (order.assignedDriver === currentDriver?.pin && order.status === 'delayed' && oldStatus !== 'delayed') {
+          playNotificationSound();
+          if (navigator.vibrate) navigator.vibrate([250, 80, 250]);
+          showToast('⏰ Un tuo ordine è in ritardo');
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('⏰ Ordine in Ritardo', {
+              body: `Ordine ${order.orderId || order.id} in ritardo`,
+              icon: 'https://i.imgur.com/nWLqs68.png'
+            });
+          }
+        }
+        
+        // 🔔 Notifica: ordine accettato dal gestionale
         if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && order.status === 'preparing') {
           showToast('✅ Ordine accettato! Inizia la preparazione...');
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('🍕 Ordine Accettato!', {
+              body: `Ordine ${order.orderId || order.id} in preparazione`,
+              icon: 'https://i.imgur.com/nWLqs68.png'
+            });
+          }
+        }
+        
+        // 📤 Ordine assegnato a un altro driver (sparisce dalla lista)
+        if (wasAvailable && order.assignedDriver && order.assignedDriver !== currentDriver?.pin) {
+          // Se l'ordine era disponibile ed è stato preso da un altro, lo rimuoviamo
+          delete ordersCache[order.id];
+          renderOrders();
         }
       }
     }
   });
 
-  // 4. Ascolta le RIMOZIONI (child_removed)
+  // 4. 🔥 ASCALTA RIMOZIONI (child_removed)
   db.ref('ordini').on('child_removed', (snapshot) => {
     const id = snapshot.key;
     if (ordersCache[id]) {
@@ -588,7 +617,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 5. Offline status
+  // 5. 🔥 OFFLINE STATUS
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -643,19 +672,19 @@ function renderOrders() {
   let completedCount = 0;
   
   Object.values(ordersCache).forEach(order => {
-    // Scheda "disponibili": solo delivery non assegnati e in stato 'new'
+    // 🔥 SCHEDA "DISPONIBILI": solo delivery non assegnati in stato new/delayed
     if (
-      ['new','delayed'].includes(order.status) &&
+      ['new', 'delayed'].includes(order.status) &&
       !order.assignedDriver &&
       order.type === 'delivery'
     ) {
       available.push(order);
     }
-    // Scheda "le mie": tutti gli ordini assegnati a me
+    // 🔥 SCHEDA "LE MIE": tutti gli ordini assegnati a me
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
-      ['new','preparing','delayed','ready','picked','delivering','delivered'].includes(order.status)
+      ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)
     ) {
       myOrders.push(order);
       if (order.status === 'delivered') completedCount++;
@@ -707,15 +736,20 @@ function renderOrders() {
     
     let statusMessage = '';
     let actions = '';
+    let statusClass = order.status;
     
-    if (['new','delayed'].includes(order.status) && !order.assignedDriver) {
+    if (['new', 'delayed'].includes(order.status) && !order.assignedDriver) {
+      const isDelayed = order.status === 'delayed';
       actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Accetta</button>`;
+      if (isDelayed) {
+        statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo (${order.delayMinutes || 10} min)</div>`;
+      }
     } else if (order.status === 'new' && order.assignedDriver === currentDriver?.pin) {
-      statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria metta in preparazione...</div>`;
+      statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria prepari...</div>`;
     } else if (order.status === 'preparing') {
       statusMessage = `<div class="status-message status-preparing">🍕 La pizzeria sta preparando...</div>`;
     } else if (order.status === 'delayed') {
-      statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo</div>`;
+      statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo (${order.delayMinutes || 10} min)</div>`;
     } else if (order.status === 'ready') {
       statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro!</div>`;
       actions = `<button class="btn-pick" onclick="pickOrder('${order.id}')">📦 Ritirato</button>`;
@@ -727,8 +761,19 @@ function renderOrders() {
       statusMessage = `<div class="status-message" style="background: rgba(74,222,128,0.2); color: #4ade80;">✅ Consegnato!</div>`;
     }
     
+    // 🆕 Pulsante "Abbandona" per ordini in stato 'new' o 'delayed' assegnati a me
+    if (
+      order.assignedDriver === currentDriver?.pin && 
+      ['new', 'delayed'].includes(order.status) &&
+      order.type === 'delivery'
+    ) {
+      const isDelayed = order.status === 'delayed';
+      const label = isDelayed ? '⏰ Abbandona (ritardo)' : '⬅️ Abbandona';
+      actions += `<button class="btn-abandon" onclick="abandonOrder('${order.id}')" style="background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); color: white;">${label}</button>`;
+    }
+    
     return `
-      <div class="order-card ${order.status}">
+      <div class="order-card ${statusClass}">
         <div class="order-header">
           <span class="order-id">${sanitize(order.orderId || order.id)}</span>
           <span class="order-time">${timeStr}</span>
@@ -756,13 +801,12 @@ function renderOrders() {
 async function clearCompletedOrders() {
   const ok = await showConfirm(
     'Cancellare ordini completati?',
-    'Gli ordini verranno nascosti dalla vista.'
+    'Gli ordini consegnati verranno nascosti.'
   );
   if (!ok) return;
 
   Object.values(ordersCache)
-    .filter(o => o.status === 'delivered' &&
-                 o.assignedDriver === currentDriver?.pin)
+    .filter(o => o.status === 'delivered' && o.assignedDriver === currentDriver?.pin)
     .forEach(o => hiddenOrderIds.add(o.id));
 
   renderOrders();
@@ -776,15 +820,17 @@ async function acceptOrder(orderId) {
   );
   if (!ok) return;
 
-  const btn = document.querySelector(`[onclick="acceptOrder('${orderId}')"]`);
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Accettazione...'; }
+  const btn = document.querySelector(`[onclick*="acceptOrder('${orderId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳...'; }
 
   const orderRef = db.ref('ordini/' + orderId);
 
   try {
+    // Transazione atomica per evitare conflitti
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
+      if (!['new', 'delayed'].includes(order.status)) return order;
       order.assignedDriver = currentDriver.pin;
       order.assignedName = currentDriver.name;
       order.acceptedAt = Date.now();
@@ -803,6 +849,25 @@ async function acceptOrder(orderId) {
     showToast('❌ Errore accettazione ordine');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '✅ Accetta'; }
+  }
+}
+
+async function abandonOrder(orderId) {
+  const ok = await showConfirm(
+    'Abbandonare ordine?',
+    'L\'ordine tornerà disponibile per gli altri fattorini.'
+  );
+  if (!ok) return;
+
+  try {
+    await db.ref(`ordini/${orderId}`).update({
+      assignedDriver: null,
+      assignedName: null,
+      abandonedAt: Date.now()
+    });
+    showToast('⬅️ Ordine abbandonato');
+  } catch(e) {
+    showToast('❌ Errore abbandono ordine');
   }
 }
 
