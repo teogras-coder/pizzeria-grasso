@@ -99,6 +99,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .btn-ready { background: #4ade80; color: var(--dark); }
 .btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
 .btn-delete { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3) !important; }
+.btn-print { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); color: white; border: none; box-shadow: 0 3px 0 #2563eb; }
 .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -844,7 +845,146 @@ async function loadAllData() {
 }
 
 // ============================================================
-// 🔥 LISTENER UNICO OTTIMIZZATO
+// 🔥 GENERA COMANDA (ESATTAMENTE COME ARRIVA DALLA STAMPANTE)
+// ============================================================
+function generaComanda(order) {
+  const ristorante = 'ANTICA PIZZERIA GRASSO';
+  const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
+  const telefono = '0884 660377';
+  
+  const now = new Date();
+  const dataOrdine = new Date(order.timestamp);
+  
+  const comanda = `
+╔═══════════════════════════════════════════════════════════════╗
+║                     ${ristorante}                              ║
+║                     ${indirizzo}                               ║
+║                     Tel: ${telefono}                           ║
+╠═══════════════════════════════════════════════════════════════╣
+║  📋 COMANDO #${order.orderId || order.id}                    ║
+║  📅 ${dataOrdine.toLocaleDateString('it-IT')}  🕐 ${dataOrdine.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}
+║  🔄 STAMPA: ${now.toLocaleString('it-IT')}                    ║
+╠═══════════════════════════════════════════════════════════════╣
+║  👤 CLIENTE: ${order.customerName || 'N/A'}                   ║
+║  📞 TEL:     ${order.customerPhone || 'N/A'}                 ║
+║  📍 TIPO:    ${order.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO'}${order.scheduledTime ? ' - '+order.scheduledTime : ''}
+${order.type === 'delivery' ? '║  🏠 INDIRIZZO: '+ (order.address || 'N/A') : ''}
+${order.notes ? '║  📝 NOTE: '+order.notes : ''}
+${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti' : ''}
+╠═══════════════════════════════════════════════════════════════╣
+║  🍕 PRODOTTI:                                                ║
+${order.items && order.items.length > 0 ? order.items.map((i, idx) => {
+  const num = String(idx + 1).padStart(2, '0');
+  const nome = (i.name || 'Prodotto').padEnd(30);
+  const qty = String(i.qty || 1).padStart(2);
+  const prezzo = ((i.price || 0) * (i.qty || 1)).toFixed(2);
+  return `║    ${num}. ${nome} x${qty}  €${prezzo.padStart(6)}`;
+}).join('\n') : '║    Nessun prodotto'}
+╠═══════════════════════════════════════════════════════════════╣
+║  💰 TOTALE: €${(order.finalTotal || 0).toFixed(2).padStart(8)}                     ║
+╚═══════════════════════════════════════════════════════════════╝
+  `;
+  
+  return comanda;
+}
+
+// ============================================================
+// 🔥 SALVA COMANDA IN FIREBASE
+// ============================================================
+async function salvaComandaInFirebase(orderId, comanda) {
+  try {
+    await db.ref(`comande_stampate/${orderId}`).set({
+      orderId: orderId,
+      comanda: comanda,
+      timestamp: Date.now(),
+      ristampe: 0,
+      dataCreazione: new Date().toISOString()
+    });
+  } catch(e) {
+    console.error('Errore salvataggio comanda:', e);
+  }
+}
+
+// ============================================================
+// 🔥 RISTAMPA ORDINE (RECUPERA DA FIREBASE)
+// ============================================================
+async function ristampaOrdine(orderId) {
+  const order = ordersCache[orderId];
+  if (!order) {
+    showToast('❌ Ordine non trovato');
+    return;
+  }
+  
+  showToast('🖨️ Recupero comanda...');
+  
+  try {
+    // 🔥 PRENDE LA COMANDA SALVATA IN FIREBASE
+    const snap = await db.ref(`comande_stampate/${orderId}`).once('value');
+    let comanda = snap.val()?.comanda;
+    let ristampe = snap.val()?.ristampe || 0;
+    
+    // Se non c'è in Firebase, la genera (per sicurezza)
+    if (!comanda) {
+      comanda = generaComanda(order);
+      await salvaComandaInFirebase(orderId, comanda);
+      ristampe = 0;
+    }
+    
+    // 🔥 AGGIORNA IL CONTATORE RISTAMPE
+    ristampe++;
+    await db.ref(`comande_stampate/${orderId}/ristampe`).set(ristampe);
+    await db.ref(`comande_stampate/${orderId}/ultimaRistampa`).set(Date.now());
+    
+    // 🖨️ INVIA ALLA STAMPANTE (o scarica)
+    try {
+      await inviaStampante(comanda);
+      showToast(`🖨️ Comanda ${order.orderId} ristampata! (n.${ristampe})`);
+    } catch(e) {
+      // Se la stampante fallisce, scarica il file
+      const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `comanda_${order.orderId}_ristampa.txt`;
+      link.click();
+      showToast(`📥 Comanda ${order.orderId} scaricata (stampante offline)`);
+    }
+    
+  } catch(e) {
+    showToast('❌ Errore ristampa: ' + e.message);
+  }
+}
+
+// ============================================================
+// 🔥 INVIA ALLA STAMPANTE TERMICA
+// ============================================================
+async function inviaStampante(comanda) {
+  try {
+    // Se hai una stampante termica USB/Bluetooth
+    if (navigator.bluetooth) {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+      const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+      
+      // Formatta per stampante termica (ESC/POS)
+      const encoder = new TextEncoder();
+      const data = encoder.encode(comanda + '\n\n\n');
+      await characteristic.writeValue(data);
+      return true;
+    } else {
+      throw new Error('Bluetooth non supportato');
+    }
+  } catch(e) {
+    console.error('Errore stampa:', e);
+    throw new Error('Stampante non disponibile');
+  }
+}
+
+// ============================================================
+// 🔥 LISTENER UNICO OTTIMIZZATO (CON STAMPA AUTOMATICA ALL'ARRIVO)
 // ============================================================
 function setupOptimizedListeners() {
   // Caricamento iniziale
@@ -882,6 +1022,23 @@ function setupOptimizedListeners() {
       added.forEach(o => {
         playAdminNotification();
         showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
+        
+        // 🔥 STAMPA AUTOMATICA ALL'ARRIVO (per tutti gli ordini)
+        const comanda = generaComanda(o);
+        salvaComandaInFirebase(o.id, comanda);
+        
+        try {
+          inviaStampante(comanda);
+          showToast(`🖨️ Comanda ${o.orderId} stampata!`);
+        } catch(e) {
+          // Se stampante offline, scarica il file
+          const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `comanda_${o.orderId || o.id}.txt`;
+          link.click();
+          showToast(`📥 Comanda ${o.orderId} scaricata (stampante offline)`);
+        }
       });
 
       changed.forEach(({ old, new: o }) => {
@@ -924,19 +1081,21 @@ function setupOptimizedListeners() {
 }
 
 // ============================================================
-// 🔥 FUNZIONE ACCETTA ORDINE
+// 🔥 FUNZIONE ACCETTA ORDINE (SOLO CAMBIO STATO - NESSUNA STAMPA)
 // ============================================================
 async function accettaOrdine(id) {
   const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
   if (!ok) return;
-  db.ref('ordini/' + id).update({ 
+  
+  // 🔥 SOLO CAMBIA STATO (la stampa è già stata fatta all'arrivo)
+  await db.ref('ordini/' + id).update({ 
     status: 'accettato', 
     accettatoIl: Date.now()
-  }).then(() => {
-    showToast('✅ Ordine accettato!');
-    renderOrders(ordersCache);
-    notifyClients();
   });
+  
+  showToast('✅ Ordine accettato!');
+  renderOrders(ordersCache);
+  notifyClients();
 }
 
 function showSection(name, el) {
@@ -951,7 +1110,7 @@ function showSection(name, el) {
 }
 
 // ============================================================
-// 🔥 RENDER ORDINI CON STATO ACCETTATO
+// 🔥 RENDER ORDINI (CON PULSANTE RISTAMPA)
 // ============================================================
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
@@ -1078,6 +1237,7 @@ function renderOrderCards(ordersList, tipo = '') {
     
     if (tipo === 'annullati' || tipo === 'rifiutati') {
       ah = '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">🗑️ Elimina</button>';
+      ah += `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       if (o.motivoRifiuto) {
         motivoMessage = '<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ' + sanitize(o.motivoRifiuto) + '</div>';
       } else if (o.motivoAnnullamento) {
@@ -1090,32 +1250,39 @@ function renderOrderCards(ordersList, tipo = '') {
              '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button>' +
              '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
              '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
-             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'accettato') {
         ah = '<button class="btn-preparing" onclick="updateOrderStatus(\''+id+'\',\'preparing\')">Prep</button>' +
              '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
              '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
-             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'preparing') {
         ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button>' +
              '<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed(\''+id+'\')">Ritardo</button>' +
              '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
-             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'delayed') {
         ah = '<button class="btn-ready" onclick="updateOrderStatus(\''+id+'\',\'ready\')">Pronto</button>' +
              '<button class="btn-rifiuta" onclick="rifiutaOrdine(\''+id+'\')">Rifiuta</button>' +
-             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+             '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'ready') { 
         const isPickup = o.type === 'pickup'; 
         ah = isPickup ? 
-          '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' : 
-          '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+          '<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus(\''+id+'\',\'delivered\',\''+o.type+'\')">Ritirato</button><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' + `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>` : 
+          '<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' + `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'picked') {
-        ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>';
+        ah = '<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else if (st === 'delivering') {
-        ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>';
+        ah = '<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       } else {
-        ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>';
+        ah = '<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder(\''+id+'\')">Elimina</button>' +
+             `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       }
     }
 
@@ -1178,6 +1345,8 @@ async function deleteOrder(id) {
   }
   try {
     await db.ref('ordini/' + id).remove();
+    // 🔥 ELIMINA ANCHE LA COMANDA SALVATA
+    await db.ref('comande_stampate/' + id).remove();
     showToast('🗑️ Eliminato');
   } catch(e) {
     showToast('❌ Errore eliminazione');
@@ -1186,7 +1355,7 @@ async function deleteOrder(id) {
 }
 
 // ============================================================
-// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC.
+// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC. (INVARIATE)
 // ============================================================
 
 async function clearOldOrders() {
@@ -1209,7 +1378,12 @@ async function clearOldOrders() {
       } else if (scelta === 'completati') {
         elimina = ['delivered', 'rifiutato', 'annullato'].includes(order.status);
       }
-      if (elimina) { child.ref.remove(); count++; }
+      if (elimina) { 
+        child.ref.remove(); 
+        // 🔥 ELIMINA ANCHE LA COMANDA
+        db.ref('comande_stampate/' + child.key).remove();
+        count++; 
+      }
     });
     showToast(`🗑️ Eliminati ${count} ordini`);
   } catch(e) { showToast('❌ Errore: ' + e.message); }
