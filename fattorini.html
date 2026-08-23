@@ -489,7 +489,7 @@ function loadOrdersFromCache() {
 
 function saveOrdersToCache() {
   const toSave = Object.values(ordersCache)
-    .filter(o => o.status !== 'delivered' && o.status !== 'rifiutato')
+    .filter(o => o.status !== 'delivered' && o.status !== 'rifiutato' && o.status !== 'annullato')
     .slice(0, 30);
   localStorage.setItem('driverOrdersCache', JSON.stringify(toSave));
 }
@@ -504,7 +504,7 @@ function setupOptimizedListeners() {
       snapshot.forEach(child => {
         const order = child.val();
         order.id = child.key;
-        // 🔥 AGGIUNGE SOLO SE È UN ORDINE DI CONSEGNA
+        // Solo ordini di consegna
         if (order.type === 'delivery') {
           ordersCache[order.id] = order;
         }
@@ -519,13 +519,11 @@ function setupOptimizedListeners() {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    // 🔥 AGGIUNGE SOLO SE È UN ORDINE DI CONSEGNA
     if (order.type === 'delivery') {
       ordersCache[order.id] = order;
       renderOrders();
       saveOrdersToCache();
       
-      // 🔔 Notifica solo se disponibile (non assegnato)
       if (!order.assignedDriver && ['new', 'delayed'].includes(order.status)) {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -544,9 +542,8 @@ function setupOptimizedListeners() {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    // 🔥 AGGIUNGE SOLO SE È UN ORDINE DI CONSEGNA
+    // Se non è un ordine di consegna, rimuovilo dalla cache
     if (order.type !== 'delivery') {
-      // Se è un ordine di ritiro e c'è in cache, rimuovilo
       if (ordersCache[order.id]) {
         delete ordersCache[order.id];
         saveOrdersToCache();
@@ -555,16 +552,36 @@ function setupOptimizedListeners() {
       return;
     }
     
-    const oldStatus = ordersCache[order.id]?.status;
+    const oldOrder = ordersCache[order.id];
+    const oldStatus = oldOrder?.status;
     
-    // 🔥 AGGIUNGE SEMPRE ALLA CACHE
+    // 🔥 CASO 1: ORDINE ASSEGNATO AD UN ALTRO FATTORINO → RIMUOVI
+    if (oldOrder && order.assignedDriver && order.assignedDriver !== currentDriver?.pin) {
+      delete ordersCache[order.id];
+      saveOrdersToCache();
+      renderOrders();
+      return;
+    }
+    
+    // 🔥 CASO 2: ORDINE CONSEGNATO O ANNULLATO → RIMUOVI (non serve più)
+    if (order.status === 'delivered' || order.status === 'rifiutato' || order.status === 'annullato') {
+      if (ordersCache[order.id]) {
+        delete ordersCache[order.id];
+        saveOrdersToCache();
+        renderOrders();
+      }
+      return;
+    }
+    
+    // 🔥 CASO 3: ORDINE ASSEGNATO A ME O ANCORA DISPONIBILE → AGGIORNA
     ordersCache[order.id] = order;
     saveOrdersToCache();
     
+    // Solo se lo stato è cambiato, renderizza e notifica
     if (oldStatus !== order.status) {
       renderOrders();
       
-      // 🔔 Notifica: ordine pronto per il ritiro (se assegnato a me)
+      // Notifica: ordine pronto per il ritiro (se assegnato a me)
       if (order.assignedDriver === currentDriver?.pin && order.status === 'ready' && oldStatus !== 'ready') {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
@@ -577,7 +594,7 @@ function setupOptimizedListeners() {
         }
       }
       
-      // 🔔 Notifica: ordine in ritardo (se assegnato a me)
+      // Notifica: ordine in ritardo (se assegnato a me)
       if (order.assignedDriver === currentDriver?.pin && order.status === 'delayed' && oldStatus !== 'delayed') {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([250, 80, 250]);
@@ -590,7 +607,7 @@ function setupOptimizedListeners() {
         }
       }
       
-      // 🔔 Notifica: ordine accettato dal gestionale (se assegnato a me)
+      // Notifica: ordine accettato dal gestionale (se assegnato a me)
       if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && order.status === 'preparing') {
         showToast('✅ Ordine accettato! Inizia la preparazione...');
         if ('Notification' in window && Notification.permission === 'granted') {
@@ -603,7 +620,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 4. 🔥 ASCALTA RIMOZIONI (child_removed)
+  // 4. 🔥 ASCALTA RIMOZIONI (child_removed) - ELIMINA DEFINITIVAMENTE
   db.ref('ordini').on('child_removed', (snapshot) => {
     const id = snapshot.key;
     if (ordersCache[id]) {
@@ -670,7 +687,6 @@ async function acceptAndPickOrder(orderId) {
   const orderRef = db.ref('ordini/' + orderId);
 
   try {
-    // Transazione atomica: assegna il driver e imposta stato a 'picked'
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
@@ -714,6 +730,7 @@ function renderOrders() {
     // 🔥 SCHEDA "DISPONIBILI": 
     // - new/delayed non assegnati (da accettare)
     // - ready non assegnati (da ritirare!)
+    // - ESCLUSI delivered, rifiutato, annullato
     if (
       order.type === 'delivery' &&
       !order.assignedDriver &&
@@ -722,11 +739,12 @@ function renderOrders() {
       available.push(order);
     }
     // 🔥 SCHEDA "LE MIE": tutti gli ordini assegnati a me
+    // ESCLUSI delivered, rifiutato, annullato
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
       order.type === 'delivery' &&
-      ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)
+      ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering'].includes(order.status)
     ) {
       myOrders.push(order);
       if (order.status === 'delivered') completedCount++;
@@ -739,7 +757,11 @@ function renderOrders() {
   availableCount.textContent = available.length;
   myOrdersCount.textContent = myOrders.length;
   
-  if (currentTab === 'my' && completedCount > 0) {
+  // Mostra pulsante cancella solo se ci sono ordini consegnati da nascondere
+  const hasDelivered = Object.values(ordersCache).some(o => 
+    o.assignedDriver === currentDriver?.pin && o.status === 'delivered' && !hiddenOrderIds.has(o.id)
+  );
+  if (hasDelivered) {
     clearBtnContainer.classList.add('show');
   } else {
     clearBtnContainer.classList.remove('show');
@@ -783,7 +805,6 @@ function renderOrders() {
     // 🔥 ORDINE NON ASSEGNATO - disponibile per accettare o ritirare
     if (!order.assignedDriver) {
       if (order.status === 'ready') {
-        // 🔥 ORDINE PRONTO SENZA FATTORINO - il fattorino può ritirarlo direttamente!
         statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro! Accetta e ritira subito.</div>`;
         actions = `<button class="btn-accept-pick" onclick="acceptAndPickOrder('${order.id}')">📦 Accetta & Ritira</button>`;
       } else if (['new', 'delayed'].includes(order.status)) {
@@ -879,7 +900,6 @@ async function acceptOrder(orderId) {
   const orderRef = db.ref('ordini/' + orderId);
 
   try {
-    // Transazione atomica per evitare conflitti
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
