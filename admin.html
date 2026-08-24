@@ -345,7 +345,6 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
           <button class="btn-secondary" onclick="trasformaTuttiPreOrdini()" style="background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border-color:var(--gold);">
             <i class="fas fa-calendar-check"></i> Trasforma tutti i Pre-ordini
           </button>
-          <!-- 🔥 PULSANTE FULLSCREEN -->
           <button class="btn-secondary" onclick="toggleFullscreen()" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);">
             <i class="fas fa-expand"></i> Schermo Intero
           </button>
@@ -916,17 +915,31 @@ async function loadAllData() {
 }
 
 // ============================================================
-// 🔥 GENERA COMANDA
+// 🔥 GENERA COMANDA (CON PRE-ORDINE IN EVIDENZA)
 // ============================================================
 function generaComanda(order) {
-  const ristorante = 'ANTICA PIZZERIA GRASSO';
-  const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
-  const telefono = '0884 660377';
-  
-  const now = new Date();
-  const dataOrdine = new Date(order.timestamp);
-  
-  const comanda = `
+    const ristorante = 'ANTICA PIZZERIA GRASSO';
+    const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
+    const telefono = '0884 660377';
+    
+    const now = new Date();
+    const dataOrdine = new Date(order.timestamp);
+    
+    // 🔥 INTESTAZIONE PRE-ORDINE
+    let preOrderHeader = '';
+    if (order.isPreOrder && order.scheduledDate) {
+        const dataPreOrdine = new Date(order.scheduledDate + 'T00:00:00');
+        preOrderHeader = `║  📅 PRE-ORDINE PER IL: ${dataPreOrdine.toLocaleDateString('it-IT')}`;
+        if (order.scheduledTime && order.scheduledTime !== 'Prima possibile') {
+            preOrderHeader += ` alle ${order.scheduledTime}`;
+        }
+        preOrderHeader += '\n';
+    }
+    
+    // 🔥 BORDO PRE-ORDINE
+    const preOrderBorder = order.isPreOrder ? '╠═══════════════════════════════════════════════════════════════╣\n║  ⚠️  QUESTO È UN PRE-ORDINE  ⚠️                            ║\n' : '';
+    
+    const comanda = `
 ╔═══════════════════════════════════════════════════════════════╗
 ║                     ${ristorante}                              ║
 ║                     ${indirizzo}                               ║
@@ -934,23 +947,21 @@ function generaComanda(order) {
 ╠═══════════════════════════════════════════════════════════════╣
 ║  📋 COMANDO #${order.orderId || order.id}                    ║
 ║  📅 ${dataOrdine.toLocaleDateString('it-IT')}  🕐 ${dataOrdine.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}
-║  🔄 STAMPA: ${now.toLocaleString('it-IT')}                    ║
-╠═══════════════════════════════════════════════════════════════╣
+${preOrderHeader}${preOrderBorder}╠═══════════════════════════════════════════════════════════════╣
 ║  👤 CLIENTE: ${order.customerName || 'N/A'}                   ║
 ║  📞 TEL:     ${order.customerPhone || 'N/A'}                 ║
 ║  📍 TIPO:    ${order.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO'}${order.scheduledTime ? ' - '+order.scheduledTime : ''}
 ${order.type === 'delivery' ? '║  🏠 INDIRIZZO: '+ (order.address || 'N/A') : ''}
 ${order.notes ? '║  📝 NOTE: '+order.notes : ''}
 ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti' : ''}
-${order.isPreOrder ? '║  📅 PRE-ORDINE: '+order.scheduledDate : ''}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  🍕 PRODOTTI:                                                ║
 ${order.items && order.items.length > 0 ? order.items.map((i, idx) => {
-  const num = String(idx + 1).padStart(2, '0');
-  const nome = (i.name || 'Prodotto').padEnd(30);
-  const qty = String(i.qty || 1).padStart(2);
-  const prezzo = ((i.price || 0) * (i.qty || 1)).toFixed(2);
-  return `║    ${num}. ${nome} x${qty}  €${prezzo.padStart(6)}`;
+    const num = String(idx + 1).padStart(2, '0');
+    const nome = (i.name || 'Prodotto').padEnd(30);
+    const qty = String(i.qty || 1).padStart(2);
+    const prezzo = ((i.price || 0) * (i.qty || 1)).toFixed(2);
+    return `║    ${num}. ${nome} x${qty}  €${prezzo.padStart(6)}`;
 }).join('\n') : '║    Nessun prodotto'}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  💰 TOTALE: €${(order.finalTotal || 0).toFixed(2).padStart(8)}                     ║
@@ -978,73 +989,128 @@ async function salvaComandaInFirebase(orderId, comanda) {
 }
 
 // ============================================================
-// 🔥 RISTAMPA ORDINE
+// 🖨️ STAMPA CON FINESTRA DEL BROWSER (NON USA BLUETOOTH)
 // ============================================================
-async function ristampaOrdine(orderId) {
-  const order = ordersCache[orderId];
-  if (!order) {
-    showToast('❌ Ordine non trovato');
-    return;
-  }
-  
-  showToast('🖨️ Recupero comanda...');
-  
-  try {
-    const snap = await db.ref(`comande_stampate/${orderId}`).once('value');
-    let comanda = snap.val()?.comanda;
-    let ristampe = snap.val()?.ristampe || 0;
-    
-    if (!comanda) {
-      comanda = generaComanda(order);
-      await salvaComandaInFirebase(orderId, comanda);
-      ristampe = 0;
-    }
-    
-    ristampe++;
-    await db.ref(`comande_stampate/${orderId}/ristampe`).set(ristampe);
-    await db.ref(`comande_stampate/${orderId}/ultimaRistampa`).set(Date.now());
-    
+async function inviaStampante(comanda) {
     try {
-      await inviaStampante(comanda);
-      showToast(`🖨️ Comanda ${order.orderId} ristampata! (n.${ristampe})`);
+        // 🔥 APRE LA FINESTRA DI STAMPA DEL BROWSER
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        if (!printWindow) {
+            showToast('⚠️ Consenti i popup per stampare');
+            return false;
+        }
+        
+        // 🔥 CREA LA PAGINA DA STAMPARE
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Stampa Comanda</title>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { 
+                        font-family: 'Courier New', monospace; 
+                        font-size: 16px; 
+                        white-space: pre-wrap;
+                        padding: 20px;
+                        margin: 0;
+                        background: white;
+                        color: black;
+                        line-height: 1.4;
+                    }
+                    @media print {
+                        body { padding: 10px; font-size: 12px; }
+                        .no-print { display: none !important; }
+                    }
+                    .no-print {
+                        text-align: center;
+                        margin-bottom: 15px;
+                        padding: 15px;
+                        background: #f5f5f5;
+                        border-radius: 10px;
+                        border: 1px solid #ddd;
+                    }
+                    .no-print button {
+                        padding: 15px 35px;
+                        background: #d4a84b;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        font-size: 18px;
+                        cursor: pointer;
+                        margin: 0 8px;
+                    }
+                    .no-print button:active {
+                        transform: scale(0.95);
+                    }
+                    .no-print .info {
+                        color: #666;
+                        font-size: 14px;
+                        margin-top: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print">
+                    <button onclick="window.print()">🖨️ STAMPA</button>
+                    <button onclick="window.close()">✖ CHIUDI</button>
+                    <div class="info">📱 Seleziona la stampante nelle impostazioni di stampa</div>
+                </div>
+                <pre>${comanda}</pre>
+                <script>
+                    // 🔥 STAMPA AUTOMATICA DOPO 1 SECONDO
+                    setTimeout(function() {
+                        window.print();
+                    }, 1000);
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        
+        return true;
     } catch(e) {
-      const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `comanda_${order.orderId}_ristampa.txt`;
-      link.click();
-      showToast(`📥 Comanda ${order.orderId} scaricata (stampante offline)`);
+        console.error('Errore stampa:', e);
+        showToast('❌ Errore stampa: ' + e.message);
+        return false;
     }
-    
-  } catch(e) {
-    showToast('❌ Errore ristampa: ' + e.message);
-  }
 }
 
 // ============================================================
-// 🔥 INVIA ALLA STAMPANTE
+// 🔥 RISTAMPA ORDINE
 // ============================================================
-async function inviaStampante(comanda) {
-  try {
-    if (navigator.bluetooth) {
-      const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-      });
-      const server = await device.gatt.connect();
-      const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-      const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-      const encoder = new TextEncoder();
-      const data = encoder.encode(comanda + '\n\n\n');
-      await characteristic.writeValue(data);
-      return true;
-    } else {
-      throw new Error('Bluetooth non supportato');
+async function ristampaOrdine(orderId) {
+    const order = ordersCache[orderId];
+    if (!order) {
+        showToast('❌ Ordine non trovato');
+        return;
     }
-  } catch(e) {
-    console.error('Errore stampa:', e);
-    throw new Error('Stampante non disponibile');
-  }
+    
+    showToast('📂 Recupero comanda...');
+    
+    try {
+        const snap = await db.ref(`comande_stampate/${orderId}`).once('value');
+        let comanda = snap.val()?.comanda;
+        let ristampe = snap.val()?.ristampe || 0;
+        
+        if (!comanda) {
+            comanda = generaComanda(order);
+            await salvaComandaInFirebase(orderId, comanda);
+            ristampe = 0;
+        }
+        
+        ristampe++;
+        await db.ref(`comande_stampate/${orderId}/ristampe`).set(ristampe);
+        await db.ref(`comande_stampate/${orderId}/ultimaRistampa`).set(Date.now());
+        
+        // 🔥 USA LA FINESTRA DI STAMPA (NON BLUETOOTH)
+        await inviaStampante(comanda);
+        showToast(`📥 Comanda ${order.orderId} inviata! (n.${ristampe})`);
+        
+    } catch(e) {
+        showToast('❌ Errore: ' + e.message);
+    }
 }
 
 // ============================================================
@@ -1063,25 +1129,19 @@ async function trasformaInOrdine(orderId) {
     }
     
     try {
+        // 🔥 1. CAMBIA STATO PRIMA
         await db.ref(`ordini/${orderId}`).update({
             status: 'new',
             isPreOrder: false,
             trasformatoIl: Date.now()
         });
         
+        // 🔥 2. POI GENERA E STAMPA
+        order.status = 'new';
+        order.isPreOrder = false;
         const comanda = generaComanda(order);
         await salvaComandaInFirebase(orderId, comanda);
-        try {
-            await inviaStampante(comanda);
-            showToast(`🖨️ Comanda ${order.orderId} stampata!`);
-        } catch(e) {
-            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `comanda_${order.orderId || orderId}.txt`;
-            link.click();
-            showToast(`📥 Comanda ${order.orderId} scaricata (stampante offline)`);
-        }
+        await inviaStampante(comanda);
         
         showToast(`✅ Pre-ordine ${order.orderId} trasformato in ordine attivo!`);
         renderOrders(ordersCache);
@@ -1150,6 +1210,7 @@ function avviaControlloPreOrdini() {
                 
                 if (deveTrasformare) {
                     console.log(`🔄 Trasformazione automatica pre-ordine ${order.orderId}`);
+                    // 🔥 USA LA STESSA FUNZIONE DI TRASFORMAZIONE
                     await trasformaInOrdine(id);
                 }
             }
@@ -1515,12 +1576,28 @@ function setupOptimizedListeners() {
         playAdminNotification();
         
         if (o.status === 'preorder') {
+          // 🔥 PRE-ORDINE: stampa con intestazione "PRE-ORDINE"
           showToast(`📅 Pre-ordine ${o.orderId || o.id} per il ${o.scheduledDate || 'data non impostata'}`);
+          
+          const comanda = generaComanda(o);
+          salvaComandaInFirebase(o.id, comanda);
+          
+          // 🔥 STAMPA (finestra del browser) con "PRE-ORDINE" in evidenza
+          try {
+            inviaStampante(comanda);
+            showToast(`🖨️ Comanda PRE-ORDINE ${o.orderId} stampata!`);
+          } catch(e) {
+            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `preordine_${o.orderId || o.id}.txt`;
+            link.click();
+            showToast(`📥 Pre-ordine ${o.orderId} scaricato (stampante offline)`);
+          }
         } else {
+          // 🔥 ORDINE NORMALE
           showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-        }
-        
-        if (o.status !== 'preorder') {
+          
           const comanda = generaComanda(o);
           salvaComandaInFirebase(o.id, comanda);
           try {
