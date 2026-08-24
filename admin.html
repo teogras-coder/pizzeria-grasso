@@ -2,13 +2,14 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1209">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-admin-192.png">
 <link rel="apple-touch-icon" href="icon-admin-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#d4a84b">
 <title>Gestionale - Antica Pizzeria Grasso</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -72,16 +73,19 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .stat-card.annullati .number { color: #f87171; }
 .stat-card.rifiutati .number { color: #ef4444; }
 .stat-card.delivered .number { color: #60a5fa; }
+.stat-card.preorder .number { color: var(--gold); }
 .stat-card .stat-icon { font-size: 1.1rem; display: block; margin-bottom: 2px; }
 .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 .order-card { background: var(--card-light); border-radius: 12px; padding: 15px; border: 1px solid rgba(212,168,75,0.2); border-left: 4px solid var(--gold); }
 .order-card.annullati { border-left-color: #f87171; opacity: 0.8; }
 .order-card.rifiutati { border-left-color: #ef4444; opacity: 0.8; }
+.order-card.preorder { border-left-color: var(--gold); background: rgba(212,168,75,0.05); }
 .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(212,168,75,0.15); flex-wrap: wrap; gap: 5px; }
 .order-id { color: var(--gold); font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .order-id .status-badge { font-size: 0.6rem; padding: 2px 10px; border-radius: 10px; font-weight: 700; }
 .order-id .status-badge.annullato { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 .order-id .status-badge.rifiutato { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.order-id .status-badge.preorder { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
 .driver-badge { background: rgba(96,165,250,0.2); color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 8px; display: inline-block; }
 .order-time { color: #8a7a5a; font-size: 0.75rem; }
 .order-customer { color: var(--cream); font-weight: 600; margin-bottom: 5px; }
@@ -94,12 +98,14 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .order-actions button { flex: 1; min-width: 80px; padding: 10px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
 .order-reject-message { margin-top: 8px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 6px; color: #fca5a5; font-size: 0.8rem; border-left: 3px solid #ef4444; }
 .order-reject-message strong { color: #ef4444; }
+.order-preorder-message { margin-top: 8px; padding: 8px; background: rgba(212,168,75,0.1); border-radius: 6px; color: var(--gold); font-size: 0.8rem; border-left: 3px solid var(--gold); }
 .btn-accept { background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%); color: #052e16; box-shadow: 0 3px 0 #16a34a; }
 .btn-preparing { background: #fbbf24; color: var(--dark); }
 .btn-ready { background: #4ade80; color: var(--dark); }
 .btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
 .btn-delete { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3) !important; }
 .btn-print { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); color: white; border: none; box-shadow: 0 3px 0 #2563eb; }
+.btn-transform { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 3px 0 var(--gold-dark); }
 .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -148,6 +154,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .orders-group-title.picked { background: #8b5cf6; color: white; }
 .orders-group-title.delivering { background: #ec4899; color: white; }
 .orders-group-title.delivered { background: #60a5fa; color: white; opacity: 0.8; }
+.orders-group-title.preorder { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); }
 .orders-accordion { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); border-radius: 12px; margin: 15px 0 8px; border: 1px solid rgba(212,168,75,0.2); overflow: hidden; }
 .orders-accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; transition: all 0.3s; user-select: none; }
 .orders-accordion-header:hover { background: rgba(212,168,75,0.05); }
@@ -335,6 +342,13 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         </div>
         <div class="header-actions">
           <button class="btn-secondary" onclick="clearOldOrders()"><i class="fas fa-broom"></i> Pulisci</button>
+          <button class="btn-secondary" onclick="trasformaTuttiPreOrdini()" style="background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border-color:var(--gold);">
+            <i class="fas fa-calendar-check"></i> Trasforma tutti i Pre-ordini
+          </button>
+          <!-- 🔥 PULSANTE FULLSCREEN -->
+          <button class="btn-secondary" onclick="toggleFullscreen()" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);">
+            <i class="fas fa-expand"></i> Schermo Intero
+          </button>
         </div>
       </div>
       <div class="stats-row">
@@ -348,6 +362,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
         <div class="stat-card delivered"><div class="number" id="statDelivered">0</div><div class="label">Consegnati</div></div>
         <div class="stat-card annullati"><div class="number" id="statAnnullati">0</div><div class="label">🗑️ Annullati</div></div>
         <div class="stat-card rifiutati"><div class="number" id="statRifiutati">0</div><div class="label">❌ Rifiutati</div></div>
+        <div class="stat-card preorder"><div class="number" id="statPreOrder">0</div><div class="label">📅 Pre-ordini</div></div>
       </div>
       <div id="ordersList"></div>
     </div>
@@ -651,6 +666,40 @@ let isFirstLoad = true;
 let accordionState = { annullati: false, rifiutati: false };
 
 // ============================================================
+// 🔋 WAKE LOCK - Impedisce lo spegnimento dello schermo
+// ============================================================
+let wakeLock = null;
+
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('🔋 Schermo sempre acceso');
+            wakeLock.addEventListener('release', () => {
+                console.log('🔋 Wake Lock rilasciato');
+            });
+        }
+    } catch (err) {
+        console.log('⚠️ Wake Lock non supportato:', err);
+    }
+}
+
+// ============================================================
+// 🖥️ SCHERMO INTERO (FULLSCREEN)
+// ============================================================
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log('⚠️ Fullscreen non supportato:', err);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+// ============================================================
 // 🔥 SEGNALE AI CLIENTI - ATOMICO
 // ============================================================
 function notifyClients() {
@@ -770,11 +819,26 @@ async function checkPin() {
 }
 
 function enterAdmin() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'grid';
-  initNotificationSound();
-  initApp();
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'grid';
+    initNotificationSound();
+    initApp();
+    
+    // 🔋 WAKE LOCK - Impedisce lo spegnimento
+    requestWakeLock();
+    
+    // 🖥️ FULLSCREEN - Schermo intero
+    setTimeout(() => {
+        toggleFullscreen();
+    }, 500);
 }
+
+// Riacquista wake lock quando la pagina torna visibile
+document.addEventListener('visibilitychange', async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+        await requestWakeLock();
+    }
+});
 
 window.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = localStorage.getItem('admin_logged_in');
@@ -791,6 +855,12 @@ async function logout() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pinInput').value = '';
   document.getElementById('loginError').style.display = 'none';
+  
+  // Rilascia wake lock
+  if (wakeLock) {
+      wakeLock.release();
+      wakeLock = null;
+  }
 }
 
 function initApp() {
@@ -800,6 +870,7 @@ function initApp() {
   setupOptimizedListeners();
   renderPalettes();
   applyCurrentPalette();
+  avviaControlloPreOrdini();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(reg => {
       reg.addEventListener('updatefound', () => {
@@ -845,7 +916,7 @@ async function loadAllData() {
 }
 
 // ============================================================
-// 🔥 GENERA COMANDA (ESATTAMENTE COME ARRIVA DALLA STAMPANTE)
+// 🔥 GENERA COMANDA
 // ============================================================
 function generaComanda(order) {
   const ristorante = 'ANTICA PIZZERIA GRASSO';
@@ -871,6 +942,7 @@ function generaComanda(order) {
 ${order.type === 'delivery' ? '║  🏠 INDIRIZZO: '+ (order.address || 'N/A') : ''}
 ${order.notes ? '║  📝 NOTE: '+order.notes : ''}
 ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti' : ''}
+${order.isPreOrder ? '║  📅 PRE-ORDINE: '+order.scheduledDate : ''}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  🍕 PRODOTTI:                                                ║
 ${order.items && order.items.length > 0 ? order.items.map((i, idx) => {
@@ -906,7 +978,7 @@ async function salvaComandaInFirebase(orderId, comanda) {
 }
 
 // ============================================================
-// 🔥 RISTAMPA ORDINE (RECUPERA DA FIREBASE)
+// 🔥 RISTAMPA ORDINE
 // ============================================================
 async function ristampaOrdine(orderId) {
   const order = ordersCache[orderId];
@@ -918,29 +990,24 @@ async function ristampaOrdine(orderId) {
   showToast('🖨️ Recupero comanda...');
   
   try {
-    // 🔥 PRENDE LA COMANDA SALVATA IN FIREBASE
     const snap = await db.ref(`comande_stampate/${orderId}`).once('value');
     let comanda = snap.val()?.comanda;
     let ristampe = snap.val()?.ristampe || 0;
     
-    // Se non c'è in Firebase, la genera (per sicurezza)
     if (!comanda) {
       comanda = generaComanda(order);
       await salvaComandaInFirebase(orderId, comanda);
       ristampe = 0;
     }
     
-    // 🔥 AGGIORNA IL CONTATORE RISTAMPE
     ristampe++;
     await db.ref(`comande_stampate/${orderId}/ristampe`).set(ristampe);
     await db.ref(`comande_stampate/${orderId}/ultimaRistampa`).set(Date.now());
     
-    // 🖨️ INVIA ALLA STAMPANTE (o scarica)
     try {
       await inviaStampante(comanda);
       showToast(`🖨️ Comanda ${order.orderId} ristampata! (n.${ristampe})`);
     } catch(e) {
-      // Se la stampante fallisce, scarica il file
       const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -955,11 +1022,10 @@ async function ristampaOrdine(orderId) {
 }
 
 // ============================================================
-// 🔥 INVIA ALLA STAMPANTE TERMICA
+// 🔥 INVIA ALLA STAMPANTE
 // ============================================================
 async function inviaStampante(comanda) {
   try {
-    // Se hai una stampante termica USB/Bluetooth
     if (navigator.bluetooth) {
       const device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
@@ -968,8 +1034,6 @@ async function inviaStampante(comanda) {
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
       const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-      
-      // Formatta per stampante termica (ESC/POS)
       const encoder = new TextEncoder();
       const data = encoder.encode(comanda + '\n\n\n');
       await characteristic.writeValue(data);
@@ -984,110 +1048,122 @@ async function inviaStampante(comanda) {
 }
 
 // ============================================================
-// 🔥 LISTENER UNICO OTTIMIZZATO (CON STAMPA AUTOMATICA ALL'ARRIVO)
+// 🔥 TRASFORMA PRE-ORDINE IN ORDINE ATTIVO
 // ============================================================
-function setupOptimizedListeners() {
-  // Caricamento iniziale
-  db.ref('ordini')
-    .orderByChild('timestamp')
-    .limitToLast(50)
-    .once('value')
-    .then(snapshot => {
-      snapshot.forEach(child => {
-        ordersCache[child.key] = { id: child.key, ...child.val() };
-      });
-      renderOrders(ordersCache);
-    });
-
-  // UN SOLO listener per ordini
-  db.ref('ordini')
-    .orderByChild('timestamp')
-    .limitToLast(50)
-    .on('value', snapshot => {
-      const newOrders = {};
-      const changed = [];
-      const added = [];
-
-      snapshot.forEach(child => {
-        const order = { id: child.key, ...child.val() };
-        newOrders[child.key] = order;
-        const old = ordersCache[child.key];
-        if (!old) {
-          added.push(order);
-        } else if (old.status !== order.status || old.delayMinutes !== order.delayMinutes) {
-          changed.push({ old, new: order });
-        }
-      });
-
-      added.forEach(o => {
-        playAdminNotification();
-        showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-        
-        // 🔥 STAMPA AUTOMATICA ALL'ARRIVO (per tutti gli ordini)
-        const comanda = generaComanda(o);
-        salvaComandaInFirebase(o.id, comanda);
-        
-        try {
-          inviaStampante(comanda);
-          showToast(`🖨️ Comanda ${o.orderId} stampata!`);
-        } catch(e) {
-          // Se stampante offline, scarica il file
-          const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = `comanda_${o.orderId || o.id}.txt`;
-          link.click();
-          showToast(`📥 Comanda ${o.orderId} scaricata (stampante offline)`);
-        }
-      });
-
-      changed.forEach(({ old, new: o }) => {
-        const orderId = o.orderId || o.id;
-        const messages = {
-          'accettato': `✅ Ordine ${orderId} ACCETTATO!`,
-          'preparing': `🍕 Ordine ${orderId} in preparazione`,
-          'delayed': `⏰ Ordine ${orderId} in ritardo (${o.delayMinutes || 10} min)`,
-          'ready': `✅ Ordine ${orderId} pronto!`,
-          'picked': `📦 Fattorino ha ritirato ${orderId}`,
-          'delivering': `🛵 Ordine ${orderId} in consegna`,
-          'delivered': `🎉 Ordine ${orderId} consegnato!`,
-          'annullato': `🗑️ Ordine ${orderId} ANNULLATO dal cliente`,
-          'rifiutato': `❌ Ordine ${orderId} RIFIUTATO`
-        };
-        if (messages[o.status]) {
-          showToast(messages[o.status]);
-          playAdminNotification();
-        }
-      });
-
-      ordersCache = newOrders;
-      renderOrders(ordersCache);
-    });
-
-  // Recensioni con limite
-  db.ref('recensioni')
-    .orderByChild('timestamp')
-    .limitToLast(50)
-    .on('value', s => loadReviews());
-
-  // Settings
-  db.ref('settings').on('value', s => {
-    if (s.exists()) {
-      appData.settings = { ...appData.settings, ...s.val() };
-      loadSettings();
-      applyCurrentPalette();
+async function trasformaInOrdine(orderId) {
+    const order = ordersCache[orderId];
+    if (!order) {
+        showToast('❌ Ordine non trovato');
+        return;
     }
-  });
+    
+    if (order.status !== 'preorder') {
+        showToast('❌ Questo non è un pre-ordine');
+        return;
+    }
+    
+    try {
+        await db.ref(`ordini/${orderId}`).update({
+            status: 'new',
+            isPreOrder: false,
+            trasformatoIl: Date.now()
+        });
+        
+        const comanda = generaComanda(order);
+        await salvaComandaInFirebase(orderId, comanda);
+        try {
+            await inviaStampante(comanda);
+            showToast(`🖨️ Comanda ${order.orderId} stampata!`);
+        } catch(e) {
+            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `comanda_${order.orderId || orderId}.txt`;
+            link.click();
+            showToast(`📥 Comanda ${order.orderId} scaricata (stampante offline)`);
+        }
+        
+        showToast(`✅ Pre-ordine ${order.orderId} trasformato in ordine attivo!`);
+        renderOrders(ordersCache);
+        notifyClients();
+        
+    } catch(e) {
+        showToast('❌ Errore trasformazione: ' + e.message);
+    }
 }
 
 // ============================================================
-// 🔥 FUNZIONE ACCETTA ORDINE (SOLO CAMBIO STATO - NESSUNA STAMPA)
+// 🔥 TRASFORMA TUTTI I PRE-ORDINI
+// ============================================================
+async function trasformaTuttiPreOrdini() {
+    const preOrders = Object.values(ordersCache).filter(o => o.status === 'preorder');
+    if (preOrders.length === 0) {
+        showToast('❌ Nessun pre-ordine da trasformare');
+        return;
+    }
+    
+    const ok = await showConfirm(
+        `✅ Trasformare ${preOrders.length} pre-ordini?`,
+        'Tutti i pre-ordini diventeranno ordini attivi e verranno stampati.'
+    );
+    if (!ok) return;
+    
+    let trasformati = 0;
+    let errori = 0;
+    for (const order of preOrders) {
+        try {
+            await trasformaInOrdine(order.id);
+            trasformati++;
+        } catch(e) {
+            errori++;
+        }
+        await new Promise(r => setTimeout(r, 500));
+    }
+    
+    showToast(`✅ Trasformati ${trasformati} pre-ordini${errori > 0 ? `, ${errori} errori` : ''}!`);
+}
+
+// ============================================================
+// 🔥 CONTROLLO AUTOMATICO PRE-ORDINI (ogni minuto)
+// ============================================================
+function avviaControlloPreOrdini() {
+    setInterval(async () => {
+        const oggi = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        
+        for (const [id, order] of Object.entries(ordersCache)) {
+            if (order.status === 'preorder' && order.scheduledDate === oggi) {
+                let deveTrasformare = false;
+                
+                if (!order.scheduledTime || order.scheduledTime === 'Prima possibile') {
+                    deveTrasformare = true;
+                } else {
+                    const [hours, minutes] = order.scheduledTime.split(':').map(Number);
+                    if (!isNaN(hours) && !isNaN(minutes)) {
+                        const orderTime = new Date();
+                        orderTime.setHours(hours, minutes, 0, 0);
+                        if (now >= orderTime) {
+                            deveTrasformare = true;
+                        }
+                    }
+                }
+                
+                if (deveTrasformare) {
+                    console.log(`🔄 Trasformazione automatica pre-ordine ${order.orderId}`);
+                    await trasformaInOrdine(id);
+                }
+            }
+        }
+    }, 60000);
+}
+
+// ============================================================
+// 🔥 FUNZIONE ACCETTA ORDINE
 // ============================================================
 async function accettaOrdine(id) {
   const ok = await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà che hai accettato l\'ordine.');
   if (!ok) return;
   
-  // 🔥 SOLO CAMBIA STATO (la stampa è già stata fatta all'arrivo)
   await db.ref('ordini/' + id).update({ 
     status: 'accettato', 
     accettatoIl: Date.now()
@@ -1110,7 +1186,7 @@ function showSection(name, el) {
 }
 
 // ============================================================
-// 🔥 RENDER ORDINI (CON PULSANTE RISTAMPA)
+// 🔥 RENDER ORDINI (CON PRE-ORDINI)
 // ============================================================
 function renderOrders(orders) {
   const list = document.getElementById('ordersList');
@@ -1124,15 +1200,23 @@ function renderOrders(orders) {
     delivering: [], 
     delivered: [], 
     annullati: [], 
-    rifiutati: [] 
+    rifiutati: [],
+    preorder: [] 
   };
   
   Object.entries(orders || {}).forEach(([id, o]) => {
     const st = o.status || 'new';
-    if (st === 'annullato') gruppi.annullati.push([id, o]);
-    else if (st === 'rifiutato') gruppi.rifiutati.push([id, o]);
-    else if (gruppi[st]) gruppi[st].push([id, o]);
-    else gruppi.new.push([id, o]);
+    if (st === 'preorder') {
+      gruppi.preorder.push([id, o]);
+    } else if (st === 'annullato') {
+      gruppi.annullati.push([id, o]);
+    } else if (st === 'rifiutato') {
+      gruppi.rifiutati.push([id, o]);
+    } else if (gruppi[st]) {
+      gruppi[st].push([id, o]);
+    } else {
+      gruppi.new.push([id, o]);
+    }
   });
   
   Object.keys(gruppi).forEach(k => {
@@ -1149,11 +1233,13 @@ function renderOrders(orders) {
   document.getElementById('statDelivered').textContent = gruppi.delivered.length;
   document.getElementById('statAnnullati').textContent = gruppi.annullati.length;
   document.getElementById('statRifiutati').textContent = gruppi.rifiutati.length;
+  document.getElementById('statPreOrder').textContent = gruppi.preorder.length;
 
   const activeOrders = gruppi.new.length + gruppi.accettato.length + gruppi.preparing.length + 
                        gruppi.delayed.length + gruppi.ready.length + gruppi.picked.length + 
                        gruppi.delivering.length;
-  const totalOrders = activeOrders + gruppi.delivered.length + gruppi.annullati.length + gruppi.rifiutati.length;
+  const totalOrders = activeOrders + gruppi.delivered.length + gruppi.annullati.length + 
+                      gruppi.rifiutati.length + gruppi.preorder.length;
   const deliveredOrders = gruppi.delivered.length;
   
   document.getElementById('dashboardActiveOrders').textContent = activeOrders;
@@ -1165,7 +1251,8 @@ function renderOrders(orders) {
   if (attivi > 0) { badge.textContent = attivi; badge.style.display = 'inline'; }
   else badge.style.display = 'none';
 
-  if (!attivi && !gruppi.delivered.length && !gruppi.annullati.length && !gruppi.rifiutati.length) {
+  if (!attivi && !gruppi.delivered.length && !gruppi.annullati.length && 
+      !gruppi.rifiutati.length && !gruppi.preorder.length) {
     list.innerHTML = '<div class="orders-empty"><i class="fas fa-inbox"></i><p>Nessun ordine</p></div>';
     return;
   }
@@ -1182,6 +1269,18 @@ function renderOrders(orders) {
   };
   
   let html = '';
+  
+  // 🔥 PRE-ORDINI (in alto)
+  if (gruppi.preorder.length > 0) {
+    const preOrderItems = gruppi.preorder.sort((a, b) => {
+      const dateA = a[1].scheduledDate || a[1].timestamp;
+      const dateB = b[1].scheduledDate || b[1].timestamp;
+      return dateA - dateB;
+    });
+    html += `<div class="orders-group-title preorder">📅 PRE-ORDINI (${gruppi.preorder.length})</div>`;
+    html += '<div class="orders-grid">' + renderOrderCards(preOrderItems, 'preorder') + '</div>';
+  }
+  
   ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].forEach(stato => {
     if (!gruppi[stato].length) return;
     html += '<div class="orders-group-title ' + stato + '">' + titoli[stato] + ' (' + gruppi[stato].length + ')</div>';
@@ -1223,19 +1322,31 @@ function renderOrderCards(ordersList, tipo = '') {
     const driverBadge = o.assignedName ? '<span class="driver-badge">' + sanitize(o.assignedName) + '</span>' : '';
     
     let statusBadge = '', borderColor = 'var(--gold)', extraClass = '';
-    if (tipo === 'annullati') { 
+    let motivoMessage = '';
+    let ah = '';
+    
+    // 🔥 PRE-ORDINE
+    if (tipo === 'preorder') { 
+      const scheduledDate = o.scheduledDate || 'Data non impostata';
+      const scheduledTime = o.scheduledTime || 'Orario non impostato';
+      statusBadge = `<span class="status-badge preorder">📅 PRE-ORDINE</span>`;
+      borderColor = 'var(--gold)';
+      extraClass = 'preorder';
+      
+      ah = `<button class="btn-transform" onclick="trasformaInOrdine('${id}')">
+        📅 Trasforma in Ordine
+      </button>
+      <button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>
+      <button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
+      
+      motivoMessage = `<div class="order-preorder-message">
+        <strong>📅 PRE-ORDINE:</strong> ${scheduledDate} alle ${scheduledTime}
+      </div>`;
+      
+    } else if (tipo === 'annullati') { 
       statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; 
       borderColor = '#f87171'; 
-      extraClass = 'annullati'; 
-    } else if (tipo === 'rifiutati') { 
-      statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; 
-      borderColor = '#ef4444'; 
-      extraClass = 'rifiutati'; 
-    }
-    
-    let ah = '', motivoMessage = '';
-    
-    if (tipo === 'annullati' || tipo === 'rifiutati') {
+      extraClass = 'annullati';
       ah = '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">🗑️ Elimina</button>';
       ah += `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
       if (o.motivoRifiuto) {
@@ -1243,6 +1354,17 @@ function renderOrderCards(ordersList, tipo = '') {
       } else if (o.motivoAnnullamento) {
         motivoMessage = '<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo annullamento:</strong> ' + sanitize(o.motivoAnnullamento) + '</div>';
       }
+      
+    } else if (tipo === 'rifiutati') { 
+      statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; 
+      borderColor = '#ef4444'; 
+      extraClass = 'rifiutati';
+      ah = '<button class="btn-delete" onclick="deleteOrder(\''+id+'\')">🗑️ Elimina</button>';
+      ah += `<button class="btn-print" onclick="ristampaOrdine('${id}')">🖨️ Ristampa</button>`;
+      if (o.motivoRifiuto) {
+        motivoMessage = '<div class="order-reject-message"><strong>❌ Motivo rifiuto:</strong> ' + sanitize(o.motivoRifiuto) + '</div>';
+      }
+      
     } else {
       const st = o.status || 'new';
       if (st === 'new') {
@@ -1289,7 +1411,8 @@ function renderOrderCards(ordersList, tipo = '') {
     return '<div class="order-card ' + extraClass + '" style="border-left-color:' + borderColor + ';">' +
       '<div class="order-header"><span class="order-id">' + (o.orderId || id) + ' ' + statusBadge + driverBadge + '</span><span class="order-time">' + ds + ' ' + ts + '</span></div>' +
       '<div class="order-customer">' + sanitize(o.customerName || 'N/A') + ' - ' + sanitize(o.customerPhone || 'N/A') + '</div>' +
-      '<div class="order-details">' + (o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro') + (o.scheduledTime ? ' - ' + o.scheduledTime : '') + (o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : '') + (o.notes ? '<br>📝 ' + sanitize(o.notes) : '') + '</div>' +
+      '<div class="order-details">' + (o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro') + (o.scheduledTime ? ' - ' + o.scheduledTime : '') + (o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : '') + (o.notes ? '<br>📝 ' + sanitize(o.notes) : '') + 
+      (o.isPreOrder ? '<br>📅 <strong>Pre-ordine:</strong> ' + (o.scheduledDate || '') : '') + '</div>' +
       '<div class="order-items">' + items + '</div>' +
       '<div class="order-total"><span>Totale</span><span>€' + (o.finalTotal || 0).toFixed(2) + '</span></div>' +
       '<div class="order-actions">' + ah + '</div>' + motivoMessage + '</div>';
@@ -1345,7 +1468,6 @@ async function deleteOrder(id) {
   }
   try {
     await db.ref('ordini/' + id).remove();
-    // 🔥 ELIMINA ANCHE LA COMANDA SALVATA
     await db.ref('comande_stampate/' + id).remove();
     showToast('🗑️ Eliminato');
   } catch(e) {
@@ -1355,7 +1477,107 @@ async function deleteOrder(id) {
 }
 
 // ============================================================
-// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC. (INVARIATE)
+// 🔥 LISTENER UNICO OTTIMIZZATO (CON PRE-ORDINI)
+// ============================================================
+function setupOptimizedListeners() {
+  // Caricamento iniziale
+  db.ref('ordini')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .once('value')
+    .then(snapshot => {
+      snapshot.forEach(child => {
+        ordersCache[child.key] = { id: child.key, ...child.val() };
+      });
+      renderOrders(ordersCache);
+    });
+
+  db.ref('ordini')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .on('value', snapshot => {
+      const newOrders = {};
+      const changed = [];
+      const added = [];
+
+      snapshot.forEach(child => {
+        const order = { id: child.key, ...child.val() };
+        newOrders[child.key] = order;
+        const old = ordersCache[child.key];
+        if (!old) {
+          added.push(order);
+        } else if (old.status !== order.status || old.delayMinutes !== order.delayMinutes) {
+          changed.push({ old, new: order });
+        }
+      });
+
+      added.forEach(o => {
+        playAdminNotification();
+        
+        if (o.status === 'preorder') {
+          showToast(`📅 Pre-ordine ${o.orderId || o.id} per il ${o.scheduledDate || 'data non impostata'}`);
+        } else {
+          showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
+        }
+        
+        if (o.status !== 'preorder') {
+          const comanda = generaComanda(o);
+          salvaComandaInFirebase(o.id, comanda);
+          try {
+            inviaStampante(comanda);
+            showToast(`🖨️ Comanda ${o.orderId} stampata!`);
+          } catch(e) {
+            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `comanda_${o.orderId || o.id}.txt`;
+            link.click();
+            showToast(`📥 Comanda ${o.orderId} scaricata (stampante offline)`);
+          }
+        }
+      });
+
+      changed.forEach(({ old, new: o }) => {
+        const orderId = o.orderId || o.id;
+        const messages = {
+          'accettato': `✅ Ordine ${orderId} ACCETTATO!`,
+          'preparing': `🍕 Ordine ${orderId} in preparazione`,
+          'delayed': `⏰ Ordine ${orderId} in ritardo (${o.delayMinutes || 10} min)`,
+          'ready': `✅ Ordine ${orderId} pronto!`,
+          'picked': `📦 Fattorino ha ritirato ${orderId}`,
+          'delivering': `🛵 Ordine ${orderId} in consegna`,
+          'delivered': `🎉 Ordine ${orderId} consegnato!`,
+          'annullato': `🗑️ Ordine ${orderId} ANNULLATO dal cliente`,
+          'rifiutato': `❌ Ordine ${orderId} RIFIUTATO`
+        };
+        if (messages[o.status]) {
+          showToast(messages[o.status]);
+          playAdminNotification();
+        }
+      });
+
+      ordersCache = newOrders;
+      renderOrders(ordersCache);
+    });
+
+  // Recensioni
+  db.ref('recensioni')
+    .orderByChild('timestamp')
+    .limitToLast(50)
+    .on('value', s => loadReviews());
+
+  // Settings
+  db.ref('settings').on('value', s => {
+    if (s.exists()) {
+      appData.settings = { ...appData.settings, ...s.val() };
+      loadSettings();
+      applyCurrentPalette();
+    }
+  });
+}
+
+// ============================================================
+// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC.
 // ============================================================
 
 async function clearOldOrders() {
@@ -1372,6 +1594,7 @@ async function clearOldOrders() {
       else if (scelta === 'rifiutati') elimina = order.status === 'rifiutato';
       else if (scelta === 'annullati') elimina = order.status === 'annullato';
       else if (scelta === 'consegnati') elimina = order.status === 'delivered';
+      else if (scelta === 'preorder') elimina = order.status === 'preorder';
       else if (scelta === 'vecchi') { 
         const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000); 
         elimina = (order.timestamp || 0) < cutoff; 
@@ -1380,7 +1603,6 @@ async function clearOldOrders() {
       }
       if (elimina) { 
         child.ref.remove(); 
-        // 🔥 ELIMINA ANCHE LA COMANDA
         db.ref('comande_stampate/' + child.key).remove();
         count++; 
       }
@@ -1402,6 +1624,7 @@ function showPuliziaOrdini() {
           <button class="btn-pulizia" data-opzione="rifiutati" style="padding:12px;border-radius:10px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#f87171;font-weight:600;cursor:pointer;font-size:0.9rem;">❌ Solo Rifiutati</button>
           <button class="btn-pulizia" data-opzione="annullati" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">🗑️ Solo Annullati</button>
           <button class="btn-pulizia" data-opzione="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;font-size:0.9rem;">🎉 Solo Consegnati</button>
+          <button class="btn-pulizia" data-opzione="preorder" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(212,168,75,0.1);color:var(--gold);font-weight:600;cursor:pointer;font-size:0.9rem;">📅 Solo Pre-ordini</button>
           <button class="btn-pulizia" data-opzione="vecchi" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;font-size:0.9rem;">📅 Più vecchi di 60 giorni</button>
           <button class="btn-pulizia" data-opzione="tutti" style="padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.2);color:#ef4444;font-weight:700;cursor:pointer;font-size:0.9rem;">⚠️ TUTTI GLI ORDINI</button>
           <button id="btnAnnullaPulizia" style="padding:12px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card-light);color:var(--cream);font-weight:600;cursor:pointer;font-size:0.9rem;margin-top:10px;">Annulla</button>
