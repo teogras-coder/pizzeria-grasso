@@ -1583,34 +1583,14 @@ function setupOptimizedListeners() {
           salvaComandaInFirebase(o.id, comanda);
           
           // 🔥 STAMPA (finestra del browser) con "PRE-ORDINE" in evidenza
-          try {
-            inviaStampante(comanda);
-            showToast(`🖨️ Comanda PRE-ORDINE ${o.orderId} stampata!`);
-          } catch(e) {
-            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `preordine_${o.orderId || o.id}.txt`;
-            link.click();
-            showToast(`📥 Pre-ordine ${o.orderId} scaricato (stampante offline)`);
-          }
+          inviaStampante(comanda);
         } else {
           // 🔥 ORDINE NORMALE
           showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
           
           const comanda = generaComanda(o);
           salvaComandaInFirebase(o.id, comanda);
-          try {
-            inviaStampante(comanda);
-            showToast(`🖨️ Comanda ${o.orderId} stampata!`);
-          } catch(e) {
-            const blob = new Blob([comanda], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `comanda_${o.orderId || o.id}.txt`;
-            link.click();
-            showToast(`📥 Comanda ${o.orderId} scaricata (stampante offline)`);
-          }
+          inviaStampante(comanda);
         }
       });
 
@@ -1654,7 +1634,7 @@ function setupOptimizedListeners() {
 }
 
 // ============================================================
-// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC.
+// FUNZIONI CATEGORIE, MENU, PROMOZIONI, ECC. (INVARIATE)
 // ============================================================
 
 async function clearOldOrders() {
