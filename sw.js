@@ -1,17 +1,19 @@
 // =====================================================
 // 🍕 SERVICE WORKER - Antica Pizzeria Grasso
-// Versione: 3.0 (2026-07-02)
+// Versione: 4.0 (2026-08-25) - CORRETTO PER GITHUB
 // =====================================================
 
-const STATIC_CACHE = 'pizzeria-grasso-static-v3';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v3';
+// 🔥 REGOLA: Cambia questi numeri (es. v5, v6) ogni volta che aggiorni l'app!
+const STATIC_CACHE = 'pizzeria-grasso-static-v4';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v4';
 
 // Risorse statiche da cacheare all'installazione
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/offline.html'
+  '/manifest-clienti.json',
+  '/icon-clienti-192.png',
+  '/icon-clienti-512.png'
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -78,13 +80,14 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // 3. FCM / Messaging
+  // 3. FCM / Messaging / OneSignal
   if (url.hostname.includes('fcm') ||
-      url.hostname.includes('firebaseinstallations')) {
+      url.hostname.includes('firebaseinstallations') ||
+      url.hostname.includes('onesignal.com')) {
     return;
   }
 
-  // ─── STRATEGIA 1: Cache First per risorse statiche ───
+  // ─── STRATEGIA 1: Cache First per risorse statiche (Immagini, CSS, JS esterni) ───
   if (/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(request)
@@ -93,34 +96,29 @@ self.addEventListener('fetch', event => {
           
           return fetch(request)
             .then(response => {
-              // Cachea solo risposte valide
               if (!response || response.status !== 200 || response.type === 'error') {
                 return response;
               }
               
               const responseToCache = response.clone();
-              caches.open(STATIC_CACHE)
+              caches.open(DYNAMIC_CACHE) // Usiamo dynamic per le immagini esterne (es. imgur, firebase storage)
                 .then(cache => cache.put(request, responseToCache))
                 .catch(err => console.warn('[SW] Errore cache statica:', err));
               
               return response;
             })
             .catch(() => {
-              // Fallback offline per immagini
-              if (/\.(png|jpg|jpeg|gif|svg|webp)$/.test(url.pathname)) {
-                return new Response('', { status: 404, statusText: 'Offline' });
-              }
+              return new Response('', { status: 404, statusText: 'Offline' });
             });
         })
     );
     return;
   }
 
-  // ─── STRATEGIA 2: Network First per HTML e altro ───
+  // ─── STRATEGIA 2: Network First per HTML (Aggiornamenti immediati) ───
   event.respondWith(
     fetch(request)
       .then(response => {
-        // Cachea solo risposte HTML valide
         if (response && response.status === 200 && 
             (response.type === 'basic' || response.type === 'cors')) {
           const responseToCache = response.clone();
@@ -136,7 +134,7 @@ self.addEventListener('fetch', event => {
           .then(cached => {
             if (cached) return cached;
             
-            // Se è una richiesta HTML, servi la index
+            // Se è una richiesta HTML e siamo offline, servi la index dalla cache
             const accept = request.headers.get('accept') || '';
             if (accept.includes('text/html')) {
               return caches.match('/index.html');
@@ -147,7 +145,7 @@ self.addEventListener('fetch', event => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📢 MESSAGE: Aggiornamento forzato da admin
+// 📢 MESSAGE: Aggiornamento forzato
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -155,7 +153,6 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
   
-  // Supporto per pulizia cache manuale
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     caches.delete(STATIC_CACHE).then(() => caches.delete(DYNAMIC_CACHE));
   }
