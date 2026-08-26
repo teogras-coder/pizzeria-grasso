@@ -514,7 +514,7 @@ function setupOptimizedListeners() {
       saveOrdersToCache();
     });
 
-  // 2. 🔥 ASCALTA NUOVI ORDINI (child_added) - SOLO CONSEGNA
+  // 2. 🔥 ASCOLTA NUOVI ORDINI (child_added) - SOLO CONSEGNA
   db.ref('ordini').on('child_added', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
@@ -524,11 +524,12 @@ function setupOptimizedListeners() {
       renderOrders();
       saveOrdersToCache();
       
-      if (!order.assignedDriver && ['new', 'delayed'].includes(order.status)) {
+      // Suona se è un nuovo ordine non assegnato (new, accettato, preparing, delayed)
+      if (!order.assignedDriver && ['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         const available = Object.values(ordersCache).filter(o => 
-          ['new', 'delayed'].includes(o.status) && 
+          ['new', 'accettato', 'preparing', 'delayed', 'ready'].includes(o.status) && 
           !o.assignedDriver && 
           o.type === 'delivery'
         );
@@ -537,7 +538,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 3. 🔥 ASCALTA CAMBIAMENTI DI STATO (child_changed) - SOLO CONSEGNA
+  // 3. 🔥 ASCOLTA CAMBIAMENTI DI STATO (child_changed) - SOLO CONSEGNA
   db.ref('ordini').on('child_changed', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
@@ -620,7 +621,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 4. 🔥 ASCALTA RIMOZIONI (child_removed) - ELIMINA DEFINITIVAMENTE
+  // 4. 🔥 ASCOLTA RIMOZIONI (child_removed) - ELIMINA DEFINITIVAMENTE
   db.ref('ordini').on('child_removed', (snapshot) => {
     const id = snapshot.key;
     if (ordersCache[id]) {
@@ -728,13 +729,11 @@ function renderOrders() {
   
   Object.values(ordersCache).forEach(order => {
     // 🔥 SCHEDA "DISPONIBILI": 
-    // - new/delayed non assegnati (da accettare)
-    // - ready non assegnati (da ritirare!)
-    // - ESCLUSI delivered, rifiutato, annullato
+    // Vedono SUBITO gli ordini di consegna (new, accettato, preparing, delayed, ready)
     if (
       order.type === 'delivery' &&
       !order.assignedDriver &&
-      ['new', 'delayed', 'ready'].includes(order.status)
+      ['new', 'accettato', 'preparing', 'delayed', 'ready'].includes(order.status)
     ) {
       available.push(order);
     }
@@ -744,7 +743,7 @@ function renderOrders() {
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
       order.type === 'delivery' &&
-      ['new', 'preparing', 'delayed', 'ready', 'picked', 'delivering'].includes(order.status)
+      ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering'].includes(order.status)
     ) {
       myOrders.push(order);
       if (order.status === 'delivered') completedCount++;
@@ -802,22 +801,27 @@ function renderOrders() {
     let actions = '';
     let statusClass = order.status;
     
-    // 🔥 ORDINE NON ASSEGNATO - disponibile per accettare o ritirare
+    // 🔥 ORDINE NON ASSEGNATO - Il fattorino lo vede SUBITO e può accettarlo
     if (!order.assignedDriver) {
       if (order.status === 'ready') {
         statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro! Accetta e ritira subito.</div>`;
         actions = `<button class="btn-accept-pick" onclick="acceptAndPickOrder('${order.id}')">📦 Accetta & Ritira</button>`;
-      } else if (['new', 'delayed'].includes(order.status)) {
-        const isDelayed = order.status === 'delayed';
-        actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Accetta</button>`;
-        if (isDelayed) {
-          statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo (${order.delayMinutes || 10} min)</div>`;
+      } else if (['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) {
+        // Mostra il pulsante ACCETTA subito per gli ordini nuovi o in preparazione
+        actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Prendi in carico</button>`;
+        
+        if (order.status === 'new') {
+            statusMessage = `<div class="status-message status-waiting">🆕 Nuovo ordine! Prendilo in carico.</div>`;
+        } else if (order.status === 'accettato' || order.status === 'preparing') {
+            statusMessage = `<div class="status-message status-preparing">🍕 In preparazione... Puoi prenderlo in carico ora.</div>`;
+        } else if (order.status === 'delayed') {
+            statusMessage = `<div class="status-message status-delayed">⏰ Ordine in ritardo (${order.delayMinutes || 10} min)</div>`;
         }
       }
     } 
     // 🔥 ORDINE ASSEGNATO A ME
     else if (order.assignedDriver === currentDriver?.pin) {
-      if (order.status === 'new') {
+      if (order.status === 'new' || order.status === 'accettato') {
         statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria prepari...</div>`;
       } else if (order.status === 'preparing') {
         statusMessage = `<div class="status-message status-preparing">🍕 La pizzeria sta preparando...</div>`;
@@ -835,10 +839,10 @@ function renderOrders() {
       }
     }
     
-    // 🆕 Pulsante "Abbandona" per ordini in stato 'new' o 'delayed' assegnati a me
+    // 🆕 Pulsante "Abbandona" per ordini in stato 'new', 'accettato', 'preparing' o 'delayed' assegnati a me
     if (
       order.assignedDriver === currentDriver?.pin && 
-      ['new', 'delayed'].includes(order.status) &&
+      ['new', 'accettato', 'preparing', 'delayed'].includes(order.status) &&
       order.type === 'delivery'
     ) {
       const isDelayed = order.status === 'delayed';
@@ -889,8 +893,8 @@ async function clearCompletedOrders() {
 
 async function acceptOrder(orderId) {
   const ok = await showConfirm(
-    'Accettare ordine?',
-    'Sei sicuro di voler accettare questo ordine?'
+    'Prendere in carico?',
+    'Sei sicuro di voler prendere in carico questo ordine?'
   );
   if (!ok) return;
 
@@ -903,7 +907,8 @@ async function acceptOrder(orderId) {
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
-      if (!['new', 'delayed'].includes(order.status)) return order;
+      // Può accettare se è new, accettato, preparing o delayed
+      if (!['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) return order;
       if (order.type !== 'delivery') return order;
       order.assignedDriver = currentDriver.pin;
       order.assignedName = currentDriver.name;
@@ -914,15 +919,15 @@ async function acceptOrder(orderId) {
     const snapshot = await orderRef.once('value');
     const order = snapshot.val();
     if (order && order.assignedDriver === currentDriver.pin) {
-      showToast('✅ Ordine accettato!');
+      showToast('✅ Ordine preso in carico!');
       playNotificationSound();
     } else {
-      showToast('❌ Ordine già accettato da un altro fattorino');
+      showToast('❌ Ordine già preso da un altro fattorino');
     }
   } catch(e) {
     showToast('❌ Errore accettazione ordine');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '✅ Accetta'; }
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Prendi in carico'; }
   }
 }
 
