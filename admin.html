@@ -785,20 +785,33 @@ if (drivers.exists()) { driversList = drivers.val() || {}; renderDrivers(drivers
 }
 
 // ============================================================
-// 🔥 GENERA COMANDA
+// 🔥 GENERA COMANDA - CON COSTO CONSEGNA SEPARATO
 // ============================================================
 function generaComanda(order) {
-const ristorante = 'ANTICA PIZZERIA GRASSO'; const indirizzo = 'Via Antiche Mura 8/A, Manfredonia'; const telefono = '0884 660377';
-const dataOrdine = new Date(order.timestamp);
-let preOrderHeader = '';
-if (order.isPreOrder && order.scheduledDate) {
-const dataPreOrdine = new Date(order.scheduledDate + 'T00:00:00');
-preOrderHeader = `║  📅 PRE-ORDINE PER IL: ${dataPreOrdine.toLocaleDateString('it-IT')}`;
-if (order.scheduledTime && order.scheduledTime !== 'Prima possibile') preOrderHeader += ` alle ${order.scheduledTime}`;
-preOrderHeader += '\n';
-}
-const preOrderBorder = order.isPreOrder ? '╠═══════════════════════════════════════════════════════════════╣\n║  ⚠️  QUESTO È UN PRE-ORDINE  ⚠️                            ║\n' : '';
-return `
+    const ristorante = 'ANTICA PIZZERIA GRASSO';
+    const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
+    const telefono = '0884 660377';
+    const dataOrdine = new Date(order.timestamp);
+    
+    // 🔥 CALCOLA SUBTOTALE PRODOTTI
+    const subtotale = order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0;
+    
+    // 🔥 COSTO CONSEGNA (Moover)
+    const costoCorsa = order.deliveryFee || 0;
+    
+    // 🔥 TOTALE ORDINE
+    const totale = order.finalTotal || (subtotale + costoCorsa);
+    
+    let preOrderHeader = '';
+    if (order.isPreOrder && order.scheduledDate) {
+        const dataPreOrdine = new Date(order.scheduledDate + 'T00:00:00');
+        preOrderHeader = `║  📅 PRE-ORDINE PER IL: ${dataPreOrdine.toLocaleDateString('it-IT')}`;
+        if (order.scheduledTime && order.scheduledTime !== 'Prima possibile') preOrderHeader += ` alle ${order.scheduledTime}`;
+        preOrderHeader += '\n';
+    }
+    const preOrderBorder = order.isPreOrder ? '╠═══════════════════════════════════════════════════════════════╣\n║  ⚠️  QUESTO È UN PRE-ORDINE  ⚠️                            ║\n' : '';
+
+    let stampa = `
 ╔═══════════════════════════════════════════════════════════════╗
 ║                     ${ristorante}                              ║
 ║                     ${indirizzo}                               ║
@@ -815,11 +828,67 @@ ${order.notes ? '║  📝 NOTE: '+order.notes+'\n' : ''}
 ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti\n' : ''}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  🍕 PRODOTTI:                                                ║
-${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((i.price || 0) * (i.qty || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}
+${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((i.price || 0) * (i.qty || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
+
+    // 🔥 SE È UNA CONSEGNA, AGGIUNGI IL DETTAGLIO COSTI
+    if (order.type === 'delivery') {
+        stampa += `
 ╠═══════════════════════════════════════════════════════════════╣
-║  💰 TOTALE: €${(order.finalTotal || 0).toFixed(2).padStart(8)}                     ║
+║  💰 SUBTOTALE PRODOTTI:              €${subtotale.toFixed(2).padStart(8)} ║
+║  🛵 COSTO CONSEGNA (Moover):         €${costoCorsa.toFixed(2).padStart(8)} ║`;
+    }
+
+    stampa += `
+╠═══════════════════════════════════════════════════════════════╣
+║  💎 TOTALE ORDINE:                   €${totale.toFixed(2).padStart(8)} ║
 ╚═══════════════════════════════════════════════════════════════╝
 `;
+
+    return stampa;
+}
+
+// ============================================================
+// 🔥 CALCOLA COSTO CONSEGNA
+// ============================================================
+function calcolaCostoConsegna(order) {
+    try {
+        const settings = appData.settings || {};
+        const baseFee = parseFloat(settings.deliveryBaseFee) || 3.00;
+        const extraFee = parseFloat(settings.deliveryExtraFee) || 2.00;
+        const maxRadius = parseFloat(settings.deliveryMaxRadius) || 4;
+        const extraRadius = parseFloat(settings.deliveryExtraRadius) || 6;
+        
+        // Se non abbiamo coordinate, usa il costo base
+        if (!order.coords || !order.coords.lat || !order.coords.lng) return baseFee;
+        
+        // Calcola distanza tra pizzeria e cliente
+        const pizzeriaLat = parseFloat(settings.pizzeriaLat) || 0;
+        const pizzeriaLng = parseFloat(settings.pizzeriaLng) || 0;
+        
+        if (pizzeriaLat === 0 || pizzeriaLng === 0) return baseFee;
+        
+        const dist = calcolaDistanza(
+            pizzeriaLat,
+            pizzeriaLng,
+            order.coords.lat,
+            order.coords.lng
+        );
+        
+        if (dist <= maxRadius) return baseFee;
+        if (dist <= extraRadius) return baseFee + extraFee;
+        return 0; // Fuori zona consegna
+    } catch(e) {
+        return 3.00; // Default
+    }
+}
+
+function calcolaDistanza(lat1, lon1, lat2, lon2) {
+    if (lat1 === 0 || lon1 === 0 || lat2 === 0 || lon2 === 0) return 0;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 // ============================================================
@@ -835,8 +904,6 @@ orderId: orderId, comanda: comanda, timestamp: Date.now(), ristampe: 0, dataCrea
 
 async function inviaStampante(comanda, orderId) {
 try {
-// Salviamo su Firebase. Il Raspberry Pi ascolterà questo nodo e stamperà.
-// Nessuna richiesta fetch() viene fatta all'IP del Raspberry, evitando gli scontrini "OPTIONS".
 await salvaComandaInFirebase(orderId, comanda);
 console.log('📤 Comanda inviata a Firebase per la stampa');
 return true;
@@ -854,8 +921,24 @@ async function trasformaInOrdine(orderId) {
 const order = ordersCache[orderId];
 if (!order || order.status !== 'preorder') return;
 try {
-await db.ref(`ordini/${orderId}`).update({ status: 'new', isPreOrder: false, trasformatoIl: Date.now() });
-order.status = 'new'; order.isPreOrder = false;
+// 🔥 Calcola il costo consegna prima di trasformare
+let deliveryFee = 0;
+if (order.type === 'delivery') {
+    deliveryFee = calcolaCostoConsegna(order);
+}
+    
+await db.ref(`ordini/${orderId}`).update({ 
+    status: 'new', 
+    isPreOrder: false, 
+    trasformatoIl: Date.now(),
+    deliveryFee: deliveryFee,
+    finalTotal: (order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0) + deliveryFee
+});
+order.status = 'new'; 
+order.isPreOrder = false;
+order.deliveryFee = deliveryFee;
+order.finalTotal = (order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0) + deliveryFee;
+
 const comanda = generaComanda(order);
 await inviaStampante(comanda, orderId);
 showToast(`✅ Pre-ordine ${order.orderId} trasformato e inviato in stampa!`);
@@ -889,10 +972,43 @@ if (deveTrasformare) await trasformaInOrdine(id);
 }, 60000);
 }
 
+// ============================================================
+// 🔥 ACCETTA ORDINE - CON CALCOLO COSTO CONSEGNA
+// ============================================================
 async function accettaOrdine(id) {
-if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
-await db.ref('ordini/' + id).update({ status: 'accettato', accettatoIl: Date.now() });
-showToast('✅ Ordine accettato!'); renderOrders(ordersCache); notifyClients();
+    if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
+    
+    const order = ordersCache[id];
+    if (!order) return;
+    
+    // 🔥 Calcola il costo consegna
+    let deliveryFee = 0;
+    let finalTotal = order.finalTotal || 0;
+    
+    if (order.type === 'delivery') {
+        deliveryFee = calcolaCostoConsegna(order);
+        const subtotale = order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0;
+        finalTotal = subtotale + deliveryFee;
+    }
+    
+    await db.ref('ordini/' + id).update({ 
+        status: 'accettato', 
+        accettatoIl: Date.now(),
+        deliveryFee: deliveryFee,
+        finalTotal: finalTotal
+    });
+    
+    order.status = 'accettato';
+    order.deliveryFee = deliveryFee;
+    order.finalTotal = finalTotal;
+    
+    // 🔥 Stampa con costo consegna separato
+    const comanda = generaComanda(order);
+    await inviaStampante(comanda, id);
+    
+    showToast('✅ Ordine accettato e stampato!'); 
+    renderOrders(ordersCache); 
+    notifyClients();
 }
 
 function showSection(name, el) {
@@ -906,7 +1022,7 @@ if (name === 'promotions') populatePromoProductSelect();
 }
 
 // ============================================================
-// 🔥 RENDER ORDINI (SENZA PULSANTI RISTAMPA)
+// 🔥 RENDER ORDINI
 // ============================================================
 function renderOrders(orders) {
 const list = document.getElementById('ordersList');
@@ -979,6 +1095,9 @@ const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanit
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
+// 🔥 MOSTRA COSTO CONSEGNA NELLE CARD
+const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${o.deliveryFee.toFixed(2)}</div>` : '';
+
 if (tipo === 'preorder') {
 statusBadge = `<span class="status-badge preorder">📅 PRE-ORDINE</span>`; extraClass = 'preorder';
 ah = `<button class="btn-transform" onclick="trasformaInOrdine('${id}')">📅 Trasforma</button><button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
@@ -1010,6 +1129,7 @@ return `<div class="order-card ${extraClass}" style="border-left-color:${borderC
 <div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.scheduledTime ? ' - ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : ''}${o.notes ? '<br>📝 ' + sanitize(o.notes) : ''}${o.isPreOrder ? '<br>📅 <strong>Pre-ordine:</strong> ' + (o.scheduledDate || '') : ''}</div>
 <div class="order-items">${items}</div>
 <div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div>
+${deliveryFeeDisplay}
 <div class="order-actions">${ah}</div>${motivoMessage}</div>`;
 }).join('');
 }
@@ -1057,7 +1177,9 @@ playAdminNotification();
 if (o.status === 'preorder') showToast(`📅 Pre-ordine ${o.orderId || o.id}`);
 else {
 showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-inviaStampante(generaComanda(o), o.id); // Manda a Firebase, il Raspy stampa
+// 🔥 Stampa con costo consegna separato (se presente)
+const comanda = generaComanda(o);
+inviaStampante(comanda, o.id);
 }
 });
 changed.forEach(({ new: o }) => {
