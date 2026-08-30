@@ -1299,6 +1299,74 @@ function inviaNotificaWeb(titolo, messaggio, icona = '/icon-clienti-192.png') {
 }
 
 // ============================================================
+// 🔥 AGGIORNAMENTO SILENZIOSO DEL SERVICE WORKER
+// ============================================================
+
+if ('serviceWorker' in navigator) {
+  let registration = null;
+  let lastActivity = Date.now();
+  
+  // Traccia l'attività dell'utente
+  document.addEventListener('click', () => { lastActivity = Date.now(); });
+  document.addEventListener('touchstart', () => { lastActivity = Date.now(); });
+  document.addEventListener('scroll', () => { lastActivity = Date.now(); });
+  
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => {
+      registration = reg;
+      console.log('✅ SW registrato');
+      
+      // 🔥 CONTROLLA AGGIORNAMENTI QUANDO L'UTENTE TORNA ALL'APP
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && registration) {
+          registration.update();
+          console.log('📱 Controllo aggiornamenti SW (silenzioso)');
+        }
+      });
+      
+      // 🔥 QUANDO UN NUOVO SW VIENE INSTALLATO → AGGIORNA IN SILENZIO
+      registration.addEventListener('updatefound', () => {
+        const newSW = registration.installing;
+        console.log('🔄 Nuova versione SW trovata, aggiorno in silenzio...');
+        
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // 🔥 FORZA L'ATTIVAZIONE IMMEDIATA (SENZA BANNER)
+            newSW.postMessage({ type: 'SKIP_WAITING' });
+            console.log('✅ SW aggiornato silenziosamente!');
+          }
+        });
+      });
+    })
+    .catch(err => console.log('❌ Errore SW:', err));
+  
+  // 🔥 QUANDO IL SW CAMBIA → RICARICA IN SILENZIO
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    console.log('🔄 SW cambiato, ricarico in silenzio...');
+    
+    // Attendi 5 secondi di inattività prima di ricaricare
+    const checkInactivity = setInterval(() => {
+      if (Date.now() - lastActivity > 5000) {
+        clearInterval(checkInactivity);
+        console.log('🔄 Ricarico in silenzio (utente inattivo)');
+        window.location.reload();
+      }
+    }, 1000);
+    
+    // Timeout massimo: 30 secondi
+    setTimeout(() => {
+      clearInterval(checkInactivity);
+      if (!refreshing) return;
+      console.log('🔄 Ricarico forzato (timeout)');
+      window.location.reload();
+    }, 30000);
+  });
+}
+
+// ============================================================
 // 🔥 INVIO ORDINE (CON SELEZIONE GIORNO)
 // ============================================================
 async function confirmAndSendOrder(){
