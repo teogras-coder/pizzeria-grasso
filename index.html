@@ -37,11 +37,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .particle:nth-child(5){left:15%}.particle:nth-child(6){left:35%;animation-delay:3s}.particle:nth-child(7){left:55%;animation-delay:6s}.particle:nth-child(8){left:75%;animation-delay:9s}
 @keyframes particleFloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px);opacity:0}}
 
-/* CORREZIONE TAGLIO IN BASSO */
+/* CORREZIONE FASCIA NERA E TAGLIO IN BASSO */
 .phone-frame{
     width: 100%;
     max-width: 480px;
-    /* Usa dvh per adattarsi alle barre dinamiche del browser mobile */
     height: 100dvh; 
     height: 100vh; /* Fallback */
     background:linear-gradient(170deg,var(--dark) 0%,var(--brown) 40%,var(--brown-light) 100%);
@@ -284,7 +283,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;"><div class="modal-rifiuto-content"><div class="modal-rifiuto-icon">❌</div><h2 data-i18n="order_rejected_title">Ordine Rifiutato</h2><p id="motivoRifiutoModal" data-i18n="order_rejected_default">La pizzeria non può accettare il tuo ordine.</p><button class="btn-ho-capito" onclick="chiudiModalRifiuto()" data-i18n="understood">Ho capito</button></div></div>
 <div id="welcomeScreen" class="welcome-screen">
 <img src="https://i.imgur.com/nWLqs68.png" alt="Grasso" class="welcome-logo">
-<h1 class="welcome-title" data-i18n="welcome_title">🍕 Benvenuto da Grasso!</h1>
+<h1 class="welcome-title" data-i18n="welcome_title"> Benvenuto da Grasso!</h1>
 <div class="home-instructions"><h3 data-i18n="save_home_title">📱 Salva l'app sulla Home!</h3><ol><li><span data-i18n="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li><li><span data-i18n="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li><li><span data-i18n="save_home_step3">Ordina con un tocco! 🚀</span></li></ol></div>
 <div class="lang-selector">
 <label data-i18n="language_label">🌍 Lingua / Language</label>
@@ -294,7 +293,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <option value="de">🇩🇪 Deutsch</option>
 </select>
 </div>
-<div class="welcome-buttons"><button class="btn-register" onclick="showRegisterModal()" data-i18n="register_btn">👤 Registrati</button><button class="btn-guest" onclick="enterAsGuest()" data-i18n="guest_btn">👻 Continua come Ospite</button></div>
+<div class="welcome-buttons"><button class="btn-register" onclick="showRegisterModal()" data-i18n="register_btn">👤 Registrati</button><button class="btn-guest" onclick="enterAsGuest()" data-i18n="guest_btn"> Continua come Ospite</button></div>
 <p class="welcome-copyright">© 2026 Antica Pizzeria Grasso</p>
 </div>
 <div id="authModal" class="modal-3d"><div class="modal-content-3d" style="max-width:500px;"><div class="modal-header"><h2 id="authModalTitle" data-i18n="login_title">Accedi al tuo account</h2><button class="close-btn-3d" onclick="closeAuthModal()">×</button></div><div id="loginForm"><div class="form-group"><label data-i18n="email_label">Email</label><input type="email" id="loginEmail" placeholder="mario@email.it"></div><div class="form-group"><label data-i18n="password_label">Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div><button onclick="loginWithEmail(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)" class="checkout-btn-3d" data-i18n="login_btn">Accedi</button><div style="margin:20px 0;text-align:center;color:#8a7a5a;" data-i18n="or">oppure</div><button onclick="loginWithGoogle()" style="width:100%;padding:14px;border-radius:10px;border:1px solid #4285F4;background:#fff;color:#4285F4;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;"><img src="https://www.google.com/favicon.ico" width="20" alt="Google"><span data-i18n="login_with_google">Continua con Google</span></button><p style="text-align:center;color:#8a7a5a;margin-top:15px;"><span data-i18n="no_account">Non hai un account?</span> <a onclick="showRegisterForm()" style="color:var(--gold);cursor:pointer;text-decoration:underline;" data-i18n="register_here">Registrati</a></p></div><div id="registerForm" style="display:none;"><div class="form-group"><label data-i18n="name_label">Nome e Cognome</label><input type="text" id="registerName" placeholder="Mario Rossi"></div><div class="form-group"><label data-i18n="email_label">Email</label><input type="email" id="registerEmail" placeholder="mario@email.it"></div><div class="form-group"><label data-i18n="password_label">Password</label><input type="password" id="registerPassword" placeholder="Minimo 6 caratteri"></div><div class="form-group"><label data-i18n="confirm_password">Conferma Password</label><input type="password" id="registerPasswordConfirm" placeholder="••••••••"></div><button onclick="registerUser()" class="checkout-btn-3d" data-i18n="register_btn">Registrati</button><p style="text-align:center;color:#8a7a5a;margin-top:15px;"><span data-i18n="already_have_account">Hai già un account?</span> <a onclick="showLoginForm()" style="color:var(--gold);cursor:pointer;text-decoration:underline;" data-i18n="login_here">Accedi</a></p></div></div></div>
@@ -302,7 +301,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div id="bannerRifiuto"><div class="banner-title" data-i18n="order_rejected">❌ Ordine Rifiutato</div><div class="banner-motivo" id="motivoRifiutoText" data-i18n="reject_default_msg">La pizzeria non può accettare il tuo ordine.</div><button class="banner-btn" onclick="chiudiBannerRifiuto()" data-i18n="understood">Ho capito</button></div>
 <div class="ambient-lights"><div class="light-orb"></div><div class="light-orb"></div><div class="light-orb"></div></div>
 <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
-<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-i18n="offline_msg">⚠️ Sei offline — riconnessione in corso...</div>
+<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-i18n="offline_msg">️ Sei offline — riconnessione in corso...</div>
 <button id="floatingCartButton" class="floating-cart-btn hidden" aria-label="Apri carrello"><i class="fas fa-shopping-cart"></i><span class="floating-cart-badge" id="floatingCartBadge">0</span></button>
 <div class="phone-frame" id="mainApp" style="display:none;">
 <header class="header">
@@ -336,7 +335,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </div>
 <div id="myOrdersView">
 <button class="back-btn-3d" onclick="showHome()"><i class="fas fa-arrow-left"></i> <span data-i18n="back_btn">Torna al Menu</span></button>
-<h2 class="category-title" data-i18n="my_orders">📦 I Miei Ordini</h2>
+<h2 class="category-title" data-i18n="my_orders"> I Miei Ordini</h2>
 <p style="color:#8a7a5a;font-size:.8rem;margin-bottom:15px;"><span data-i18n="orders_info">Visualizzi solo gli ultimi 5 ordini recenti.</span> <span class="order-live-indicator">LIVE</span></p>
 <button class="btn-clear-history" onclick="clearLocalHistory()"><i class="fas fa-trash"></i> <span data-i18n="clear_history">Cancella Storico Locale</span></button>
 <div id="myOrdersList"></div>
@@ -396,10 +395,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 // ============================================================
 const translations = {
 it: {
-welcome_title: "🍕 Benvenuto da Grasso!", save_home_title: "📱 Salva l'app sulla Home!",
+welcome_title: "🍕 Benvenuto da Grasso!", save_home_title: " Salva l'app sulla Home!",
 save_home_step1: 'Tocca il tasto <strong>Condividi</strong>', save_home_step2: 'Tocca <strong>"Aggiungi a Home"</strong>',
 save_home_step3: "Ordina con un tocco! 🚀", language_label: "🌍 Lingua / Language",
-register_btn: "👤 Registrati", guest_btn: "👻 Continua come Ospite", login_title: "Accedi al tuo account",
+register_btn: " Registrati", guest_btn: "👻 Continua come Ospite", login_title: "Accedi al tuo account",
 email_label: "Email", password_label: "Password", login_btn: "Accedi", or: "oppure",
 login_with_google: "Continua con Google", no_account: "Non hai un account?", register_here: "Registrati",
 name_label: "Nome e Cognome", confirm_password: "Conferma Password", already_have_account: "Hai già un account?",
@@ -409,10 +408,10 @@ cart: "Carrello", orders: "Ordini", back_btn: "Torna al Menu", search_placeholde
 my_orders: "📦 I Miei Ordini", orders_info: "Visualizzi solo gli ultimi 5 ordini recenti.",
 clear_history: "Cancella Storico Locale", reviews: "⭐ Le Nostre Recensioni", privacy_policy: "Privacy Policy",
 your_order: "Il Tuo Ordine", delivery_fee: "Costo consegna", total: "Totale", delivery_short: "Consegna",
-pickup_short: "Ritiro", your_data: "I Tuoi Dati", time_label: "Orario", asap: " Prima possibile",
+pickup_short: "Ritiro", your_data: "I Tuoi Dati", time_label: "Orario", asap: "⚡ Prima possibile",
 choose_time: "🕐 Scegli Orario", select_time: "Seleziona orario:",
 select_date: "Seleziona il giorno:",
-no_available_dates: "⚠️ Nessun giorno disponibile nei prossimi 7 giorni",
+no_available_dates: "️ Nessun giorno disponibile nei prossimi 7 giorni",
 select_valid_date: "⚠️ Seleziona una data valida",
 phone_label: "Telefono *",
 address_label: "Indirizzo di Consegna *", use_gps: "Usa GPS", notes_label: "Note (opzionale)",
@@ -426,14 +425,14 @@ retention: "Conservazione", retention_text: "Conserviamo i dati per 24 mesi.",
 cookie_text: "Utilizziamo cookie tecnici.", accept: "Accetta", cancel: "Annulla", confirm: "Conferma",
 order_rejected: "❌ Ordine Rifiutato", order_rejected_title: "Ordine Rifiutato",
 order_rejected_default: "La pizzeria non può accettare il tuo ordine.", reject_default_msg: "La pizzeria non può accettare il tuo ordine.",
-understood: "Ho capito", offline_msg: "⚠️ Sei offline — riconnessione in corso...",
+understood: "Ho capito", offline_msg: "️ Sei offline — riconnessione in corso...",
 empty_cart: "Vuoto", add_product: "aggiunta!", promo_removed: "Promo rimossa", cart_emptied: "Svuotato",
 gps_loading: "Caricamento...", gps_fail: "Impossibile ottenere posizione", gps_ok: "Posizione trovata!",
 order_sent: "✅ Ordine inviato!", order_error: "❌ Errore invio", history_cleared: "🗑️ Storico cancellato!",
 thanks_review: "⭐ Grazie per la recensione!", no_reviews: "Nessuna recensione.<br>Sii il primo! 🌟",
 no_orders: "Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕", not_available: "❌ Non disponibile",
 no_products: "Nessun prodotto trovato 🍕", closed_now: "⚠️ Siamo chiusi ora, ma puoi ordinare per dopo!",
-no_delivery: "🚫 Consegna non disponibile", no_pickup: "🚫 Ritiro non disponibile",
+no_delivery: "🚫 Consegna non disponibile", no_pickup: " Ritiro non disponibile",
 wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
 fill_name: "⚠️ Inserisci il nome", invalid_phone: "❌ Telefono non valido", out_of_range: "❌ Fuori raggio",
 fill_address: "⚠️ Completa indirizzo", min_order: "⚠️ Ordine minimo per consegna: €", empty_cart_confirm: "Vuoi svuotare il carrello?",
@@ -441,23 +440,23 @@ clear_history_confirm: "Cancellare tutto lo storico?", add_another_promo: "Hai g
 promo_unavailable: "❌ Promo non disponibile", promo_exhausted: "❌ Promo esaurita",
 accettato: "✅ Accettato!", preparing: "🍕 In preparazione", ready: "✅ Pronto", picked: "📦 Ritirato", delivering: "🛵 In consegna!",
 delivered: "🎉 Consegnato!", rejected: " Ordine rifiutato", review_btn: "⭐ Recensisci", already_reviewed: "✅ Già recensito",
-annullato: "🗑️ Ordine annullato", sold_out: "🍕 Esaurito", product_not_available: "❌ Prodotto esaurito, scegli altro!",
+annullato: "️ Ordine annullato", sold_out: "🍕 Esaurito", product_not_available: "❌ Prodotto esaurito, scegli altro!",
 app_updated: "🔄 App aggiornata!",
-notify_ready: "✅ Ordine Pronto!", notify_delivering: " Il rider sta arrivando!", notify_delayed: "⏰ Ordine in ritardo",
+notify_ready: "✅ Ordine Pronto!", notify_delivering: " Il rider sta arrivando!", notify_delayed: " Ordine in ritardo",
 select_valid_time: "⚠️ Seleziona un orario valido"
 },
 en: {
-welcome_title: "🍕 Welcome to Grasso!", save_home_title: "📱 Save app to Home!",
+welcome_title: " Welcome to Grasso!", save_home_title: "📱 Save app to Home!",
 save_home_step1: 'Tap the <strong>Share</strong> button', save_home_step2: 'Tap <strong>"Add to Home"</strong>',
 save_home_step3: "Order with one tap! ", language_label: "🌍 Language / Lingua",
-register_btn: "👤 Register", guest_btn: "👻 Continue as Guest", login_title: "Sign in to your account",
+register_btn: "👤 Register", guest_btn: " Continue as Guest", login_title: "Sign in to your account",
 email_label: "Email", password_label: "Password", login_btn: "Sign In", or: "or",
 login_with_google: "Continue with Google", no_account: "Don't have an account?", register_here: "Register",
 name_label: "Full Name", confirm_password: "Confirm Password", already_have_account: "Already have an account?",
-login_here: "Sign In", logout_btn: "Log Out", closed: "🔴 CLOSED", open: "🟢 OPEN",
+login_here: "Sign In", logout_btn: "Log Out", closed: "🔴 CLOSED", open: " OPEN",
 menu_title: "Our Menu", quick_access: "Quick Access", call: "Call", navigate: "Navigate",
 cart: "Cart", orders: "Orders", back_btn: "Back to Menu", search_placeholder: "Search menu...",
-my_orders: "📦 My Orders", orders_info: "Showing last 5 recent orders.",
+my_orders: " My Orders", orders_info: "Showing last 5 recent orders.",
 clear_history: "Clear Local History", reviews: "⭐ Our Reviews", privacy_policy: "Privacy Policy",
 your_order: "Your Order", delivery_fee: "Delivery fee", total: "Total", delivery_short: "Delivery",
 pickup_short: "Pickup", your_data: "Your Details", time_label: "Time", asap: "⚡ ASAP",
@@ -494,8 +493,8 @@ accettato: "✅ Accepted!", preparing: " Preparing", ready: "✅ Ready", picked:
 delivered: " Delivered!", rejected: "❌ Order rejected", review_btn: "⭐ Review", already_reviewed: "✅ Already reviewed",
 annullato: "️ Order cancelled", sold_out: " Sold Out", product_not_available: "❌ Product sold out, choose another!",
 app_updated: " App updated!",
-notify_ready: "✅ Order Ready!", notify_delivering: "🛵 Rider is coming!", notify_delayed: "⏰ Order delayed",
-select_valid_time: "⚠️ Select a valid time"
+notify_ready: "✅ Order Ready!", notify_delivering: " Rider is coming!", notify_delayed: " Order delayed",
+select_valid_time: "️ Select a valid time"
 },
 de: {
 welcome_title: "🍕 Willkommen bei Grasso!", save_home_title: "📱 App zum Startbildschirm!",
@@ -523,7 +522,7 @@ leave_review: "Bewertung schreiben", how_many_stars: "Wie viele Sterne? ⭐", yo
 your_opinion: "Ihre Meinung", order_number: "Bestellnummer", send_review: "Bewertung senden",
 privacy_respect: "respektiert Ihre Privatsphäre.", what_data: "📋 Welche Daten wir sammeln",
 data_name: "Vor- und Nachname", data_phone: "Telefon", data_address: "Adresse", data_notes: "Bestellnotizen",
-security: "🔒 Sicherheit", security_text: "Daten auf sicheren Servern (Firebase/Google Cloud) mit Verschlüsselung gespeichert.",
+security: " Sicherheit", security_text: "Daten auf sicheren Servern (Firebase/Google Cloud) mit Verschlüsselung gespeichert.",
 retention: "Aufbewahrung", retention_text: "Wir speichern Daten für 24 Monate.",
 cookie_text: "Wir verwenden technische Cookies.", accept: "Akzeptieren", cancel: "Abbrechen", confirm: "Bestätigen",
 order_rejected: "❌ Bestellung abgelehnt", order_rejected_title: "Bestellung abgelehnt",
@@ -534,14 +533,14 @@ gps_loading: "Laden...", gps_fail: "Standort nicht verfügbar", gps_ok: "Standor
 order_sent: "✅ Bestellung gesendet!", order_error: "❌ Sende-Fehler", history_cleared: "️ Verlauf gelöscht!",
 thanks_review: "⭐ Danke für die Bewertung!", no_reviews: "Noch keine Bewertungen.<br>Seien Sie der Erste! ",
 no_orders: "Keine aktuellen Bestellungen.<br>Geben Sie Ihre erste Bestellung auf! ", not_available: "❌ Nicht verfügbar",
-no_products: "Keine Produkte gefunden 🍕", closed_now: "⚠️ Wir sind jetzt geschlossen, aber Sie können für später bestellen!",
+no_products: "Keine Produkte gefunden 🍕", closed_now: "️ Wir sind jetzt geschlossen, aber Sie können für später bestellen!",
 no_delivery: "🚫 Keine Lieferung", no_pickup: "🚫 Keine Abholung",
 wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
-fill_name: "⚠️ Name eingeben", invalid_phone: "❌ Ungültiges Telefon", out_of_range: "❌ Außerhalb des Bereichs",
+fill_name: "️ Name eingeben", invalid_phone: " Ungültiges Telefon", out_of_range: " Außerhalb des Bereichs",
 fill_address: "️ Adresse vervollständigen", min_order: "⚠️ Mindestbestellwert für Lieferung: €", empty_cart_confirm: "Warenkorb leeren?",
 clear_history_confirm: "Gesamten Verlauf löschen?", add_another_promo: "Sie haben diese Aktion bereits. Eine weitere hinzufügen?",
 promo_unavailable: "❌ Aktion nicht verfügbar", promo_exhausted: "❌ Aktion ausgeschöpft",
-accettato: "✅ Akzeptiert!", preparing: " In Zubereitung", ready: "✅ Fertig", picked: "📦 Abgeholt", delivering: "🛵 Wird geliefert!",
+accettato: "✅ Akzeptiert!", preparing: " In Zubereitung", ready: "✅ Fertig", picked: " Abgeholt", delivering: "🛵 Wird geliefert!",
 delivered: "🎉 Geliefert!", rejected: "❌ Bestellung abgelehnt", review_btn: "⭐ Bewerten", already_reviewed: "✅ Bereits bewertet",
 annullato: "🗑️ Bestellung storniert", sold_out: "🍕 Ausverkauft", product_not_available: "❌ Produkt ausverkauft, wähle ein anderes!",
 app_updated: "🔄 App aktualisiert!",
@@ -600,7 +599,7 @@ appData.settings.deliveryEnabled = newDelivery; appData.settings.pickupEnabled =
 localStorage.setItem('delivery_state', String(newDelivery)); localStorage.setItem('pickup_state', String(newPickup));
 updateDeliveryPickupUI();
 if (oldDelivery !== null && String(oldDelivery) !== String(newDelivery)) { showToast(newDelivery ? '🛵 Consegna ATTIVA' : '🚫 Consegna DISATTIVATA'); playNotificationSound(); }
-if (oldPickup !== null && String(oldPickup) !== String(newPickup)) { showToast(newPickup ? '🏪 Ritiro ATTIVO' : '🚫 Ritiro DISATTIVATO'); playNotificationSound(); }
+if (oldPickup !== null && String(oldPickup) !== String(newPickup)) { showToast(newPickup ? '🏪 Ritiro ATTIVO' : ' Ritiro DISATTIVATO'); playNotificationSound(); }
 });
 }
 function startVersionListener() {
@@ -977,7 +976,7 @@ updateCartBadge();
 openCart();
 }
 // ============================================================
-// 🔥 OPEN CART (CON PULSANTE RIMUOVI PER OGNI PRODOTTO)
+// 🔥 OPEN CART (CON PULSANTE RIMUOVI PER OGNI PRODOTTO E SEPARAZIONE CATEGORIE)
 // ============================================================
 function openCart(){
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
@@ -1003,20 +1002,37 @@ h+=`
 </div>`;
 }
 });
-// Prodotti normali (con pulsante RIMUOVI)
-cart.forEach((x,idx)=>{
-if(!x.isPromo) {
+
+// Raggruppa i prodotti normali per categoria
+const categoriesMap = {};
+cart.forEach((x, idx) => {
+if (!x.isPromo) {
+const catKey = x.cat || 'Altro';
+if (!categoriesMap[catKey]) categoriesMap[catKey] = [];
+categoriesMap[catKey].push({ ...x, originalIndex: idx });
+}
+});
+
+// Renderizza ogni categoria separatamente
+Object.keys(categoriesMap).forEach(catKey => {
+const catName = getCategoryDisplayName(catKey);
+h += `<div style="margin-top:15px; margin-bottom:8px; border-bottom:1px solid rgba(212,168,75,0.3); padding-bottom:4px;">
+<h4 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1rem;">${catName}</h4>
+</div>`;
+
+categoriesMap[catKey].forEach(item => {
+const idx = item.originalIndex;
 h+=`
 <div class="cart-item-3d" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(212,168,75,0.1);">
 <div style="flex:1;">
-<span class="cart-item-name">${x.name}</span>
+<span class="cart-item-name">${item.name}</span>
 <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
 <div class="qty-counter" style="transform:scale(0.85);transform-origin:left;">
 <button type="button" class="qty-btn minus" onclick="changeProductQtyInCart(${idx}, -1)" style="width:28px;height:28px;font-size:0.85rem;">−</button>
-<span class="qty-value" style="min-width:20px;">${x.qty || 1}</span>
+<span class="qty-value" style="min-width:20px;">${item.qty || 1}</span>
 <button type="button" class="qty-btn" onclick="changeProductQtyInCart(${idx}, 1)" style="width:28px;height:28px;font-size:0.85rem;">+</button>
 </div>
-<span class="cart-item-price" style="font-size:0.95rem;">€${((x.price || 0) * (x.qty || 1)).toFixed(2)}</span>
+<span class="cart-item-price" style="font-size:0.95rem;">€${((item.price || 0) * (item.qty || 1)).toFixed(2)}</span>
 </div>
 </div>
 <button onclick="removeProductFromCart(${idx})" style="
@@ -1034,8 +1050,9 @@ white-space:nowrap;
 🗑️ Rimuovi
 </button>
 </div>`;
-}
 });
+});
+
 it.innerHTML=h; ts.style.display='flex'; cl.style.display='flex'; cf.style.display='block'; tt.style.display='flex';
 const de = appData.settings.deliveryEnabled !== false; const pe = appData.settings.pickupEnabled !== false;
 document.getElementById('typeDelivery').classList.toggle('disabled', !de); document.getElementById('typePickup').classList.toggle('disabled', !pe);
@@ -1143,7 +1160,7 @@ playNotificationSound();
 if(navigator.vibrate) navigator.vibrate([200,100,200]);
 }
 else if(finalStatus === 'delivering'){
-messaggio = '🛵 Il rider sta arrivando con il tuo ordine!';
+messaggio = ' Il rider sta arrivando con il tuo ordine!';
 showToast(t('notify_delivering'));
 playNotificationSound();
 if(navigator.vibrate) navigator.vibrate([200,100,200]);
@@ -1244,7 +1261,7 @@ showMyOrders();
 setTimeout(() => {
 if (notifica) notifica.close();
 }, 10000);
-console.log('📱 Notifica web inviata:', messaggio);
+console.log(' Notifica web inviata:', messaggio);
 } catch(e) {
 console.log('Errore invio notifica web:', e);
 }
@@ -1288,7 +1305,7 @@ console.log('🔄 SW cambiato, ricarico in silenzio...');
 const checkInactivity = setInterval(() => {
 if (Date.now() - lastActivity > 5000) {
 clearInterval(checkInactivity);
-console.log('🔄 Ricarico in silenzio (utente inattivo)');
+console.log(' Ricarico in silenzio (utente inattivo)');
 window.location.reload();
 }
 }, 1000);
@@ -1451,8 +1468,8 @@ const bc=s==='rifiutato'?'#ef4444':s==='annullato'?'#f87171':s==='preorder'?'var
 const preOrderBadge = x.isPreOrder ? `<span style="color:var(--gold);font-size:0.65rem;font-weight:700;background:rgba(212,168,75,0.2);padding:2px 8px;border-radius:10px;margin-left:5px;">📅 PRE-ORDINE</span>` : '';
 const tr=renderOrderTracker(s,x.motivoRifiuto||x.motivoAnnullamento,ot,x.delayMinutes);
 const puoAnnullare=puoAnnullareOrdine(x);
-const annullamentoInfo=!puoAnnullare&&s!=='annullato'&&s!=='rifiutato'&&x.status!=='delivered'?`<span style="color:#f59e0b;font-size:0.8rem;font-weight:600;">⏰ Non più annullabile</span>`:'';
-return`<div class="my-order-card" style="border-left-color:${bc}"><div class="my-order-header"><span class="my-order-id">📦 ${x.orderId} ${preOrderBadge}</span><span class="my-order-date">${ds} • ${tl}</span></div><div class="my-order-items">${x.items}</div><div class="my-order-total">€${x.total.toFixed(2)}</div>${tr}<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${puoAnnullare?`<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla Ordine</button>`:''}${annullamentoInfo}${s==='annullato'?`<span style="color:#f87171;font-weight:bold;">🗑️ ORDINE ANNULLATO</span>`:''}${s!=='rifiutato'&&s!=='annullato'&&!x.reviewed?`<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>`:''}${x.reviewed?`<span class="btn-reviewed">✅ Già recensito</span>`:''}</div></div>`
+const annullamentoInfo=!puoAnnullare&&s!=='annullato'&&s!=='rifiutato'&&x.status!=='delivered'?`<span style="color:#f59e0b;font-size:0.8rem;font-weight:600;"> Non più annullabile</span>`:'';
+return`<div class="my-order-card" style="border-left-color:${bc}"><div class="my-order-header"><span class="my-order-id"> ${x.orderId} ${preOrderBadge}</span><span class="my-order-date">${ds} • ${tl}</span></div><div class="my-order-items">${x.items}</div><div class="my-order-total">€${x.total.toFixed(2)}</div>${tr}<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${puoAnnullare?`<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla Ordine</button>`:''}${annullamentoInfo}${s==='annullato'?`<span style="color:#f87171;font-weight:bold;">🗑️ ORDINE ANNULLATO</span>`:''}${s!=='rifiutato'&&s!=='annullato'&&!x.reviewed?`<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>`:''}${x.reviewed?`<span class="btn-reviewed">✅ Già recensito</span>`:''}</div></div>`
 }).join('')
 }catch(e){console.log(e);l.innerHTML='<p style="color:red">Errore caricamento ordini</p>'}
 }
