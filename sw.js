@@ -1,11 +1,11 @@
 // =====================================================
 // 🍕 SERVICE WORKER - Antica Pizzeria Grasso
-// Versione: 4.0 (2026-08-25) - CORRETTO PER GITHUB
+// Versione: 4.0 (2026-08-30) - CORRETTO PER GITHUB
 // =====================================================
 
-// 🔥 REGOLA: Cambia questi numeri (es. v5, v6) ogni volta che aggiorni l'app!
-const STATIC_CACHE = 'pizzeria-grasso-static-v7';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v7';
+// 🔥 REGOLA: Cambia questi numeri (es. v10, v11) ogni volta che aggiorni l'app!
+const STATIC_CACHE = 'pizzeria-grasso-static-v9';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v9';
 
 // Risorse statiche da cacheare all'installazione
 const STATIC_ASSETS = [
@@ -45,7 +45,22 @@ self.addEventListener('activate', event => {
             return caches.delete(key);
           })
       );
-    }).then(() => self.clients.claim())
+    })
+    .then(() => {
+      console.log('[SW] Claim clients...');
+      return self.clients.claim();
+    })
+    .then(() => {
+      // 🔥 NOTIFICA TUTTE LE SCHEDE CHE IL SW È STATO AGGIORNATO
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_UPDATED',
+            version: STATIC_CACHE
+          });
+        });
+      });
+    })
   );
 });
 
@@ -101,7 +116,7 @@ self.addEventListener('fetch', event => {
               }
               
               const responseToCache = response.clone();
-              caches.open(DYNAMIC_CACHE) // Usiamo dynamic per le immagini esterne (es. imgur, firebase storage)
+              caches.open(DYNAMIC_CACHE)
                 .then(cache => cache.put(request, responseToCache))
                 .catch(err => console.warn('[SW] Errore cache statica:', err));
               
@@ -157,3 +172,5 @@ self.addEventListener('message', event => {
     caches.delete(STATIC_CACHE).then(() => caches.delete(DYNAMIC_CACHE));
   }
 });
+
+console.log('🚀 SW avviato! Versione:', STATIC_CACHE);
