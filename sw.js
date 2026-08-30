@@ -4,8 +4,8 @@
 // =====================================================
 
 // 🔥 REGOLA: Cambia questi numeri (es. v10, v11) ogni volta che aggiorni l'app!
-const STATIC_CACHE = 'pizzeria-grasso-static-v11';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v11';
+const STATIC_CACHE = 'pizzeria-grasso-static-v12';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v12';
 
 // Risorse statiche da cacheare all'installazione
 const STATIC_ASSETS = [
