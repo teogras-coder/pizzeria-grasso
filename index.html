@@ -261,19 +261,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
 </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-window.OneSignalDeferred=window.OneSignalDeferred||[];
-OneSignalDeferred.push(async function(OneSignal){await OneSignal.init({appId:"00485893-99f7-4757-aa76-df88e8b67766",serviceWorkerPath:"/OneSignalSDKWorker.js",serviceWorkerScope:"/",notifyButton:{enable:false},promptOptions:{slidedown:{prompts:[{type:'push',autoPrompt:true,text:{actionMessage:"🔔 Ricevi notifiche da Antica Pizzeria Grasso!",exampleNotificationTitle:"Nuova offerta!",exampleNotificationMessage:"Oggi 2x1 sulla Margherita! 🍕",exampleNotificationCaption:"Puoi disattivare in qualsiasi momento",acceptButton:"Consenti",cancelButton:"No grazie"}}]}}});});
-</script>
-<style>
-.onesignal-slidedown-container{background:linear-gradient(145deg,#2a1e13 0%,#1a1209 100%)!important;border:2px solid #ffffff!important;border-radius:16px!important;box-shadow:0 10px 40px rgba(0,0,0,0.5)!important;max-width:320px!important;padding:20px!important}
-.onesignal-slidedown-container .message-container{color:#f5e6c8!important;font-size:14px!important;font-family:'Montserrat',sans-serif!important}
-.onesignal-slidedown-container .action-container{display:flex!important;gap:10px!important;margin-top:15px!important}
-.onesignal-slidedown-container .action-container button{flex:1!important;padding:10px 16px!important;border-radius:10px!important;font-weight:700!important;font-size:13px!important;cursor:pointer!important;border:none!important}
-.onesignal-slidedown-container .action-container .action-accept{background:linear-gradient(180deg,#d4a84b 0%,#b8860b 100%)!important;color:#1a1209!important}
-.onesignal-slidedown-container .action-container .action-cancel{background:transparent!important;color:#f5e6c8!important;border:1px solid #d4a84b!important}
-</style>
 </head>
 <body>
 
@@ -589,7 +576,7 @@ let currentUser=null,currentLang='it',userType='none',cart=[],orderType='deliver
 let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null;
 let orderStatusListeners={},ordersData={};
 let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:{}};
-let selectedDateOffset = 0; // 0 = oggi, 1 = domani, ecc.
+let selectedDateOffset = 0;
 const ORDER_POLL_MS = 30000;
 
 // ============================================================
@@ -733,7 +720,6 @@ function initApp() {
     try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
     setupFloatingCartDrag(); startStatusListener(); startServicesListener(); loadReviewsPublic(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); setInterval(updateStatusBanner, 60000);
     
-    // 🔥 RICHIEDI PERMESSO NOTIFICHE DOPO 2 SECONDI
     setTimeout(() => {
         richiediPermessoNotifiche();
     }, 2000);
@@ -778,7 +764,6 @@ function generateValidDates() {
     const now = new Date();
     let foundDates = false;
     
-    // Cerca nei prossimi 7 giorni (incluso oggi)
     for (let offset = 0; offset <= 7; offset++) {
         const checkDate = new Date(now);
         checkDate.setDate(now.getDate() + offset);
@@ -786,22 +771,17 @@ function generateValidDates() {
         const checkDayStr = ['dom','lun','mar','mer','gio','ven','sab'][checkDate.getDay()];
         const checkDs = checkDate.toISOString().split('T')[0];
         
-        // Controlla se il giorno è aperto
         let isOpen = true;
         
-        // Controlla giorni di apertura settimanali
         if (s.openDays && s.openDays.length > 0 && !s.openDays.includes(checkDayStr)) {
             isOpen = false;
         }
         
-        // Controlla chiusure speciali
         if (s.specialClosures && s.specialClosures.split(',').map(d => d.trim()).includes(checkDs)) {
             isOpen = false;
         }
         
-        // Controlla se è un giorno passato (escluso oggi)
         if (offset === 0) {
-            // Oggi: controlla se siamo già oltre l'orario di chiusura
             const hs = s.hours || "11:00-15:00,18:00-23:00";
             const ranges = hs.split(',').map(r => r.trim()).filter(Boolean);
             const currentMins = now.getHours() * 60 + now.getMinutes();
@@ -819,11 +799,9 @@ function generateValidDates() {
                 }
             }
             
-            // Se è passato l'orario di chiusura, oggi non è più valido
             if (isPastClosing) isOpen = false;
         }
         
-        // Se il giorno è aperto, aggiungilo alla select
         if (isOpen) {
             foundDates = true;
             const opt = document.createElement('option');
@@ -839,7 +817,6 @@ function generateValidDates() {
         }
     }
     
-    // Se non ci sono giorni disponibili
     if (!foundDates) {
         const opt = document.createElement('option');
         opt.value = "";
@@ -848,9 +825,8 @@ function generateValidDates() {
         document.getElementById('scheduledTimeSelect').innerHTML = 
             `<option value="">⏰ ${t('no_available_dates')}</option>`;
     } else {
-        // Seleziona il primo giorno disponibile (il più vicino)
         select.value = select.options[0]?.value || "0";
-        onDateChange(); // Genera gli orari per il primo giorno
+        onDateChange();
     }
 }
 
@@ -884,7 +860,6 @@ function generateValidTimeSlotsForDate(dayOffset) {
     const targetDate = new Date(now);
     targetDate.setDate(now.getDate() + dayOffset);
     
-    // Se è oggi, controlla l'ora corrente
     const isToday = (dayOffset === 0);
     const currentMins = isToday ? (now.getHours() * 60 + now.getMinutes()) : 0;
     
@@ -900,7 +875,6 @@ function generateValidTimeSlotsForDate(dayOffset) {
         let startM = sh * 60 + sm;
         let endM = eh * 60 + em;
         
-        // Se è oggi, parti dall'ora corrente (arrotondata ai 5 min)
         if (isToday && startM < currentMins) {
             startM = Math.ceil(currentMins / 5) * 5;
         }
@@ -917,7 +891,6 @@ function generateValidTimeSlotsForDate(dayOffset) {
         }
     });
     
-    // Se non ci sono slot (es. giorno festivo o chiuso)
     if (slots.length === 0) {
         const opt = document.createElement('option');
         opt.value = "";
@@ -926,7 +899,6 @@ function generateValidTimeSlotsForDate(dayOffset) {
         return;
     }
     
-    // Popola la select
     slots.forEach(slot => {
         const opt = document.createElement('option');
         opt.value = slot.label;
@@ -937,7 +909,6 @@ function generateValidTimeSlotsForDate(dayOffset) {
         select.appendChild(opt);
     });
     
-    // Seleziona il primo orario disponibile
     select.selectedIndex = 0;
 }
 
@@ -958,7 +929,6 @@ function updateCartTotals(){
         }
     });
     
-    // Aggiorna il totale nel carrello
     let finalTotal = tot;
     let isOutOfRange = false;
     
@@ -998,7 +968,6 @@ function updateCartTotals(){
     
     document.getElementById('totalAmount').textContent = '€' + finalTotal.toFixed(2);
     
-    // 🔥 CONTROLLO ORDINE MINIMO SOLO PER CONSEGNA
     const mo = parseFloat(appData.settings.minDeliveryOrder) || 0;
     if (orderType === 'delivery' && mo > 0 && prodottiTot < mo && !isOutOfRange) {
         document.getElementById('checkoutBtn').disabled = true;
@@ -1043,7 +1012,38 @@ function selectTimeMode(m){
 async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
 
 // ============================================================
-// 🔥 OPEN CART (MODIFICATO CON SELEZIONE GIORNO)
+// 🔥 FUNZIONI PER RIMUOVERE PRODOTTI DAL CARRELLO
+// ============================================================
+function removeProductFromCart(index) {
+    if (index < 0 || index >= cart.length) return;
+    const product = cart[index];
+    if (!product || product.isPromo) return;
+    
+    const productName = product.name || 'Prodotto';
+    cart.splice(index, 1);
+    updateCartBadge();
+    openCart();
+    showToast(`🗑️ ${productName} rimosso dal carrello`);
+}
+
+function changeProductQtyInCart(index, delta) {
+    if (index < 0 || index >= cart.length) return;
+    const item = cart[index];
+    if (!item || item.isPromo) return;
+    
+    const newQty = (item.qty || 1) + delta;
+    if (newQty <= 0) {
+        removeProductFromCart(index);
+        return;
+    }
+    
+    item.qty = newQty;
+    updateCartBadge();
+    openCart();
+}
+
+// ============================================================
+// 🔥 OPEN CART (CON PULSANTE RIMUOVI PER OGNI PRODOTTO)
 // ============================================================
 function openCart(){
     const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
@@ -1053,8 +1053,58 @@ function openCart(){
         document.getElementById('deliveryFeeRow').style.display='none'; document.getElementById('distanceInfo').style.display='none';
     } else {
         let h='';
-        cart.forEach((x,i)=>{ if(x.isPromo) h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="float:right;background:none;border:none;color:#f87171;cursor:pointer;">×</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`; });
-        cart.forEach(x=>{ if(!x.isPromo) h+=`<div class="cart-item-3d"><span class="cart-item-name">${x.name} × ${x.qty}</span><span class="cart-item-price">€${(x.price*x.qty).toFixed(2)}</span></div>`; });
+        
+        // Promozioni
+        cart.forEach((x,i)=>{
+            if(x.isPromo) {
+                h+=`
+                <div class="promo-card-item">
+                    <div class="promo-card-item-header">
+                        <div class="promo-card-item-title">
+                            <span class="promo-badge">PROMO</span> ${x.promoTitle}
+                        </div>
+                        <button onclick="removePromoFromCartAtIndex(${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:1.2rem;">✕</button>
+                    </div>
+                    <div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div>
+                    <div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div>
+                </div>`;
+            }
+        });
+        
+        // Prodotti normali (con pulsante RIMUOVI)
+        cart.forEach((x,idx)=>{
+            if(!x.isPromo) {
+                h+=`
+                <div class="cart-item-3d" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(212,168,75,0.1);">
+                    <div style="flex:1;">
+                        <span class="cart-item-name">${x.name}</span>
+                        <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+                            <div class="qty-counter" style="transform:scale(0.85);transform-origin:left;">
+                                <button type="button" class="qty-btn minus" onclick="changeProductQtyInCart(${idx}, -1)" style="width:28px;height:28px;font-size:0.85rem;">−</button>
+                                <span class="qty-value" style="min-width:20px;">${x.qty || 1}</span>
+                                <button type="button" class="qty-btn" onclick="changeProductQtyInCart(${idx}, 1)" style="width:28px;height:28px;font-size:0.85rem;">+</button>
+                            </div>
+                            <span class="cart-item-price" style="font-size:0.95rem;">€${((x.price || 0) * (x.qty || 1)).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeProductFromCart(${idx})" style="
+                        background:rgba(248,113,113,0.15);
+                        color:#f87171;
+                        border:1px solid rgba(248,113,113,0.3);
+                        border-radius:8px;
+                        padding:8px 12px;
+                        font-size:0.75rem;
+                        font-weight:600;
+                        cursor:pointer;
+                        transition:all 0.2s;
+                        white-space:nowrap;
+                    " onmouseover="this.style.background='rgba(248,113,113,0.3)'" onmouseout="this.style.background='rgba(248,113,113,0.15)'">
+                        🗑️ Rimuovi
+                    </button>
+                </div>`;
+            }
+        });
+        
         it.innerHTML=h; ts.style.display='flex'; cl.style.display='flex'; cf.style.display='block'; tt.style.display='flex';
         
         const de = appData.settings.deliveryEnabled !== false; const pe = appData.settings.pickupEnabled !== false;
@@ -1157,7 +1207,6 @@ function updateLocalOrderStatus(oid, ns, mr, delayMinutes){
                     ch = true; x.status = finalStatus; x.delayMinutes = nextDelay;
                     if((finalStatus === 'rifiutato' || finalStatus === 'annullato') && mr){ if(finalStatus === 'rifiutato') x.motivoRifiuto = mr; else x.motivoAnnullamento = mr; }
                     
-                    // 🔥 COSTRUISCI MESSAGGIO PER LA NOTIFICA
                     let titolo = '🍕 Antica Pizzeria Grasso';
                     let messaggio = '';
                     let icona = '/icon-clienti-192.png';
@@ -1206,7 +1255,6 @@ function updateLocalOrderStatus(oid, ns, mr, delayMinutes){
                         messaggio = '📦 Il rider ha ritirato il tuo ordine!';
                     }
                     
-                    // 🔥 INVIA NOTIFICA WEB (se l'app è in background)
                     if (messaggio) {
                         inviaNotificaWeb(titolo, messaggio, icona);
                     }
@@ -1261,7 +1309,6 @@ function inviaNotificaWeb(titolo, messaggio, icona = '/icon-clienti-192.png') {
         if (!('Notification' in window)) return;
         if (Notification.permission !== 'granted') return;
         
-        // Se l'app è in primo piano, mostra solo toast (evita doppie notifiche)
         if (document.hasFocus()) {
             console.log('📱 App in primo piano, mostro solo toast');
             return;
@@ -1279,14 +1326,12 @@ function inviaNotificaWeb(titolo, messaggio, icona = '/icon-clienti-192.png') {
             }
         });
         
-        // Quando l'utente clicca sulla notifica, apri l'app
         notifica.onclick = function() {
             window.focus();
             this.close();
             showMyOrders();
         };
         
-        // Chiudi automaticamente dopo 10 secondi
         setTimeout(() => {
             if (notifica) notifica.close();
         }, 10000);
@@ -1306,7 +1351,6 @@ if ('serviceWorker' in navigator) {
   let registration = null;
   let lastActivity = Date.now();
   
-  // Traccia l'attività dell'utente
   document.addEventListener('click', () => { lastActivity = Date.now(); });
   document.addEventListener('touchstart', () => { lastActivity = Date.now(); });
   document.addEventListener('scroll', () => { lastActivity = Date.now(); });
@@ -1316,7 +1360,6 @@ if ('serviceWorker' in navigator) {
       registration = reg;
       console.log('✅ SW registrato');
       
-      // 🔥 CONTROLLA AGGIORNAMENTI QUANDO L'UTENTE TORNA ALL'APP
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden && registration) {
           registration.update();
@@ -1324,14 +1367,12 @@ if ('serviceWorker' in navigator) {
         }
       });
       
-      // 🔥 QUANDO UN NUOVO SW VIENE INSTALLATO → AGGIORNA IN SILENZIO
       registration.addEventListener('updatefound', () => {
         const newSW = registration.installing;
         console.log('🔄 Nuova versione SW trovata, aggiorno in silenzio...');
         
         newSW.addEventListener('statechange', () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // 🔥 FORZA L'ATTIVAZIONE IMMEDIATA (SENZA BANNER)
             newSW.postMessage({ type: 'SKIP_WAITING' });
             console.log('✅ SW aggiornato silenziosamente!');
           }
@@ -1340,14 +1381,12 @@ if ('serviceWorker' in navigator) {
     })
     .catch(err => console.log('❌ Errore SW:', err));
   
-  // 🔥 QUANDO IL SW CAMBIA → RICARICA IN SILENZIO
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return;
     refreshing = true;
     console.log('🔄 SW cambiato, ricarico in silenzio...');
     
-    // Attendi 5 secondi di inattività prima di ricaricare
     const checkInactivity = setInterval(() => {
       if (Date.now() - lastActivity > 5000) {
         clearInterval(checkInactivity);
@@ -1356,7 +1395,6 @@ if ('serviceWorker' in navigator) {
       }
     }, 1000);
     
-    // Timeout massimo: 30 secondi
     setTimeout(() => {
       clearInterval(checkInactivity);
       if (!refreshing) return;
@@ -1391,7 +1429,6 @@ async function confirmAndSendOrder(){
         }else df=parseFloat(appData.settings.deliveryBaseFee)||3
     }
     
-    // 🔥 ORDINE MINIMO SOLO PER CONSEGNA (NON PER RITIRO)
     const mo = parseFloat(appData.settings.minDeliveryOrder) || 0;
     if(orderType === 'delivery'){
         if(!st||!nu){ showToast(t('fill_address')); return; }
@@ -1401,7 +1438,6 @@ async function confirmAndSendOrder(){
         }
     }
     
-    // 🔥 GESTIONE ORARIO E PRE-ORDINE CON SELEZIONE GIORNO
     let sch = 'Prima possibile';
     let isPreOrder = false;
     let scheduledDate = null;
@@ -1427,13 +1463,11 @@ async function confirmAndSendOrder(){
         const dateStr = selectedDateOption.dataset.date;
         const timeStr = selectedTimeOption.value;
         
-        // Se il giorno è oggi e siamo aperti, non è pre-ordine
         if (dayOffset === 0 && checkIfOpen()) {
             sch = timeStr;
             isPreOrder = false;
             scheduledDate = null;
         } else {
-            // Altrimenti è un pre-ordine
             isPreOrder = true;
             scheduledDate = dateStr;
             sch = timeStr;
@@ -1441,7 +1475,6 @@ async function confirmAndSendOrder(){
         
         selectedDayOffset = dayOffset;
     } else if (!checkIfOpen()) {
-        // Se è selezionato "Prima possibile" ma siamo chiusi
         showToast(t('closed_now'));
         return;
     }
