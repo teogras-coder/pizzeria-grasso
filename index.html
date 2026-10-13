@@ -721,13 +721,6 @@ firebase.auth().onAuthStateChanged(u=>{if(u){currentUser=u;userType='registered'
 });
 function initApp() {
 cleanLocalHistory();
-function initApp() {
-cleanLocalHistory();
-if(localStorage.getItem('grasso_last_maps') && Date.now() - parseInt(localStorage.getItem('grasso_last_maps')) < 10000){
-  hideWelcomeScreen();
-  document.getElementById('mainApp').style.display='block';
-  document.querySelector('.phone-frame').style.display='block';
-}
 try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
 setupFloatingCartDrag(); startStatusListener(); startServicesListener(); loadReviewsPublic(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); setInterval(updateStatusBanner, 60000);
 setTimeout(() => {
@@ -1577,39 +1570,17 @@ function showHome(){document.getElementById('mainMenu').style.display='block';do
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
 setTimeout(updateNavLiveDotOld,500);
 </script>
-<script>
-// FIX DEFINITIVO PAGINA BIANCA + RITORNO DA MAPS
-(function(){
-  function forceShow(){
-    document.documentElement.style.background='#1a1209';
-    document.body.style.background='#1a1209';
-    document.body.style.display='flex';
-    document.body.style.visibility='visible';
-    document.body.style.opacity='1';
-    var pf=document.getElementById('mainApp');
-    if(pf){ pf.style.display='block'; pf.style.visibility='visible'; pf.style.opacity='1'; }
-    var frame=document.querySelector('.phone-frame');
-    if(frame){ frame.style.display='block'; frame.style.visibility='visible'; }
-    // se eri già entrato come ospite, non mostrare welcome
-    if(localStorage.getItem('grasso_user_type')){
-      var ws=document.getElementById('welcomeScreen');
-      if(ws) ws.style.display='none';
-      if(pf) pf.style.display='block';
-    }
+    <script>
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){
+    location.reload();
   }
-  // esegui subito e ogni volta che torni
-  forceShow();
-  window.addEventListener('pageshow', function(e){ setTimeout(forceShow,10); setTimeout(forceShow,200); setTimeout(forceShow,600); });
-  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ setTimeout(forceShow,10); setTimeout(forceShow,300); } });
-  window.addEventListener('focus', forceShow);
-  // se torni da Maps nei primi 10 sec, forza 5 volte
-  if(localStorage.getItem('grasso_last_maps')){
-    var diff=Date.now() - parseInt(localStorage.getItem('grasso_last_maps'));
-    if(diff < 15000){
-      for(let i=0;i<5;i++) setTimeout(forceShow, i*300);
-    }
+});
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && document.body.style.display==='none'){
+    location.reload();
   }
-})();
+});
 </script>
 </body>
 </html>
