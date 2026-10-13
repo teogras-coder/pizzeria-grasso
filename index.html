@@ -1506,7 +1506,19 @@ function openPrivacyModal(){document.getElementById('privacyModal').classList.ad
 function closePrivacyModal(){document.getElementById('privacyModal').classList.remove('active')}
 function sanitizeWA(txt){return String(txt).replace(/[*_~`]/g,'\\$&')}
 function callPhone(){window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`}
-function openMaps(){window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG"),'_blank')}
+function openMaps(){
+  var dest = encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG");
+  var url = 'https://www.google.com/maps/dir/?api=1&destination=' + dest;
+  // apri in modo che iOS non lasci pagina bianca
+  var a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+}
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function mostraModalRifiuto(m){const md=document.getElementById('modalRifiutoOrdine'),el=document.getElementById('motivoRifiutoModal');if(el)el.textContent=m||t('order_rejected_default');if(md){md.style.display='flex';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500])}}
 function chiudiModalRifiuto(){const m=document.getElementById('modalRifiutoOrdine');if(m)m.style.display='none'}
@@ -1570,15 +1582,23 @@ function showHome(){document.getElementById('mainMenu').style.display='block';do
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
 setTimeout(updateNavLiveDotOld,500);
 </script>
-    <script>
-window.addEventListener('pageshow', function(e){
-  if(e.persisted){
-    location.reload();
-  }
+   <script>
+// FIX PAGINA BIANCA RITORNO DA MAPS - PWA iOS
+window.addEventListener('pagehide', function(){
+  // salva che stai uscendo
+  sessionStorage.setItem('grasso_exiting', '1');
 });
-document.addEventListener('visibilitychange', function(){
-  if(!document.hidden && document.body.style.display==='none'){
-    location.reload();
+window.addEventListener('pageshow', function(e){
+  if(e.persisted || sessionStorage.getItem('grasso_exiting')){
+    sessionStorage.removeItem('grasso_exiting');
+    // forza ridisegno senza reload completo
+    document.body.style.display='none';
+    document.body.offsetHeight;
+    document.body.style.display='flex';
+    var main=document.getElementById('mainApp');
+    if(main) main.style.display='block';
+    var frame=document.querySelector('.phone-frame');
+    if(frame) frame.style.display='block';
   }
 });
 </script>
