@@ -25,8 +25,9 @@
 <style>
 :root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--brown:#2d1f12;--brown-light:#4a3728;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#1a1209 !important;color:#f5e6c8}
-body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative}
+html{height:-webkit-fill-available;background:#1a1209 !important}
+html,body{height:100%;min-height:100vh;min-height:100svh;min-height:100dvh;min-height:-webkit-fill-available;background:#1a1209 !important;color:#f5e6c8}
+body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
 .ambient-lights{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
 .light-orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.3;animation:float 8s ease-in-out infinite}
 .light-orb:nth-child(1){width:200px;height:200px;background:var(--gold);top:10%;left:10%}
@@ -39,18 +40,22 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 
 /* CORREZIONE FASCIA NERA E TAGLIO IN BASSO */
 .phone-frame{
-    width: 100%;
-    max-width: 480px;
-    height: 100dvh; 
-    height: 100vh; /* Fallback */
+    width:100% !important;
+    max-width:480px !important;
+    height:100vh !important;
+    height:100svh !important;
+    height:100dvh !important;
+    min-height:100vh !important;
+    min-height:100svh !important;
+    min-height:100dvh !important;
+    min-height:-webkit-fill-available !important;
     background:linear-gradient(170deg,var(--dark) 0%,var(--brown) 40%,var(--brown-light) 100%);
     position:relative;
     overflow-y:auto;
     overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     z-index:10;
-    /* Padding extra per safe-area e floating cart button */
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    padding-bottom:calc(110px + env(safe-area-inset-bottom)) !important;
 }
 
 .header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:hidden}
@@ -276,6 +281,24 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-register{background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
 .btn-guest{background:linear-gradient(180deg,var(--brown-light) 0%,var(--brown) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
+/* FIX MASCHERA HERO - OMOGENEA CON PALETTE */
+.hero-img{
+  background-color: var(--brown) !important;
+}
+.hero-overlay{
+  background: linear-gradient(180deg, transparent 40%, var(--dark) 95%) !important;
+  background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--dark) 95%, transparent) 100%) !important;
+}
+.gold-shimmer-bar{
+  background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 60%, color-mix(in srgb, var(--gold-dark) 70%, black) 80%, var(--gold) 100%) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,.6), 0 0 12px color-mix(in srgb, var(--gold) 50%, transparent) !important;
+}
+.logo-area{
+  background: var(--dark) !important;
+}
+.logo-tint-overlay{
+  background: var(--gold) !important;
+}
 </style>
 </head>
 <body>
@@ -1546,6 +1569,21 @@ function filterProducts(term){if(currentSearchCat)renderProductList(currentSearc
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat=''}
 function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
 setTimeout(updateNavLiveDotOld,500);
+</script>
+<script>
+// FIX PAGINA BIANCA DOPO NAVIGATORE
+(function(){
+  function restoreApp(){
+    document.documentElement.style.background='#1a1209';
+    document.body.style.background='#1a1209';
+    document.body.style.display='none';
+    document.body.offsetHeight;
+    document.body.style.display='flex';
+  }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){setTimeout(restoreApp,50);setTimeout(restoreApp,300);}});
+  window.addEventListener('pageshow',function(e){if(e.persisted)setTimeout(restoreApp,50);});
+  window.addEventListener('focus',function(){setTimeout(restoreApp,100);});
+})();
 </script>
 </body>
 </html>
