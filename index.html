@@ -1571,18 +1571,51 @@ function applyImages(){if(appData.images.hero)document.getElementById('heroImg')
 setTimeout(updateNavLiveDotOld,500);
 </script>
 <script>
-// FIX PAGINA BIANCA DOPO NAVIGATORE
+// FIX PAGINA BIANCA DEFINITIVO - FRECCETTA + NAVIGATORE
 (function(){
   function restoreApp(){
     document.documentElement.style.background='#1a1209';
     document.body.style.background='#1a1209';
+    document.body.style.display='flex';
+    document.body.style.visibility='visible';
+    document.body.style.opacity='1';
+    var pf=document.querySelector('.phone-frame');
+    if(pf){
+      pf.style.display='block';
+      pf.style.visibility='visible';
+      pf.style.opacity='1';
+      pf.style.height='100dvh';
+    }
+    var main=document.getElementById('mainApp');
+    if(main && localStorage.getItem('grasso_user_type')){
+      main.style.display='block';
+    }
     document.body.style.display='none';
     document.body.offsetHeight;
     document.body.style.display='flex';
   }
-  document.addEventListener('visibilitychange',function(){if(!document.hidden){setTimeout(restoreApp,50);setTimeout(restoreApp,300);}});
-  window.addEventListener('pageshow',function(e){if(e.persisted)setTimeout(restoreApp,50);});
-  window.addEventListener('focus',function(){setTimeout(restoreApp,100);});
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted){
+      setTimeout(restoreApp,10);
+      setTimeout(restoreApp,100);
+      setTimeout(restoreApp,300);
+    }
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden){
+      setTimeout(restoreApp,10);
+      setTimeout(restoreApp,200);
+    }
+  });
+  window.addEventListener('popstate', function(){
+    setTimeout(restoreApp,10);
+  });
+  window.addEventListener('focus', function(){
+    setTimeout(restoreApp,50);
+  });
+  if(document.readyState === 'complete'){
+    setTimeout(restoreApp,100);
+  }
 })();
 </script>
 </body>
