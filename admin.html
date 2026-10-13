@@ -1466,6 +1466,16 @@ pistacchio:{icon:'fa-leaf',colors:{gold:'#a8c686',goldLight:'#c8e8a8',goldDark:'
 vaniglia:{icon:'fa-cookie-bite',colors:{gold:'#f5e6a8',goldLight:'#fff8c8',goldDark:'#d4c48a',dark:'#2a2618',brown:'#3d392a',brownLight:'#4d493a',card:'#353122',cardLight:'#454132',cream:'#fffff0'}},
 nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',brown:'#352a1e',brownLight:'#453a2e',card:'#2a2118',cardLight:'#3a3128',cream:'#f5ece0'}}
 };
+function renderPalettes() { 
+  const grid = document.getElementById('paletteGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(palettes).map(([n,p]) => `<div class="palette-item" onclick="changePalette('${n}')" style="background:linear-gradient(135deg, ${p.colors.gold} 0%, ${p.colors.dark} 100%);" data-palette="${n}"><i class="fas ${p.icon}"></i>${n.replace('_',' ')}</div>`).join(''); 
+  db.ref('settings/colorPalette').once('value').then(s => {
+    const val = s.val()||'autunno';
+    const el = document.querySelector(`[data-palette="${val}"]`);
+    if (el) el.classList.add('selected');
+  });
+}
 async function changePalette(n) { if(!palettes[n]) return; try { await db.ref('settings/colorPalette').set(n); document.querySelectorAll('.palette-item').forEach(p=>p.classList.remove('selected')); document.querySelector(`[data-palette="${n}"]`)?.classList.add('selected'); applyPalette(n); showToast('✅ Palette aggiornata!'); notifyClients(); } catch(e) { showToast('❌ Errore'); } }
 function applyCurrentPalette() { applyPalette(appData.settings.colorPalette||'autunno'); document.querySelectorAll('.palette-item').forEach(p=>p.classList.remove('selected')); document.querySelector(`[data-palette="${appData.settings.colorPalette||'autunno'}"]`)?.classList.add('selected'); }
 function applyPalette(n) { const c=palettes[n]?.colors; if(!c) return; const r=document.documentElement; r.style.setProperty('--gold',c.gold); r.style.setProperty('--gold-light',c.goldLight); r.style.setProperty('--gold-dark',c.goldDark); r.style.setProperty('--dark',c.dark); r.style.setProperty('--brown',c.brown); r.style.setProperty('--brown-light',c.brownLight); r.style.setProperty('--card',c.card); r.style.setProperty('--card-light',c.cardLight); r.style.setProperty('--cream',c.cream); }
