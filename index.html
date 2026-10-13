@@ -286,8 +286,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
   background-color: var(--brown) !important;
 }
 .hero-overlay{
-  background: linear-gradient(180deg, transparent 40%, var(--dark) 95%) !important;
-  background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--dark) 95%, transparent) 100%) !important;
+  background: linear-gradient(180deg, transparent 20%, rgba(255,255,255,0.9) 100%) !important;
 }
 .gold-shimmer-bar{
   background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 60%, color-mix(in srgb, var(--gold-dark) 70%, black) 80%, var(--gold) 100%) !important;
@@ -1585,8 +1584,19 @@ if(document.getElementById('cartModal').classList.contains('active'))openCart();
 }
 function filterProducts(term){if(currentSearchCat)renderProductList(currentSearchCat,term||'')}
 function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat=''}
-function applyImages(){if(appData.images.hero)document.getElementById('heroImg').src=appData.images.hero;renderCategories()}
-setTimeout(updateNavLiveDotOld,500);
+function applyImages(){
+  const HERO_FISSA = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop";
+  const heroEl = document.getElementById('heroImg');
+  if(heroEl){
+    // Se c'è immagine su Firebase usa quella, altrimenti usa fissa leggera (no base64)
+    if(appData.images && appData.images.hero && appData.images.hero !== ""){
+      heroEl.src = appData.images.hero;
+    } else {
+      heroEl.src = HERO_FISSA;
+    }
+  }
+  renderCategories();
+}setTimeout(updateNavLiveDotOld,500);
 </script>
    <script>
 // FIX PAGINA BIANCA RITORNO DA MAPS - PWA iOS
