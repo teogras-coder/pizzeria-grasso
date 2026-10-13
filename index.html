@@ -656,7 +656,7 @@ natale:{gold:'#c41e3a',goldLight:'#e84860',goldDark:'#901020',dark:'#0f2018',bro
 san_valentino:{gold:'#ff4d6d',goldLight:'#ff8098',goldDark:'#d02040',dark:'#1a0a0f',brown:'#2a1520',brownLight:'#3a2530',card:'#201018',cardLight:'#302028',cream:'#f5e8ec'},
 notte:{gold:'#7209b7',goldLight:'#a040d0',goldDark:'#5005a0',dark:'#050510',brown:'#101025',brownLight:'#202035',card:'#0a0a1a',cardLight:'#1a1a2a',cream:'#e8e0f5'}
 };
-function applyPaletteFromFirebase(){db.ref('settings/colorPalette').once('value').then(s=>{applyPalette(s.val()||'autunno');});}
+let paletteListener=null; function applyPaletteFromFirebase(){   if(paletteListener) return;   paletteListener=db.ref('settings/colorPalette').on('value',s=>{     applyPalette(s.val()||'autunno');   }); }
 function applyPalette(name){const p=palettes[name]||palettes.autunno;const r=document.documentElement;Object.keys(p).forEach(k=>r.style.setProperty('--'+k,p[k]));const tint=document.getElementById('logoTint');if(tint)tint.style.background=p.gold;}
 // ============================================================
 // AUTH
