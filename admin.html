@@ -1450,7 +1450,6 @@ await db.ref('settings/adminPin').set(np); appData.settings.adminPin = np; showT
 document.getElementById('currentPin').value = ''; document.getElementById('newPin').value = ''; document.getElementById('confirmPin').value = '';
 } catch(e) { showToast('❌ ' + e.message); }
 }
-
 const palettes = { 
 autunno:{icon:'fa-leaf',colors:{gold:'#d4a84b',goldLight:'#f0d78c',goldDark:'#b8860b',dark:'#1a1209',brown:'#2d1f12',brownLight:'#4a3728',card:'#2a1e13',cardLight:'#3d2b1a',cream:'#f5e6c8'}},
 inverno:{icon:'fa-snowflake',colors:{gold:'#a8c3d4',goldLight:'#c8d8e4',goldDark:'#7a99b0',dark:'#1a2530',brown:'#253545',brownLight:'#354555',card:'#203040',cardLight:'#304050',cream:'#e8f0f5'}},
