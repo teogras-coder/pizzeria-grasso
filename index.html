@@ -665,8 +665,21 @@ vaniglia:{icon:'fa-cookie-bite',colors:{gold:'#f5e6a8',goldLight:'#fff8c8',goldD
 nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',brown:'#352a1e',brownLight:'#453a2e',card:'#2a2118',cardLight:'#3a3128',cream:'#f5ece0'}}
 };
 let paletteListener=null; function applyPaletteFromFirebase(){   if(paletteListener) return;   paletteListener=db.ref('settings/colorPalette').on('value',s=>{     applyPalette(s.val()||'autunno');   }); }
-function applyPalette(name){   const p=palettes[name]||palettes.autunno;   const colors = p.colors || p;   const r=document.documentElement;   Object.keys(colors).forEach(k=>r.style.setProperty('--'+k,colors[k]));   const tint=document.getElementById('logoTint');   if(tint) tint.style.background=colors.gold; }
-// ============================================================
+function applyPalette(name){
+  const p=palettes[name]||palettes.autunno;
+  const colors = p.colors || p;
+  const r=document.documentElement;
+  Object.keys(colors).forEach(k=>r.style.setProperty('--'+k,colors[k]));
+  const tint=document.getElementById('logoTint');
+  const logoArea=document.querySelector('.logo-area');
+  if(name==='panna'){
+    if(logoArea) logoArea.style.background='#ffffff!important';
+    if(tint){ tint.style.background='#4a3728'; tint.style.mixBlendMode='color'; tint.style.opacity='0.9'; }
+  } else {
+    if(logoArea) logoArea.style.background='#1a1209';
+    if(tint){ tint.style.background=colors.gold; tint.style.mixBlendMode='color'; tint.style.opacity='0.8'; }
+  }
+}// ============================================================
 // AUTH
 // ============================================================
 function showConfirm(m){return new Promise(r=>{const o=document.getElementById('confirmModal');document.getElementById('confirmModalText').textContent=m;o.classList.add('active');const y=document.getElementById('confirmBtnYes'),n=document.getElementById('confirmBtnNo'),c=()=>{o.classList.remove('active');y.onclick=null;n.onclick=null};y.onclick=()=>{c();r(true)};n.onclick=()=>{c();r(false)}})}
