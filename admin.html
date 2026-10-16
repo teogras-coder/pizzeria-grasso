@@ -794,7 +794,7 @@ function generaComanda(order) {
     const dataOrdine = new Date(order.timestamp);
     
     // 🔥 CALCOLA SUBTOTALE PRODOTTI
-    const subtotale = order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0;
+    const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price || 0) * (parseInt(i.qty || 1))), 0) : 0;
     
     // 🔥 COSTO CONSEGNA (Moover)
     const costoCorsa = order.deliveryFee || 0;
@@ -828,7 +828,7 @@ ${order.notes ? '║  📝 NOTE: '+order.notes+'\n' : ''}
 ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti\n' : ''}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  🍕 PRODOTTI:                                                ║
-${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((i.price || 0) * (i.qty || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
+${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((parseFloat(i.price) || 0) * (parseInt(i.qty) || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
 
     // 🔥 SE È UNA CONSEGNA, AGGIUNGI IL DETTAGLIO COSTI
     if (order.type === 'delivery') {
@@ -915,44 +915,50 @@ return false;
 }
 
 // ============================================================
-// 🔥 TRASFORMA PRE-ORDINE
+// 🔥 TRASFORMA PRE-ORDINE (FIX 0.00)
 // ============================================================
 async function trasformaInOrdine(orderId) {
-const order = ordersCache[orderId];
-if (!order || order.status !== 'preorder') return;
-try {
-// 🔥 Calcola il costo consegna prima di trasformare
-let deliveryFee = 0;
-if (order.type === 'delivery') {
-    deliveryFee = calcolaCostoConsegna(order);
-}
-    
-await db.ref(`ordini/${orderId}`).update({ 
-    status: 'new', 
-    isPreOrder: false, 
-    trasformatoIl: Date.now(),
-    deliveryFee: deliveryFee,
-    finalTotal: (order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0) + deliveryFee
-});
-order.status = 'new'; 
-order.isPreOrder = false;
-order.deliveryFee = deliveryFee;
-order.finalTotal = (order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0) + deliveryFee;
-
-const comanda = generaComanda(order);
-await inviaStampante(comanda, orderId);
-showToast(`✅ Pre-ordine ${order.orderId} trasformato e inviato in stampa!`);
-renderOrders(ordersCache); notifyClients();
-} catch(e) { showToast('❌ Errore trasformazione'); }
+  const order = ordersCache[orderId];
+  if (!order || order.status !== 'preorder') return;
+  let deliveryFee = 0;
+  if (order.type === 'delivery') deliveryFee = calcolaCostoConsegna(order);
+  const subtotale = order.items ? order.items.reduce((s,i)=>s+(parseFloat(i.price||0)*(parseInt(i.qty||1))),0) : 0;
+  const finalTotal = subtotale + deliveryFee;
+  await db.ref(`ordini/${orderId}`).update({
+    status:'new', isPreOrder:false, trasformatoIl:Date.now(),
+    customerName:order.customerName||'', customerPhone:order.customerPhone||'',
+    address:order.address||'', type:order.type||'pickup',
+    items:order.items||[], productsTotal:subtotale,
+    deliveryFee:deliveryFee, finalTotal:finalTotal,
+    scheduledTime:order.scheduledTime||'Prima possibile',
+    notes:order.notes||'',
+    stampato_130:null, stampato_131:null, stampato_annullato:null
+  });
+  order.status='new'; order.isPreOrder=false; order.deliveryFee=deliveryFee; order.finalTotal=finalTotal;
+  const comanda=generaComanda(order);
+  await inviaStampante(comanda, orderId);
+  showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); renderOrders(ordersCache); notifyClients();
 }
 
 async function trasformaTuttiPreOrdini() {
-const preOrders = Object.values(ordersCache).filter(o => o.status === 'preorder');
-if (!preOrders.length) { showToast('❌ Nessun pre-ordine'); return; }
+const oggi = new Date().toISOString().split('T')[0];
+const preOrders = Object.values(ordersCache).filter(o => o.status === 'preorder' && (!o.scheduledDate || o.scheduledDate >= oggi));
+if (!preOrders.length) { showToast('❌ Nessun pre-ordine da trasformare'); return; }
 if (!await showConfirm(`✅ Trasformare ${preOrders.length} pre-ordini?`, 'Diventeranno ordini attivi e verranno stampati.')) return;
 let ok = 0, err = 0;
 for (const o of preOrders) { try { await trasformaInOrdine(o.id); ok++; } catch(e) { err++; } await new Promise(r=>setTimeout(r,500)); }
 showToast(`✅ Trasformati ${ok} pre-ordini${err ? `, ${err} errori` : ''}!`);
+}
+
+// ============================================================
+// 🖨️ RISTAMPA ORDINE (SBLOCCA RASPBERRY E RISTAMPA SU 130 + 131)
+// ============================================================
+async function ristampaOrdine(id){
+  const order=ordersCache[id]; if(!order) return;
+  if(!await showConfirm('Ristampare?',`Ristampo ${order.orderId||id}?`)) return;
+  await db.ref(`ordini/${id}`).update({stampato_130:null, stampato_131:null, stampato_annullato:null});
+  order.isRistampa=true; const comanda=generaComanda(order);
+  await inviaStampante(comanda,id); showToast('🖨️ Ristampa inviata');
 }
 
 function avviaControlloPreOrdini() {
@@ -987,7 +993,7 @@ async function accettaOrdine(id) {
     
     if (order.type === 'delivery') {
         deliveryFee = calcolaCostoConsegna(order);
-        const subtotale = order.items ? order.items.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0) : 0;
+        const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1), 0) : 0;
         finalTotal = subtotale + deliveryFee;
     }
     
@@ -1091,16 +1097,19 @@ return ordersList.map(([id, o]) => {
 const dt = new Date(o.timestamp || 0);
 const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
 const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanitize(i.name)} x${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('') : '';
+const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanitize(i.name)} x${i.qty} - €${(parseFloat(i.price) * parseInt(i.qty)).toFixed(2)}</div>`).join('') : '';
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
+// 🖨️ Tasto Ristampa (per tutti gli ordini esistenti)
+const btnRistampa = `<button class="btn-secondary" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);" onclick="ristampaOrdine('${id}')"><i class="fas fa-print"></i> Ristampa</button>`;
+
 // 🔥 MOSTRA COSTO CONSEGNA NELLE CARD
-const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${o.deliveryFee.toFixed(2)}</div>` : '';
+const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${parseFloat(o.deliveryFee).toFixed(2)}</div>` : '';
 
 if (tipo === 'preorder') {
 statusBadge = `<span class="status-badge preorder">📅 PRE-ORDINE</span>`; extraClass = 'preorder';
-ah = `<button class="btn-transform" onclick="trasformaInOrdine('${id}')">📅 Trasforma</button><button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
+ah = `<button class="btn-transform" onclick="trasformaInOrdine('${id}')">📅 Trasforma</button>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
 motivoMessage = `<div class="order-preorder-message"><strong>📅 PRE-ORDINE:</strong> ${o.scheduledDate || '?'} alle ${o.scheduledTime || '?'}</div>`;
 } else if (tipo === 'annullati') {
 statusBadge = '<span class="status-badge annullato">🗑️ ANNULLATO</span>'; borderColor = '#f87171'; extraClass = 'annullati';
@@ -1113,14 +1122,14 @@ ah = `<button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina<
 if (o.motivoRifiuto) motivoMessage = `<div class="order-reject-message"><strong>❌ Motivo:</strong> ${sanitize(o.motivoRifiuto)}</div>`;
 } else {
 const st = o.status || 'new';
-if (st === 'new') ah = `<button class="btn-accept" onclick="accettaOrdine('${id}')">✅ Accetta</button><button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'accettato') ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'preparing') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'delayed') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'ready') ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'picked') ah = `<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>`;
-else if (st === 'delivering') ah = `<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
-else ah = `<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+if (st === 'new') ah = `<button class="btn-accept" onclick="accettaOrdine('${id}')">✅ Accetta</button>${btnRistampa}<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'accettato') ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'preparing') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'delayed') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'ready') ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'picked') ah = `${btnRistampa}<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>`;
+else if (st === 'delivering') ah = `${btnRistampa}<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
+else ah = `${btnRistampa}<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
 }
 
 return `<div class="order-card ${extraClass}" style="border-left-color:${borderColor};">
@@ -1128,7 +1137,7 @@ return `<div class="order-card ${extraClass}" style="border-left-color:${borderC
 <div class="order-customer">${sanitize(o.customerName || 'N/A')} - ${sanitize(o.customerPhone || 'N/A')}</div>
 <div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.scheduledTime ? ' - ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : ''}${o.notes ? '<br>📝 ' + sanitize(o.notes) : ''}${o.isPreOrder ? '<br>📅 <strong>Pre-ordine:</strong> ' + (o.scheduledDate || '') : ''}</div>
 <div class="order-items">${items}</div>
-<div class="order-total"><span>Totale</span><span>€${(o.finalTotal || 0).toFixed(2)}</span></div>
+<div class="order-total"><span>Totale</span><span>€${(parseFloat(o.finalTotal) || 0).toFixed(2)}</span></div>
 ${deliveryFeeDisplay}
 <div class="order-actions">${ah}</div>${motivoMessage}</div>`;
 }).join('');
@@ -1270,7 +1279,7 @@ function populatePromoProductSelect() {
 const s = document.getElementById('promoProductSelect'); if(!s) return;
 let h = '<option value="">-- Scegli --</option>';
 Object.keys(appData.categories).forEach(k => {
-const pr = appData.menu[k]||[]; if(pr.length) { h += `<optgroup label="${sanitize(appData.categories[k].name)}">` + pr.map((p,i) => !p.disabled ? `<option value="${k}|${i}" data-price="${p.price}">${sanitize(p.name)} - €${p.price.toFixed(2)}</option>` : '').join('') + '</optgroup>'; }
+const pr = appData.menu[k]||[]; if(pr.length) { h += `<optgroup label="${sanitize(appData.categories[k].name)}">` + pr.map((p,i) => !p.disabled ? `<option value="${k}|${i}" data-price="${p.price}">${sanitize(p.name)} - €${parseFloat(p.price).toFixed(2)}</option>` : '').join('') + '</optgroup>'; }
 });
 s.innerHTML = h; s.onchange = function() { const sel = this.options[this.selectedIndex]; if(sel.dataset.price) document.getElementById('promoProductPrice').value = sel.dataset.price; };
 }
@@ -1284,7 +1293,7 @@ s.value = ''; document.getElementById('promoProductQty').value = '1';
 function renderPromoProductsPreview() {
 const c = document.getElementById('promoProductsPreview'); if(!tempPromoProducts.length) { c.style.display='none'; return; }
 c.style.display = 'block';
-c.innerHTML = '<div style="color:var(--gold);font-weight:700;margin-bottom:10px;">Prodotti:</div>' + tempPromoProducts.map((p,i) => `<div class="promo-product-item"><span>${sanitize(p.name)} x${p.qty}</span><div style="display:flex;gap:10px;"><span style="color:var(--gold);">€${p.price.toFixed(2)}</span><button class="promo-product-remove" onclick="removePromoProduct(${i})">×</button></div></div>`).join('') + `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gold-dark);font-weight:700;color:var(--gold);">Totale: €${tempPromoProducts.reduce((s,p)=>s+(p.price*p.qty),0).toFixed(2)}</div>`;
+c.innerHTML = '<div style="color:var(--gold);font-weight:700;margin-bottom:10px;">Prodotti:</div>' + tempPromoProducts.map((p,i) => `<div class="promo-product-item"><span>${sanitize(p.name)} x${p.qty}</span><div style="display:flex;gap:10px;"><span style="color:var(--gold);">€${parseFloat(p.price).toFixed(2)}</span><button class="promo-product-remove" onclick="removePromoProduct(${i})">×</button></div></div>`).join('') + `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gold-dark);font-weight:700;color:var(--gold);">Totale: €${tempPromoProducts.reduce((s,p)=>s+(p.price*p.qty),0).toFixed(2)}</div>`;
 }
 function removePromoProduct(i) { tempPromoProducts.splice(i,1); renderPromoProductsPreview(); }
 function createPromotion() {
