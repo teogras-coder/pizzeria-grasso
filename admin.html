@@ -793,13 +793,8 @@ function generaComanda(order) {
     const telefono = '0884 660377';
     const dataOrdine = new Date(order.timestamp);
     
-    // 🔥 CALCOLA SUBTOTALE PRODOTTI
     const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price || 0) * (parseInt(i.qty || 1))), 0) : 0;
-    
-    // 🔥 COSTO CONSEGNA (Moover)
     const costoCorsa = order.deliveryFee || 0;
-    
-    // 🔥 TOTALE ORDINE
     const totale = order.finalTotal || (subtotale + costoCorsa);
     
     let preOrderHeader = '';
@@ -830,7 +825,6 @@ ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti\n' : ''}
 ║  🍕 PRODOTTI:                                                ║
 ${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((parseFloat(i.price) || 0) * (parseInt(i.qty) || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
 
-    // 🔥 SE È UNA CONSEGNA, AGGIUNGI IL DETTAGLIO COSTI
     if (order.type === 'delivery') {
         stampa += `
 ╠═══════════════════════════════════════════════════════════════╣
@@ -858,10 +852,8 @@ function calcolaCostoConsegna(order) {
         const maxRadius = parseFloat(settings.deliveryMaxRadius) || 4;
         const extraRadius = parseFloat(settings.deliveryExtraRadius) || 6;
         
-        // Se non abbiamo coordinate, usa il costo base
         if (!order.coords || !order.coords.lat || !order.coords.lng) return baseFee;
         
-        // Calcola distanza tra pizzeria e cliente
         const pizzeriaLat = parseFloat(settings.pizzeriaLat) || 0;
         const pizzeriaLng = parseFloat(settings.pizzeriaLng) || 0;
         
@@ -876,9 +868,9 @@ function calcolaCostoConsegna(order) {
         
         if (dist <= maxRadius) return baseFee;
         if (dist <= extraRadius) return baseFee + extraFee;
-        return 0; // Fuori zona consegna
+        return 0;
     } catch(e) {
-        return 3.00; // Default
+        return 3.00;
     }
 }
 
@@ -951,14 +943,33 @@ showToast(`✅ Trasformati ${ok} pre-ordini${err ? `, ${err} errori` : ''}!`);
 }
 
 // ============================================================
-// 🖨️ RISTAMPA ORDINE (SBLOCCA RASPBERRY E RISTAMPA SU 130 + 131)
+// 🖨️ RISTAMPA ORDINE - SOLO FLAG SU /ordini (NO comande_stampate)
+// Il Raspberry ascolta /ordini/{id}: vede flag null + ristampa:true,
+// stampa UNA volta su 130 + 131, poi cancella da solo ristampa:true.
+// NIENTE inviaStampante → nessun loop infinito.
 // ============================================================
 async function ristampaOrdine(id){
-  const order=ordersCache[id]; if(!order) return;
-  if(!await showConfirm('Ristampare?',`Ristampo ${order.orderId||id}?`)) return;
-  await db.ref(`ordini/${id}`).update({stampato_130:null, stampato_131:null, stampato_annullato:null});
-  order.isRistampa=true; const comanda=generaComanda(order);
-  await inviaStampante(comanda,id); showToast('🖨️ Ristampa inviata');
+  const order = ordersCache[id];
+  if (!order) return;
+  if (!await showConfirm('Ristampare?', `Ristampo ${order.orderId || id}?`)) return;
+
+  try {
+    await db.ref(`ordini/${id}`).update({
+      stampato_130: null,
+      stampato_131: null,
+      stampato_annullato: null,
+      ristampa: true
+    });
+
+    // Aggiorna cache locale per coerenza UI
+    order.ristampa = true;
+    order.stampato_130 = null;
+    order.stampato_131 = null;
+
+    showToast('🖨️ Ristampa inviata');
+  } catch(e) {
+    showToast('❌ Errore ristampa: ' + e.message);
+  }
 }
 
 function avviaControlloPreOrdini() {
@@ -987,7 +998,6 @@ async function accettaOrdine(id) {
     const order = ordersCache[id];
     if (!order) return;
     
-    // 🔥 Calcola il costo consegna
     let deliveryFee = 0;
     let finalTotal = order.finalTotal || 0;
     
@@ -1008,7 +1018,6 @@ async function accettaOrdine(id) {
     order.deliveryFee = deliveryFee;
     order.finalTotal = finalTotal;
     
-    // 🔥 Stampa con costo consegna separato
     const comanda = generaComanda(order);
     await inviaStampante(comanda, id);
     
@@ -1101,10 +1110,9 @@ const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanit
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
-// 🖨️ Tasto Ristampa (per tutti gli ordini esistenti)
+// 🖨️ Tasto Ristampa
 const btnRistampa = `<button class="btn-secondary" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);" onclick="ristampaOrdine('${id}')"><i class="fas fa-print"></i> Ristampa</button>`;
 
-// 🔥 MOSTRA COSTO CONSEGNA NELLE CARD
 const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${parseFloat(o.deliveryFee).toFixed(2)}</div>` : '';
 
 if (tipo === 'preorder') {
@@ -1186,7 +1194,6 @@ playAdminNotification();
 if (o.status === 'preorder') showToast(`📅 Pre-ordine ${o.orderId || o.id}`);
 else {
 showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-// 🔥 Stampa con costo consegna separato (se presente)
 const comanda = generaComanda(o);
 inviaStampante(comanda, o.id);
 }
