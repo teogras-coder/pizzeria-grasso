@@ -2,26 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-🖨️ PRINTER BOT - Ascoltatore Firebase per Stampante Bluetooth
+🖨️ PRINTER BOT v2 - Ascoltatore Firebase per Stampante Bluetooth
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Questo script:
-1. Ascolta gli ordini su Firebase
-2. Stampa automaticamente i ticket sulla stampante Bluetooth
-3. Evita duplicati con flag di stampa
-4. Gestisce disconnessioni e errori
+Legge i flag stampato_130 / stampato_131 / stampato_annullato
+scritti da admin.html e stampa di conseguenza.
+
+Flusso:
+  admin.html crea ordine → stampato_130=null, stampato_131=null
+  → questo bot stampa su Bluetooth
+  → setta stampato_130=True, stampato_131=True
+
+Ristampa:
+  admin.html mette stampato_130=null, stampato_131=null, ristampa=True
+  → bot ristampa
+  → bot cancella ristampa=True
 
 INSTALLAZIONE:
   pip3 install firebase-admin pyserial
 
-CONFIGURAZIONE:
-  1. Scarica serviceAccountKey.json da Firebase Console
-  2. Metti il file in /home/pizzeria/serviceAccountKey.json
-  3. Copia questo script in /home/pizzeria/printer_bot.py
-  4. Rendi eseguibile: chmod +x /home/pizzeria/printer_bot.py
-  5. Avvia: python3 /home/pizzeria/printer_bot.py
-
-SYSTEMD (Autoavvio):
+SYSTEMD:
   sudo systemctl restart bt-keepalive.service
 """
 
@@ -32,6 +32,7 @@ import os
 import json
 import re
 import fcntl
+import threading
 from firebase_admin import credentials, db
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -41,14 +42,14 @@ from firebase_admin import credentials, db
 FIREBASE_KEY = "/home/pizzeria/serviceAccountKey.json"
 FIREBASE_URL = "https://teogra-c8cf5-default-rtdb.europe-west1.firebasedatabase.app"
 
-FILE_STAMPATI = "/home/pizzeria/stampati.json"  # Cache ordini già stampati
-LOCK_FILE = "/home/pizzeria/stampati.lock"       # Lock file per evitare race conditions
+FILE_STAMPATI = "/home/pizzeria/stampati_v2.json"
+LOCK_FILE = "/home/pizzeria/stampati_v2.lock"
 
-SERIAL_PORT = "/dev/rfcomm0"  # Porta Bluetooth
+SERIAL_PORT = "/dev/rfcomm0"
 BAUD_RATE = 9600
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# INIZIALIZZAZIONE FIREBASE
+# FIREBASE INIT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 try:
@@ -64,14 +65,14 @@ except Exception as e:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 stampati = set()
-ultimo_ordine = {}
+in_elaborazione = set()
+print_lock = threading.Lock()
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# GESTIONE CACHE
+# CACHE
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def carica_stampati():
-    """Carica la lista di ordini già stampati dal file locale"""
     try:
         with open(FILE_STAMPATI, 'r') as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_SH)
@@ -81,34 +82,25 @@ def carica_stampati():
     except:
         return set()
 
-def salva_stampati(stampati):
-    """Salva la lista di ordini già stampati nel file locale"""
-    with open(FILE_STAMPATI, 'w') as f:
-        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-        json.dump(list(stampati), f)
-        fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+def salva_stampati(s):
+    try:
+        with open(FILE_STAMPATI, 'w') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            json.dump(list(s), f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+    except Exception as e:
+        print(f"❌ Errore salvataggio cache: {e}")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # PULIZIA TESTO
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def pulisci_testo(testo):
-    """
-    Pulisce il testo da caratteri non stampabili
-    - Rimuove unicode sporco
-    - Rimuove stringhe strane come "b'" e "b""
-    - Converte in latin-1 per la stampante
-    """
     if not testo:
         return ''
-    
-    # Mantieni solo caratteri stampabili e latino
-    testo = re.sub(r'[^\x20-\x7E\xC0-\xFF]', '', testo)
-    testo = re.sub(r'[Uu]\s*[0-9]', '', testo)
-    testo = re.sub(r'[A-Za-z]\s*[0-9]{4,}', '', testo)
+    testo = re.sub(r'[^\x20-\x7E\xC0-\xFF]', '', str(testo))
     testo = re.sub(r"b'", "", testo)
     testo = re.sub(r'b"', "", testo)
-    
     return testo.strip()
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -116,267 +108,249 @@ def pulisci_testo(testo):
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def stampa_ordine(data, tipo, oid):
-    """
-    Stampa un ordine sulla stampante Bluetooth
-    
-    Args:
-        data: Dizionario con i dati dell'ordine (da Firebase)
-        tipo: 'new' oppure 'annullato'
-        oid: ID Firebase dell'ordine
-    """
-    global stampati, ultimo_ordine
-    
-    # Prendi l'orderId reale (es: ORD-00001)
+    global stampati, in_elaborazione
+
     order_id = data.get('orderId', oid)
-    
-    # Usa una chiave che combina orderId e tipo
-    # Es: "ORD-00001_new" oppure "ORD-00001_annullato"
-    chiave_stampa = f"{order_id}_{tipo}"
-    
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # PROTEZIONE CONTRO DUPLICATI
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    with open(LOCK_FILE, 'w') as lock:
-        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
-        
-        # Ricarica dal file (potrebbe essere stato aggiornato)
+    chiave = f"{order_id}_{tipo}"
+
+    with print_lock:
         stampati = carica_stampati()
-        
-        # Controlla se già stampato
-        if chiave_stampa in stampati:
-            print(f"⏭️  ORDINE {order_id} {tipo} GIA STAMPATO, SALTO")
+
+        if chiave in stampati:
+            print(f"⏭️  {order_id} {tipo} già stampato")
             return
-        
-        # Controlla se attualmente in elaborazione (crash durante stampa?)
-        if ultimo_ordine.get('orderId') == order_id and ultimo_ordine.get('tipo') == tipo:
-            print(f"⏳ ORDINE {order_id} {tipo} GIA IN ELABORAZIONE, SALTO")
+
+        if chiave in in_elaborazione:
+            print(f"⏳ {order_id} {tipo} in elaborazione")
             return
-        
-        # Segna come in elaborazione
-        ultimo_ordine = {'orderId': order_id, 'tipo': tipo}
-        stampati.add(chiave_stampa)
+
+        in_elaborazione.add(chiave)
+        stampati.add(chiave)
         salva_stampati(stampati)
-    
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # CONNESSIONE E STAMPA
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
+
     try:
-        # Apri porta seriale Bluetooth
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=10)
         time.sleep(0.5)
-        
-        # Reset stampante
         ser.write(b'\x1B\x40')
         time.sleep(0.3)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # SE È ANNULLATO - SCRIVI IN EVIDENZA
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
+
+        # Banner ristampa
+        if data.get('ristampa') is True:
+            ser.write(b'\x1B\x21\x30\x1B\x61\x01')
+            ser.write(b'*** RISTAMPA ***\n')
+            ser.write(b'\x1B\x21\x00\x1B\x61\x00\n')
+
+        # Banner annullato
         if tipo == 'annullato':
-            ser.write(b'\x1B\x21\x10\x1B\x61\x01')  # Grassetto + Centrato
+            ser.write(b'\x1B\x21\x10\x1B\x61\x01')
             ser.write(b'   *** ORDINE ANNULLATO ***\n')
             ser.write(b'-------------------------------\n\n')
-            ser.write(b'\x1B\x21\x00\x1B\x61\x00')  # Normale
+            ser.write(b'\x1B\x21\x00\x1B\x61\x00')
             time.sleep(0.2)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # INTESTAZIONE
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
-        ser.write(b'\x1B\x21\x10\x1B\x61\x01\n')  # Grassetto + Centrato
+
+        # Intestazione
+        ser.write(b'\x1B\x21\x10\x1B\x61\x01\n')
         ser.write(b'   ANTICA PIZZERIA GRASSO\n')
         ser.write(b'-------------------------------\n\n')
         time.sleep(0.2)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # NUMERO ORDINE
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
-        ser.write(b'\x1B\x21\x10\x1B\x61\x00')  # Grassetto
+
+        # Numero ordine
+        ser.write(b'\x1B\x21\x10\x1B\x61\x00')
         ser.write(b'ORDINE: ' + order_id.encode('latin-1', errors='ignore') + b'\n')
         time.sleep(0.1)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # DATI CLIENTE
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
-        ser.write(b'\x1B\x21\x00')  # Normale
-        ser.write(b'DATA:   ' + time.strftime('%d/%m/%Y %H:%M').encode('latin-1', errors='ignore') + b'\n')
+
+        # Cliente
+        ser.write(b'\x1B\x21\x00')
+        ser.write(b'DATA:    ' + time.strftime('%d/%m/%Y %H:%M').encode('latin-1', errors='ignore') + b'\n')
         ser.write(b'CLIENTE: ' + pulisci_testo(data.get('customerName', '')).encode('latin-1', errors='ignore') + b'\n')
-        ser.write(b'TEL:    ' + pulisci_testo(data.get('customerPhone', '')).encode('latin-1', errors='ignore') + b'\n')
-        
+        ser.write(b'TEL:     ' + pulisci_testo(data.get('customerPhone', '')).encode('latin-1', errors='ignore') + b'\n')
+
         if data.get('type') == 'delivery':
             ser.write(b'INDIRIZZO: ' + pulisci_testo(data.get('address', '')).encode('latin-1', errors='ignore') + b'\n')
-        
-        ser.write(b'ORARIO: ' + pulisci_testo(data.get('scheduledTime', 'Subito')).encode('latin-1', errors='ignore') + b'\n')
-        ser.write(b'TIPO: ' + ('CONSEGNA' if data.get('type') == 'delivery' else 'RITIRO').encode('latin-1', errors='ignore') + b'\n')
-        
-        # Note (se presenti)
+
+        ser.write(b'ORARIO:  ' + pulisci_testo(data.get('scheduledTime', 'Subito')).encode('latin-1', errors='ignore') + b'\n')
+        ser.write(b'TIPO:    ' + ('CONSEGNA' if data.get('type') == 'delivery' else 'RITIRO').encode('latin-1', errors='ignore') + b'\n')
+
         note = pulisci_testo(data.get('notes', ''))
         if note:
-            ser.write(b'NOTE: ' + note.encode('latin-1', errors='ignore') + b'\n')
-        
-        # Motivo annullamento (se presente)
+            ser.write(b'NOTE:    ' + note.encode('latin-1', errors='ignore') + b'\n')
+
         if tipo == 'annullato':
             motivo = pulisci_testo(data.get('motivoAnnullamento', ''))
             if motivo:
-                ser.write(b'MOTIVO: ' + motivo.encode('latin-1', errors='ignore') + b'\n')
-        
+                ser.write(b'MOTIVO:  ' + motivo.encode('latin-1', errors='ignore') + b'\n')
+
         time.sleep(0.1)
         ser.write(b'\n-------------------------------\n\n')
         time.sleep(0.1)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # ARTICOLI
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
-        ser.write(b'\x1B\x21\x10')  # Grassetto
-        
+
+        # Articoli
+        ser.write(b'\x1B\x21\x10')
         items = data.get('items', [])
-        categoria_corrente = None
-        
+        cat_corrente = None
+
         for item in items:
             categoria = item.get('cat', '')
-            
-            # Intestazione categoria
-            if categoria != categoria_corrente:
-                categoria_corrente = categoria
+            if categoria != cat_corrente:
+                cat_corrente = categoria
                 ser.write(b'--- ' + pulisci_testo(categoria).encode('latin-1', errors='ignore') + b' ---\n')
                 time.sleep(0.05)
-            
-            # Riga articolo: "2x Margherita             EUR 11.00"
+
             nome = pulisci_testo(item.get('name', '')).encode('latin-1', errors='ignore')
             qty = item.get('qty', 1)
-            prezzo = item.get('price', 0)
-            
+            prezzo = float(item.get('price', 0)) * qty
+
             riga = b'  ' + str(qty).encode() + b'x ' + nome
             prezzo_str = f'EUR {prezzo:.2f}'.encode('latin-1', errors='ignore')
-            spazi = 32 - len(riga) - len(prezzo_str)
-            if spazi < 1:
-                spazi = 1
-            
+            spazi = max(1, 32 - len(riga) - len(prezzo_str))
             ser.write(riga + b' ' * spazi + prezzo_str + b'\n')
             time.sleep(0.05)
-        
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # TOTALE
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        
-        ser.write(b'\x1B\x21\x10')  # Grassetto
+
+        # Totali
+        ser.write(b'\x1B\x21\x10')
         ser.write(b'\n-------------------------------\n')
-        
-        if data.get('type') == 'delivery' and data.get('deliveryFee', 0) > 0:
-            ser.write(b'COSTO CONSEGNA:  EUR ' + f"{data.get('deliveryFee', 0):.2f}".encode('latin-1', errors='ignore') + b'\n')
-        
-        ser.write(b'TOTALE:         EUR ' + f"{data.get('finalTotal', 0):.2f}".encode('latin-1', errors='ignore') + b'\n')
-        
-        # Spazi finali (per far staccare il ticket)
+
+        subtotale = sum(float(i.get('price', 0)) * int(i.get('qty', 1)) for i in items)
+        delivery_fee = float(data.get('deliveryFee', 0))
+        totale = float(data.get('finalTotal', subtotale + delivery_fee))
+
+        if data.get('type') == 'delivery' and delivery_fee > 0:
+            ser.write(b'PRODOTTI: EUR ' + f"{subtotale:.2f}".encode('latin-1', errors='ignore') + b'\n')
+            ser.write(b'CONSEGNA: EUR ' + f"{delivery_fee:.2f}".encode('latin-1', errors='ignore') + b'\n')
+
+        ser.write(b'TOTALE:   EUR ' + f"{totale:.2f}".encode('latin-1', errors='ignore') + b'\n')
         ser.write(b'\n\n\n\n\n')
-        
+
         time.sleep(0.5)
         ser.flush()
         ser.close()
-        
+
         print(f"✅ STAMPATO {order_id} - {tipo}")
         return True
-        
+
     except Exception as e:
-        print(f"❌ ERRORE STAMPA: {e}")
+        print(f"❌ ERRORE STAMPA {order_id}: {e}")
         import traceback
         traceback.print_exc()
-        
-        # Rimuovi dalla cache se la stampa è fallita
-        stampati.discard(chiave_stampa)
+        # Rimuovi dalla cache così ritenta
+        stampati.discard(chiave)
         salva_stampati(stampati)
         return False
+    finally:
+        in_elaborazione.discard(chiave)
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# LISTENER FIREBASE
+# LISTENER ORDINI
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-def on_change(event):
-    """
-    Callback chiamato quando un ordine cambia su Firebase
-    
-    Stampa quando:
-    - status = 'new' e stampato_cucina = false
-    - status = 'annullato' e stampato_annullato = false
-    """
-    
+def on_ordine_change(event):
     if not isinstance(event.data, dict):
         return
-    
-    # Estrai ID Firebase dal percorso (es: /ordini/-ABC123DEF)
+
     oid = event.path.split('/')[-1]
     if not oid or oid == 'ordini':
         return
-    
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # RECUPERA DATI COMPLETI DELL'ORDINE
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
+
     try:
-        ref = db.reference(f"ordini/{oid}")
-        data = ref.get()
+        data = db.reference(f"ordini/{oid}").get()
         if not data:
             return
     except Exception as e:
-        print(f"❌ ERRORE recupero dati: {e}")
+        print(f"❌ Errore recupero dati: {e}")
         return
-    
+
     status = data.get('status', '')
-    stampato_cucina = data.get('stampato_cucina', False)
-    stampato_annullato = data.get('stampato_annullato', False)
-    
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # STAMPA SE È NUOVO
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    if status == 'new' and not stampato_cucina:
-        print(f"📦 ORDINE NUOVO: {data.get('orderId', oid)}")
-        
-        # Segna come in stampa
-        try:
-            db.reference(f"ordini/{oid}/stampato_cucina").set(True)
-        except:
-            pass
-        
-        stampa_ordine(data, 'new', oid)
-    
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # STAMPA SE È ANNULLATO
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    elif status in ['cancelled', 'annullato'] and not stampato_annullato:
-        print(f"📦 ORDINE ANNULLATO: {data.get('orderId', oid)}")
-        
-        # Segna come in stampa
-        try:
-            db.reference(f"ordini/{oid}/stampato_annullato").set(True)
-        except:
-            pass
-        
-        stampa_ordine(data, 'annullato', oid)
+
+    # Salta preordini non trasformati
+    if status == 'preorder':
+        return
+
+    # Salta annullati/rifiutati per la stampa normale
+    # (li gestiamo nel ramo 'annullato' sotto)
+    if status in ('rifiutato',):
+        return
+
+    s130 = data.get('stampato_130')
+    s131 = data.get('stampato_131')
+    sann = data.get('stampato_annullato')
+
+    # ─── Stampa ordine normale ───
+    if status not in ('annullato',) and (s130 is not True or s131 is not True):
+        print(f"📦 STAMPA: {data.get('orderId', oid)} (130={s130}, 131={s131})")
+        ok = stampa_ordine(data, 'new', oid)
+        if ok:
+            try:
+                db.reference(f"ordini/{oid}").update({
+                    'stampato_130': True,
+                    'stampato_131': True
+                })
+                # 🧹 Cancella flag ristampa se presente
+                if data.get('ristampa') is True:
+                    db.reference(f"ordini/{oid}/ristampa").delete()
+                    print(f"🧹 Flag ristampa cancellato per {oid}")
+            except Exception as e:
+                print(f"❌ Errore aggiornamento flag: {e}")
+
+    # ─── Stampa annullamento ───
+    if status == 'annullato' and sann is not True:
+        print(f"🗑️  ANNULLATO: {data.get('orderId', oid)}")
+        ok = stampa_ordine(data, 'annullato', oid)
+        if ok:
+            try:
+                db.reference(f"ordini/{oid}/stampato_annullato").set(True)
+            except Exception as e:
+                print(f"❌ Errore aggiornamento flag annullato: {e}")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# MAIN LOOP
+# SCAN INIZIALE
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def scan_iniziale():
+    print("🔍 Scan iniziale ordini non stampati...")
+    try:
+        ordini = db.reference("ordini").get() or {}
+        count = 0
+        for oid, o in ordini.items():
+            if not isinstance(o, dict):
+                continue
+            status = o.get('status', '')
+            if status in ('preorder', 'rifiutato'):
+                continue
+            if status != 'annullato':
+                if o.get('stampato_130') is not True or o.get('stampato_131') is not True:
+                    stampa_ordine(o, 'new', oid)
+                    db.reference(f"ordini/{oid}").update({'stampato_130': True, 'stampato_131': True})
+                    if o.get('ristampa') is True:
+                        db.reference(f"ordini/{oid}/ristampa").delete()
+                    count += 1
+            elif status == 'annullato' and o.get('stampato_annullato') is not True:
+                stampa_ordine(o, 'annullato', oid)
+                db.reference(f"ordini/{oid}/stampato_annullato").set(True)
+                count += 1
+        if count:
+            print(f"✅ Processati {count} ordini")
+        else:
+            print("✅ Nessun ordine da stampare")
+    except Exception as e:
+        print(f"❌ Errore scan: {e}")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MAIN
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 if __name__ == '__main__':
     print("""
 ╔════════════════════════════════════╗
-║  🖨️ PRINTER BOT - GRASSO           ║
+║  🖨️  PRINTER BOT v2 - GRASSO       ║
 ║  Ascoltando Firebase...            ║
 ╚════════════════════════════════════╝
     """)
-    
-    # Inizio ascolto
-    db.reference("ordini").listen(on_change)
-    print("✅ BOT AVVIATO - IN ATTESA DI ORDINI...")
-    
-    # Keep running
+
+    scan_iniziale()
+
+    print("👂 In ascolto su /ordini ...")
+    db.reference("ordini").listen(on_ordine_change)
+    print("✅ BOT AVVIATO")
+
     while True:
         time.sleep(1)
