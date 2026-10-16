@@ -1,11 +1,11 @@
 // =====================================================
 // 🍕 SERVICE WORKER - Antica Pizzeria Grasso
-// Versione: 4.0 (2026-08-30) - CORRETTO PER GITHUB
+// Versione: 5.0 (2026-10-16) - CACHE + NOTIFICHE ADMIN
 // =====================================================
 
-// 🔥 REGOLA: Cambia questi numeri (es. v10, v11) ogni volta che aggiorni l'app!
-const STATIC_CACHE = 'pizzeria-grasso-static-v12';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v12';
+// 🔥 REGOLA: Cambia questi numeri (es. v13, v14) ogni volta che aggiorni l'app!
+const STATIC_CACHE = 'pizzeria-grasso-static-v13';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v13';
 
 // Risorse statiche da cacheare all'installazione
 const STATIC_ASSETS = [
@@ -51,7 +51,6 @@ self.addEventListener('activate', event => {
       return self.clients.claim();
     })
     .then(() => {
-      // 🔥 NOTIFICA TUTTE LE SCHEDE CHE IL SW È STATO AGGIORNATO
       return self.clients.matchAll().then(clients => {
         clients.forEach(client => {
           client.postMessage({
@@ -70,39 +69,35 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   
-  // Ignora richieste non GET
   if (request.method !== 'GET') return;
   
   let url;
   try {
     url = new URL(request.url);
   } catch (e) {
-    return; // URL non valido, ignora
+    return;
   }
 
   // ─── ESCLUSIONI: NON cachare mai ───
-  // 1. API Firebase Realtime DB (dati sempre freschi via listener)
   if (url.hostname.includes('firebase') || 
       url.hostname.includes('firebaseio') ||
       url.hostname.includes('firebasedatabase.app')) {
     return;
   }
   
-  // 2. Firebase Auth / Identity Toolkit
   if (url.hostname.includes('identity-toolkit') ||
       url.hostname.includes('securetoken.google.com') ||
       url.hostname.includes('googleapis.com/identitytoolkit')) {
     return;
   }
   
-  // 3. FCM / Messaging / OneSignal
   if (url.hostname.includes('fcm') ||
       url.hostname.includes('firebaseinstallations') ||
       url.hostname.includes('onesignal.com')) {
     return;
   }
 
-  // ─── STRATEGIA 1: Cache First per risorse statiche (Immagini, CSS, JS esterni) ───
+  // ─── Cache First per risorse statiche ───
   if (/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(request)
@@ -130,7 +125,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ─── STRATEGIA 2: Network First per HTML (Aggiornamenti immediati) ───
+  // ─── Network First per HTML ───
   event.respondWith(
     fetch(request)
       .then(response => {
@@ -144,12 +139,10 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => {
-        // Fallback offline
         return caches.match(request)
           .then(cached => {
             if (cached) return cached;
             
-            // Se è una richiesta HTML e siamo offline, servi la index dalla cache
             const accept = request.headers.get('accept') || '';
             if (accept.includes('text/html')) {
               return caches.match('/index.html');
@@ -160,17 +153,57 @@ self.addEventListener('fetch', event => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📢 MESSAGE: Aggiornamento forzato
+// 📢 MESSAGE: Aggiornamento + Notifiche Admin
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  const data = event.data || {};
+
+  if (data.type === 'SKIP_WAITING') {
     console.log('[SW] SKIP_WAITING ricevuto, aggiorno subito');
     self.skipWaiting();
   }
   
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+  if (data.type === 'CLEAR_CACHE') {
     caches.delete(STATIC_CACHE).then(() => caches.delete(DYNAMIC_CACHE));
   }
+
+  // 🔔 NOTIFICHE ADMIN (tendina + telefono bloccato)
+  if (data.type === 'SHOW_NOTIFICATION') {
+    console.log('[SW] 🔔 Notifica admin:', data.title);
+    event.waitUntil(
+      self.registration.showNotification(
+        data.title || '🍕 Nuovo ordine!',
+        {
+          body: data.body || '',
+          icon: data.icon || '/icon-admin-192.png',
+          badge: data.badge || '/icon-admin-192.png',
+          tag: data.tag || 'grasso-order-' + Date.now(),
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [300, 150, 300, 150, 300],
+          data: { url: data.url || '/admin.html' }
+        }
+      )
+    );
+  }
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 👆 NOTIFICATION CLICK: Apre/focalizza l'admin
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/admin.html';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientsArr => {
+      for (const client of clientsArr) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
 });
 
 console.log('🚀 SW avviato! Versione:', STATIC_CACHE);
