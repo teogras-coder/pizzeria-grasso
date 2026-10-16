@@ -548,6 +548,16 @@ oninput="renderMenu()">
 <div class="form-group"><label>Conferma</label><input type="password" class="form-input" id="confirmPin"></div>
 <button class="btn-primary" onclick="changePin()"><i class="fas fa-key"></i> Cambia PIN</button>
 </div>
+<div class="card" style="border: 2px solid var(--gold);">
+<div class="card-title"><i class="fas fa-bell"></i> Notifiche di Sistema</div>
+<p style="color:#8a7a5a; font-size:0.9rem; margin-bottom:15px;">
+Le notifiche di sistema appaiono nella <strong style="color:var(--gold);">tendina del telefono</strong> (anche a schermo bloccato).<br>
+Stato attuale: <strong id="notifStatus" style="color:var(--gold);">--</strong>
+</p>
+<button class="btn-primary" onclick="requestNotifPermission()" style="width:100%;">
+<i class="fas fa-bell"></i> Attiva / Verifica Notifiche
+</button>
+</div>
 <div class="card" style="border: 2px solid #ef4444; margin-top: 20px;">
 <div class="card-title" style="color: #ef4444;">
 <i class="fas fa-redo"></i> Azzera Contatore Ordini
@@ -639,6 +649,8 @@ let tempPromoProducts = [];
 let isFirstLoad = true;
 let accordionState = { annullati: false, rifiutati: false };
 let wakeLock = null;
+let notifPermission = 'default';
+let swRegistration = null;
 
 async function requestWakeLock() {
 try {
@@ -707,18 +719,99 @@ function sanitize(text) { return typeof text !== 'string' ? text : text.replace(
 function sanitizeKey(key) { return key.toLowerCase().replace(/[^a-z0-9_]/g, ''); }
 
 function initNotificationSound() { try { notificationSound = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
-function playAdminNotification() {
-if (!notificationSound) return;
-try {
-const osc = notificationSound.createOscillator(); const gain = notificationSound.createGain();
-osc.connect(gain); gain.connect(notificationSound.destination);
-osc.frequency.setValueAtTime(880, notificationSound.currentTime);
-osc.frequency.setValueAtTime(1100, notificationSound.currentTime + 0.1);
-osc.frequency.setValueAtTime(880, notificationSound.currentTime + 0.2);
-gain.gain.setValueAtTime(0.3, notificationSound.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.01, notificationSound.currentTime + 0.4);
-osc.start(notificationSound.currentTime); osc.stop(notificationSound.currentTime + 0.4);
-} catch(e) {}
+
+// ============================================================
+// 🔔 NOTIFICHE DI SISTEMA (tendina + telefono bloccato)
+// ============================================================
+async function initSystemNotifications() {
+  if ('serviceWorker' in navigator) {
+    try {
+      swRegistration = await navigator.serviceWorker.register('/sw.js');
+      console.log('✅ SW registrato');
+    } catch(e) { console.warn('⚠️ SW registration failed:', e); }
+  }
+  if (!('Notification' in window)) { console.warn('⚠️ Notifiche non supportate'); return; }
+  notifPermission = Notification.permission;
+  if (notifPermission === 'default') {
+    try { notifPermission = await Notification.requestPermission(); } catch(e) {}
+  }
+  console.log('🔔 Permesso notifiche:', notifPermission);
+}
+
+async function sendSystemNotification(title, body, tag, url) {
+  if (notifPermission !== 'granted') return;
+  if (swRegistration && swRegistration.active) {
+    try {
+      swRegistration.active.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        title: title,
+        body: body,
+        tag: tag || 'grasso-' + Date.now(),
+        url: url || '/',
+        icon: '/icon-admin-192.png',
+        badge: '/icon-admin-192.png'
+      });
+      return;
+    } catch(e) { console.warn('SW postMessage failed, fallback Notification', e); }
+  }
+  try {
+    new Notification(title, {
+      body: body,
+      icon: '/icon-admin-192.png',
+      badge: '/icon-admin-192.png',
+      tag: tag,
+      requireInteraction: true
+    });
+  } catch(e) { console.warn('Notification fallback failed', e); }
+}
+
+function vibrate(pattern) {
+  try { if ('vibrate' in navigator) navigator.vibrate(pattern || [300, 150, 300, 150, 300]); } catch(e) {}
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('❌ Notifiche non supportate'); return; }
+  const perm = await Notification.requestPermission();
+  notifPermission = perm;
+  updateNotifStatus();
+  if (perm === 'granted') {
+    showToast('✅ Notifiche attivate!');
+    sendSystemNotification('🍕 Test notifica', 'Se vedi questo messaggio, funziona!', 'test-' + Date.now());
+  } else {
+    showToast('❌ Notifiche negate');
+  }
+}
+
+function updateNotifStatus() {
+  const el = document.getElementById('notifStatus');
+  if (!el) return;
+  if (!('Notification' in window)) { el.textContent = 'Non supportate'; return; }
+  const p = Notification.permission;
+  el.textContent = p === 'granted' ? '✅ Attive' : (p === 'denied' ? '❌ Negate' : '⚠️ Non richieste');
+  el.style.color = p === 'granted' ? '#4ade80' : (p === 'denied' ? '#f87171' : '#fbbf24');
+}
+
+// ============================================================
+// 🔔 NOTIFICA + SUONO + VIBRAZIONE
+// ============================================================
+function playAdminNotification(title, body, tag) {
+  // 🔊 Suono
+  if (notificationSound) {
+    try {
+      const osc = notificationSound.createOscillator(); const gain = notificationSound.createGain();
+      osc.connect(gain); gain.connect(notificationSound.destination);
+      osc.frequency.setValueAtTime(880, notificationSound.currentTime);
+      osc.frequency.setValueAtTime(1100, notificationSound.currentTime + 0.1);
+      osc.frequency.setValueAtTime(880, notificationSound.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, notificationSound.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, notificationSound.currentTime + 0.4);
+      osc.start(notificationSound.currentTime); osc.stop(notificationSound.currentTime + 0.4);
+    } catch(e) {}
+  }
+  // 📳 Vibra
+  vibrate([300, 150, 300, 150, 300]);
+  // 🔔 Notifica di sistema (tendina / lockscreen)
+  if (title) sendSystemNotification(title, body || '', tag || 'grasso-' + Date.now());
 }
 
 function toggleSidebar() {
@@ -759,7 +852,7 @@ if (wakeLock) { wakeLock.release(); wakeLock = null; }
 function initApp() {
 updateClock(); setInterval(updateClock, 1000);
 loadAllData(); setupOptimizedListeners(); renderPalettes(); applyCurrentPalette(); avviaControlloPreOrdini();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+initSystemNotifications().then(() => setTimeout(updateNotifStatus, 800));
 }
 
 function updateClock() {
@@ -785,18 +878,16 @@ if (drivers.exists()) { driversList = drivers.val() || {}; renderDrivers(drivers
 }
 
 // ============================================================
-// 🔥 GENERA COMANDA - CON COSTO CONSEGNA SEPARATO
+// 🔥 GENERA COMANDA
 // ============================================================
 function generaComanda(order) {
     const ristorante = 'ANTICA PIZZERIA GRASSO';
     const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
     const telefono = '0884 660377';
     const dataOrdine = new Date(order.timestamp);
-    
     const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price || 0) * (parseInt(i.qty || 1))), 0) : 0;
     const costoCorsa = order.deliveryFee || 0;
     const totale = order.finalTotal || (subtotale + costoCorsa);
-    
     let preOrderHeader = '';
     if (order.isPreOrder && order.scheduledDate) {
         const dataPreOrdine = new Date(order.scheduledDate + 'T00:00:00');
@@ -805,7 +896,6 @@ function generaComanda(order) {
         preOrderHeader += '\n';
     }
     const preOrderBorder = order.isPreOrder ? '╠═══════════════════════════════════════════════════════════════╣\n║  ⚠️  QUESTO È UN PRE-ORDINE  ⚠️                            ║\n' : '';
-
     let stampa = `
 ╔═══════════════════════════════════════════════════════════════╗
 ║                     ${ristorante}                              ║
@@ -824,20 +914,17 @@ ${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti\n' : ''}
 ╠═══════════════════════════════════════════════════════════════╣
 ║  🍕 PRODOTTI:                                                ║
 ${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((parseFloat(i.price) || 0) * (parseInt(i.qty) || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
-
     if (order.type === 'delivery') {
         stampa += `
 ╠═══════════════════════════════════════════════════════════════╣
 ║  💰 SUBTOTALE PRODOTTI:              €${subtotale.toFixed(2).padStart(8)} ║
 ║  🛵 COSTO CONSEGNA (Moover):         €${costoCorsa.toFixed(2).padStart(8)} ║`;
     }
-
     stampa += `
 ╠═══════════════════════════════════════════════════════════════╣
 ║  💎 TOTALE ORDINE:                   €${totale.toFixed(2).padStart(8)} ║
 ╚═══════════════════════════════════════════════════════════════╝
 `;
-
     return stampa;
 }
 
@@ -851,27 +938,15 @@ function calcolaCostoConsegna(order) {
         const extraFee = parseFloat(settings.deliveryExtraFee) || 2.00;
         const maxRadius = parseFloat(settings.deliveryMaxRadius) || 4;
         const extraRadius = parseFloat(settings.deliveryExtraRadius) || 6;
-        
         if (!order.coords || !order.coords.lat || !order.coords.lng) return baseFee;
-        
         const pizzeriaLat = parseFloat(settings.pizzeriaLat) || 0;
         const pizzeriaLng = parseFloat(settings.pizzeriaLng) || 0;
-        
         if (pizzeriaLat === 0 || pizzeriaLng === 0) return baseFee;
-        
-        const dist = calcolaDistanza(
-            pizzeriaLat,
-            pizzeriaLng,
-            order.coords.lat,
-            order.coords.lng
-        );
-        
+        const dist = calcolaDistanza(pizzeriaLat, pizzeriaLng, order.coords.lat, order.coords.lng);
         if (dist <= maxRadius) return baseFee;
         if (dist <= extraRadius) return baseFee + extraFee;
         return 0;
-    } catch(e) {
-        return 3.00;
-    }
+    } catch(e) { return 3.00; }
 }
 
 function calcolaDistanza(lat1, lon1, lat2, lon2) {
@@ -884,7 +959,7 @@ function calcolaDistanza(lat1, lon1, lat2, lon2) {
 }
 
 // ============================================================
-// 🔥 SALVA E STAMPA (SOLO FIREBASE - NIENTE HTTP AL RASPBERRY)
+// 🔥 SALVA E STAMPA
 // ============================================================
 async function salvaComandaInFirebase(orderId, comanda) {
 try {
@@ -907,7 +982,7 @@ return false;
 }
 
 // ============================================================
-// 🔥 TRASFORMA PRE-ORDINE (FIX 0.00)
+// 🔥 TRASFORMA PRE-ORDINE
 // ============================================================
 async function trasformaInOrdine(orderId) {
   const order = ordersCache[orderId];
@@ -943,16 +1018,12 @@ showToast(`✅ Trasformati ${ok} pre-ordini${err ? `, ${err} errori` : ''}!`);
 }
 
 // ============================================================
-// 🖨️ RISTAMPA ORDINE - SOLO FLAG SU /ordini (NO comande_stampate)
-// Il Raspberry ascolta /ordini/{id}: vede flag null + ristampa:true,
-// stampa UNA volta su 130 + 131, poi cancella da solo ristampa:true.
-// NIENTE inviaStampante → nessun loop infinito.
+// 🖨️ RISTAMPA ORDINE (SOLO FLAG SU /ordini)
 // ============================================================
 async function ristampaOrdine(id){
   const order = ordersCache[id];
   if (!order) return;
   if (!await showConfirm('Ristampare?', `Ristampo ${order.orderId || id}?`)) return;
-
   try {
     await db.ref(`ordini/${id}`).update({
       stampato_130: null,
@@ -960,16 +1031,11 @@ async function ristampaOrdine(id){
       stampato_annullato: null,
       ristampa: true
     });
-
-    // Aggiorna cache locale per coerenza UI
     order.ristampa = true;
     order.stampato_130 = null;
     order.stampato_131 = null;
-
     showToast('🖨️ Ristampa inviata');
-  } catch(e) {
-    showToast('❌ Errore ristampa: ' + e.message);
-  }
+  } catch(e) { showToast('❌ Errore ristampa: ' + e.message); }
 }
 
 function avviaControlloPreOrdini() {
@@ -990,37 +1056,25 @@ if (deveTrasformare) await trasformaInOrdine(id);
 }
 
 // ============================================================
-// 🔥 ACCETTA ORDINE - CON CALCOLO COSTO CONSEGNA
+// 🔥 ACCETTA ORDINE
 // ============================================================
 async function accettaOrdine(id) {
     if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
-    
     const order = ordersCache[id];
     if (!order) return;
-    
     let deliveryFee = 0;
     let finalTotal = order.finalTotal || 0;
-    
     if (order.type === 'delivery') {
         deliveryFee = calcolaCostoConsegna(order);
         const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1), 0) : 0;
         finalTotal = subtotale + deliveryFee;
     }
-    
-    await db.ref('ordini/' + id).update({ 
-        status: 'accettato', 
-        accettatoIl: Date.now(),
-        deliveryFee: deliveryFee,
-        finalTotal: finalTotal
-    });
-    
+    await db.ref('ordini/' + id).update({ status: 'accettato', accettatoIl: Date.now(), deliveryFee: deliveryFee, finalTotal: finalTotal });
     order.status = 'accettato';
     order.deliveryFee = deliveryFee;
     order.finalTotal = finalTotal;
-    
     const comanda = generaComanda(order);
     await inviaStampante(comanda, id);
-    
     showToast('✅ Ordine accettato e stampato!'); 
     renderOrders(ordersCache); 
     notifyClients();
@@ -1034,6 +1088,7 @@ if (el) el.classList.add('active');
 else document.querySelector(`.nav-item[data-section="${name}"]`)?.classList.add('active');
 if (window.innerWidth <= 768) toggleSidebar();
 if (name === 'promotions') populatePromoProductSelect();
+if (name === 'security') updateNotifStatus();
 }
 
 // ============================================================
@@ -1110,9 +1165,7 @@ const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanit
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
-// 🖨️ Tasto Ristampa
 const btnRistampa = `<button class="btn-secondary" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);" onclick="ristampaOrdine('${id}')"><i class="fas fa-print"></i> Ristampa</button>`;
-
 const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${parseFloat(o.deliveryFee).toFixed(2)}</div>` : '';
 
 if (tipo === 'preorder') {
@@ -1190,17 +1243,36 @@ if (!old) added.push(o);
 else if (old.status !== o.status || old.delayMinutes !== o.delayMinutes) changed.push({ old, new: o });
 });
 added.forEach(o => {
-playAdminNotification();
-if (o.status === 'preorder') showToast(`📅 Pre-ordine ${o.orderId || o.id}`);
-else {
-showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-const comanda = generaComanda(o);
-inviaStampante(comanda, o.id);
-}
+  if (o.status === 'preorder') {
+    playAdminNotification(
+      `📅 Pre-ordine ${o.orderId || o.id}`,
+      `${o.customerName || 'Cliente'} - ${o.scheduledDate || ''} ${o.scheduledTime || ''}`,
+      'preorder-' + o.id
+    );
+    showToast(`📅 Pre-ordine ${o.orderId || o.id}`);
+  } else {
+    playAdminNotification(
+      `🆕 Nuovo ordine ${o.orderId || o.id}`,
+      `${o.customerName || 'Cliente'} - €${parseFloat(o.finalTotal || 0).toFixed(2)} - ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}`,
+      'order-' + o.id
+    );
+    showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
+    const comanda = generaComanda(o);
+    inviaStampante(comanda, o.id);
+  }
 });
 changed.forEach(({ new: o }) => {
-const msgs = { 'accettato': '✅ ACCETTATO!', 'preparing': '🍕 In preparazione', 'delayed': `⏰ In ritardo (${o.delayMinutes||10}m)`, 'ready': '✅ Pronto!', 'picked': '📦 Ritirato', 'delivering': '🛵 In consegna', 'delivered': '🎉 Consegnato!', 'annullato': '🗑️ ANNULLATO', 'rifiutato': '❌ RIFIUTATO' };
-if (msgs[o.status]) { showToast(`${msgs[o.status]} (${o.orderId||o.id})`); playAdminNotification(); }
+  const msgs = { 'accettato': '✅ ACCETTATO!', 'preparing': '🍕 In preparazione', 'delayed': `⏰ In ritardo (${o.delayMinutes||10}m)`, 'ready': '✅ Pronto!', 'picked': '📦 Ritirato', 'delivering': '🛵 In consegna', 'delivered': '🎉 Consegnato!', 'annullato': '🗑️ ANNULLATO', 'rifiutato': '❌ RIFIUTATO' };
+  if (msgs[o.status]) {
+    showToast(`${msgs[o.status]} (${o.orderId||o.id})`);
+    if (o.status === 'annullato' || o.status === 'rifiutato') {
+      playAdminNotification(
+        `${msgs[o.status]} - ${o.orderId||o.id}`,
+        `${o.customerName || 'Cliente'} - ${o.motivoAnnullamento || o.motivoRifiuto || ''}`,
+        'status-' + o.id
+      );
+    }
+  }
 });
 ordersCache = newOrders; renderOrders(ordersCache);
 });
