@@ -1003,7 +1003,6 @@ async function trasformaInOrdine(orderId) {
   });
   order.status='new'; order.isPreOrder=false; order.deliveryFee=deliveryFee; order.finalTotal=finalTotal;
   const comanda=generaComanda(order);
-  await inviaStampante(comanda, orderId);
   showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); renderOrders(ordersCache); notifyClients();
 }
 
