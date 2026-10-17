@@ -720,9 +720,6 @@ function sanitizeKey(key) { return key.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
 function initNotificationSound() { try { notificationSound = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
 
-// ============================================================
-// 🔔 NOTIFICHE DI SISTEMA (tendina + telefono bloccato)
-// ============================================================
 async function initSystemNotifications() {
   if ('serviceWorker' in navigator) {
     try {
@@ -791,11 +788,7 @@ function updateNotifStatus() {
   el.style.color = p === 'granted' ? '#4ade80' : (p === 'denied' ? '#f87171' : '#fbbf24');
 }
 
-// ============================================================
-// 🔔 NOTIFICA + SUONO + VIBRAZIONE
-// ============================================================
 function playAdminNotification(title, body, tag) {
-  // 🔊 Suono
   if (notificationSound) {
     try {
       const osc = notificationSound.createOscillator(); const gain = notificationSound.createGain();
@@ -808,10 +801,37 @@ function playAdminNotification(title, body, tag) {
       osc.start(notificationSound.currentTime); osc.stop(notificationSound.currentTime + 0.4);
     } catch(e) {}
   }
-  // 📳 Vibra
   vibrate([300, 150, 300, 150, 300]);
-  // 🔔 Notifica di sistema (tendina / lockscreen)
   if (title) sendSystemNotification(title, body || '', tag || 'grasso-' + Date.now());
+}
+
+function avvisaWhatsApp(orderId, statoForzato) {
+  const order = ordersCache[orderId];
+  if (!order) { showToast('❌ Ordine non trovato'); return; }
+  const rawPhone = (order.customerPhone || '').replace(/\D/g, '');
+  if (!rawPhone || rawPhone.length < 9) { showToast('⚠️ Numero cliente non valido'); return; }
+  const phone = rawPhone.startsWith('39') ? rawPhone : '39' + rawPhone;
+  const nome = (order.customerName || 'Cliente').split(' ')[0];
+  const oid = order.orderId || orderId;
+  const stato = statoForzato || order.status || 'new';
+  const tipo = order.type === 'delivery' ? 'delivery' : 'pickup';
+  let testo = '';
+  if (stato === 'accettato') {
+    testo = `Ciao ${nome}! ✅ Confermiamo il tuo ordine *${oid}*. Iniziamo a prepararlo 🍕\n\nPuoi seguire lo stato in tempo reale dall'app.`;
+  } else if (stato === 'rifiutato') {
+    const motivo = order.motivoRifiuto || 'non specificato';
+    testo = `Ciao ${nome}, purtroppo non possiamo accettare il tuo ordine *${oid}*.\n\nMotivo: ${motivo}\n\nCi scusiamo per il disagio 🙏`;
+  } else if (stato === 'ready' && tipo === 'pickup') {
+    testo = `Ciao ${nome}! ✅ Il tuo ordine *${oid}* è PRONTO per il ritiro! Ti aspettiamo 🍕`;
+  } else if (stato === 'delivering' && tipo === 'delivery') {
+    testo = `Ciao ${nome}! 🛵 Il rider è in viaggio verso di te con il tuo ordine *${oid}*. Preparati! 🍕`;
+  } else {
+    showToast('ℹ️ Nessun messaggio automatico per questo stato');
+    return;
+  }
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(testo)}`;
+  window.open(url, '_blank');
+  showToast('📱 WhatsApp aperto!');
 }
 
 function toggleSidebar() {
@@ -877,60 +897,15 @@ if (drivers.exists()) { driversList = drivers.val() || {}; renderDrivers(drivers
 } catch(e) { showToast('❌ Errore caricamento dati'); }
 }
 
-// ============================================================
-// 🔥 GENERA COMANDA
-// ============================================================
-function generaComanda(order) {
-    const ristorante = 'ANTICA PIZZERIA GRASSO';
-    const indirizzo = 'Via Antiche Mura 8/A, Manfredonia';
-    const telefono = '0884 660377';
-    const dataOrdine = new Date(order.timestamp);
-    const subtotale = order.items ? order.items.reduce((sum, i) => sum + (parseFloat(i.price || 0) * (parseInt(i.qty || 1))), 0) : 0;
-    const costoCorsa = order.deliveryFee || 0;
-    const totale = order.finalTotal || (subtotale + costoCorsa);
-    let preOrderHeader = '';
-    if (order.isPreOrder && order.scheduledDate) {
-        const dataPreOrdine = new Date(order.scheduledDate + 'T00:00:00');
-        preOrderHeader = `║  📅 PRE-ORDINE PER IL: ${dataPreOrdine.toLocaleDateString('it-IT')}`;
-        if (order.scheduledTime && order.scheduledTime !== 'Prima possibile') preOrderHeader += ` alle ${order.scheduledTime}`;
-        preOrderHeader += '\n';
-    }
-    const preOrderBorder = order.isPreOrder ? '╠═══════════════════════════════════════════════════════════════╣\n║  ⚠️  QUESTO È UN PRE-ORDINE  ⚠️                            ║\n' : '';
-    let stampa = `
-╔═══════════════════════════════════════════════════════════════╗
-║                     ${ristorante}                              ║
-║                     ${indirizzo}                               ║
-║                     Tel: ${telefono}                           ║
-╠═══════════════════════════════════════════════════════════════╣
-║  📋 COMANDA #${order.orderId || order.id}                    ║
-║  📅 ${dataOrdine.toLocaleDateString('it-IT')}  🕐 ${dataOrdine.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}
-${preOrderHeader}${preOrderBorder}╠═══════════════════════════════════════════════════════════════╣
-║  👤 CLIENTE: ${order.customerName || 'N/A'}                   ║
-║  📞 TEL:     ${order.customerPhone || 'N/A'}                 ║
-║  📍 TIPO:    ${order.type === 'delivery' ? '🚚 CONSEGNA' : '🏪 RITIRO'}${order.scheduledTime ? ' - '+order.scheduledTime : ''}
-${order.type === 'delivery' ? '║  🏠 INDIRIZZO: '+ (order.address || 'N/A')+'\n' : ''}
-${order.notes ? '║  📝 NOTE: '+order.notes+'\n' : ''}
-${order.delayMinutes ? '║  ⏰ RITARDO: '+order.delayMinutes+' minuti\n' : ''}
-╠═══════════════════════════════════════════════════════════════╣
-║  🍕 PRODOTTI:                                                ║
-${order.items && order.items.length > 0 ? order.items.map((i, idx) => `║    ${String(idx + 1).padStart(2, '0')}. ${(i.name || 'Prodotto').padEnd(30)} x${String(i.qty || 1).padStart(2)}  €${((parseFloat(i.price) || 0) * (parseInt(i.qty) || 1)).toFixed(2).padStart(6)}`).join('\n') : '║    Nessun prodotto'}`;
-    if (order.type === 'delivery') {
-        stampa += `
-╠═══════════════════════════════════════════════════════════════╣
-║  💰 SUBTOTALE PRODOTTI:              €${subtotale.toFixed(2).padStart(8)} ║
-║  🛵 COSTO CONSEGNA (Moover):         €${costoCorsa.toFixed(2).padStart(8)} ║`;
-    }
-    stampa += `
-╠═══════════════════════════════════════════════════════════════╣
-║  💎 TOTALE ORDINE:                   €${totale.toFixed(2).padStart(8)} ║
-╚═══════════════════════════════════════════════════════════════╝
-`;
-    return stampa;
+function calcolaDistanza(lat1, lon1, lat2, lon2) {
+    if (lat1 === 0 || lon1 === 0 || lat2 === 0 || lon2 === 0) return 0;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// ============================================================
-// 🔥 CALCOLA COSTO CONSEGNA
-// ============================================================
 function calcolaCostoConsegna(order) {
     try {
         const settings = appData.settings || {};
@@ -949,41 +924,6 @@ function calcolaCostoConsegna(order) {
     } catch(e) { return 3.00; }
 }
 
-function calcolaDistanza(lat1, lon1, lat2, lon2) {
-    if (lat1 === 0 || lon1 === 0 || lat2 === 0 || lon2 === 0) return 0;
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-// ============================================================
-// 🔥 SALVA E STAMPA
-// ============================================================
-async function salvaComandaInFirebase(orderId, comanda) {
-try {
-await db.ref(`comande_stampate/${orderId}`).set({
-orderId: orderId, comanda: comanda, timestamp: Date.now(), ristampe: 0, dataCreazione: new Date().toISOString(), stato: 'da_stampare'
-});
-} catch(e) { console.error('Errore salvataggio comanda:', e); }
-}
-
-async function inviaStampante(comanda, orderId) {
-try {
-await salvaComandaInFirebase(orderId, comanda);
-console.log('📤 Comanda inviata a Firebase per la stampa');
-return true;
-} catch (e) {
-console.error('Errore invio a Firebase:', e);
-showToast('❌ Errore invio comanda');
-return false;
-}
-}
-
-// ============================================================
-// 🔥 TRASFORMA PRE-ORDINE
-// ============================================================
 async function trasformaInOrdine(orderId) {
   const order = ordersCache[orderId];
   if (!order || order.status !== 'preorder') return;
@@ -1002,8 +942,8 @@ async function trasformaInOrdine(orderId) {
     stampato_130:null, stampato_131:null, stampato_annullato:null
   });
   order.status='new'; order.isPreOrder=false; order.deliveryFee=deliveryFee; order.finalTotal=finalTotal;
-  const comanda=generaComanda(order);
-  showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); renderOrders(ordersCache); notifyClients();
+  showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); 
+  renderOrders(ordersCache); notifyClients();
 }
 
 async function trasformaTuttiPreOrdini() {
@@ -1016,9 +956,6 @@ for (const o of preOrders) { try { await trasformaInOrdine(o.id); ok++; } catch(
 showToast(`✅ Trasformati ${ok} pre-ordini${err ? `, ${err} errori` : ''}!`);
 }
 
-// ============================================================
-// 🖨️ RISTAMPA ORDINE (SOLO FLAG SU /ordini)
-// ============================================================
 async function ristampaOrdine(id){
   const order = ordersCache[id];
   if (!order) return;
@@ -1054,9 +991,6 @@ if (deveTrasformare) await trasformaInOrdine(id);
 }, 60000);
 }
 
-// ============================================================
-// 🔥 ACCETTA ORDINE
-// ============================================================
 async function accettaOrdine(id) {
     if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
     const order = ordersCache[id];
@@ -1072,9 +1006,7 @@ async function accettaOrdine(id) {
     order.status = 'accettato';
     order.deliveryFee = deliveryFee;
     order.finalTotal = finalTotal;
-    const comanda = generaComanda(order);
-    await inviaStampante(comanda, id);
-    showToast('✅ Ordine accettato e stampato!'); 
+    showToast('✅ Ordine accettato!'); 
     renderOrders(ordersCache); 
     notifyClients();
 }
@@ -1090,9 +1022,6 @@ if (name === 'promotions') populatePromoProductSelect();
 if (name === 'security') updateNotifStatus();
 }
 
-// ============================================================
-// 🔥 RENDER ORDINI
-// ============================================================
 function renderOrders(orders) {
 const list = document.getElementById('ordersList');
 const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [], annullati: [], rifiutati: [], preorder: [] };
@@ -1165,6 +1094,7 @@ const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.as
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
 const btnRistampa = `<button class="btn-secondary" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);" onclick="ristampaOrdine('${id}')"><i class="fas fa-print"></i> Ristampa</button>`;
+const btnWhatsApp = `<button class="btn-secondary" style="background:rgba(37,211,102,0.15);border-color:#25D366;color:#25D366;" onclick="avvisaWhatsApp('${id}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>`;
 const deliveryFeeDisplay = o.deliveryFee && o.deliveryFee > 0 ? `<div style="font-size:0.8rem;color:#60a5fa;">🛵 +€${parseFloat(o.deliveryFee).toFixed(2)}</div>` : '';
 
 if (tipo === 'preorder') {
@@ -1178,17 +1108,17 @@ if (o.motivoRifiuto) motivoMessage = `<div class="order-reject-message"><strong>
 else if (o.motivoAnnullamento) motivoMessage = `<div class="order-reject-message" style="border-left-color:#f87171;"><strong>🗑️ Motivo:</strong> ${sanitize(o.motivoAnnullamento)}</div>`;
 } else if (tipo === 'rifiutati') {
 statusBadge = '<span class="status-badge rifiutato">❌ RIFIUTATO</span>'; borderColor = '#ef4444'; extraClass = 'rifiutati';
-ah = `<button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
+ah = `${btnWhatsApp}<button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
 if (o.motivoRifiuto) motivoMessage = `<div class="order-reject-message"><strong>❌ Motivo:</strong> ${sanitize(o.motivoRifiuto)}</div>`;
 } else {
 const st = o.status || 'new';
 if (st === 'new') ah = `<button class="btn-accept" onclick="accettaOrdine('${id}')">✅ Accetta</button>${btnRistampa}<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'accettato') ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'accettato') ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button>${btnRistampa}${btnWhatsApp}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
 else if (st === 'preparing') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
 else if (st === 'delayed') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'ready') ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+else if (st === 'ready') ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button>${btnRistampa}${btnWhatsApp}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
 else if (st === 'picked') ah = `${btnRistampa}<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>`;
-else if (st === 'delivering') ah = `${btnRistampa}<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
+else if (st === 'delivering') ah = `${btnRistampa}${btnWhatsApp}<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
 else ah = `${btnRistampa}<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
 }
 
@@ -1256,8 +1186,6 @@ added.forEach(o => {
       'order-' + o.id
     );
     showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
-    const comanda = generaComanda(o);
-    inviaStampante(comanda, o.id);
   }
 });
 changed.forEach(({ new: o }) => {
