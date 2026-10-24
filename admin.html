@@ -16,7 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-<!-- 🔥 AGGIUNTO SDK AUTH -->
+<!-- 🔥 SDK AUTH -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 <style>
@@ -92,8 +92,33 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .order-time { color: #8a7a5a; font-size: 0.75rem; }
 .order-customer { color: var(--cream); font-weight: 600; margin-bottom: 5px; }
 .order-details { color: #a08b6d; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.5; }
-.order-items { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
-.order-items div { color: var(--cream); padding: 2px 0; }
+
+/* 🔥 SCROLL PER LISTA PRODOTTI */
+.order-items { 
+    background: rgba(0,0,0,0.2); 
+    border-radius: 8px; 
+    padding: 10px; 
+    margin-bottom: 10px; 
+    font-size: 0.85rem; 
+    max-height: 250px; 
+    overflow-y: auto; 
+}
+.order-items::-webkit-scrollbar { width: 4px; }
+.order-items::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
+.order-cat-title {
+    color: var(--gold-light);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    border-bottom: 1px dashed rgba(212,168,75,0.3);
+    padding-bottom: 2px;
+}
+.order-cat-title:first-child { margin-top: 0; }
+.order-item-row { color: var(--cream); padding: 2px 0; display: flex; justify-content: space-between; }
+.order-item-row span:last-child { color: var(--gold); }
+
 .order-total { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 12px; }
 .order-total span:last-child { color: var(--gold); font-size: 1.1rem; }
 .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1097,9 +1122,25 @@ return ordersList.map(([id, o]) => {
 const dt = new Date(o.timestamp || 0);
 const ts = dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
 const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-const items = o.items && Array.isArray(o.items) ? o.items.map(i => `<div>${sanitize(i.name)} x${i.qty} - €${(parseFloat(i.price) * parseInt(i.qty)).toFixed(2)}</div>`).join('') : '';
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
+
+// 🔥 RAGGRUPPAMENTO PRODOTTI PER CATEGORIA
+let itemsHtml = '';
+if (o.items && Array.isArray(o.items)) {
+    const grouped = {};
+    o.items.forEach(i => {
+        const cat = (i.cat || 'Altro').toUpperCase();
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(i);
+    });
+    for (const cat in grouped) {
+        itemsHtml += `<div class="order-cat-title">${cat}</div>`;
+        grouped[cat].forEach(i => {
+            itemsHtml += `<div class="order-item-row"><span>${sanitize(i.name)} x${i.qty}</span><span>€${(parseFloat(i.price) * parseInt(i.qty)).toFixed(2)}</span></div>`;
+        });
+    }
+}
 
 const btnRistampa = `<button class="btn-secondary" style="background:rgba(212,168,75,0.2);border-color:var(--gold);color:var(--gold);" onclick="ristampaOrdine('${id}')"><i class="fas fa-print"></i> Ristampa</button>`;
 const btnWhatsApp = `<button class="btn-secondary" style="background:rgba(37,211,102,0.15);border-color:#25D366;color:#25D366;" onclick="avvisaWhatsApp('${id}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>`;
@@ -1134,7 +1175,7 @@ return `<div class="order-card ${extraClass}" style="border-left-color:${borderC
 <div class="order-header"><span class="order-id">${o.orderId || id} ${statusBadge} ${driverBadge}</span><span class="order-time">${ds} ${ts}</span></div>
 <div class="order-customer">${sanitize(o.customerName || 'N/A')} - ${sanitize(o.customerPhone || 'N/A')}</div>
 <div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.scheduledTime ? ' - ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : ''}${o.notes ? '<br>📝 ' + sanitize(o.notes) : ''}${o.isPreOrder ? '<br>📅 <strong>Pre-ordine:</strong> ' + (o.scheduledDate || '') : ''}</div>
-<div class="order-items">${items}</div>
+<div class="order-items">${itemsHtml}</div>
 <div class="order-total"><span>Totale</span><span>€${(parseFloat(o.finalTotal) || 0).toFixed(2)}</span></div>
 ${deliveryFeeDisplay}
 <div class="order-actions">${ah}</div>${motivoMessage}</div>`;
