@@ -16,7 +16,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-<!-- 🔥 SDK AUTH -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 <style>
@@ -92,33 +91,13 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .order-time { color: #8a7a5a; font-size: 0.75rem; }
 .order-customer { color: var(--cream); font-weight: 600; margin-bottom: 5px; }
 .order-details { color: #a08b6d; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.5; }
-
-/* 🔥 SCROLL PER LISTA PRODOTTI */
-.order-items { 
-    background: rgba(0,0,0,0.2); 
-    border-radius: 8px; 
-    padding: 10px; 
-    margin-bottom: 10px; 
-    font-size: 0.85rem; 
-    max-height: 250px; 
-    overflow-y: auto; 
-}
+.order-items { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 0.85rem; max-height: 250px; overflow-y: auto; }
 .order-items::-webkit-scrollbar { width: 4px; }
 .order-items::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
-.order-cat-title {
-    color: var(--gold-light);
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    margin-top: 8px;
-    margin-bottom: 4px;
-    border-bottom: 1px dashed rgba(212,168,75,0.3);
-    padding-bottom: 2px;
-}
+.order-cat-title { color: var(--gold-light); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px; border-bottom: 1px dashed rgba(212,168,75,0.3); padding-bottom: 2px; }
 .order-cat-title:first-child { margin-top: 0; }
 .order-item-row { color: var(--cream); padding: 2px 0; display: flex; justify-content: space-between; }
 .order-item-row span:last-child { color: var(--gold); }
-
 .order-total { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 12px; }
 .order-total span:last-child { color: var(--gold); font-size: 1.1rem; }
 .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -346,6 +325,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 <div class="nav-item" onclick="showSection('security', this)" data-section="security"><i class="fas fa-lock"></i> Sicurezza</div>
 <div class="nav-item" onclick="showSection('colors', this)" data-section="colors"><i class="fas fa-palette"></i> Colori</div>
 <div class="nav-item" onclick="showSection('dashboard', this)" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+<div class="nav-item" onclick="showSection('stats', this)" data-section="stats"><i class="fas fa-chart-bar"></i> Statistiche</div>
 </nav>
 <div class="sidebar-footer">
 <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Esci</button>
@@ -638,6 +618,50 @@ Per inviare notifiche push ai clienti, usa il <strong style="color:var(--gold);"
 </a>
 </div>
 </div>
+<div class="section" id="section-stats">
+<div class="content-header">
+<div>
+<h1><i class="fas fa-chart-bar"></i> Statistiche Vendite</h1>
+<div class="subtitle">Analisi ordini, prodotti più venduti e vendite al bancone</div>
+</div>
+<div class="header-actions">
+<select class="form-input" id="statsPeriod" onchange="renderStats()" style="min-width:180px;">
+<option value="month">📅 Questo mese</option>
+<option value="last_month">📅 Mese scorso</option>
+<option value="year">📆 Quest'anno</option>
+<option value="last_year">📆 Anno scorso</option>
+<option value="all">🗂️ Tutti gli ordini</option>
+</select>
+<button class="btn-secondary" onclick="exportStatsCSV()"><i class="fas fa-download"></i> Esporta CSV</button>
+</div>
+</div>
+<div class="stats-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));">
+<div class="stat-card"><div class="number" id="statsTotalOrders">0</div><div class="label">Ordini totali</div></div>
+<div class="stat-card delivered"><div class="number" id="statsDelivered">0</div><div class="label">Consegnati</div></div>
+<div class="stat-card"><div class="number" id="statsCounter">0</div><div class="label">🍕 Bancone</div></div>
+<div class="stat-card rifiutati"><div class="number" id="statsRejected">0</div><div class="label">Rifiutati</div></div>
+<div class="stat-card annullati"><div class="number" id="statsCancelled">0</div><div class="label">Annullati</div></div>
+<div class="stat-card"><div class="number" id="statsRevenue">€0</div><div class="label">Incasso totale</div></div>
+<div class="stat-card"><div class="number" id="statsAvgOrder">€0</div><div class="label">Media ordine</div></div>
+<div class="stat-card"><div class="number" id="statsProductsSold">0</div><div class="label">Pezzi venduti</div></div>
+</div>
+<div class="card">
+<div class="card-title"><i class="fas fa-calendar-alt"></i> Ordini per mese</div>
+<div id="statsMonthlyChart" style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px 0;overflow-x:auto;"></div>
+</div>
+<div class="card" id="dailyChartCard">
+<div class="card-title"><i class="fas fa-calendar-day"></i> Ordini per giorno <span style="font-size:0.8rem;color:#8a7a5a;font-weight:400;" id="dailyChartLabel"></span></div>
+<div id="statsDailyChart" style="display:flex;align-items:flex-end;gap:4px;height:140px;padding:10px 0;overflow-x:auto;"></div>
+</div>
+<div class="card">
+<div class="card-title"><i class="fas fa-trophy"></i> Top 20 Prodotti più venduti</div>
+<div id="statsTopProducts"></div>
+</div>
+<div class="card">
+<div class="card-title"><i class="fas fa-layer-group"></i> Vendite per Categoria</div>
+<div id="statsCategories"></div>
+</div>
+</div>
 <div class="section" id="section-colors">
 <div class="content-header"><h1><i class="fas fa-palette"></i> Colori</h1></div>
 <div class="card">
@@ -662,7 +686,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// 🔥 AGGIUNTO: LOGIN ANONIMO PER ADMIN
 firebase.auth().signInAnonymously()
   .then(() => console.log('✅ Admin auth OK'))
   .catch(e => console.error('❌ Admin auth Error:', e));
@@ -1024,6 +1047,126 @@ if (deveTrasformare) await trasformaInOrdine(id);
 }, 60000);
 }
 
+// ============================================
+// GESTIONE STOCK / PEZZI LIMITATI
+// ============================================
+
+async function scaricaStockOrdine(order) {
+    if (!order.items || !Array.isArray(order.items)) return;
+    for (const item of order.items) {
+        const cat = item.cat;
+        if (!cat || !appData.menu[cat]) continue;
+        const idx = appData.menu[cat].findIndex(p => p.name === item.name);
+        if (idx === -1) continue;
+        const prod = appData.menu[cat][idx];
+        if (prod.stock === undefined || prod.stock === null) continue;
+        const qty = parseInt(item.qty) || 1;
+        const nuovoStock = Math.max(0, (parseInt(prod.stock) || 0) - qty);
+        prod.stock = nuovoStock;
+        if (nuovoStock === 0) prod.disabled = true;
+        await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: nuovoStock === 0 });
+    }
+    showToast('📦 Stock aggiornato');
+    renderMenu();
+    notifyClients();
+}
+
+async function aggiungiPezzoManuale(cat, idx) {
+    const prod = appData.menu[cat]?.[idx];
+    if (!prod) return;
+    const val = await showPrompt('Aggiungi pezzi', 'Quanti pezzi aggiungere?', 'Es: 10', '10');
+    if (val === null) return;
+    const n = parseInt(val);
+    if (isNaN(n) || n <= 0) { showToast('⚠️ Valore non valido'); return; }
+    const nuovoStock = (parseInt(prod.stock) || 0) + n;
+    prod.stock = nuovoStock;
+    prod.disabled = false;
+    await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: false });
+    showToast(`➕ Aggiunti ${n} pezzi (totale: ${nuovoStock})`);
+    renderMenu();
+    notifyClients();
+}
+
+async function impostaStock(cat, idx) {
+    const prod = appData.menu[cat]?.[idx];
+    if (!prod) return;
+    const val = await showPrompt('Imposta Stock', `Pezzi disponibili per "${prod.name}":`, 'Es: 50', prod.stock ?? '0');
+    if (val === null) return;
+    const n = parseInt(val);
+    if (isNaN(n) || n < 0) { showToast('⚠️ Valore non valido'); return; }
+    prod.stock = n;
+    prod.disabled = n === 0;
+    await db.ref(`menu/${cat}/${idx}`).update({ stock: n, disabled: n === 0 });
+    showToast(`📦 Stock impostato: ${n}`);
+    renderMenu();
+    notifyClients();
+}
+
+// ============================================
+// VENDITA AL BANCONE (registra ordine + scala stock)
+// ============================================
+
+async function venditaBancone(cat, idx) {
+    const prod = appData.menu[cat]?.[idx];
+    if (!prod) return;
+    if (prod.stock === undefined || prod.stock === null) {
+        showToast('⚠️ Questo prodotto non ha stock impostato');
+        return;
+    }
+    if (prod.stock <= 0) { showToast('⚠️ Già esaurito'); return; }
+
+    const qtyStr = await showPrompt(
+        '🍕 Vendita al bancone',
+        `Quanti pezzi di "${prod.name}" hai venduto?\n(Stock attuale: ${prod.stock})`,
+        'Es: 1',
+        '1'
+    );
+    if (qtyStr === null) return;
+    const qty = parseInt(qtyStr);
+    if (isNaN(qty) || qty <= 0) { showToast('⚠️ Valore non valido'); return; }
+    if (qty > prod.stock) { showToast(`⚠️ Solo ${prod.stock} pezzi disponibili`); return; }
+
+    const nuovoStock = prod.stock - qty;
+    prod.stock = nuovoStock;
+    if (nuovoStock === 0) prod.disabled = true;
+    await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: nuovoStock === 0 });
+
+    try {
+        const newRef = db.ref('ordini').push();
+        const orderId = 'BANCO-' + newRef.key.slice(-6).toUpperCase();
+        const now = Date.now();
+        const total = (parseFloat(prod.price) || 0) * qty;
+        await newRef.set({
+            orderId: orderId,
+            timestamp: now,
+            status: 'delivered',
+            type: 'pickup',
+            isCounterSale: true,
+            customerName: 'Vendita al bancone',
+            customerPhone: '',
+            address: '',
+            items: [{
+                cat: cat,
+                name: prod.name,
+                qty: qty,
+                price: parseFloat(prod.price) || 0
+            }],
+            productsTotal: total,
+            deliveryFee: 0,
+            finalTotal: total,
+            notes: 'Vendita al bancone',
+            deliveredAt: now
+        });
+        showToast(`🍕 Venduti ${qty} pezzi al bancone (rimasti: ${nuovoStock})`);
+    } catch(e) {
+        showToast('⚠️ Stock scalato ma errore registrazione ordine');
+        console.error(e);
+    }
+
+    renderMenu();
+    notifyClients();
+}
+
 async function accettaOrdine(id) {
     if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
     const order = ordersCache[id];
@@ -1039,6 +1182,9 @@ async function accettaOrdine(id) {
     order.status = 'accettato';
     order.deliveryFee = deliveryFee;
     order.finalTotal = finalTotal;
+    
+    await scaricaStockOrdine(order);
+    
     showToast('✅ Ordine accettato!'); 
     renderOrders(ordersCache); 
     notifyClients();
@@ -1053,6 +1199,7 @@ else document.querySelector(`.nav-item[data-section="${name}"]`)?.classList.add(
 if (window.innerWidth <= 768) toggleSidebar();
 if (name === 'promotions') populatePromoProductSelect();
 if (name === 'security') updateNotifStatus();
+if (name === 'stats') renderStats();
 }
 
 function renderOrders(orders) {
@@ -1125,7 +1272,6 @@ const ds = dt.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
 const driverBadge = o.assignedName ? `<span class="driver-badge">${sanitize(o.assignedName)}</span>` : '';
 let statusBadge = '', borderColor = 'var(--gold)', extraClass = '', motivoMessage = '', ah = '';
 
-// 🔥 RAGGRUPPAMENTO PRODOTTI PER CATEGORIA
 let itemsHtml = '';
 if (o.items && Array.isArray(o.items)) {
     const grouped = {};
@@ -1432,10 +1578,26 @@ if (st && !fp.length) return;
 h += `<div class="admin-category-accordion ${io?'open':''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ci.icon||'fa-utensils'}"></i></div><span class="admin-category-header-title">${sanitize(ci.name)}</span></div><span class="admin-category-header-count">${pr.length}</span><button class="btn-add-product" onclick="event.stopPropagation();addProduct('${cat}')"><i class="fas fa-plus"></i></button></div><div class="admin-category-body">`;
 h += (st?fp:pr).map((p,idx) => {
 const oi = pr.indexOf(p), dis = p.disabled===true;
-return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span></div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
+const hasStock = p.stock !== undefined && p.stock !== null;
+const stockBadge = hasStock 
+    ? `<span style="background:${p.stock > 0 ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.2)'};color:${p.stock > 0 ? '#4ade80' : '#f87171'};padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:700;">📦 ${p.stock}</span>` 
+    : '';
+const stockButtons = hasStock 
+    ? `<div style="display:flex;gap:6px;align-items:center;">
+         <button onclick="venditaBancone('${cat}',${oi})" title="Vendita al bancone (scala automaticamente)" style="background:#f59e0b;color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.85rem;display:flex;align-items:center;gap:6px;"><i class="fas fa-store"></i> 🍕 Vendi al bancone</button>
+         <button onclick="aggiungiPezzoManuale('${cat}',${oi})" title="Aggiungi pezzi" style="background:#4ade80;color:#052e16;border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;font-weight:700;font-size:1rem;">➕</button>
+         <button onclick="impostaStock('${cat}',${oi})" title="Imposta stock" style="background:var(--gold);color:var(--dark);border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:0.9rem;">📦</button>
+       </div>`
+    : `<button onclick="impostaStock('${cat}',${oi})" style="background:var(--card);color:var(--gold);border:1px dashed var(--gold-dark);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:700;">📦 Imposta Stock</button>`;
+
+return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span>${stockBadge}</div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
 <div class="admin-product-inputs"><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.name)}" onchange="updateProduct('${cat}',${oi},'name',this.value)" placeholder="Nome 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_en||'')}" onchange="updateProduct('${cat}',${oi},'name_en',this.value)" placeholder="Name 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_de||'')}" onchange="updateProduct('${cat}',${oi},'name_de',this.value)" placeholder="Name 🇩🇪" style="flex:2;min-width:150px;"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.desc||'')}" onchange="updateProduct('${cat}',${oi},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_en||'')}" onchange="updateProduct('${cat}',${oi},'desc_en',this.value)" placeholder="Description 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_de||'')}" onchange="updateProduct('${cat}',${oi},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪" style="flex:2;min-width:150px;"></div>
 <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${cat}',${oi},'price',parseFloat(this.value))" placeholder="Prezzo €">
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(212,168,75,0.08);padding:10px;border-radius:8px;border:1px dashed rgba(212,168,75,0.3);">
+  <span style="color:var(--gold);font-size:0.8rem;font-weight:700;">📦 STOCK:</span>
+  ${stockButtons}
+</div>
 <div class="admin-product-img-wrapper">${p.img?`<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${cat}',${oi})" title="Rimuovi">`:''}<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ${p.img?'Cambia':'Aggiungi'} Foto<input type="file" accept="image/*" onchange="uploadProductImage('${cat}',${oi},this)"></label></div>
 <button class="btn-translate" onclick="translateProduct('${cat}',${oi},this)"><i class="fas fa-language"></i> Traduci 🌐</button></div></div>`;
 }).join('');
@@ -1450,7 +1612,16 @@ async function addProduct(c) {
 const n = await showPrompt('Nuovo Prodotto', 'Nome (🇮🇹):', 'Es: Margherita'); if(!n||!n.trim()) return;
 const ps = await showPrompt('Prezzo', 'Prezzo (€):', 'Es: 7.00', '5.00'); if(ps===null) return; const p = parseFloat(ps.replace(',','.')); if(isNaN(p)||p<0) return;
 const ds = await showPrompt('Descrizione', 'Descrizione (opzionale):', '', '');
-if(!appData.menu[c]) appData.menu[c]=[]; appData.menu[c].push({ name:sanitize(n), price:p, desc:ds?sanitize(ds):'', disabled:false });
+const stk = await showPrompt('Pezzi disponibili', 'Stock iniziale (vuoto = illimitato, 0 = esaurito):', 'Es: 50', '');
+let stock = undefined, disabled = false;
+if (stk !== null && stk.trim() !== '') {
+    const s = parseInt(stk);
+    if (!isNaN(s) && s >= 0) { stock = s; disabled = s === 0; }
+}
+if(!appData.menu[c]) appData.menu[c]=[];
+const newProd = { name:sanitize(n), price:p, desc:ds?sanitize(ds):'', disabled };
+if (stock !== undefined) newProd.stock = stock;
+appData.menu[c].push(newProd);
 try { await db.ref('menu').set(appData.menu); showToast('✅ Aggiunto!'); renderMenu(); populatePromoProductSelect(); notifyClients(); } catch(e) { showToast('❌ Errore'); }
 }
 async function deleteProduct(c,i) { if(!await showConfirm('Eliminare Prodotto?','Irreversibile.')) return; appData.menu[c].splice(i,1); db.ref('menu').set(appData.menu); showToast('🗑️ Eliminato'); renderMenu(); populatePromoProductSelect(); notifyClients(); }
@@ -1545,6 +1716,258 @@ function applyCurrentPalette() { applyPalette(appData.settings.colorPalette||'au
 function applyPalette(n) { const c=palettes[n]?.colors; if(!c) return; const r=document.documentElement; r.style.setProperty('--gold',c.gold); r.style.setProperty('--gold-light',c.goldLight); r.style.setProperty('--gold-dark',c.goldDark); r.style.setProperty('--dark',c.dark); r.style.setProperty('--brown',c.brown); r.style.setProperty('--brown-light',c.brownLight); r.style.setProperty('--card',c.card); r.style.setProperty('--card-light',c.cardLight); r.style.setProperty('--cream',c.cream); }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 async function resetOrderCounter() { if(!await showConfirm('⚠️ SEI SICURO?\nContatore azzerato.\nProssimo: ORD-00001.')) return; try { await db.ref('counter/ordini').set(0); showToast('✅ Azzerato! Prossimo: ORD-00001'); notifyClients(); } catch(e) { showToast('❌ '+e.message); } }
+
+// ============================================
+// STATISTICHE
+// ============================================
+
+function getStatsPeriodRange() {
+    const now = new Date();
+    const period = document.getElementById('statsPeriod')?.value || 'month';
+    let from, to = new Date();
+    to.setHours(23,59,59,999);
+
+    switch(period) {
+        case 'month':
+            from = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+        case 'last_month':
+            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+            break;
+        case 'year':
+            from = new Date(now.getFullYear(), 0, 1);
+            break;
+        case 'last_year':
+            from = new Date(now.getFullYear() - 1, 0, 1);
+            to = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
+            break;
+        case 'all':
+        default:
+            from = new Date(2000, 0, 1);
+            break;
+    }
+    return { from: from.getTime(), to: to.getTime(), period };
+}
+
+async function renderStats() {
+    let allOrders = {};
+    try {
+        const snap = await db.ref('ordini').once('value');
+        snap.forEach(c => { allOrders[c.key] = { id: c.key, ...c.val() }; });
+    } catch(e) { showToast('❌ Errore caricamento'); return; }
+
+    const { from, to, period } = getStatsPeriodRange();
+
+    const filtered = Object.values(allOrders).filter(o => {
+        const t = o.timestamp || 0;
+        return t >= from && t <= to;
+    });
+
+    const delivered = filtered.filter(o => o.status === 'delivered');
+    const counter = filtered.filter(o => o.isCounterSale === true);
+    const rejected = filtered.filter(o => o.status === 'rifiutato');
+    const cancelled = filtered.filter(o => o.status === 'annullato');
+    const validOrders = filtered.filter(o => !['rifiutato','annullato'].includes(o.status));
+
+    const revenue = validOrders.reduce((s, o) => s + (parseFloat(o.finalTotal) || 0), 0);
+    const avg = validOrders.length ? revenue / validOrders.length : 0;
+    const totalPieces = validOrders.reduce((s, o) => {
+        if (!o.items) return s;
+        return s + o.items.reduce((ss, i) => ss + (parseInt(i.qty) || 0), 0);
+    }, 0);
+
+    document.getElementById('statsTotalOrders').textContent = filtered.length;
+    document.getElementById('statsDelivered').textContent = delivered.length;
+    document.getElementById('statsCounter').textContent = counter.length;
+    document.getElementById('statsRejected').textContent = rejected.length;
+    document.getElementById('statsCancelled').textContent = cancelled.length;
+    document.getElementById('statsRevenue').textContent = '€' + revenue.toFixed(2);
+    document.getElementById('statsAvgOrder').textContent = '€' + avg.toFixed(2);
+    document.getElementById('statsProductsSold').textContent = totalPieces;
+
+    renderMonthlyChart(allOrders, period);
+
+    const dailyCard = document.getElementById('dailyChartCard');
+    if (period === 'month' || period === 'last_month') {
+        dailyCard.style.display = 'block';
+        renderDailyChart(filtered, from, to);
+    } else {
+        dailyCard.style.display = 'none';
+    }
+
+    renderTopProducts(filtered);
+    renderCategoryStats(filtered);
+}
+
+function renderMonthlyChart(allOrders, period) {
+    const chart = document.getElementById('statsMonthlyChart');
+    const now = new Date();
+    let months = [];
+
+    if (period === 'year') {
+        for (let m = 0; m < 12; m++) months.push(new Date(now.getFullYear(), m, 1));
+    } else if (period === 'last_year') {
+        for (let m = 0; m < 12; m++) months.push(new Date(now.getFullYear() - 1, m, 1));
+    } else {
+        for (let i = 11; i >= 0; i--) months.push(new Date(now.getFullYear(), now.getMonth() - i, 1));
+    }
+
+    const counts = months.map(m => {
+        const y = m.getFullYear(), mo = m.getMonth();
+        return Object.values(allOrders).filter(o => {
+            const d = new Date(o.timestamp || 0);
+            return d.getFullYear() === y && d.getMonth() === mo && !['rifiutato','annullato'].includes(o.status);
+        }).length;
+    });
+
+    const max = Math.max(...counts, 1);
+    const monthNames = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+    chart.innerHTML = months.map((m, i) => {
+        const h = (counts[i] / max) * 100;
+        return `<div style="flex:1;min-width:40px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:0.7rem;color:var(--gold);font-weight:700;margin-bottom:4px;">${counts[i]}</div>
+            <div style="width:100%;background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);border-radius:4px 4px 0 0;height:${h}%;min-height:2px;transition:height 0.4s;"></div>
+            <div style="font-size:0.65rem;color:#8a7a5a;margin-top:4px;white-space:nowrap;">${monthNames[m.getMonth()]}</div>
+            <div style="font-size:0.55rem;color:#8a7a5a;">${String(m.getFullYear()).slice(-2)}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderDailyChart(filtered, from, to) {
+    const chart = document.getElementById('statsDailyChart');
+    const fromD = new Date(from), toD = new Date(to);
+    const days = [];
+    for (let d = new Date(fromD); d <= toD; d.setDate(d.getDate() + 1)) {
+        days.push(new Date(d));
+    }
+    const counts = days.map(day => {
+        const y = day.getFullYear(), mo = day.getMonth(), dd = day.getDate();
+        return filtered.filter(o => {
+            const t = new Date(o.timestamp || 0);
+            return t.getFullYear() === y && t.getMonth() === mo && t.getDate() === dd && !['rifiutato','annullato'].includes(o.status);
+        }).length;
+    });
+    const max = Math.max(...counts, 1);
+    document.getElementById('dailyChartLabel').textContent = `(${fromD.toLocaleDateString('it-IT')} → ${toD.toLocaleDateString('it-IT')})`;
+
+    chart.innerHTML = days.map((d, i) => {
+        const h = (counts[i] / max) * 100;
+        return `<div style="flex:1;min-width:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;" title="${d.toLocaleDateString('it-IT')}: ${counts[i]} ordini">
+            <div style="font-size:0.55rem;color:var(--gold);margin-bottom:2px;">${counts[i] || ''}</div>
+            <div style="width:100%;background:${counts[i] ? 'linear-gradient(180deg,#60a5fa 0%,#3b82f6 100%)' : 'rgba(255,255,255,0.05)'};border-radius:3px 3px 0 0;height:${h}%;min-height:2px;"></div>
+            <div style="font-size:0.5rem;color:#8a7a5a;margin-top:2px;">${d.getDate()}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderTopProducts(filtered) {
+    const container = document.getElementById('statsTopProducts');
+    const productMap = {};
+
+    filtered.forEach(o => {
+        if (!o.items || !Array.isArray(o.items)) return;
+        if (['rifiutato','annullato'].includes(o.status)) return;
+        o.items.forEach(i => {
+            const key = (i.cat || 'altro') + '|' + i.name;
+            if (!productMap[key]) productMap[key] = { name: i.name, cat: i.cat || 'Altro', qty: 0, revenue: 0 };
+            productMap[key].qty += parseInt(i.qty) || 1;
+            productMap[key].revenue += (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1);
+        });
+    });
+
+    const sorted = Object.values(productMap).sort((a, b) => b.qty - a.qty).slice(0, 20);
+
+    if (!sorted.length) {
+        container.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun dato nel periodo selezionato</p>';
+        return;
+    }
+
+    const maxQty = sorted[0].qty;
+    container.innerHTML = sorted.map((p, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+        const pct = (p.qty / maxQty) * 100;
+        return `<div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="color:var(--cream);font-weight:600;font-size:0.9rem;">${medal} ${sanitize(p.name)} <span style="color:#8a7a5a;font-size:0.75rem;">(${p.cat})</span></span>
+                <span style="color:var(--gold);font-weight:700;font-size:0.9rem;">${p.qty} pz · €${p.revenue.toFixed(2)}</span>
+            </div>
+            <div style="height:8px;background:rgba(0,0,0,0.3);border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-dark) 100%);border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderCategoryStats(filtered) {
+    const container = document.getElementById('statsCategories');
+    const catMap = {};
+
+    filtered.forEach(o => {
+        if (!o.items || ['rifiutato','annullato'].includes(o.status)) return;
+        o.items.forEach(i => {
+            const cat = i.cat || 'Altro';
+            if (!catMap[cat]) catMap[cat] = { qty: 0, revenue: 0 };
+            catMap[cat].qty += parseInt(i.qty) || 1;
+            catMap[cat].revenue += (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1);
+        });
+    });
+
+    const entries = Object.entries(catMap).sort((a, b) => b[1].revenue - a[1].revenue);
+    if (!entries.length) {
+        container.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun dato</p>';
+        return;
+    }
+
+    const totalRev = entries.reduce((s, [, v]) => s + v.revenue, 0);
+    container.innerHTML = entries.map(([cat, v]) => {
+        const pct = totalRev ? (v.revenue / totalRev) * 100 : 0;
+        const catName = appData.categories[cat]?.name || cat;
+        return `<div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="color:var(--cream);font-weight:600;">${sanitize(catName)}</span>
+                <span style="color:var(--gold);font-weight:700;">${v.qty} pz · €${v.revenue.toFixed(2)} <span style="color:#8a7a5a;font-size:0.75rem;">(${pct.toFixed(1)}%)</span></span>
+            </div>
+            <div style="height:10px;background:rgba(0,0,0,0.3);border-radius:5px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#60a5fa 0%,#3b82f6 100%);border-radius:5px;"></div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function exportStatsCSV() {
+    db.ref('ordini').once('value').then(snap => {
+        const { from, to } = getStatsPeriodRange();
+        const rows = [['Data','Ora','ID Ordine','Cliente','Telefono','Tipo','Stato','Totale','Prodotti']];
+        snap.forEach(c => {
+            const o = c.val();
+            const t = o.timestamp || 0;
+            if (t < from || t > to) return;
+            const d = new Date(t);
+            const items = (o.items || []).map(i => `${i.name} x${i.qty}`).join(' | ');
+            rows.push([
+                d.toLocaleDateString('it-IT'),
+                d.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'}),
+                o.orderId || c.key,
+                o.customerName || '',
+                o.customerPhone || '',
+                o.isCounterSale ? 'Bancone' : (o.type === 'delivery' ? 'Consegna' : 'Ritiro'),
+                o.status || '',
+                (parseFloat(o.finalTotal) || 0).toFixed(2),
+                items
+            ]);
+        });
+        const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `statistiche_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        showToast('📥 CSV esportato!');
+    });
+}
+
 document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.innerHTML.trim() === '') window.location.reload(); }, 500); });
 </script>
 </body>
