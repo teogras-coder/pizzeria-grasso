@@ -2021,9 +2021,39 @@ function searchGlobal(term){
 }
 </script>
    <script>
-// BUG 3 FIX: Rimuovi vecchio blocco pagehide/pageshow, sostituisci con versione semplice
-window.addEventListener('pageshow', function(e){
-  if(e.persisted){ window.location.reload(); }
+// FIX PAGINA BIANCA iOS PWA - DOPO RITORNO DA MAPS/TEL
+function forceRepaintGrasso() {
+  const main = document.getElementById('mainApp');
+  const frame = document.querySelector('.phone-frame');
+  if (frame) {
+    frame.style.display = 'none';
+    frame.offsetHeight; // trigger reflow
+    frame.style.display = 'block';
+  }
+  if (main && main.style.display === 'none') {
+    main.style.display = 'block';
+  }
+  document.documentElement.style.height = '-webkit-fill-available';
+  document.body.style.height = '-webkit-fill-available';
+  window.scrollTo(0,0);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    // sei tornato in app
+    setTimeout(forceRepaintGrasso, 50);
+    setTimeout(forceRepaintGrasso, 300);
+  }
+});
+
+window.addEventListener('pageshow', (e) => {
+  // non fare reload (perdi carrello), fai solo repaint
+  setTimeout(forceRepaintGrasso, 50);
+});
+
+// Previeni il freeze di iOS: quando esci, salva posizione
+window.addEventListener('pagehide', () => {
+  sessionStorage.setItem('grasso_last_scroll', window.scrollY);
 });
 </script>
 </body>
