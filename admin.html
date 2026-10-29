@@ -27,14 +27,9 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .mobile-top-bar .logo-area img { height: 40px; border-radius: 8px; border: 1px solid var(--gold-dark); }
 .mobile-top-bar .logo-area span { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.2rem; font-weight: 700; }
 .mobile-top-bar .menu-btn { background: linear-gradient(145deg, var(--gold) 0%, var(--gold-dark) 100%); border: none; color: var(--dark); width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 var(--gold-dark); }
-.ambient-lights { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-.light-orb { position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.3; animation: float 8s ease-in-out infinite; }
-.light-orb:nth-child(1) { width: 200px; height: 200px; background: var(--gold); top: 10%; left: 10%; }
-.light-orb:nth-child(2) { width: 150px; height: 150px; background: var(--gold-light); top: 60%; right: 15%; animation-delay: 2s; }
-.light-orb:nth-child(3) { width: 180px; height: 180px; background: var(--gold-dark); bottom: 20%; left: 30%; animation-delay: 4s; }
-@keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; } 50% { transform: translate(30px, -30px) scale(1.1); opacity: 0.5; } }
 .login-screen { position: fixed; inset: 0; background: linear-gradient(170deg, var(--dark) 0%, var(--brown) 50%, var(--brown-light) 100%); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
-.login-box { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 40px; border-radius: 20px; text-align: center; border: 2px solid rgba(212,168,75,0.3); box-shadow: 0 0 50px rgba(212,168,75,0.2); max-width: 400px; width: 100%; }
+.login-box { background: linear-gradient(145deg, var(--card-light) 0%, var(--card) 100%); padding: 40px 30px; border-radius: 20px; text-align: center; border: 2px solid rgba(212,168,75,0.3); box-shadow: 0 0 50px rgba(212,168,75,0.2); max-width: 400px; width: 100%; }
+.login-logo { max-width: 180px; height: auto; margin-bottom: 20px; }
 .login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 2rem; margin-bottom: 10px; }
 .login-box p { color: #8a7a5a; margin-bottom: 30px; }
 .login-box input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--gold-dark); background: var(--dark); color: var(--gold); font-size: 1.5rem; text-align: center; letter-spacing: 10px; font-weight: 700; margin-bottom: 20px; }
@@ -43,6 +38,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .app-container { display: none; grid-template-columns: 260px 1fr; min-height: 100vh; }
 .sidebar { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); border-right: 2px solid var(--gold-dark); padding: 20px 15px; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
 .sidebar-logo { text-align: center; padding: 15px 10px 20px; border-bottom: 1px solid rgba(212,168,75,0.2); margin-bottom: 20px; }
+.sidebar-logo-img { max-width: 120px; height: auto; margin-bottom: 10px; }
 .sidebar-logo h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.3rem; }
 .sidebar-logo p { color: #8a7a5a; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
 .sidebar-status { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 20px; text-align: center; }
@@ -275,18 +271,14 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 </div>
 <div class="mobile-top-bar">
 <div class="logo-area">
-<img src="logo.png" alt="Logo Grasso">
+<img src="https://i.postimg.cc/v8Sfxb5T/IMG-1602.png" alt="Logo Grasso">
 <span>GRASSO</span>
 </div>
 <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 </div>
-<div class="ambient-lights">
-<div class="light-orb"></div>
-<div class="light-orb"></div>
-<div class="light-orb"></div>
-</div>
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
+<img src="https://i.postimg.cc/v8Sfxb5T/IMG-1602.png" alt="Logo Grasso" class="login-logo">
 <h1>🔒 Gestionale</h1>
 <p>Antica Pizzeria Grasso</p>
 <input type="password" id="pinInput" placeholder="••••" maxlength="6" autofocus>
@@ -298,6 +290,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 <div class="app-container" id="mainApp">
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-logo">
+<img src="https://i.postimg.cc/v8Sfxb5T/IMG-1602.png" alt="Logo Grasso" class="sidebar-logo-img">
 <h2>🍕 GRASSO</h2>
 <p>Gestionale</p>
 </div>
@@ -325,7 +318,6 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 <div class="nav-item" onclick="showSection('security', this)" data-section="security"><i class="fas fa-lock"></i> Sicurezza</div>
 <div class="nav-item" onclick="showSection('colors', this)" data-section="colors"><i class="fas fa-palette"></i> Colori</div>
 <div class="nav-item" onclick="showSection('dashboard', this)" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
-<div class="nav-item" onclick="showSection('stats', this)" data-section="stats"><i class="fas fa-chart-bar"></i> Statistiche</div>
 </nav>
 <div class="sidebar-footer">
 <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Esci</button>
@@ -380,6 +372,14 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 </div>
 <div class="section" id="section-branding">
 <div class="content-header"><h1><i class="fas fa-palette"></i> Brand</h1></div>
+<div class="card">
+<div class="card-title">Logo</div>
+<div class="img-upload-area" onclick="document.getElementById('logoUpload').click()">
+<i class="fas fa-cloud-upload-alt"></i><p>Carica Logo (PNG trasparente)</p>
+<img id="logoPreview" class="img-preview" style="display:none;">
+</div>
+<input type="file" id="logoUpload" accept="image/*" style="display:none;" onchange="uploadLogo(this)">
+</div>
 <div class="card">
 <div class="form-group"><label>Nome</label><input type="text" class="form-input" id="brandName"></div>
 <div class="form-group"><label>Sottotitolo</label><input type="text" class="form-input" id="brandSubtitle"></div>
@@ -467,6 +467,25 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 </div>
 <button class="btn-primary" onclick="saveDeliveryGPS()"><i class="fas fa-save"></i> Salva Impostazioni GPS</button>
 </div>
+
+<!-- EFFETTO FESTE - 10 EFFETTI -->
+<div class="card" style="border:2px solid var(--gold);">
+<div class="card-title"><i class="fas fa-snowflake"></i> Effetto Feste (app clienti)</div>
+<p style="color:#8a7a5a;font-size:0.85rem;margin-bottom:15px;">Mostra particelle animate nella home dell'app clienti. Scegli l'effetto o disattivalo.</p>
+<select class="form-input" id="festiveEffectSelect" onchange="saveFestiveEffect()">
+<option value="none">❌ Nessun effetto</option>
+<option value="snow">❄️ Neve (Inverno / Natale)</option>
+<option value="confetti">🎉 Coriandoli (Feste / Estate)</option>
+<option value="halloween">🎃 Halloween (Zucche e Fantasmi)</option>
+<option value="easter">🐰 Pasqua (Coniglietti e Uova)</option>
+<option value="christmas">🎄 Natale – Alberi e Regali</option>
+<option value="newyear">🎆 Capodanno – Fuochi d'artificio</option>
+<option value="valentine">❤️ San Valentino – Cuori</option>
+<option value="carnevale">🎭 Carnevale – Maschere</option>
+<option value="summer">☀️ Estate – Sole</option>
+</select>
+</div>
+
 <div class="card">
 <div class="toggle-row"><div><i class="fas fa-motorcycle"></i> Consegna <span style="color:#8a7a5a;font-size:0.75rem;">(click = salva subito)</span></div><div class="toggle-switch on" id="deliveryToggle" onclick="toggleSwitch(this)"></div></div>
 <div class="toggle-row"><div><i class="fas fa-store"></i> Ritiro <span style="color:#8a7a5a;font-size:0.75rem;">(click = salva subito)</span></div><div class="toggle-switch on" id="pickupToggle" onclick="toggleSwitch(this)"></div></div>
@@ -618,50 +637,6 @@ Per inviare notifiche push ai clienti, usa il <strong style="color:var(--gold);"
 </a>
 </div>
 </div>
-<div class="section" id="section-stats">
-<div class="content-header">
-<div>
-<h1><i class="fas fa-chart-bar"></i> Statistiche Vendite</h1>
-<div class="subtitle">Analisi ordini, prodotti più venduti e vendite al bancone</div>
-</div>
-<div class="header-actions">
-<select class="form-input" id="statsPeriod" onchange="renderStats()" style="min-width:180px;">
-<option value="month">📅 Questo mese</option>
-<option value="last_month">📅 Mese scorso</option>
-<option value="year">📆 Quest'anno</option>
-<option value="last_year">📆 Anno scorso</option>
-<option value="all">🗂️ Tutti gli ordini</option>
-</select>
-<button class="btn-secondary" onclick="exportStatsCSV()"><i class="fas fa-download"></i> Esporta CSV</button>
-</div>
-</div>
-<div class="stats-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));">
-<div class="stat-card"><div class="number" id="statsTotalOrders">0</div><div class="label">Ordini totali</div></div>
-<div class="stat-card delivered"><div class="number" id="statsDelivered">0</div><div class="label">Consegnati</div></div>
-<div class="stat-card"><div class="number" id="statsCounter">0</div><div class="label">🍕 Bancone</div></div>
-<div class="stat-card rifiutati"><div class="number" id="statsRejected">0</div><div class="label">Rifiutati</div></div>
-<div class="stat-card annullati"><div class="number" id="statsCancelled">0</div><div class="label">Annullati</div></div>
-<div class="stat-card"><div class="number" id="statsRevenue">€0</div><div class="label">Incasso totale</div></div>
-<div class="stat-card"><div class="number" id="statsAvgOrder">€0</div><div class="label">Media ordine</div></div>
-<div class="stat-card"><div class="number" id="statsProductsSold">0</div><div class="label">Pezzi venduti</div></div>
-</div>
-<div class="card">
-<div class="card-title"><i class="fas fa-calendar-alt"></i> Ordini per mese</div>
-<div id="statsMonthlyChart" style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px 0;overflow-x:auto;"></div>
-</div>
-<div class="card" id="dailyChartCard">
-<div class="card-title"><i class="fas fa-calendar-day"></i> Ordini per giorno <span style="font-size:0.8rem;color:#8a7a5a;font-weight:400;" id="dailyChartLabel"></span></div>
-<div id="statsDailyChart" style="display:flex;align-items:flex-end;gap:4px;height:140px;padding:10px 0;overflow-x:auto;"></div>
-</div>
-<div class="card">
-<div class="card-title"><i class="fas fa-trophy"></i> Top 20 Prodotti più venduti</div>
-<div id="statsTopProducts"></div>
-</div>
-<div class="card">
-<div class="card-title"><i class="fas fa-layer-group"></i> Vendite per Categoria</div>
-<div id="statsCategories"></div>
-</div>
-</div>
 <div class="section" id="section-colors">
 <div class="content-header"><h1><i class="fas fa-palette"></i> Colori</h1></div>
 <div class="card">
@@ -693,7 +668,7 @@ firebase.auth().signInAnonymously()
 let ordersCache = {};
 let appData = {
 categories: {}, menu: {}, promotions: {},
-settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15, deliveryBaseFee: 3.00, deliveryExtraFee: 2.00, deliveryMaxRadius: 4, deliveryExtraRadius: 6 },
+settings: { adminPin: "1234", deliveryEnabled: true, pickupEnabled: true, minDeliveryOrder: 15, deliveryBaseFee: 3.00, deliveryExtraFee: 2.00, deliveryMaxRadius: 4, deliveryExtraRadius: 6, festiveEffect: "none" },
 branding: { name: "Antica Pizzeria Grasso", subtitle: "Tradizione", city: "Manfredonia" },
 images: { hero: "", categories: {} }
 };
@@ -1047,126 +1022,6 @@ if (deveTrasformare) await trasformaInOrdine(id);
 }, 60000);
 }
 
-// ============================================
-// GESTIONE STOCK / PEZZI LIMITATI
-// ============================================
-
-async function scaricaStockOrdine(order) {
-    if (!order.items || !Array.isArray(order.items)) return;
-    for (const item of order.items) {
-        const cat = item.cat;
-        if (!cat || !appData.menu[cat]) continue;
-        const idx = appData.menu[cat].findIndex(p => p.name === item.name);
-        if (idx === -1) continue;
-        const prod = appData.menu[cat][idx];
-        if (prod.stock === undefined || prod.stock === null) continue;
-        const qty = parseInt(item.qty) || 1;
-        const nuovoStock = Math.max(0, (parseInt(prod.stock) || 0) - qty);
-        prod.stock = nuovoStock;
-        if (nuovoStock === 0) prod.disabled = true;
-        await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: nuovoStock === 0 });
-    }
-    showToast('📦 Stock aggiornato');
-    renderMenu();
-    notifyClients();
-}
-
-async function aggiungiPezzoManuale(cat, idx) {
-    const prod = appData.menu[cat]?.[idx];
-    if (!prod) return;
-    const val = await showPrompt('Aggiungi pezzi', 'Quanti pezzi aggiungere?', 'Es: 10', '10');
-    if (val === null) return;
-    const n = parseInt(val);
-    if (isNaN(n) || n <= 0) { showToast('⚠️ Valore non valido'); return; }
-    const nuovoStock = (parseInt(prod.stock) || 0) + n;
-    prod.stock = nuovoStock;
-    prod.disabled = false;
-    await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: false });
-    showToast(`➕ Aggiunti ${n} pezzi (totale: ${nuovoStock})`);
-    renderMenu();
-    notifyClients();
-}
-
-async function impostaStock(cat, idx) {
-    const prod = appData.menu[cat]?.[idx];
-    if (!prod) return;
-    const val = await showPrompt('Imposta Stock', `Pezzi disponibili per "${prod.name}":`, 'Es: 50', prod.stock ?? '0');
-    if (val === null) return;
-    const n = parseInt(val);
-    if (isNaN(n) || n < 0) { showToast('⚠️ Valore non valido'); return; }
-    prod.stock = n;
-    prod.disabled = n === 0;
-    await db.ref(`menu/${cat}/${idx}`).update({ stock: n, disabled: n === 0 });
-    showToast(`📦 Stock impostato: ${n}`);
-    renderMenu();
-    notifyClients();
-}
-
-// ============================================
-// VENDITA AL BANCONE (registra ordine + scala stock)
-// ============================================
-
-async function venditaBancone(cat, idx) {
-    const prod = appData.menu[cat]?.[idx];
-    if (!prod) return;
-    if (prod.stock === undefined || prod.stock === null) {
-        showToast('⚠️ Questo prodotto non ha stock impostato');
-        return;
-    }
-    if (prod.stock <= 0) { showToast('⚠️ Già esaurito'); return; }
-
-    const qtyStr = await showPrompt(
-        '🍕 Vendita al bancone',
-        `Quanti pezzi di "${prod.name}" hai venduto?\n(Stock attuale: ${prod.stock})`,
-        'Es: 1',
-        '1'
-    );
-    if (qtyStr === null) return;
-    const qty = parseInt(qtyStr);
-    if (isNaN(qty) || qty <= 0) { showToast('⚠️ Valore non valido'); return; }
-    if (qty > prod.stock) { showToast(`⚠️ Solo ${prod.stock} pezzi disponibili`); return; }
-
-    const nuovoStock = prod.stock - qty;
-    prod.stock = nuovoStock;
-    if (nuovoStock === 0) prod.disabled = true;
-    await db.ref(`menu/${cat}/${idx}`).update({ stock: nuovoStock, disabled: nuovoStock === 0 });
-
-    try {
-        const newRef = db.ref('ordini').push();
-        const orderId = 'BANCO-' + newRef.key.slice(-6).toUpperCase();
-        const now = Date.now();
-        const total = (parseFloat(prod.price) || 0) * qty;
-        await newRef.set({
-            orderId: orderId,
-            timestamp: now,
-            status: 'delivered',
-            type: 'pickup',
-            isCounterSale: true,
-            customerName: 'Vendita al bancone',
-            customerPhone: '',
-            address: '',
-            items: [{
-                cat: cat,
-                name: prod.name,
-                qty: qty,
-                price: parseFloat(prod.price) || 0
-            }],
-            productsTotal: total,
-            deliveryFee: 0,
-            finalTotal: total,
-            notes: 'Vendita al bancone',
-            deliveredAt: now
-        });
-        showToast(`🍕 Venduti ${qty} pezzi al bancone (rimasti: ${nuovoStock})`);
-    } catch(e) {
-        showToast('⚠️ Stock scalato ma errore registrazione ordine');
-        console.error(e);
-    }
-
-    renderMenu();
-    notifyClients();
-}
-
 async function accettaOrdine(id) {
     if (!await showConfirm('✅ Accettare questo ordine?', 'Il cliente vedrà l\'aggiornamento.')) return;
     const order = ordersCache[id];
@@ -1182,9 +1037,6 @@ async function accettaOrdine(id) {
     order.status = 'accettato';
     order.deliveryFee = deliveryFee;
     order.finalTotal = finalTotal;
-    
-    await scaricaStockOrdine(order);
-    
     showToast('✅ Ordine accettato!'); 
     renderOrders(ordersCache); 
     notifyClients();
@@ -1199,7 +1051,7 @@ else document.querySelector(`.nav-item[data-section="${name}"]`)?.classList.add(
 if (window.innerWidth <= 768) toggleSidebar();
 if (name === 'promotions') populatePromoProductSelect();
 if (name === 'security') updateNotifStatus();
-if (name === 'stats') renderStats();
+if (name === 'services') loadFestiveEffect();
 }
 
 function renderOrders(orders) {
@@ -1465,6 +1317,24 @@ async function deleteReview(id) { if(!await showConfirm('Eliminare Recensione?',
 function loadBranding() { document.getElementById('brandName').value = appData.branding.name||''; document.getElementById('brandSubtitle').value = appData.branding.subtitle||''; document.getElementById('brandCity').value = appData.branding.city||''; }
 function saveBranding() { db.ref('branding').update({ name: sanitize(document.getElementById('brandName').value)||"Antica Pizzeria Grasso", subtitle: sanitize(document.getElementById('brandSubtitle').value)||"Tradizione", city: sanitize(document.getElementById('brandCity').value)||"Manfredonia" }).then(()=>{ showToast('✅ Salvato'); notifyClients(); }); }
 
+// FUNZIONE UPLOAD LOGO
+async function uploadLogo(input) {
+  if(!input.files[0]) return;
+  showToast('🗜️ Compressione...');
+  try {
+    const comp = await compressImage(input.files[0]);
+    const r = new FileReader();
+    r.onload = e => { document.getElementById('logoPreview').src = e.target.result; document.getElementById('logoPreview').style.display = 'block'; };
+    r.readAsDataURL(comp);
+    const sn = await storage.ref('images/logo_' + Date.now() + '.webp').put(comp);
+    const url = await sn.ref.getDownloadURL();
+    appData.branding.logoUrl = url;
+    await db.ref('branding/logoUrl').set(url);
+    showToast('✅ Logo caricato!');
+    notifyClients();
+  } catch(e) { showToast('❌ ' + e.message); }
+}
+
 function renderPromotions() {
 const l = document.getElementById('promotionsList'); const ps = Object.entries(appData.promotions||{});
 if (!ps.length) { l.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:20px;">Nessuna promozione</p>'; return; }
@@ -1523,11 +1393,23 @@ const mst = document.getElementById('manualStatusToggle'), msl = document.getEle
 if (appData.settings.manualStatus==='open') { mst.classList.add('on'); msl.textContent='APERTO'; } else if (appData.settings.manualStatus==='closed') { mst.classList.add('closed'); msl.textContent='CHIUSO'; } else msl.textContent='Auto';
 const od = appData.settings.openDays ? appData.settings.openDays.split(',') : []; document.querySelectorAll('.day-btn').forEach(el => el.classList.toggle('active', od.includes(el.dataset.day)));
 document.getElementById('currentAppVersion').textContent = appData.settings.appVersion||0;
+loadFestiveEffect();
 }
 function updateDeliveryInfo() {
 const b = parseFloat(document.getElementById('deliveryBaseFee').value)||3, m = parseFloat(document.getElementById('deliveryMaxRadius').value)||4, e = parseFloat(document.getElementById('deliveryExtraRadius').value)||6, f = parseFloat(document.getElementById('deliveryExtraFee').value)||2;
 document.getElementById('infoMaxRadius').textContent = m; document.getElementById('infoBaseFee').textContent = '€'+b.toFixed(2); document.getElementById('infoMaxRadius2').textContent = m; document.getElementById('infoBaseFee2').textContent = '€'+b.toFixed(2); document.getElementById('infoExtraRadius').textContent = e; document.getElementById('infoExtraFee').textContent = '€'+f.toFixed(2); document.getElementById('infoTotal').textContent = '€'+(b+f).toFixed(2); document.getElementById('infoExtraRadius2').textContent = e;
 }
+
+// FUNZIONI PER EFFETTO FESTE (10 EFFETTI)
+function loadFestiveEffect() {
+  const sel = document.getElementById('festiveEffectSelect');
+  if (sel) sel.value = appData.settings.festiveEffect || 'none';
+}
+function saveFestiveEffect() {
+  const val = document.getElementById('festiveEffectSelect').value;
+  db.ref('settings/festiveEffect').set(val).then(()=>{ appData.settings.festiveEffect = val; showToast('✅ Effetto: ' + val); notifyClients(); }).catch(e=>showToast('❌ '+e.message));
+}
+
 async function getPizzeriaGPS() {
 if (!navigator.geolocation) { showToast('❌ No GPS'); return; } showToast('📍 Posizione...');
 try { const p = await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000})); document.getElementById('pizzeriaLat').value = p.coords.latitude.toFixed(6); document.getElementById('pizzeriaLng').value = p.coords.longitude.toFixed(6); showToast('✅ Ottenuta!'); } catch(e) { showToast('❌ Errore GPS'); }
@@ -1578,26 +1460,10 @@ if (st && !fp.length) return;
 h += `<div class="admin-category-accordion ${io?'open':''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ci.icon||'fa-utensils'}"></i></div><span class="admin-category-header-title">${sanitize(ci.name)}</span></div><span class="admin-category-header-count">${pr.length}</span><button class="btn-add-product" onclick="event.stopPropagation();addProduct('${cat}')"><i class="fas fa-plus"></i></button></div><div class="admin-category-body">`;
 h += (st?fp:pr).map((p,idx) => {
 const oi = pr.indexOf(p), dis = p.disabled===true;
-const hasStock = p.stock !== undefined && p.stock !== null;
-const stockBadge = hasStock 
-    ? `<span style="background:${p.stock > 0 ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.2)'};color:${p.stock > 0 ? '#4ade80' : '#f87171'};padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:700;">📦 ${p.stock}</span>` 
-    : '';
-const stockButtons = hasStock 
-    ? `<div style="display:flex;gap:6px;align-items:center;">
-         <button onclick="venditaBancone('${cat}',${oi})" title="Vendita al bancone (scala automaticamente)" style="background:#f59e0b;color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.85rem;display:flex;align-items:center;gap:6px;"><i class="fas fa-store"></i> 🍕 Vendi al bancone</button>
-         <button onclick="aggiungiPezzoManuale('${cat}',${oi})" title="Aggiungi pezzi" style="background:#4ade80;color:#052e16;border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;font-weight:700;font-size:1rem;">➕</button>
-         <button onclick="impostaStock('${cat}',${oi})" title="Imposta stock" style="background:var(--gold);color:var(--dark);border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:0.9rem;">📦</button>
-       </div>`
-    : `<button onclick="impostaStock('${cat}',${oi})" style="background:var(--card);color:var(--gold);border:1px dashed var(--gold-dark);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:700;">📦 Imposta Stock</button>`;
-
-return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span>${stockBadge}</div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
+return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span></div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
 <div class="admin-product-inputs"><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.name)}" onchange="updateProduct('${cat}',${oi},'name',this.value)" placeholder="Nome 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_en||'')}" onchange="updateProduct('${cat}',${oi},'name_en',this.value)" placeholder="Name 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_de||'')}" onchange="updateProduct('${cat}',${oi},'name_de',this.value)" placeholder="Name 🇩🇪" style="flex:2;min-width:150px;"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.desc||'')}" onchange="updateProduct('${cat}',${oi},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_en||'')}" onchange="updateProduct('${cat}',${oi},'desc_en',this.value)" placeholder="Description 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_de||'')}" onchange="updateProduct('${cat}',${oi},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪" style="flex:2;min-width:150px;"></div>
 <input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${cat}',${oi},'price',parseFloat(this.value))" placeholder="Prezzo €">
-<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(212,168,75,0.08);padding:10px;border-radius:8px;border:1px dashed rgba(212,168,75,0.3);">
-  <span style="color:var(--gold);font-size:0.8rem;font-weight:700;">📦 STOCK:</span>
-  ${stockButtons}
-</div>
 <div class="admin-product-img-wrapper">${p.img?`<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${cat}',${oi})" title="Rimuovi">`:''}<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ${p.img?'Cambia':'Aggiungi'} Foto<input type="file" accept="image/*" onchange="uploadProductImage('${cat}',${oi},this)"></label></div>
 <button class="btn-translate" onclick="translateProduct('${cat}',${oi},this)"><i class="fas fa-language"></i> Traduci 🌐</button></div></div>`;
 }).join('');
@@ -1612,16 +1478,7 @@ async function addProduct(c) {
 const n = await showPrompt('Nuovo Prodotto', 'Nome (🇮🇹):', 'Es: Margherita'); if(!n||!n.trim()) return;
 const ps = await showPrompt('Prezzo', 'Prezzo (€):', 'Es: 7.00', '5.00'); if(ps===null) return; const p = parseFloat(ps.replace(',','.')); if(isNaN(p)||p<0) return;
 const ds = await showPrompt('Descrizione', 'Descrizione (opzionale):', '', '');
-const stk = await showPrompt('Pezzi disponibili', 'Stock iniziale (vuoto = illimitato, 0 = esaurito):', 'Es: 50', '');
-let stock = undefined, disabled = false;
-if (stk !== null && stk.trim() !== '') {
-    const s = parseInt(stk);
-    if (!isNaN(s) && s >= 0) { stock = s; disabled = s === 0; }
-}
-if(!appData.menu[c]) appData.menu[c]=[];
-const newProd = { name:sanitize(n), price:p, desc:ds?sanitize(ds):'', disabled };
-if (stock !== undefined) newProd.stock = stock;
-appData.menu[c].push(newProd);
+if(!appData.menu[c]) appData.menu[c]=[]; appData.menu[c].push({ name:sanitize(n), price:p, desc:ds?sanitize(ds):'', disabled:false });
 try { await db.ref('menu').set(appData.menu); showToast('✅ Aggiunto!'); renderMenu(); populatePromoProductSelect(); notifyClients(); } catch(e) { showToast('❌ Errore'); }
 }
 async function deleteProduct(c,i) { if(!await showConfirm('Eliminare Prodotto?','Irreversibile.')) return; appData.menu[c].splice(i,1); db.ref('menu').set(appData.menu); showToast('🗑️ Eliminato'); renderMenu(); populatePromoProductSelect(); notifyClients(); }
@@ -1694,7 +1551,7 @@ estate:{icon:'fa-sun',colors:{gold:'#e8a84b',goldLight:'#f0c878',goldDark:'#c080
 natale:{icon:'fa-tree',colors:{gold:'#c41e3a',goldLight:'#e84860',goldDark:'#901020',dark:'#0f2018',brown:'#1f3028',brownLight:'#2f4038',card:'#152820',cardLight:'#253830',cream:'#f5e8e8'}},
 san_valentino:{icon:'fa-heart',colors:{gold:'#ff4d6d',goldLight:'#ff8098',goldDark:'#d02040',dark:'#1a0a0f',brown:'#2a1520',brownLight:'#3a2530',card:'#201018',cardLight:'#302028',cream:'#f5e8ec'}},
 notte:{icon:'fa-moon',colors:{gold:'#7209b7',goldLight:'#a040d0',goldDark:'#5005a0',dark:'#050510',brown:'#101025',brownLight:'#202035',card:'#0a0a1a',cardLight:'#1a1a2a',cream:'#e8e0f5'}},
-panna:{icon:'fa-gem',colors:{gold:'#b8860b',goldLight:'#d4a84b',goldDark:'#8b6914',dark:'#ffffff',brown:'#fefefe',brownLight:'#fff8f0',card:'#ffffff',cardLight:'#fffaf5',cream:'#4a3728'}},
+panna:{icon:'fa-gem',colors:{gold:'#2c1e14',goldLight:'#4a3728',goldDark:'#1a0f08',dark:'#ffffff',brown:'#fefefe',brownLight:'#fff8f0',card:'#ffffff',cardLight:'#fffaf5',cream:'#2c1e14'}},
 crema:{icon:'fa-ice-cream',colors:{gold:'#f0d9a8',goldLight:'#fff0c8',goldDark:'#d0b888',dark:'#2a2118',brown:'#3d3226',brownLight:'#4d4236',card:'#352e26',cardLight:'#453e36',cream:'#fff8e8'}},
 cioccolato:{icon:'fa-cookie',colors:{gold:'#c48a5a',goldLight:'#e8b88a',goldDark:'#8b5a2b',dark:'#1a1209',brown:'#2d1f12',brownLight:'#4a3728',card:'#251a10',cardLight:'#352a1a',cream:'#f5e6c8'}},
 pistacchio:{icon:'fa-leaf',colors:{gold:'#a8c686',goldLight:'#c8e8a8',goldDark:'#7aa85a',dark:'#1e2618',brown:'#2d3a22',brownLight:'#3d4a32',card:'#26301e',cardLight:'#36402e',cream:'#eef5e8'}},
@@ -1716,258 +1573,6 @@ function applyCurrentPalette() { applyPalette(appData.settings.colorPalette||'au
 function applyPalette(n) { const c=palettes[n]?.colors; if(!c) return; const r=document.documentElement; r.style.setProperty('--gold',c.gold); r.style.setProperty('--gold-light',c.goldLight); r.style.setProperty('--gold-dark',c.goldDark); r.style.setProperty('--dark',c.dark); r.style.setProperty('--brown',c.brown); r.style.setProperty('--brown-light',c.brownLight); r.style.setProperty('--card',c.card); r.style.setProperty('--card-light',c.cardLight); r.style.setProperty('--cream',c.cream); }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 async function resetOrderCounter() { if(!await showConfirm('⚠️ SEI SICURO?\nContatore azzerato.\nProssimo: ORD-00001.')) return; try { await db.ref('counter/ordini').set(0); showToast('✅ Azzerato! Prossimo: ORD-00001'); notifyClients(); } catch(e) { showToast('❌ '+e.message); } }
-
-// ============================================
-// STATISTICHE
-// ============================================
-
-function getStatsPeriodRange() {
-    const now = new Date();
-    const period = document.getElementById('statsPeriod')?.value || 'month';
-    let from, to = new Date();
-    to.setHours(23,59,59,999);
-
-    switch(period) {
-        case 'month':
-            from = new Date(now.getFullYear(), now.getMonth(), 1);
-            break;
-        case 'last_month':
-            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-            break;
-        case 'year':
-            from = new Date(now.getFullYear(), 0, 1);
-            break;
-        case 'last_year':
-            from = new Date(now.getFullYear() - 1, 0, 1);
-            to = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
-            break;
-        case 'all':
-        default:
-            from = new Date(2000, 0, 1);
-            break;
-    }
-    return { from: from.getTime(), to: to.getTime(), period };
-}
-
-async function renderStats() {
-    let allOrders = {};
-    try {
-        const snap = await db.ref('ordini').once('value');
-        snap.forEach(c => { allOrders[c.key] = { id: c.key, ...c.val() }; });
-    } catch(e) { showToast('❌ Errore caricamento'); return; }
-
-    const { from, to, period } = getStatsPeriodRange();
-
-    const filtered = Object.values(allOrders).filter(o => {
-        const t = o.timestamp || 0;
-        return t >= from && t <= to;
-    });
-
-    const delivered = filtered.filter(o => o.status === 'delivered');
-    const counter = filtered.filter(o => o.isCounterSale === true);
-    const rejected = filtered.filter(o => o.status === 'rifiutato');
-    const cancelled = filtered.filter(o => o.status === 'annullato');
-    const validOrders = filtered.filter(o => !['rifiutato','annullato'].includes(o.status));
-
-    const revenue = validOrders.reduce((s, o) => s + (parseFloat(o.finalTotal) || 0), 0);
-    const avg = validOrders.length ? revenue / validOrders.length : 0;
-    const totalPieces = validOrders.reduce((s, o) => {
-        if (!o.items) return s;
-        return s + o.items.reduce((ss, i) => ss + (parseInt(i.qty) || 0), 0);
-    }, 0);
-
-    document.getElementById('statsTotalOrders').textContent = filtered.length;
-    document.getElementById('statsDelivered').textContent = delivered.length;
-    document.getElementById('statsCounter').textContent = counter.length;
-    document.getElementById('statsRejected').textContent = rejected.length;
-    document.getElementById('statsCancelled').textContent = cancelled.length;
-    document.getElementById('statsRevenue').textContent = '€' + revenue.toFixed(2);
-    document.getElementById('statsAvgOrder').textContent = '€' + avg.toFixed(2);
-    document.getElementById('statsProductsSold').textContent = totalPieces;
-
-    renderMonthlyChart(allOrders, period);
-
-    const dailyCard = document.getElementById('dailyChartCard');
-    if (period === 'month' || period === 'last_month') {
-        dailyCard.style.display = 'block';
-        renderDailyChart(filtered, from, to);
-    } else {
-        dailyCard.style.display = 'none';
-    }
-
-    renderTopProducts(filtered);
-    renderCategoryStats(filtered);
-}
-
-function renderMonthlyChart(allOrders, period) {
-    const chart = document.getElementById('statsMonthlyChart');
-    const now = new Date();
-    let months = [];
-
-    if (period === 'year') {
-        for (let m = 0; m < 12; m++) months.push(new Date(now.getFullYear(), m, 1));
-    } else if (period === 'last_year') {
-        for (let m = 0; m < 12; m++) months.push(new Date(now.getFullYear() - 1, m, 1));
-    } else {
-        for (let i = 11; i >= 0; i--) months.push(new Date(now.getFullYear(), now.getMonth() - i, 1));
-    }
-
-    const counts = months.map(m => {
-        const y = m.getFullYear(), mo = m.getMonth();
-        return Object.values(allOrders).filter(o => {
-            const d = new Date(o.timestamp || 0);
-            return d.getFullYear() === y && d.getMonth() === mo && !['rifiutato','annullato'].includes(o.status);
-        }).length;
-    });
-
-    const max = Math.max(...counts, 1);
-    const monthNames = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-
-    chart.innerHTML = months.map((m, i) => {
-        const h = (counts[i] / max) * 100;
-        return `<div style="flex:1;min-width:40px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
-            <div style="font-size:0.7rem;color:var(--gold);font-weight:700;margin-bottom:4px;">${counts[i]}</div>
-            <div style="width:100%;background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);border-radius:4px 4px 0 0;height:${h}%;min-height:2px;transition:height 0.4s;"></div>
-            <div style="font-size:0.65rem;color:#8a7a5a;margin-top:4px;white-space:nowrap;">${monthNames[m.getMonth()]}</div>
-            <div style="font-size:0.55rem;color:#8a7a5a;">${String(m.getFullYear()).slice(-2)}</div>
-        </div>`;
-    }).join('');
-}
-
-function renderDailyChart(filtered, from, to) {
-    const chart = document.getElementById('statsDailyChart');
-    const fromD = new Date(from), toD = new Date(to);
-    const days = [];
-    for (let d = new Date(fromD); d <= toD; d.setDate(d.getDate() + 1)) {
-        days.push(new Date(d));
-    }
-    const counts = days.map(day => {
-        const y = day.getFullYear(), mo = day.getMonth(), dd = day.getDate();
-        return filtered.filter(o => {
-            const t = new Date(o.timestamp || 0);
-            return t.getFullYear() === y && t.getMonth() === mo && t.getDate() === dd && !['rifiutato','annullato'].includes(o.status);
-        }).length;
-    });
-    const max = Math.max(...counts, 1);
-    document.getElementById('dailyChartLabel').textContent = `(${fromD.toLocaleDateString('it-IT')} → ${toD.toLocaleDateString('it-IT')})`;
-
-    chart.innerHTML = days.map((d, i) => {
-        const h = (counts[i] / max) * 100;
-        return `<div style="flex:1;min-width:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;" title="${d.toLocaleDateString('it-IT')}: ${counts[i]} ordini">
-            <div style="font-size:0.55rem;color:var(--gold);margin-bottom:2px;">${counts[i] || ''}</div>
-            <div style="width:100%;background:${counts[i] ? 'linear-gradient(180deg,#60a5fa 0%,#3b82f6 100%)' : 'rgba(255,255,255,0.05)'};border-radius:3px 3px 0 0;height:${h}%;min-height:2px;"></div>
-            <div style="font-size:0.5rem;color:#8a7a5a;margin-top:2px;">${d.getDate()}</div>
-        </div>`;
-    }).join('');
-}
-
-function renderTopProducts(filtered) {
-    const container = document.getElementById('statsTopProducts');
-    const productMap = {};
-
-    filtered.forEach(o => {
-        if (!o.items || !Array.isArray(o.items)) return;
-        if (['rifiutato','annullato'].includes(o.status)) return;
-        o.items.forEach(i => {
-            const key = (i.cat || 'altro') + '|' + i.name;
-            if (!productMap[key]) productMap[key] = { name: i.name, cat: i.cat || 'Altro', qty: 0, revenue: 0 };
-            productMap[key].qty += parseInt(i.qty) || 1;
-            productMap[key].revenue += (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1);
-        });
-    });
-
-    const sorted = Object.values(productMap).sort((a, b) => b.qty - a.qty).slice(0, 20);
-
-    if (!sorted.length) {
-        container.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun dato nel periodo selezionato</p>';
-        return;
-    }
-
-    const maxQty = sorted[0].qty;
-    container.innerHTML = sorted.map((p, i) => {
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
-        const pct = (p.qty / maxQty) * 100;
-        return `<div style="margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="color:var(--cream);font-weight:600;font-size:0.9rem;">${medal} ${sanitize(p.name)} <span style="color:#8a7a5a;font-size:0.75rem;">(${p.cat})</span></span>
-                <span style="color:var(--gold);font-weight:700;font-size:0.9rem;">${p.qty} pz · €${p.revenue.toFixed(2)}</span>
-            </div>
-            <div style="height:8px;background:rgba(0,0,0,0.3);border-radius:4px;overflow:hidden;">
-                <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-dark) 100%);border-radius:4px;transition:width 0.4s;"></div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function renderCategoryStats(filtered) {
-    const container = document.getElementById('statsCategories');
-    const catMap = {};
-
-    filtered.forEach(o => {
-        if (!o.items || ['rifiutato','annullato'].includes(o.status)) return;
-        o.items.forEach(i => {
-            const cat = i.cat || 'Altro';
-            if (!catMap[cat]) catMap[cat] = { qty: 0, revenue: 0 };
-            catMap[cat].qty += parseInt(i.qty) || 1;
-            catMap[cat].revenue += (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1);
-        });
-    });
-
-    const entries = Object.entries(catMap).sort((a, b) => b[1].revenue - a[1].revenue);
-    if (!entries.length) {
-        container.innerHTML = '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun dato</p>';
-        return;
-    }
-
-    const totalRev = entries.reduce((s, [, v]) => s + v.revenue, 0);
-    container.innerHTML = entries.map(([cat, v]) => {
-        const pct = totalRev ? (v.revenue / totalRev) * 100 : 0;
-        const catName = appData.categories[cat]?.name || cat;
-        return `<div style="margin-bottom:12px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                <span style="color:var(--cream);font-weight:600;">${sanitize(catName)}</span>
-                <span style="color:var(--gold);font-weight:700;">${v.qty} pz · €${v.revenue.toFixed(2)} <span style="color:#8a7a5a;font-size:0.75rem;">(${pct.toFixed(1)}%)</span></span>
-            </div>
-            <div style="height:10px;background:rgba(0,0,0,0.3);border-radius:5px;overflow:hidden;">
-                <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#60a5fa 0%,#3b82f6 100%);border-radius:5px;"></div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function exportStatsCSV() {
-    db.ref('ordini').once('value').then(snap => {
-        const { from, to } = getStatsPeriodRange();
-        const rows = [['Data','Ora','ID Ordine','Cliente','Telefono','Tipo','Stato','Totale','Prodotti']];
-        snap.forEach(c => {
-            const o = c.val();
-            const t = o.timestamp || 0;
-            if (t < from || t > to) return;
-            const d = new Date(t);
-            const items = (o.items || []).map(i => `${i.name} x${i.qty}`).join(' | ');
-            rows.push([
-                d.toLocaleDateString('it-IT'),
-                d.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'}),
-                o.orderId || c.key,
-                o.customerName || '',
-                o.customerPhone || '',
-                o.isCounterSale ? 'Bancone' : (o.type === 'delivery' ? 'Consegna' : 'Ritiro'),
-                o.status || '',
-                (parseFloat(o.finalTotal) || 0).toFixed(2),
-                items
-            ]);
-        });
-        const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-        const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `statistiche_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        showToast('📥 CSV esportato!');
-    });
-}
-
 document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.innerHTML.trim() === '') window.location.reload(); }, 500); });
 </script>
 </body>
