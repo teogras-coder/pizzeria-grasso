@@ -1,7 +1,9 @@
 {
   "name": "Antica Pizzeria Grasso",
   "short_name": "Pizzeria Grasso",
-  "start_url": ".",
+  "id": "./index-clienti.html",
+  "start_url": "./index-clienti.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a1209",
