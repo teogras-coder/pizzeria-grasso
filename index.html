@@ -761,11 +761,7 @@ storageBucket:"teogra-c8cf5.firebasestorage.app",
 appId:"1:686300112893:web:e147b82f91374f12db1b94"
 };
 firebase.initializeApp(firebaseConfig);
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) {
-    firebase.auth().signInAnonymously().catch(console.error);
-  }
-});
+
 const db=firebase.database();
 // ============================================================
 // VARIABILI GLOBALI
@@ -908,7 +904,18 @@ function applyFestiveEffect(type) {
 function showConfirm(m){return new Promise(r=>{const o=document.getElementById('confirmModal');document.getElementById('confirmModalText').textContent=m;o.classList.add('active');const y=document.getElementById('confirmBtnYes'),n=document.getElementById('confirmBtnNo'),c=()=>{o.classList.remove('active');y.onclick=null;n.onclick=null};y.onclick=()=>{c();r(true)};n.onclick=()=>{c();r(false)}})}
 function showWelcomeScreen(){document.getElementById('welcomeScreen').style.display='flex';document.getElementById('mainApp').style.display='none'}
 function hideWelcomeScreen(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('mainApp').style.display='block'}
-function enterAsGuest(){userType='guest';localStorage.setItem('grasso_user_type','guest');hideWelcomeScreen();showToast(t('guest_btn'))}
+
+function enterAsGuest(){
+  userType = 'guest';
+  localStorage.setItem('grasso_user_type','guest');
+  if (!firebase.auth().currentUser) {
+    firebase.auth().signInAnonymously().catch(console.error);
+  }
+  hideWelcomeScreen();
+  updateUIForLoggedInUser(firebase.auth().currentUser);
+  showToast(t('guest_btn'));
+}
+
 function showRegisterModal(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('authModal').classList.add('active');showLoginForm()}
 function closeAuthModal(){document.getElementById('authModal').classList.remove('active');showWelcomeScreen()}
 function showLoginForm(){document.getElementById('loginForm').style.display='block';document.getElementById('registerForm').style.display='none'}
@@ -916,8 +923,26 @@ function showRegisterForm(){document.getElementById('loginForm').style.display='
 function registerUser(){const n=document.getElementById('registerName').value.trim(),e=document.getElementById('registerEmail').value.trim(),p=document.getElementById('registerPassword').value,pc=document.getElementById('registerPasswordConfirm').value;if(!n||!e||!p){showToast('⚠️ Compila tutto');return}if(p!==pc){showToast('❌ Password diverse');return}if(p.length<6){showToast('❌ Minimo 6 caratteri');return}firebase.auth().createUserWithEmailAndPassword(e,p).then(u=>{u.user.updateProfile({displayName:n});firebase.database().ref('users/'+u.user.uid).set({name:n,email:e,createdAt:Date.now()});showToast('✅ Registrato!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
 function loginWithEmail(e,p){firebase.auth().signInWithEmailAndPassword(e,p).then(()=>{showToast('✅ Accesso!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
 function loginWithGoogle(){const pr=new firebase.auth.GoogleAuthProvider();firebase.auth().signInWithPopup(pr).then(()=>{showToast('✅ Google!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
-function logout(){firebase.auth().signOut();userType='none';localStorage.removeItem('grasso_user_type');const fl=document.getElementById('footerLogout');if(fl)fl.style.display='none';showToast(' Arrivederci!');location.reload()}
-function updateUIForLoggedInUser(u){const fl=document.getElementById('footerLogout');if(fl)fl.style.display='block'}
+
+function logout(){
+  userType='none';
+  localStorage.removeItem('grasso_user_type');
+  localStorage.removeItem('pizzeria_grasso_orders');
+  
+  const fl=document.getElementById('footerLogout');
+  if(fl) fl.style.display='none';
+  
+  showToast('👋 Arrivederci!');
+
+  firebase.auth().signOut().then(() => {
+    setTimeout(() => location.reload(), 300);
+  });
+}
+
+function updateUIForLoggedInUser(u){
+  const fl = document.getElementById('footerLogout');
+  if (fl) fl.style.display = 'block';
+}
 // ============================================================
 // CARICAMENTO DATI
 // ============================================================
@@ -961,24 +986,43 @@ const lang=detectBrowserLanguage();currentLang=lang;document.getElementById('lan
 const hasCache = loadFromCache();
 if (!hasCache) { forceUpdateFromServer(); } else { startVersionListener(); }
 initApp();
-firebase.auth().onAuthStateChanged(u=>{
-  if(u){
-    currentUser=u;
-    userType='registered';
-    localStorage.setItem('grasso_user_type','registered');
-    hideWelcomeScreen();
-    updateUIForLoggedInUser(u);
-    // Carica recensioni solo dopo autenticazione
-    loadReviewsHome();
-  } else {
-    showWelcomeScreen();
+
+// 🔧 FIX LOGOUT: Unico listener centrale
+firebase.auth().onAuthStateChanged(u => {
+  if (!u) {
+    // Nessun utente -> entra anonimo per permettere l'uso base
+    firebase.auth().signInAnonymously().catch(console.error);
+    return;
   }
+
+  if (u.isAnonymous) {
+    currentUser = u;
+    // Se era ospite, resta dentro l'app, altrimenti welcome
+    const savedType = localStorage.getItem('grasso_user_type');
+    if (savedType === 'guest' || savedType === 'registered') {
+      hideWelcomeScreen();
+      updateUIForLoggedInUser(u); // 🔧 Mostra SEMPRE il pulsante Esci
+    } else {
+      showWelcomeScreen();
+      const fl = document.getElementById('footerLogout');
+      if (fl) fl.style.display = 'none';
+    }
+    return;
+  }
+
+  // Utente vero registrato
+  currentUser = u;
+  userType = 'registered';
+  localStorage.setItem('grasso_user_type', 'registered');
+  hideWelcomeScreen();
+  updateUIForLoggedInUser(u); // 🔧 Mostra SEMPRE il pulsante Esci
 });
 });
 function initApp() {
 cleanLocalHistory();
 try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
-setupFloatingCartDrag(); startStatusListener(); startServicesListener(); loadReviewsPublic(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
+// 🔧 FIX RECENSIONI: loadReviewsHome() parte subito
+setupFloatingCartDrag(); startStatusListener(); startServicesListener(); loadReviewsPublic(); loadReviewsHome(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
 setTimeout(() => {
 richiediPermessoNotifiche();
 }, 2000);
@@ -1802,18 +1846,14 @@ function sanitizeWA(txt){
     .replace(/[<>]/g, '')
     .replace(/[*_~`]/g, '\\$&');
 }
-function callPhone(){window.location.href=`tel:${appData.settings.visiblePhone||"0884660377"}`}
+function callPhone(){
+  const tel = (appData.settings.visiblePhone||"0884660377").replace(/\s/g,'');
+  window.open('tel:'+tel, '_self');
+}
 function openMaps(){
-  var dest = encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG");
-  var url = 'https://www.google.com/maps/dir/?api=1&destination=' + dest;
-  var a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+  const dest = encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG");
+  const url = 'https://www.google.com/maps/dir/?api=1&destination=' + dest;
+  window.open(url, '_blank');
 }
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function mostraModalRifiuto(m){const md=document.getElementById('modalRifiutoOrdine'),el=document.getElementById('motivoRifiutoModal');if(el)el.textContent=m||t('order_rejected_default');if(md){md.style.display='flex';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500])}}
@@ -1981,21 +2021,9 @@ function searchGlobal(term){
 }
 </script>
    <script>
-// FIX PAGINA BIANCA RITORNO DA MAPS - PWA iOS
-window.addEventListener('pagehide', function(){
-  sessionStorage.setItem('grasso_exiting', '1');
-});
+// BUG 3 FIX: Rimuovi vecchio blocco pagehide/pageshow, sostituisci con versione semplice
 window.addEventListener('pageshow', function(e){
-  if(e.persisted || sessionStorage.getItem('grasso_exiting')){
-    sessionStorage.removeItem('grasso_exiting');
-    document.body.style.display='none';
-    document.body.offsetHeight;
-    document.body.style.display='flex';
-    var main=document.getElementById('mainApp');
-    if(main) main.style.display='block';
-    var frame=document.querySelector('.phone-frame');
-    if(frame) frame.style.display='block';
-  }
+  if(e.persisted){ window.location.reload(); }
 });
 </script>
 </body>
