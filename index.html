@@ -100,7 +100,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .search-bar-3d input:focus{border-color:var(--gold);}
 .search-bar-3d i{position:absolute;left:15px;top:14px;color:var(--gold);z-index:2;}
 
-/* CARD PROMO - SPARISCE SE VUOTA */
+/* CARD PROMO - APPARE SOLO SE PRESENTE */
 #promoCardContainer {
     display: none; 
     padding: 0 20px 10px;
@@ -137,23 +137,38 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* CARD CATEGORIE RIMPICCIOLITE E SENZA ICONE */
-.menu-list{padding:0 20px 10px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.menu-btn-3d{
-    background:linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);
-    border-radius:16px;
-    overflow:hidden;
-    cursor:pointer;
-    color:white;
-    position:relative;
-    transition:all .3s ease;
-    box-shadow:0 5px 0 var(--shadow), 0 6px 12px rgba(0,0,0,.4);
-    border:1px solid rgba(212,168,75,.15);
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    text-align:center;
+/* GRIGLIA CATEGORIE A DOPPIA FILA CON SCORRIMENTO ORIZZONTALE (SWIPE) */
+.menu-list {
+    display: grid;
+    grid-template-rows: repeat(2, auto);
+    grid-auto-flow: column;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding: 5px 20px 15px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+.menu-list::-webkit-scrollbar { display: none; }
+
+.menu-btn-3d {
+    width: 150px;
+    background: linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    color: white;
+    position: relative;
+    transition: all .3s ease;
+    box-shadow: 0 5px 0 var(--shadow), 0 6px 12px rgba(0,0,0,.4);
+    border: 1px solid rgba(212,168,75,.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    scroll-snap-align: start;
     aspect-ratio: 1.6 / 1;
 }
 .category-img-container{width:100%;height:65px;overflow:hidden;position:relative;flex-shrink:0}
@@ -497,12 +512,12 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     </div>
 </div>
 
-<!-- CARD PROMO (APPARE SOLO SE PRESENTE) -->
-<div id="promoCardContainer"></div>
-
 <div class="section-divider"><span data-i18n="menu_title">Il Nostro Menu</span></div>
 <div class="menu-list" id="categoriesSkeletons"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
 <div class="menu-list" id="categoriesList" style="display:none;"></div>
+
+<!-- CARD PROMO (APPARE SOLO SE PRESENTE) -->
+<div id="promoCardContainer"></div>
 
 <!-- RECENSIONI IN HOME (DICONO DI NOI) -->
 <div class="section-divider" style="margin-top:10px;"><span>💬 Dicono di noi</span></div>
@@ -1991,7 +2006,39 @@ function renderPromotionsBanner(){
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0];const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null}
 function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categories[k].name)||k}
 function showCategories(){renderCategories();document.getElementById('categoriesSkeletons').style.display='none';document.getElementById('categoriesList').style.display='grid'}
-function renderCategories(){const l=document.getElementById('categoriesList');if(!l)return;l.innerHTML=Object.keys(appData.categories).map(c=>{const p=appData.menu[c]||[],i=appData.categories[c],s=(appData.images.categories&&appData.images.categories[c])||'';return`<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${c}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div></div></div>`}).join('')}
+
+function renderCategories(){
+    const l = document.getElementById('categoriesList');
+    if (!l) return;
+    
+    // Converte e ordina le categorie in base al campo numerico 'order'
+    const catsArray = Object.entries(appData.categories || {}).map(([key, val]) => ({
+        key: key,
+        ...val
+    })).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    l.innerHTML = catsArray.map(catItem => {
+        const c = catItem.key;
+        const i = appData.categories[c];
+        const p = appData.menu[c] || [];
+        const s = (appData.images.categories && appData.images.categories[c]) || '';
+        
+        return `
+            <div class="menu-btn-3d" onclick="showCategory('${c}')">
+                <div class="category-img-container">
+                    <img class="category-img" src="${s}" alt="${i.name}" onerror="this.style.display='none';">
+                    <div class="category-img-overlay"></div>
+                </div>
+                <div class="menu-btn-content">
+                    <div class="btn-content">
+                        <h3>${i.name}</h3>
+                        <p>${p.length} prodotti</p>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+}
+
 function showCategory(c){if(!c||!appData.menu||!appData.menu[c]){showToast(t('not_available'));return}currentSearchCat=c;document.getElementById('productSearch').value='';document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);renderProductList(c);window.scrollTo(0,0)}
 function renderProductList(cat,ft){
 if(!cat||!appData.menu||!appData.menu[cat])return;
