@@ -570,13 +570,13 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </footer>
 </div>
 
-<!-- BARRA FISSA CARRELLO IN BASSO (A SCOMPARSA) -->
-<div id="stickyCartBar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg, var(--card-light) 0%, var(--card) 100%); border-top:2px solid var(--gold); padding:12px 20px; z-index:1500; justify-content:space-between; align-items:center; box-shadow:0 -5px 20px rgba(0,0,0,0.6); backdrop-filter:blur(10px);">
+<!-- BARRA FISSA CARRELLO IN BASSO (A SCOMPARSA E CLICCABILE) -->
+<div id="stickyCartBar" onclick="openCart()" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg, var(--card-light) 0%, var(--card) 100%); border-top:2px solid var(--gold); padding:12px 20px; z-index:1500; justify-content:space-between; align-items:center; box-shadow:0 -5px 20px rgba(0,0,0,0.6); backdrop-filter:blur(10px); cursor:pointer;">
   <div style="display:flex; flex-direction:column;">
     <span style="font-size:0.75rem; color:#8a7a5a; text-transform:uppercase; font-weight:700;" data-i18n="cart">Carrello</span>
     <span id="stickyCartTotal" style="font-size:1.1rem; color:var(--gold); font-weight:800;">€0.00</span>
   </div>
-  <button onclick="openCart()" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%); color:var(--dark); border:none; padding:10px 22px; border-radius:30px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:0 4px 10px rgba(212,168,75,0.4); display:flex; align-items:center; gap:8px;">
+  <button type="button" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%); color:var(--dark); border:none; padding:10px 22px; border-radius:30px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:0 4px 10px rgba(212,168,75,0.4); display:flex; align-items:center; gap:8px; pointer-events:none;">
     <i class="fas fa-shopping-cart"></i> <span data-i18n="your_order">Visualizza Carrello</span> (<span id="stickyCartCount">0</span>)
   </button>
 </div>
