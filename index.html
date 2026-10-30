@@ -480,7 +480,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div id="userMenu" class="user-menu" style="display:none;"></div>
 <div id="bannerRifiuto"><div class="banner-title" data-i18n="order_rejected">❌ Ordine Rifiutato</div><div class="banner-motivo" id="motivoRifiutoText" data-i18n="reject_default_msg">La pizzeria non può accettare il tuo ordine.</div><button class="banner-btn" onclick="chiudiBannerRifiuto()" data-i18n="understood">Ho capito</button></div>
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-i18n="offline_msg">️ Sei offline — riconnessione in corso...</div>
-<!-- RIMOSSO CARRELLO FLUTTUANTE -->
 <div class="phone-frame" id="mainApp" style="display:none;">
 <header class="header">
 <div class="logo-area">
@@ -1846,28 +1845,36 @@ function callPhone() {
   window.open("tel:" + tel, "_self");
 }
 
-// 2. Sostituisci openMaps
+// 2. Sostituisci openMaps (FIX iOS)
 function openMaps() {
   const address = "Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";
   const mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(address);
-  // Apri FUORI dalla PWA per non congelare il layout
+  
+  // Forza reflow del layout prima dell'apertura
+  const frame = document.querySelector('.phone-frame');
+  if (frame) {
+    frame.style.display = 'none';
+    frame.offsetHeight; // trigger reflow
+    frame.style.display = 'block';
+  }
+
+  // Apre la mappa in un processo isolato
   window.open(mapsUrl, "_blank", "noopener,noreferrer");
 }
 
-// 3. FIX PAGINA BIANCA AL RITORNO
+// 3. FIX PAGINA BIANCA AL RITORNO (VERSIONE RINFORZATA)
 function fixWhitePage() {
   const frame = document.querySelector('.phone-frame');
   const main = document.getElementById('mainApp');
   const app = document.getElementById('welcomeScreen');
 
-  // Forza il body a riprendere l'altezza corretta
   document.documentElement.style.height = '-webkit-fill-available';
   document.body.style.height = '-webkit-fill-available';
   document.body.style.background = '#1a1209';
 
   if (frame) {
     frame.style.display = 'none';
-    frame.offsetHeight; // forza reflow
+    frame.offsetHeight; // forza reflow grafico
     frame.style.display = 'block';
     frame.style.height = '-webkit-fill-available';
   }
@@ -1877,21 +1884,14 @@ function fixWhitePage() {
   window.scrollTo(0, 0);
 }
 
-// 4. Attiva il fix OGNI VOLTA che torni in app da un'app esterna
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    fixWhitePage();
-    setTimeout(fixWhitePage, 150);
-    setTimeout(fixWhitePage, 500);
-  }
-});
-
-window.addEventListener('pageshow', () => {
-  setTimeout(fixWhitePage, 50);
-});
-
-window.addEventListener('focus', () => {
-  setTimeout(fixWhitePage, 50);
+['visibilitychange', 'pageshow', 'focus'].forEach(evt => {
+  window.addEventListener(evt, () => {
+    if (!document.hidden) {
+      fixWhitePage();
+      setTimeout(fixWhitePage, 100);
+      setTimeout(fixWhitePage, 300);
+    }
+  });
 });
 
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
