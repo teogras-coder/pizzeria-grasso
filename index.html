@@ -9,7 +9,7 @@
 <title>Antica Pizzeria Grasso</title>
 <meta name="apple-mobile-web-app-title" content="Antica Pizzeria Grasso">
 <meta name="application-name" content="Antica Pizzeria Grasso">
-<link rel="manifest" href="/manifest-clienti.json?v=5">
+<link rel="manifest" href="manifest-clienti.json?v=10">
 <link rel="icon" type="image/png" href="icon-clienti-192.png">
 <link rel="apple-touch-icon" href="icon-clienti-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -263,12 +263,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .quick-nav-btn .nav-live-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:#e74c3c;border-radius:50%;border:1px solid var(--dark);display:none;animation:pulseDot 1.5s ease-in-out infinite;pointer-events:none}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-.floating-cart-btn{position:fixed;bottom:22px;right:22px;left:auto;top:auto;z-index:10010;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);border:2px solid rgba(255,255,255,.25);color:var(--dark);font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.35),0 0 0 0 rgba(255,255,255,0);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;touch-action:none;}
-.floating-cart-btn:hover{transform:translateY(-2px);box-shadow:0 16px 35px rgba(0,0,0,.45),0 0 0 12px rgba(255,255,255,.15);border-color:rgba(255,255,255,.75)}
-.floating-cart-btn.snapped{box-shadow:0 14px 38px rgba(0,0,0,.35),0 0 0 14px rgba(255,255,255,.18);border-color:rgba(255,255,255,.9)}
-.floating-cart-btn.hidden{display:none}
-.floating-cart-btn .floating-cart-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e74c3c;color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
-
 #productsView,#myOrdersView,#reviewsPublicView{display:none;padding:0 20px 20px;box-sizing:border-box}
 #productList{overflow-y:auto;max-height:calc(100vh - 280px);padding-right:6px;}
 .back-btn-3d{background:var(--card-light);border:none;color:var(--gold);padding:12px 20px;border-radius:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;margin:20px 0;box-shadow:0 4px 0 var(--shadow)}
@@ -486,7 +480,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div id="userMenu" class="user-menu" style="display:none;"></div>
 <div id="bannerRifiuto"><div class="banner-title" data-i18n="order_rejected">❌ Ordine Rifiutato</div><div class="banner-motivo" id="motivoRifiutoText" data-i18n="reject_default_msg">La pizzeria non può accettare il tuo ordine.</div><button class="banner-btn" onclick="chiudiBannerRifiuto()" data-i18n="understood">Ho capito</button></div>
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;z-index:99998;" data-i18n="offline_msg">️ Sei offline — riconnessione in corso...</div>
-<button id="floatingCartButton" class="floating-cart-btn hidden" aria-label="Apri carrello"><i class="fas fa-shopping-cart"></i><span class="floating-cart-badge" id="floatingCartBadge">0</span></button>
+<!-- RIMOSSO CARRELLO FLUTTUANTE -->
 <div class="phone-frame" id="mainApp" style="display:none;">
 <header class="header">
 <div class="logo-area">
@@ -1001,7 +995,7 @@ firebase.auth().onAuthStateChanged(u => {
     const savedType = localStorage.getItem('grasso_user_type');
     if (savedType === 'guest' || savedType === 'registered') {
       hideWelcomeScreen();
-      updateUIForLoggedInUser(u); // 🔧 Mostra SEMPRE il pulsante Esci
+      updateUIForLoggedInUser(u);
     } else {
       showWelcomeScreen();
       const fl = document.getElementById('footerLogout');
@@ -1015,14 +1009,14 @@ firebase.auth().onAuthStateChanged(u => {
   userType = 'registered';
   localStorage.setItem('grasso_user_type', 'registered');
   hideWelcomeScreen();
-  updateUIForLoggedInUser(u); // 🔧 Mostra SEMPRE il pulsante Esci
+  updateUIForLoggedInUser(u);
 });
 });
 function initApp() {
 cleanLocalHistory();
 try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
 // 🔧 FIX RECENSIONI: loadReviewsHome() parte subito
-setupFloatingCartDrag(); startStatusListener(); startServicesListener(); loadReviewsPublic(); loadReviewsHome(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
+startStatusListener(); startServicesListener(); loadReviewsPublic(); loadReviewsHome(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
 setTimeout(() => {
 richiediPermessoNotifiche();
 }, 2000);
@@ -1044,8 +1038,7 @@ return false;
 }
 function updateStatusBanner(){const b = document.getElementById('statusBanner');const txt = document.getElementById('statusText');const o = checkIfOpen();if(!b || !txt) return;b.className = `status-banner ${o ? 'status-open' : 'status-closed'}`;txt.textContent = o ? t('open') : t('closed');}
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
-function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}const fb=document.getElementById('floatingCartButton');const fbBadge=document.getElementById('floatingCartBadge');if(fb){fb.classList.toggle('hidden',n===0);}if(fbBadge){fbBadge.textContent=n;}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
-function setupFloatingCartDrag(){const btn=document.getElementById('floatingCartButton');if(!btn)return;let dragging=false;let pointerId=null;let startX=0;let startY=0;let origX=0;let origY=0;let moved=false;const margin=12;const clamp=(value,min,max)=>Math.min(Math.max(value,min),max);const updatePosition=(x,y)=>{const maxX=window.innerWidth-btn.offsetWidth-margin;const maxY=window.innerHeight-btn.offsetHeight-margin;btn.style.left=clamp(x,margin,maxX)+'px';btn.style.top=clamp(y,margin,maxY)+'px';btn.style.right='auto';btn.style.bottom='auto';btn.classList.remove('snapped')};const snapToEdge=(x,y)=>{const maxY=window.innerHeight-btn.offsetHeight-margin;const clampedY=clamp(y,margin,maxY);const closeToLeft=x < 100;const closeToRight=(window.innerWidth-(x+btn.offsetWidth)) < 100; if(closeToLeft){btn.style.left=margin+'px';btn.style.right='auto';btn.classList.add('snapped')}else if(closeToRight){btn.style.left='auto';btn.style.right=margin+'px';btn.classList.add('snapped')}else{btn.style.left=clamp(x,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.right='auto';btn.classList.remove('snapped')}btn.style.top=clampedY+'px';btn.style.bottom='auto'};const resetPosition=()=>{const rect=btn.getBoundingClientRect();btn.style.left=clamp(rect.left,margin,window.innerWidth-btn.offsetWidth-margin)+'px';btn.style.top=clamp(rect.top,margin,window.innerHeight-btn.offsetHeight-margin)+'px';btn.style.right='auto';btn.style.bottom='auto'};btn.style.touchAction='none';btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;dragging=true;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;const rect=btn.getBoundingClientRect();origX=rect.left;origY=rect.top;moved=false;btn.setPointerCapture(e.pointerId);});btn.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;const dy=e.clientY-startY;if(!moved&&Math.hypot(dx,dy)>6)moved=true;if(moved)updatePosition(origX+dx,origY+dy);});const endDrag=e=>{if(!dragging||e.pointerId!==pointerId)return;dragging=false;btn.releasePointerCapture(e.pointerId);if(moved){const rect=btn.getBoundingClientRect();snapToEdge(rect.left,rect.top);}setTimeout(()=>{moved=false},0);};btn.addEventListener('pointerup',endDrag);btn.addEventListener('pointercancel',endDrag);btn.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();}else{openCart();}});window.addEventListener('resize',resetPosition);}
+function updateCartBadge(){let n=0;cart.forEach(i=>{if(i.isPromo)n+=1;else n+=(i.qty||0)});const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}}
 function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(!d)return;d.style.display=hasActive?'block':'none'}
 function updateNavLiveDotOld(){try{const o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');updateNavLiveDot(hasActive)}catch(e){updateNavLiveDot(false)}}
 async function clearCart(){if(!cart.length)return;const ok=await showConfirm(t('empty_cart_confirm'));if(!ok)return;cart=[];updateCartBadge();closeCart();showToast(t('cart_emptied'))}
@@ -1846,15 +1839,61 @@ function sanitizeWA(txt){
     .replace(/[<>]/g, '')
     .replace(/[*_~`]/g, '\\$&');
 }
-function callPhone(){
-  const tel = (appData.settings.visiblePhone||"0884660377").replace(/\s/g,'');
-  window.open('tel:'+tel, '_self');
+
+// 1. Sostituisci callPhone
+function callPhone() {
+  const tel = (appData.settings.visiblePhone || "0884660377").replace(/\s/g, '');
+  window.open("tel:" + tel, "_self");
 }
-function openMaps(){
-  const dest = encodeURIComponent("Via Antiche Mura 8/A, Manfredonia, FG");
-  const url = 'https://www.google.com/maps/dir/?api=1&destination=' + dest;
-  window.open(url, '_blank');
+
+// 2. Sostituisci openMaps
+function openMaps() {
+  const address = "Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";
+  const mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(address);
+  // Apri FUORI dalla PWA per non congelare il layout
+  window.open(mapsUrl, "_blank", "noopener,noreferrer");
 }
+
+// 3. FIX PAGINA BIANCA AL RITORNO
+function fixWhitePage() {
+  const frame = document.querySelector('.phone-frame');
+  const main = document.getElementById('mainApp');
+  const app = document.getElementById('welcomeScreen');
+
+  // Forza il body a riprendere l'altezza corretta
+  document.documentElement.style.height = '-webkit-fill-available';
+  document.body.style.height = '-webkit-fill-available';
+  document.body.style.background = '#1a1209';
+
+  if (frame) {
+    frame.style.display = 'none';
+    frame.offsetHeight; // forza reflow
+    frame.style.display = 'block';
+    frame.style.height = '-webkit-fill-available';
+  }
+  if (main) main.style.display = 'block';
+  if (app && app.style.display !== 'none') app.style.display = 'flex';
+
+  window.scrollTo(0, 0);
+}
+
+// 4. Attiva il fix OGNI VOLTA che torni in app da un'app esterna
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    fixWhitePage();
+    setTimeout(fixWhitePage, 150);
+    setTimeout(fixWhitePage, 500);
+  }
+});
+
+window.addEventListener('pageshow', () => {
+  setTimeout(fixWhitePage, 50);
+});
+
+window.addEventListener('focus', () => {
+  setTimeout(fixWhitePage, 50);
+});
+
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function mostraModalRifiuto(m){const md=document.getElementById('modalRifiutoOrdine'),el=document.getElementById('motivoRifiutoModal');if(el)el.textContent=m||t('order_rejected_default');if(md){md.style.display='flex';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500])}}
 function chiudiModalRifiuto(){const m=document.getElementById('modalRifiutoOrdine');if(m)m.style.display='none'}
@@ -2019,42 +2058,6 @@ function searchGlobal(term){
   document.getElementById('categoryTitle').textContent = 'Risultati per: ' + term;
   document.getElementById('productList').innerHTML = `<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>`;
 }
-</script>
-   <script>
-// FIX PAGINA BIANCA iOS PWA - DOPO RITORNO DA MAPS/TEL
-function forceRepaintGrasso() {
-  const main = document.getElementById('mainApp');
-  const frame = document.querySelector('.phone-frame');
-  if (frame) {
-    frame.style.display = 'none';
-    frame.offsetHeight; // trigger reflow
-    frame.style.display = 'block';
-  }
-  if (main && main.style.display === 'none') {
-    main.style.display = 'block';
-  }
-  document.documentElement.style.height = '-webkit-fill-available';
-  document.body.style.height = '-webkit-fill-available';
-  window.scrollTo(0,0);
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    // sei tornato in app
-    setTimeout(forceRepaintGrasso, 50);
-    setTimeout(forceRepaintGrasso, 300);
-  }
-});
-
-window.addEventListener('pageshow', (e) => {
-  // non fare reload (perdi carrello), fai solo repaint
-  setTimeout(forceRepaintGrasso, 50);
-});
-
-// Previeni il freeze di iOS: quando esci, salva posizione
-window.addEventListener('pagehide', () => {
-  sessionStorage.setItem('grasso_last_scroll', window.scrollY);
-});
 </script>
 </body>
 </html>
