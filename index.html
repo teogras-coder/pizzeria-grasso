@@ -1845,21 +1845,19 @@ function callPhone() {
   window.open("tel:" + tel, "_self");
 }
 
-// 2. Sostituisci openMaps (FIX iOS)
+// 2. Sostituisci openMaps (FIX iOS: link nativo)
 function openMaps() {
   const address = "Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";
   const mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(address);
   
-  // Forza reflow del layout prima dell'apertura
-  const frame = document.querySelector('.phone-frame');
-  if (frame) {
-    frame.style.display = 'none';
-    frame.offsetHeight; // trigger reflow
-    frame.style.display = 'block';
-  }
-
-  // Apre la mappa in un processo isolato
-  window.open(mapsUrl, "_blank", "noopener,noreferrer");
+  // Crea un link nativo invisibile per simulare il tap dell'utente (evita il WebKit freeze su PWA iOS)
+  const tempLink = document.createElement('a');
+  tempLink.href = mapsUrl;
+  tempLink.target = '_blank';
+  tempLink.rel = 'noopener noreferrer';
+  document.body.appendChild(tempLink);
+  tempLink.click();
+  document.body.removeChild(tempLink);
 }
 
 // 3. FIX PAGINA BIANCA AL RITORNO (VERSIONE RINFORZATA)
@@ -1873,10 +1871,10 @@ function fixWhitePage() {
   document.body.style.background = '#1a1209';
 
   if (frame) {
-    frame.style.display = 'none';
-    frame.offsetHeight; // forza reflow grafico
     frame.style.display = 'block';
     frame.style.height = '-webkit-fill-available';
+    // Forza il ricalcolo del rendering DOM
+    void frame.offsetWidth;
   }
   if (main) main.style.display = 'block';
   if (app && app.style.display !== 'none') app.style.display = 'flex';
@@ -1888,8 +1886,8 @@ function fixWhitePage() {
   window.addEventListener(evt, () => {
     if (!document.hidden) {
       fixWhitePage();
-      setTimeout(fixWhitePage, 100);
-      setTimeout(fixWhitePage, 300);
+      setTimeout(fixWhitePage, 50);
+      setTimeout(fixWhitePage, 250);
     }
   });
 });
