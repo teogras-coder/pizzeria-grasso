@@ -392,13 +392,16 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 <div id="promotionsList"></div>
 <div class="card" style="border:2px dashed var(--gold-dark);">
 <div class="card-title">Nuova Promozione</div>
-<div class="form-group"><label>Titolo *</label><input type="text" class="form-input" id="newPromoTitle" placeholder="Es:  Pizza Margherita Scontata"></div>
+<div class="form-group"><label>Titolo *</label><input type="text" class="form-input" id="newPromoTitle" placeholder="Es: Pizza Margherita Scontata"></div>
 <div class="form-group"><label>Messaggio</label><textarea class="form-input" id="newPromoMessage" placeholder="Es: Solo oggi!"></textarea></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
 <div class="form-group"><label>Inizio *</label><input type="date" class="form-input" id="newPromoStart"></div>
 <div class="form-group"><label>Fine *</label><input type="date" class="form-input" id="newPromoEnd"></div>
 </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
 <div class="form-group"><label>Max Utilizzi (pezzi disponibili) *</label><input type="number" class="form-input" id="newPromoMaxUses" min="1" value="10"></div>
+<div class="form-group"><label>Sconto in Percentuale (%)</label><input type="number" class="form-input" id="newPromoDiscountPercent" min="0" max="100" placeholder="Es: 20"></div>
+</div>
 <div style="background:rgba(212,168,75,0.1);padding:15px;border-radius:10px;margin-top:15px;border:1px solid rgba(212,168,75,0.3);">
 <div style="color:var(--gold);font-weight:700;margin-bottom:10px;">📦 Prodotti della Promo</div>
 <div class="form-group">
@@ -1317,7 +1320,6 @@ async function deleteReview(id) { if(!await showConfirm('Eliminare Recensione?',
 function loadBranding() { document.getElementById('brandName').value = appData.branding.name||''; document.getElementById('brandSubtitle').value = appData.branding.subtitle||''; document.getElementById('brandCity').value = appData.branding.city||''; }
 function saveBranding() { db.ref('branding').update({ name: sanitize(document.getElementById('brandName').value)||"Antica Pizzeria Grasso", subtitle: sanitize(document.getElementById('brandSubtitle').value)||"Tradizione", city: sanitize(document.getElementById('brandCity').value)||"Manfredonia" }).then(()=>{ showToast('✅ Salvato'); notifyClients(); }); }
 
-// FUNZIONE UPLOAD LOGO
 async function uploadLogo(input) {
   if(!input.files[0]) return;
   showToast('🗜️ Compressione...');
@@ -1343,7 +1345,8 @@ l.innerHTML = ps.map(([id, p]) => {
 const u = p.currentUses||0, lf = p.maxUses-u; let st='', sc='';
 if (!p.active) { st='Off'; sc='promo-expired'; } else if (u>=p.maxUses) { st='Esaurita'; sc='promo-expired'; } else if (p.startDate>td) { st='In attesa'; sc='promo-pending'; } else if (p.endDate<td) { st='Scaduta'; sc='promo-expired'; } else { st='Attiva'; sc='promo-active'; }
 let ph = ''; if (p.products&&p.products.length) { ph = '<div class="promo-products-list">' + p.products.map(pr => `<div class="promo-product-item"><span>${sanitize(pr.name)} x${pr.qty}</span><span style="color:var(--gold);">€${pr.price.toFixed(2)}</span></div>`).join('') + '</div>'; }
-return `<div class="promo-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="color:var(--gold-light);font-weight:700;">${sanitize(p.title)}</div><span class="promo-status ${sc}">${st}</span></div>${ph}<div style="display:flex;gap:10px;font-size:0.85rem;color:var(--gold);margin-bottom:10px;"><span>Usati: ${u}</span><span>Rimasti: ${lf}</span></div><div style="display:flex;gap:8px;"><button class="btn-secondary" style="flex:1;" onclick="togglePromo('${id}')">${p.active?'Disattiva':'Attiva'}</button><button class="btn-danger" onclick="deletePromo('${id}')">Elimina</button></div></div>`;
+let discountBadge = p.discountPercent ? `<span style="background:rgba(212,168,75,0.2);color:var(--gold);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">-${p.discountPercent}%</span>` : '';
+return `<div class="promo-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;"><div style="color:var(--gold-light);font-weight:700;">${sanitize(p.title)}</div>${discountBadge}</div><span class="promo-status ${sc}">${st}</span></div>${ph}<div style="display:flex;gap:10px;font-size:0.85rem;color:var(--gold);margin-bottom:10px;"><span>Usati: ${u}</span><span>Rimasti: ${lf}</span></div><div style="display:flex;gap:8px;"><button class="btn-secondary" style="flex:1;" onclick="togglePromo('${id}')">${p.active?'Disattiva':'Attiva'}</button><button class="btn-danger" onclick="deletePromo('${id}')">Elimina</button></div></div>`;
 }).join('');
 }
 function populatePromoProductSelect() {
@@ -1368,10 +1371,10 @@ c.innerHTML = '<div style="color:var(--gold);font-weight:700;margin-bottom:10px;
 }
 function removePromoProduct(i) { tempPromoProducts.splice(i,1); renderPromoProductsPreview(); }
 function createPromotion() {
-const t = sanitize(document.getElementById('newPromoTitle').value), m = sanitize(document.getElementById('newPromoMessage').value), s = document.getElementById('newPromoStart').value, e = document.getElementById('newPromoEnd').value, mx = parseInt(document.getElementById('newPromoMaxUses').value);
+const t = sanitize(document.getElementById('newPromoTitle').value), m = sanitize(document.getElementById('newPromoMessage').value), s = document.getElementById('newPromoStart').value, e = document.getElementById('newPromoEnd').value, mx = parseInt(document.getElementById('newPromoMaxUses').value), dp = parseFloat(document.getElementById('newPromoDiscountPercent').value) || 0;
 if (!t||!s||!e||!mx||s>e||!tempPromoProducts.length||mx<1||s<new Date().toISOString().split('T')[0]) { showToast('⚠️ Controlla i dati'); return; }
-db.ref('promotions/promo_'+Date.now()).set({ title:t, message:m, startDate:s, endDate:e, maxUses:mx, currentUses:0, active:true, products:tempPromoProducts, createdAt:Date.now() }).then(()=>{
-document.getElementById('newPromoTitle').value=''; document.getElementById('newPromoMessage').value=''; document.getElementById('newPromoStart').value=''; document.getElementById('newPromoEnd').value=''; document.getElementById('newPromoMaxUses').value='10'; tempPromoProducts=[]; renderPromoProductsPreview(); showToast('✅ Promo creata!'); db.ref('promotions').once('value').then(sn=>{ appData.promotions=sn.val()||{}; renderPromotions(); }); notifyClients();
+db.ref('promotions/promo_'+Date.now()).set({ title:t, message:m, startDate:s, endDate:e, maxUses:mx, currentUses:0, active:true, products:tempPromoProducts, discountPercent: dp, createdAt:Date.now() }).then(()=>{
+document.getElementById('newPromoTitle').value=''; document.getElementById('newPromoMessage').value=''; document.getElementById('newPromoStart').value=''; document.getElementById('newPromoEnd').value=''; document.getElementById('newPromoMaxUses').value='10'; document.getElementById('newPromoDiscountPercent').value=''; tempPromoProducts=[]; renderPromoProductsPreview(); showToast('✅ Promo creata!'); db.ref('promotions').once('value').then(sn=>{ appData.promotions=sn.val()||{}; renderPromotions(); }); notifyClients();
 });
 }
 function togglePromo(id) { db.ref('promotions/'+id+'/active').set(!appData.promotions[id].active).then(()=>{ db.ref('promotions').once('value').then(s=>{ appData.promotions=s.val()||{}; renderPromotions(); }); notifyClients(); }); }
@@ -1400,7 +1403,6 @@ const b = parseFloat(document.getElementById('deliveryBaseFee').value)||3, m = p
 document.getElementById('infoMaxRadius').textContent = m; document.getElementById('infoBaseFee').textContent = '€'+b.toFixed(2); document.getElementById('infoMaxRadius2').textContent = m; document.getElementById('infoBaseFee2').textContent = '€'+b.toFixed(2); document.getElementById('infoExtraRadius').textContent = e; document.getElementById('infoExtraFee').textContent = '€'+f.toFixed(2); document.getElementById('infoTotal').textContent = '€'+(b+f).toFixed(2); document.getElementById('infoExtraRadius2').textContent = e;
 }
 
-// FUNZIONI PER EFFETTO FESTE (10 EFFETTI)
 function loadFestiveEffect() {
   const sel = document.getElementById('festiveEffectSelect');
   if (sel) sel.value = appData.settings.festiveEffect || 'none';
@@ -1428,9 +1430,67 @@ else if (el.id==='pickupToggle') { appData.settings.pickupEnabled=on; db.ref('se
 
 function renderCategories() {
 const l = document.getElementById('categoriesList'), s = document.getElementById('categorySelect');
-l.innerHTML = Object.keys(appData.categories).map(k => `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="color:var(--gold);font-weight:700;">${sanitize(appData.categories[k].name)}</span><button class="btn-danger" onclick="deleteCategory('${k}')">Elimina</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="text" class="form-input" value="${sanitize(appData.categories[k].name||'')}" onchange="updateCategory('${k}','name',this.value)"><input type="text" class="form-input" value="${sanitize(appData.categories[k].icon||'')}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona"></div></div>`).join('');
-if (s) s.innerHTML = '<option value="">Seleziona...</option>' + Object.keys(appData.categories).map(c => `<option value="${c}">${sanitize(appData.categories[c].name)}</option>`).join('');
+const keys = Object.keys(appData.categories);
+let index = 1;
+l.innerHTML = keys.map((k, idx) => {
+const numText = `#${index++} `;
+const btnUp = idx > 0 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', -1)"><i class="fas fa-arrow-up"></i></button>` : '';
+const btnDown = idx < keys.length - 1 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', 1)"><i class="fas fa-arrow-down"></i></button>` : '';
+return `<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+<span style="color:var(--gold);font-weight:700;">${numText}${sanitize(appData.categories[k].name)}</span>
+<div style="display:flex;gap:5px;align-items:center;">
+${btnUp}${btnDown}
+<button class="btn-danger" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteCategory('${k}')">Elimina</button>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+<input type="text" class="form-input" value="${sanitize(appData.categories[k].name||'')}" onchange="updateCategory('${k}','name',this.value)">
+<input type="text" class="form-input" value="${sanitize(appData.categories[k].icon||'')}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona">
+</div>
+</div>`;
+}).join('');
+if (s) s.innerHTML = '<option value="">Seleziona...</option>' + keys.map(c => `<option value="${c}">${sanitize(appData.categories[c].name)}</option>`).join('');
 }
+
+async function moveCategory(key, direction) {
+const keys = Object.keys(appData.categories);
+const idx = keys.indexOf(key);
+if (idx < 0) return;
+const targetIdx = idx + direction;
+if (targetIdx < 0 || targetIdx >= keys.length) return;
+
+// Scambia le chiavi nell'array
+const temp = keys[idx];
+keys[idx] = keys[targetIdx];
+keys[targetIdx] = temp;
+
+// Ricostruisci l'oggetto ordinato per le categorie e per il menu
+const newCats = {};
+const newMenu = {};
+keys.forEach(k => {
+  newCats[k] = appData.categories[k];
+  if (appData.menu[k]) newMenu[k] = appData.menu[k];
+});
+
+appData.categories = newCats;
+appData.menu = newMenu;
+
+try {
+  await Promise.all([
+    db.ref('categories').set(appData.categories),
+    db.ref('menu').set(appData.menu)
+  ]);
+  showToast('✅ Posizione aggiornata');
+  renderCategories();
+  renderMenu();
+  populatePromoProductSelect();
+  notifyClients();
+} catch(e) {
+  showToast('❌ Errore spostamento');
+}
+}
+
 async function addCategory() {
 const n = await showPrompt('Nuova Categoria', 'Nome:', 'Es: Pizze'); if(!n||!n.trim()) return;
 const i = await showPrompt('Icona', 'FontAwesome (senza fa-):', 'Es: pizza-slice', 'utensils'); if(i===null) return;
@@ -1454,10 +1514,12 @@ if(Object.keys(up).length) await db.ref(`menu/${c}/${i}`).update(up); showToast(
 
 function renderMenu() {
 const c = document.getElementById('menuAccordion'), st = (document.getElementById('menuSearch')?.value||'').toLowerCase(); let h='';
+let catIndex = 1;
 Object.keys(appData.categories).forEach(cat => {
 const ci = appData.categories[cat], pr = appData.menu[cat]||[], io = openCategories.has(cat), fp = pr.filter(p => p.name.toLowerCase().includes(st)||(p.desc||'').toLowerCase().includes(st));
 if (st && !fp.length) return;
-h += `<div class="admin-category-accordion ${io?'open':''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ci.icon||'fa-utensils'}"></i></div><span class="admin-category-header-title">${sanitize(ci.name)}</span></div><span class="admin-category-header-count">${pr.length}</span><button class="btn-add-product" onclick="event.stopPropagation();addProduct('${cat}')"><i class="fas fa-plus"></i></button></div><div class="admin-category-body">`;
+const catNumLabel = `#${catIndex++} `;
+h += `<div class="admin-category-accordion ${io?'open':''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ci.icon||'fa-utensils'}"></i></div><span class="admin-category-header-title">${catNumLabel}${sanitize(ci.name)}</span></div><span class="admin-category-header-count">${pr.length}</span><button class="btn-add-product" onclick="event.stopPropagation();addProduct('${cat}')"><i class="fas fa-plus"></i></button></div><div class="admin-category-body">`;
 h += (st?fp:pr).map((p,idx) => {
 const oi = pr.indexOf(p), dis = p.disabled===true;
 return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span></div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
@@ -1473,7 +1535,7 @@ h += '</div></div>';
 c.innerHTML = (h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto</p>') + '<div style="height:200px;"></div>';
 }
 function toggleProductAvailability(c,i,el) { const ns = !(appData.menu[c][i].disabled===true); appData.menu[c][i].disabled=ns; if(ns){el.classList.remove('on');el.classList.add('closed');}else{el.classList.remove('closed');el.classList.add('on');} db.ref(`menu/${c}/${i}/disabled`).set(ns); showToast(ns?'🚫 ESAURITO':'✅ DISPONIBILE'); notifyClients(); }
-function toggleCategoryAccordion(c) { const el = document.getElementById('accordion-'+c); if(!el) return; document.querySelectorAll('.admin-category-accordion').forEach(a => { if(a.id!=='accordion-'+c){a.classList.remove('open');openCategories.delete(a.id.replace('accordion-',''));} }); el.classList.toggle('open'); if(el.classList.contains('open')) openCategories.add(c); else openCategories.delete(c); }
+function toggleCategoryAccordion(c) { const el = document.getElementById('accordion-'+c); if(!el) return; document.querySelectorAll('.admin-category-accordion').forEach(a => { if(a.id!=='accordion-'+c){a.classList.remove('open');openCategories.delete(a.id.replace('accordion-','',''));} }); el.classList.toggle('open'); if(el.classList.contains('open')) openCategories.add(c); else openCategories.delete(c); }
 async function addProduct(c) {
 const n = await showPrompt('Nuovo Prodotto', 'Nome (🇮🇹):', 'Es: Margherita'); if(!n||!n.trim()) return;
 const ps = await showPrompt('Prezzo', 'Prezzo (€):', 'Es: 7.00', '5.00'); if(ps===null) return; const p = parseFloat(ps.replace(',','.')); if(isNaN(p)||p<0) return;
