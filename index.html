@@ -50,26 +50,26 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     min-height:-webkit-fill-available !important;
     background: var(--dark) !important;
     position:relative;
-    overflow-y:auto;
-    overflow-x:hidden;
+    overflow-y:scroll;
     -webkit-overflow-scrolling:touch;
     z-index:10;
     padding-bottom:calc(110px + env(safe-area-inset-bottom)) !important;
+    will-change: scroll-position;
 }
 
-.header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:hidden}
-
+.header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:visible}
 .logo-area{
     width:100%;
     position:relative;
-    overflow:hidden;
+    overflow:visible;
     padding-top:env(safe-area-inset-top);
-    padding-bottom:0px; 
-    margin-bottom:0px;
+    padding-bottom:0; 
+    margin-bottom:0;
     background-color: var(--dark) !important;
     box-shadow: none !important;
+    line-height: 0;
+    z-index: 10;
 }
-
 .logo-area img{
     width:100%;
     height:auto;
@@ -78,12 +78,24 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     max-height:220px;
     position:relative;
     z-index:1;
+    margin:0;
     mix-blend-mode: normal !important;
 }
-
-.hero-section{position:relative;height:130px;overflow:hidden;flex-shrink:0;margin-bottom:0}
+/* SFUMATURA RIDOTTA A 30px */
+.logo-area::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: linear-gradient(to bottom, var(--dark) 0%, var(--dark) 10%, transparent 100%);
+    pointer-events: none;
+    z-index: 11;
+}
+.hero-section{position:relative;height:130px;overflow:hidden;flex-shrink:0;margin-bottom:0;margin-top:-1px;z-index:1;background:var(--dark);}
 .hero-img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;background-color:var(--dark) !important;}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,var(--dark) 100%);z-index:2;pointer-events:none}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg, var(--dark) 0%, transparent 35%, transparent 70%, var(--dark) 100%);z-index:2;pointer-events:none}
 
 .status-banner{position:relative;margin:8px auto 4px!important;padding:6px 16px!important;z-index:10;font-weight:700;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;display:inline-flex;align-items:center;background:rgba(26,18,9,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(212,168,75,.4);border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
 .status-open{color:#f0d78c!important;text-shadow:0 0 8px rgba(212,168,75,.8)!important}
@@ -875,13 +887,11 @@ function applyPalette(name) {
 function applyPaletteFromFirebase() {
   if (paletteListener) return;
 
-  // 1. Applica subito l'ultimo tema salvato in locale per azzerare il ritardo e il flicker iniziale
   const savedPalette = localStorage.getItem('grasso_current_palette');
   if (savedPalette) {
     applyPalette(savedPalette);
   }
 
-  // 2. Ascolta i cambiamenti in tempo reale da Firebase
   paletteListener = db.ref('settings/colorPalette').on('value', s => {
     const paletteName = s.val() || 'autunno';
     localStorage.setItem('grasso_current_palette', paletteName);
