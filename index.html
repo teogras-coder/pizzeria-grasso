@@ -478,7 +478,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="modal-rifiuto" id="modalRifiutoOrdine" style="display:none;"><div class="modal-rifiuto-content"><div class="modal-rifiuto-icon">❌</div><h2 data-i18n="order_rejected_title">Ordine Rifiutato</h2><p id="motivoRifiutoModal" data-i18n="order_rejected_default">La pizzeria non può accettare il tuo ordine.</p><button class="btn-ho-capito" onclick="chiudiModalRifiuto()" data-i18n="understood">Ho capito</button></div></div>
 <div id="welcomeScreen" class="welcome-screen">
 <img src="https://i.postimg.cc/v8Sfxb5T/IMG-1602.png" alt="Grasso" class="welcome-logo">
-<h1 class="welcome_title"> Benvenuto </h1>
+<h1 class="welcome-title" data-i18n="welcome_title">🍕 Benvenuto da Grasso!</h1>
 <div class="home-instructions"><h3 data-i18n="save_home_title">📱 Salva l'app sulla Home!</h3><ol><li><span data-i18n="save_home_step1">Tocca il tasto <strong>Condividi</strong></span></li><li><span data-i18n="save_home_step2">Tocca <strong>"Aggiungi a Home"</strong></span></li><li><span data-i18n="save_home_step3">Ordina con un tocco! 🚀</span></li></ol></div>
 <div class="lang-selector">
 <label data-i18n="language_label">🌍 Lingua / Language</label>
@@ -836,7 +836,7 @@ showToast(t('app_updated'));
 });
 }
 // ============================================================
-// TRADUZIONI & PALETTE
+// TRADUZIONI & PALETTE (OTTIMIZZATE CONTRO IL RITARDO)
 // ============================================================
 function t(key){return(translations[currentLang]&&translations[currentLang][key])||translations.it[key]||key}
 function applyTranslations(){
@@ -847,7 +847,6 @@ updateStatusBanner();
 function changeLanguage(lang){currentLang=lang;localStorage.setItem('grasso_lang',lang);document.getElementById('langSelect').value=lang;applyTranslations();if(document.getElementById('cartModal').classList.contains('active')){openCart();if(timeMode==='scheduled')generateValidDates();}if(document.getElementById('myOrdersView').style.display==='block')renderMyOrders();if(currentSearchCat)renderProductList(currentSearchCat,document.getElementById('productSearch')?.value||'');}
 function detectBrowserLanguage(){const saved=localStorage.getItem('grasso_lang');if(saved)return saved;const bl=(navigator.language||navigator.userLanguage||'it').toLowerCase();if(bl.startsWith('de'))return'de';if(bl.startsWith('en'))return'en';return'it';}
 
-// PALETTE (CAMBIANO TUTTI I COLORI DELLA PAGINA, INCLUSO LO SFONDO)
 const palettes = { 
 autunno:{icon:'fa-leaf',colors:{gold:'#d4a84b',goldLight:'#f0d78c',goldDark:'#b8860b',dark:'#1a1209',card:'#2a1e13',cardLight:'#3d2b1a',cream:'#f5e6c8'}},
 inverno:{icon:'fa-snowflake',colors:{gold:'#a8c3d4',goldLight:'#c8d8e4',goldDark:'#7a99b0',dark:'#1a2530',card:'#203040',cardLight:'#304050',cream:'#e8f0f5'}},
@@ -863,12 +862,31 @@ pistacchio:{icon:'fa-leaf',colors:{gold:'#a8c686',goldLight:'#c8e8a8',goldDark:'
 vaniglia:{icon:'fa-cookie-bite',colors:{gold:'#f5e6a8',goldLight:'#fff8c8',goldDark:'#d4c48a',dark:'#2a2618',card:'#353122',cardLight:'#454132',cream:'#fffff0'}},
 nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',card:'#2a2118',cardLight:'#3a3128',cream:'#f5ece0'}}
 };
-let paletteListener=null; function applyPaletteFromFirebase(){   if(paletteListener) return;   paletteListener=db.ref('settings/colorPalette').on('value',s=>{     applyPalette(s.val()||'autunno');   }); }
-function applyPalette(name){
-  const p=palettes[name]||palettes.autunno;
-  const colors=p.colors||p;
-  const r=document.documentElement;
-  Object.keys(colors).forEach(k=>r.style.setProperty('--'+k,colors[k]));
+
+let paletteListener = null;
+
+function applyPalette(name) {
+  const p = palettes[name] || palettes.autunno;
+  const colors = p.colors || p;
+  const r = document.documentElement;
+  Object.keys(colors).forEach(k => r.style.setProperty('--' + k, colors[k]));
+}
+
+function applyPaletteFromFirebase() {
+  if (paletteListener) return;
+
+  // 1. Applica subito l'ultimo tema salvato in locale per azzerare il ritardo e il flicker iniziale
+  const savedPalette = localStorage.getItem('grasso_current_palette');
+  if (savedPalette) {
+    applyPalette(savedPalette);
+  }
+
+  // 2. Ascolta i cambiamenti in tempo reale da Firebase
+  paletteListener = db.ref('settings/colorPalette').on('value', s => {
+    const paletteName = s.val() || 'autunno';
+    localStorage.setItem('grasso_current_palette', paletteName);
+    applyPalette(paletteName);
+  });
 }
 
 // ============================================================
@@ -1006,17 +1024,14 @@ const hasCache = loadFromCache();
 if (!hasCache) { forceUpdateFromServer(); } else { startVersionListener(); }
 initApp();
 
-// 🔧 FIX LOGOUT: Unico listener centrale
 firebase.auth().onAuthStateChanged(u => {
   if (!u) {
-    // Nessun utente -> entra anonimo per permettere l'uso base
     firebase.auth().signInAnonymously().catch(console.error);
     return;
   }
 
   if (u.isAnonymous) {
     currentUser = u;
-    // Se era ospite, resta dentro l'app, altrimenti welcome
     const savedType = localStorage.getItem('grasso_user_type');
     if (savedType === 'guest' || savedType === 'registered') {
       hideWelcomeScreen();
@@ -1029,7 +1044,6 @@ firebase.auth().onAuthStateChanged(u => {
     return;
   }
 
-  // Utente vero registrato
   currentUser = u;
   userType = 'registered';
   localStorage.setItem('grasso_user_type', 'registered');
@@ -1040,7 +1054,6 @@ firebase.auth().onAuthStateChanged(u => {
 function initApp() {
 cleanLocalHistory();
 try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
-// 🔧 FIX RECENSIONI: loadReviewsHome() parte subito
 startStatusListener(); startServicesListener(); loadReviewsPublic(); loadReviewsHome(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
 setTimeout(() => {
 richiediPermessoNotifiche();
@@ -1080,14 +1093,13 @@ function updateCartBadge(){
   const nb=document.getElementById('navCartBadge');
   if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}
 
-  // GESTIONE BARRA A SCOMPARSA IN BASSO (VISIBILE SOLO SE CI SONO PRODOTTI)
   const stickyBar = document.getElementById('stickyCartBar');
   const stickyCount = document.getElementById('stickyCartCount');
   const stickyTotal = document.getElementById('stickyCartTotal');
   
   if (stickyBar && stickyCount && stickyTotal) {
     if (totalItemsCount > 0) {
-      stickyBar.style.display = 'flex'; // Mostra la barra
+      stickyBar.style.display = 'flex';
       stickyCount.textContent = totalItemsCount;
       let currentTot = 0;
       cart.forEach(i => {
@@ -1096,7 +1108,7 @@ function updateCartBadge(){
       });
       stickyTotal.textContent = '€' + currentTot.toFixed(2);
     } else {
-      stickyBar.style.display = 'none'; // Nasconde la barra se vuoto
+      stickyBar.style.display = 'none';
     }
   }
 
@@ -1312,7 +1324,7 @@ else { document.getElementById('addressGroup').style.display = 'none'; document.
 updateCartTotals();
 }
 // ============================================================
-// LOGICA ORARI (PRE-ORDINI) - MODIFICATA CON SELEZIONE GIORNO
+// LOGICA ORARI (PRE-ORDINI)
 // ============================================================
 function selectTimeMode(m){
 if (m === 'asap' && !checkIfOpen()) {
@@ -1356,7 +1368,7 @@ updateCartBadge();
 openCart();
 }
 // ============================================================
-// OPEN CART (CON PULSANTE RIMUOVI PER OGNI PRODOTTO E SEPARAZIONE CATEGORIE)
+// OPEN CART
 // ============================================================
 function openCart(){
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
@@ -1506,7 +1518,7 @@ snap.forEach(child => { const d = child.val(); if (d) updateLocalOrderStatus(o.o
 }
 }
 // ============================================================
-// UPDATE LOCAL ORDER STATUS (CON NOTIFICHE WEB)
+// UPDATE LOCAL ORDER STATUS
 // ============================================================
 function updateLocalOrderStatus(oid, ns, mr, delayMinutes){
 try{
@@ -1585,40 +1597,17 @@ updateNavLiveDotOld();
 // NOTIFICHE WEB
 // ============================================================
 async function richiediPermessoNotifiche() {
-if (!('Notification' in window)) {
-console.log('❌ Questo browser non supporta le notifiche');
-return false;
-}
-if (Notification.permission === 'granted') {
-console.log('✅ Permesso già concesso');
-return true;
-}
-if (Notification.permission === 'denied') {
-console.log('❌ Permesso negato dall\'utente');
-return false;
-}
+if (!('Notification' in window)) return false;
+if (Notification.permission === 'granted') return true;
+if (Notification.permission === 'denied') return false;
 try {
 const permission = await Notification.requestPermission();
-if (permission === 'granted') {
-console.log('✅ Permesso concesso!');
-return true;
-} else {
-console.log('❌ Permesso negato');
-return false;
-}
-} catch(e) {
-console.log('Errore richiesta permesso:', e);
-return false;
-}
+return permission === 'granted';
+} catch(e) { return false; }
 }
 function inviaNotificaWeb(titolo, messaggio, icona = '/icon-clienti-192.png') {
 try {
-if (!('Notification' in window)) return;
-if (Notification.permission !== 'granted') return;
-if (document.hasFocus()) {
-console.log('📱 App in primo piano, mostro solo toast');
-return;
-}
+if (!('Notification' in window) || Notification.permission !== 'granted' || document.hasFocus()) return;
 const notifica = new Notification(titolo, {
 body: messaggio,
 icon: icona,
@@ -1626,22 +1615,11 @@ badge: '/icon-clienti-192.png',
 tag: 'order_update_' + Date.now(),
 requireInteraction: true,
 silent: false,
-data: {
-timestamp: Date.now()
-}
+data: { timestamp: Date.now() }
 });
-notifica.onclick = function() {
-window.focus();
-this.close();
-showMyOrders();
-};
-setTimeout(() => {
-if (notifica) notifica.close();
-}, 10000);
-console.log('🔔 Notifica web inviata:', messaggio);
-} catch(e) {
-console.log('Errore invio notifica web:', e);
-}
+notifica.onclick = function() { window.focus(); this.close(); showMyOrders(); };
+setTimeout(() => { if (notifica) notifica.close(); }, 10000);
+} catch(e) {}
 }
 // ============================================================
 // AGGIORNAMENTO SILENZIOSO DEL SERVICE WORKER
@@ -1655,47 +1633,38 @@ document.addEventListener('scroll', () => { lastActivity = Date.now(); });
 navigator.serviceWorker.register('/sw.js')
 .then(reg => {
 registration = reg;
-console.log('✅ SW registrato');
 document.addEventListener('visibilitychange', () => {
-if (!document.hidden && registration) {
-registration.update();
-console.log('📱 Controllo aggiornamenti SW (silenzioso)');
-}
+if (!document.hidden && registration) registration.update();
 });
 registration.addEventListener('updatefound', () => {
 const newSW = registration.installing;
-console.log('🔄 Nuova versione SW trovata, aggiorno in silenzio...');
 newSW.addEventListener('statechange', () => {
 if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
 newSW.postMessage({ type: 'SKIP_WAITING' });
-console.log('✅ SW aggiornato silenziosamente!');
 }
 });
 });
 })
-.catch(err => console.log('❌ Errore SW:', err));
+.catch(err => {});
 let refreshing = false;
 navigator.serviceWorker.addEventListener('controllerchange', () => {
 if (refreshing) return;
 refreshing = true;
-console.log('🔄 SW cambiato, ricarico in silenzio...');
 const checkInactivity = setInterval(() => {
 if (Date.now() - lastActivity > 5000) {
 clearInterval(checkInactivity);
-console.log('🔄 Ricarico in silenzio (utente inattivo)');
 window.location.reload();
 }
 }, 1000);
 setTimeout(() => {
 clearInterval(checkInactivity);
 if (!refreshing) return;
-console.log('🔄 Ricarico forzato (timeout)');
 window.location.reload();
 }, 30000);
 });
 }
 // ============================================================
-// INVIO ORDINE (CON SELEZIONE GIORNO)
+// INVIO ORDINE
 // ============================================================
 async function confirmAndSendOrder(){
 if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(t('wait_minute'));return}
@@ -1830,7 +1799,7 @@ if(!orderId)return;const conferma=await showConfirm("Vuoi davvero annullare ques
 try{const snapshot=await db.ref('ordini').orderByChild('orderId').equalTo(orderId).once('value');let key=null;snapshot.forEach(child=>{key=child.key;});if(key){await db.ref('ordini/'+key).update({status:'annullato',motivoAnnullamento:'Annullato dal cliente',annullatoIl:Date.now()});let localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders=localOrders.map(o=>o.orderId===orderId?{...o,status:'annullato'}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));showToast('✅ Ordine annullato!');renderMyOrders();}else{showToast('❌ Ordine non trovato sul server');}}catch(e){console.error(e);showToast('❌ Errore annullamento');}
 }
 // ============================================================
-// RENDER MY ORDERS (CON BADGE PRE-ORDINE)
+// RENDER MY ORDERS
 // ============================================================
 function renderMyOrders(){
 const l=document.getElementById('myOrdersList');if(!l)return;
@@ -1848,13 +1817,12 @@ const puoAnnullare=puoAnnullareOrdine(x);
 const annullamentoInfo=!puoAnnullare&&s!=='annullato'&&s!=='rifiutato'&&x.status!=='delivered'?`<span style="color:#f59e0b;font-size:0.8rem;font-weight:600;">🚫 Non più annullabile</span>`:'';
 return`<div class="my-order-card" style="border-left-color:${bc}"><div class="my-order-header"><span class="my-order-id">📦 ${x.orderId} ${preOrderBadge}</span><span class="my-order-date">${ds} • ${tl}</span></div><div class="my-order-items">${x.items}</div><div class="my-order-total">€${x.total.toFixed(2)}</div>${tr}<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${puoAnnullare?`<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla Ordine</button>`:''}${annullamentoInfo}${s==='annullato'?`<span style="color:#f87171;font-weight:bold;">🗑️ ORDINE ANNULLATO</span>`:''}${s!=='rifiutato'&&s!=='annullato'&&!x.reviewed?`<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>`:''}${x.reviewed?`<span class="btn-reviewed">✅ Già recensito</span>`:''}</div></div>`
 }).join('')
-}catch(e){console.log(e);l.innerHTML='<p style="color:red">Errore caricamento ordini</p>'}
+}catch(e){l.innerHTML='<p style="color:red">Errore caricamento ordini</p>'}
 }
 function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementById('reviewOrderId').value=oid;openReviewModal()}
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
 function loadReviewsPublic(){db.ref('recensioni').orderByChild('status').equalTo('approved').limitToLast(10).once('value',s=>{const rv=[];let totalApproved=0;db.ref('recensioni').orderByChild('status').equalTo('approved').once('value',countSnap=>{totalApproved=countSnap.numChildren()||0;s.forEach(c=>{const r=c.val();rv.push({id:c.key,...r});});rv.sort((a,b)=>b.timestamp-a.timestamp);const l=document.getElementById('reviewsPublicList');if(!l)return;if(!rv.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}const maxToShow=5,recensioniDaMostrare=rv.slice(0,maxToShow),rimanenti=totalApproved-maxToShow;let html=`<div style="text-align:center;margin-bottom:20px;padding:15px;background:rgba(212,168,75,0.1);border-radius:12px;border:1px solid rgba(212,168,75,0.3);"><div style="color:var(--gold);font-size:1.8rem;font-weight:700;">⭐ ${totalApproved}</div><div style="color:var(--cream);font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Recensioni totali</div></div>`;html+=recensioniDaMostrare.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`}).join('');if(rimanenti>0){html+=`<div style="text-align:center;color:#8a7a5a;padding:20px;font-size:0.9rem;font-weight:600;"><i class="fas fa-chevron-down"></i> ...e altre ${rimanenti} recensioni</div>`;}l.innerHTML=html;});})}
 
-// FUNZIONE PER CARICARE RECENSIONI IN HOME (DICONO DI NOI) - FIX COMPLETO
 function loadReviewsHome(){
   db.ref('recensioni').on('value', snap => {
     const rv = [];
@@ -1887,16 +1855,12 @@ function loadReviewsHome(){
   });
 }
 
-function controllaRifiutiCliente(){try{const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).once('value').then(s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})}).catch(e=>console.log("Errore controllo rifiuti", e));}catch(e){}}
+function controllaRifiutiCliente(){try{const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).once('value').then(s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})}).catch(e=>{});}catch(e){}}
 function playNotificationSound(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.setValueAtTime(880,c.currentTime);o.frequency.setValueAtTime(1100,c.currentTime+.1);o.frequency.setValueAtTime(880,c.currentTime+.2);g.gain.setValueAtTime(.3,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.4);o.start(c.currentTime);o.stop(c.currentTime+.4)}catch(e){}}
 function acceptCookies(){localStorage.setItem('cookies_accepted','true');document.getElementById('cookieBanner').style.display='none'}
 function openPrivacyModal(){document.getElementById('privacyModal').classList.add('active')}
 function closePrivacyModal(){document.getElementById('privacyModal').classList.remove('active')}
-// ============================================================
-// FUNZIONE UNIFICATA: sanitizeWA (ex doppia definizione)
-// Rimuove i tag HTML pericolosi < > e fa escape dei caratteri
-// speciali di WhatsApp (* _ ~ `) così i messaggi non si rompono.
-// ============================================================
+
 function sanitizeWA(txt){
   if (txt === null || txt === undefined) return '';
   return String(txt)
@@ -1904,18 +1868,14 @@ function sanitizeWA(txt){
     .replace(/[*_~`]/g, '\\$&');
 }
 
-// 1. Sostituisci callPhone
 function callPhone() {
   const tel = (appData.settings.visiblePhone || "0884660377").replace(/\s/g, '');
   window.open("tel:" + tel, "_self");
 }
 
-// 2. Sostituisci openMaps (FIX iOS: link nativo)
 function openMaps() {
   const address = "Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";
   const mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(address);
-  
-  // Crea un link nativo invisibile per simulare il tap dell'utente (evita il WebKit freeze su PWA iOS)
   const tempLink = document.createElement('a');
   tempLink.href = mapsUrl;
   tempLink.target = '_blank';
@@ -1925,7 +1885,6 @@ function openMaps() {
   document.body.removeChild(tempLink);
 }
 
-// 3. FIX PAGINA BIANCA AL RITORNO (VERSIONE RINFORZATA)
 function fixWhitePage() {
   const frame = document.querySelector('.phone-frame');
   const main = document.getElementById('mainApp');
@@ -1938,7 +1897,6 @@ function fixWhitePage() {
   if (frame) {
     frame.style.display = 'block';
     frame.style.height = '-webkit-fill-available';
-    // Forza il ricalcolo del rendering DOM
     void frame.offsetWidth;
   }
   if (main) main.style.display = 'block';
@@ -1978,7 +1936,6 @@ else { document.getElementById('checkoutBtn').disabled = false; document.getElem
 function updateFooter() { const footerInfo = document.getElementById('footerInfo'); if (footerInfo) { const city = appData.branding?.city || "Manfredonia"; const phone = appData.settings?.visiblePhone || "0884660377"; footerInfo.innerHTML = `${city} • Tel. <span id="footerPhone">${phone}</span>`; } }
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso";}
 
-// FUNZIONE PROMO IN HOME (CARD)
 function renderPromotionsBanner(){
   const container = document.getElementById('promoCardContainer');
   if (!container) return;
@@ -2010,8 +1967,6 @@ function showCategories(){renderCategories();document.getElementById('categories
 function renderCategories(){
     const l = document.getElementById('categoriesList');
     if (!l) return;
-    
-    // Converte e ordina le categorie in base al campo numerico 'order'
     const catsArray = Object.entries(appData.categories || {}).map(([key, val]) => ({
         key: key,
         ...val
@@ -2095,7 +2050,6 @@ function applyImages(){
   renderCategories();
 }setTimeout(updateNavLiveDotOld,500);
 
-// DEBOUNCE PER LA RICERCA GLOBALE (1 SECONDO)
 let searchTimeout;
 function debouncedSearchGlobal(term) {
   clearTimeout(searchTimeout);
