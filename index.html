@@ -872,7 +872,7 @@ crema:{icon:'fa-ice-cream',colors:{gold:'#f0d9a8',goldLight:'#fff0c8',goldDark:'
 cioccolato:{icon:'fa-cookie',colors:{gold:'#c48a5a',goldLight:'#e8b88a',goldDark:'#8b5a2b',dark:'#1a1209',card:'#251a10',cardLight:'#352a1a',cream:'#f5e6c8'}},
 pistacchio:{icon:'fa-leaf',colors:{gold:'#a8c686',goldLight:'#c8e8a8',goldDark:'#7aa85a',dark:'#1e2618',card:'#26301e',cardLight:'#36402e',cream:'#eef5e8'}},
 vaniglia:{icon:'fa-cookie-bite',colors:{gold:'#f5e6a8',goldLight:'#fff8c8',goldDark:'#d4c48a',dark:'#2a2618',card:'#353122',cardLight:'#454132',cream:'#fffff0'}},
-nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',card:'#2a2118',cardLight:'#3a3128',cream:'#f5ece0'}}
+nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',card:'#352a1e',cardLight:'#453a2e',cream:'#f5ece0'}}
 };
 
 let paletteListener = null;
@@ -1676,82 +1676,19 @@ window.location.reload();
 // ============================================================
 // INVIO ORDINE
 // ============================================================
-async function confirmAndSendOrder(){
-if(Date.now()-(parseInt(localStorage.getItem('lastOrderTime'))||0)<60000){showToast(t('wait_minute'));return}
-const pc=document.getElementById('privacyConsent');if(!pc||!pc.checked){showToast(t('accept_privacy'));return}
-const hp=document.getElementById('honeypot');if(hp&&hp.value!=='')return;
-const n=document.getElementById('customerName').value.trim(),p=document.getElementById('customerPhone').value.trim(),st=document.getElementById('customerStreet').value.trim(),nu=document.getElementById('customerNumber').value.trim(),addr=`${st} ${nu}`.trim(),nt=document.getElementById('customerNotes').value.trim();
-if(!n){showToast(t('fill_name'));return}
-const ph=p.replace(/[\s\-().+]/g,'');if(!/^(\+?39)?3[0-9]{9}$/.test(ph)&&!/^0[0-9]{6,9}$/.test(ph)){showToast(t('invalid_phone'));return}
-const esauriti = cart.filter(item => !item.isPromo && appData.menu[item.cat] && appData.menu[item.cat][appData.menu[item.cat].findIndex(p => p.name === item.name)]?.disabled === true);
-if (esauriti.length > 0) { const nomiEsauriti = esauriti.map(item => item.name).join(', ');showToast(`❌ Prodotti esauriti: ${nomiEsauriti}`);esauriti.forEach(item => { const idx = cart.indexOf(item); if (idx > -1) cart.splice(idx, 1); });updateCartBadge();if (document.getElementById('cartModal').classList.contains('active')) openCart();return; }
-let pt=0;cart.forEach(i=>{if(i.isPromo)pt+=i.totalPrice;else pt+=(i.price*i.qty)});
-let df=0;
-if(orderType==='delivery'&&appData.settings.deliveryEnabled!==false){
-if(window.customerGPSLat&&window.customerGPSLng&&appData.settings.pizzeriaLat&&appData.settings.pizzeriaLng){
-const dist=calculateDistance(appData.settings.pizzeriaLat,appData.settings.pizzeriaLng,window.customerGPSLat,window.customerGPSLng);
-const{fee,outOfRange}=computeDeliveryFee(dist);
-if(outOfRange){showToast(t('out_of_range'));return}
-df=fee
-}else df=parseFloat(appData.settings.deliveryBaseFee)||3
-}
-const mo = parseFloat(appData.settings.minDeliveryOrder) || 0;
-if(orderType === 'delivery'){
-if(!st||!nu){ showToast(t('fill_address')); return; }
-if(pt < mo){
-showToast(`${t('min_order')}${mo.toFixed(2)} (subtotale prodotti: €${pt.toFixed(2)})`);
-return;
-}
-}
-let sch = 'Prima possibile';
-let isPreOrder = false;
-let scheduledDate = null;
-let selectedDayOffset = 0;
-if (timeMode === 'scheduled') {
-const dateSelect = document.getElementById('scheduledDateSelect');
-const timeSelect = document.getElementById('scheduledTimeSelect');
-const selectedDateOption = dateSelect.options[dateSelect.selectedIndex];
-const selectedTimeOption = timeSelect.options[timeSelect.selectedIndex];
-if (!selectedDateOption || selectedDateOption.value === "") {
-showToast(t('select_valid_date'));
-return;
-}
-if (!selectedTimeOption || !selectedTimeOption.value) {
-showToast(t('select_valid_time'));
-return;
-}
-const dayOffset = parseInt(selectedDateOption.value);
-const dateStr = selectedDateOption.dataset.date;
-const timeStr = selectedTimeOption.value;
-if (dayOffset === 0 && checkIfOpen()) {
-sch = timeStr;
-isPreOrder = false;
-scheduledDate = null;
-} else {
-isPreOrder = true;
-scheduledDate = dateStr;
-sch = timeStr;
-}
-selectedDayOffset = dayOffset;
-} else if (!checkIfOpen()) {
-showToast(t('closed_now'));
-return;
-}
-const ft=pt+df;
-const oi=[];cart.forEach(i=>{if(i.isPromo)oi.push({name:`🎁 ${i.promoTitle}`,qty:1,price:i.totalPrice,isPromo:true});else oi.push({name:i.name,qty:i.qty,price:i.price,cat:i.cat})});
-await sendOrder({
-name:n, phone:p, address:orderType==='delivery'?sanitizeWA(addr):'', notes:sanitizeWA(nt), type:orderType,
-scheduledTime:sch, isPreOrder: isPreOrder, scheduledDate: scheduledDate,
-productsTotal:pt, deliveryFee:df, finalTotal:ft, items:oi, customerLat:window.customerGPSLat||null, customerLng:window.customerGPSLng||null
-});
-}
 async function sendOrder(d){
 const btn=document.getElementById('checkoutBtn'),cb=[...cart];
 if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...'}
 try{
 const ref=db.ref('ordini').push();const snap=await db.ref('counter/ordini').transaction(c=>(c||0)+1);const num=snap.snapshot.val();const oid='ORD-'+String(num).padStart(5,'0');d.orderId=oid;
+
+// Ottieni l'ID dell'utente autenticato (anonimo o registrato)
+const uid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'anonimo';
+
 await ref.set({
-orderId:oid, customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
+orderId:oid,
+userId:uid, // <-- Associa l'ordine in modo sicuro all'ID utente
+customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
 address:d.type==='delivery'?sanitizeWA(d.address):'', notes:sanitizeWA(d.notes), type:d.type,
 scheduledTime:d.scheduledTime,
 isPreOrder: d.isPreOrder || false,
