@@ -1856,10 +1856,14 @@ function renderCategories(){
     const l = document.getElementById('categoriesList');
     if (!l) return;
     
-    const catsArray = Object.keys(appData.categories || {}).map(key => ({
+    // Converte l'oggetto in un array e ordina in base al campo 'order' salvato nel gestionale
+    let catsArray = Object.keys(appData.categories || {}).map(key => ({
         key: key,
         ...appData.categories[key]
     }));
+
+    // Ordina le categorie in base alla proprietà numerica 'order'
+    catsArray.sort((a, b) => (a.order || 0) - (b.order || 0));
 
     l.innerHTML = catsArray.map(catItem => {
         const c = catItem.key;
