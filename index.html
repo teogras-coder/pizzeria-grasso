@@ -81,7 +81,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     margin:0;
     mix-blend-mode: normal !important;
 }
-/* SFUMATURA RIDOTTA A 30px */
 .logo-area::after {
     content: '';
     position: absolute;
@@ -105,14 +104,12 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .section-divider span{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);text-shadow:0 0 10px var(--gold)}
 .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent);margin:0 15px}
 
-/* RICERCA GLOBALE IN HOME */
 .global-search-wrap { padding: 10px 20px 5px; }
 .search-bar-3d{position:relative;margin-bottom:10px;}
 .search-bar-3d input{width:100%;padding:14px 14px 14px 45px;border-radius:14px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:.95rem;outline:none;box-shadow:0 4px 0 var(--shadow);transition: border-color .2s;}
 .search-bar-3d input:focus{border-color:var(--gold);}
 .search-bar-3d i{position:absolute;left:15px;top:14px;color:var(--gold);z-index:2;}
 
-/* CARD PROMO - APPARE SOLO SE PRESENTE */
 #promoCardContainer {
     display: none; 
     padding: 0 20px 10px;
@@ -149,7 +146,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* GRIGLIA CATEGORIE A DOPPIA FILA CON SCORRIMENTO ORIZZONTALE (SWIPE) */
 .menu-list {
     display: grid;
     grid-template-rows: repeat(2, auto);
@@ -202,7 +198,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .menu-btn-3d .btn-content h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light);margin-bottom:2px;line-height:1.1;}
 .menu-btn-3d .btn-content p{font-size:.7rem;color:#a08b6d;}
 
-/* SEZIONE RECENSIONI IN HOME - SCORREVOLI */
 .reviews-home-wrap {
     padding: 0 20px;
     margin-bottom: 15px;
@@ -276,7 +271,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
     text-align: right;
 }
 
-/* ACCESSO RAPIDO */
 .quick-nav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:15px 20px 20px}
 .quick-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 4px;border-radius:14px;border:1px solid rgba(212,168,75,.2);background:linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);color:var(--cream);cursor:pointer;position:relative;box-shadow:0 4px 0 var(--shadow),0 6px 12px rgba(0,0,0,.4);transition:all .2s ease;-webkit-tap-highlight-color:rgba(212,168,75,.3)}
 .quick-nav-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow),0 2px 6px rgba(0,0,0,.3)}
@@ -434,7 +428,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-ho-capito:active{transform:translateY(4px);box-shadow:0 0 0 #991b1b}
 @media(max-width:768px){.modal-rifiuto-content{padding:30px 20px;margin-bottom:env(safe-area-inset-bottom)}}
 
-/* FOOTER PULITO */
 .app-footer{background:linear-gradient(180deg,var(--card) 0%,var(--dark) 100%);padding:20px;text-align:center;border-top:2px solid var(--gold-dark);margin-top: 20px;}
 .footer-info{color:#8a7a5a;font-size:.75rem}
 .footer-links{margin-top:10px;display:flex;justify-content:center;gap:15px}
@@ -472,7 +465,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-guest{background:linear-gradient(180deg,var(--card-light) 0%,var(--card) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
 
-/* EFFETTO PARTICELLE FESTIVE */
 .festive-particle {
   position: fixed;
   top: -20px;
@@ -516,7 +508,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div id="statusBanner" class="status-banner status-closed"><span id="statusText" data-i18n="closed">🔴 CHIUSO</span></div>
 </header>
 <div id="mainMenu">
-<!-- RICERCA GLOBALE IN HOME -->
 <div class="global-search-wrap">
     <div class="search-bar-3d">
         <i class="fas fa-search"></i>
@@ -528,14 +519,11 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="menu-list" id="categoriesSkeletons"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
 <div class="menu-list" id="categoriesList" style="display:none;"></div>
 
-<!-- CARD PROMO (APPARE SOLO SE PRESENTE) -->
 <div id="promoCardContainer"></div>
 
-<!-- RECENSIONI IN HOME (DICONO DI NOI) -->
 <div class="section-divider" style="margin-top:10px;"><span>💬 Dicono di noi</span></div>
 <div class="reviews-home-wrap">
     <div class="reviews-scroll" id="reviewsHomeList">
-        <!-- Le recensioni verranno caricate qui dinamicamente -->
     </div>
 </div>
 
@@ -582,7 +570,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </footer>
 </div>
 
-<!-- BARRA FISSA CARRELLO IN BASSO (A SCOMPARSA E CLICCABILE) -->
 <div id="stickyCartBar" onclick="openCart()" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg, var(--card-light) 0%, var(--card) 100%); border-top:2px solid var(--gold); padding:12px 20px; z-index:1500; justify-content:space-between; align-items:center; box-shadow:0 -5px 20px rgba(0,0,0,0.6); backdrop-filter:blur(10px); cursor:pointer;">
   <div style="display:flex; flex-direction:column;">
     <span style="font-size:0.75rem; color:#8a7a5a; text-transform:uppercase; font-weight:700;" data-i18n="cart">Carrello</span>
@@ -593,7 +580,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
   </button>
 </div>
 
-<!-- CART MODAL -->
 <div class="modal-3d" id="cartModal"><div class="modal-content-3d"><div class="modal-header"><h2><i class="fas fa-shopping-cart"></i> <span data-i18n="your_order">Il Tuo Ordine</span></h2><button class="close-btn-3d" onclick="closeCart()">×</button></div><div id="cartItems"></div><div class="delivery-fee-row" id="deliveryFeeRow" style="display:none;"><span class="delivery-fee-label"><i class="fas fa-motorcycle"></i> <span data-i18n="delivery_fee">Costo consegna</span></span><span class="delivery-fee-value" id="deliveryFeeValue">€0.00</span></div><div class="distance-info" id="distanceInfo" style="display:none;"><div class="distance-info-text" id="distanceText">📍 Distanza: -- km</div></div><div class="cart-total-3d" id="cartTotalSection" style="display:none;"><span class="cart-total-label" data-i18n="total">Totale</span><span class="cart-total-amount" id="totalAmount">€0.00</span></div><div class="order-type-toggle" id="orderTypeToggle" style="display:none;"><div class="type-option active" id="typeDelivery" onclick="selectOrderType('delivery')"><i class="fas fa-motorcycle"></i> <span data-i18n="delivery_short">Consegna</span></div><div class="type-option" id="typePickup" onclick="selectOrderType('pickup')"><i class="fas fa-store"></i> <span data-i18n="pickup_short">Ritiro</span></div></div><div class="customer-form" id="customerForm" style="display:none;"><h3 style="color:var(--gold);margin-bottom:15px;"><i class="fas fa-user"></i> <span data-i18n="your_data">I Tuoi Dati</span></h3>
 <div class="form-group">
 <label><i class="fas fa-clock"></i> <span data-i18n="time_label">Orario</span> <span id="timeTypeLabel" data-i18n="delivery_short">consegna</span></label>
@@ -615,16 +601,13 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </div>
 </div>
 <div class="form-group"><label data-i18n="name_label">Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div><div class="form-group"><label data-i18n="phone_label">Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div><div class="form-group" id="addressGroup" style="display:none;"><label data-i18n="address_label">Indirizzo di Consegna *</label><div style="display:flex;gap:8px;"><input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex:3;"><input type="text" id="customerNumber" placeholder="Civico" style="flex:1;"></div><button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> <span data-i18n="use_gps">Usa GPS</span></button></div><div class="form-group"><label data-i18n="notes_label">Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div><div aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9999px;top:-9999px;"><input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1"></div><div class="form-group"><div class="privacy-checkbox"><input type="checkbox" id="privacyConsent" required><label for="privacyConsent"><span data-i18n="privacy_accept">Ho letto e accetto la</span> <a onclick="openPrivacyModal()" data-i18n="privacy_policy">Privacy Policy</a> *</label></div></div></div><button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> <span data-i18n="clear_cart">Svuota Carrello</span></button><button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> <span data-i18n="send_order">Invia Ordine</span></button></div></div>
-<!-- REVIEW MODAL -->
+
 <div class="modal-3d" id="reviewModal"><div class="modal-content-3d"><div class="modal-header"><h2><i class="fas fa-star"></i> <span data-i18n="leave_review">Lascia una Recensione</span></h2><button class="close-btn-3d" onclick="closeReviewModal()">×</button></div><div class="form-group"><label data-i18n="how_many_stars">Quante stelle? ⭐</label><div class="stars-input" id="starsInput"><span class="star" data-value="1" onclick="selectStar(1)">★</span><span class="star" data-value="2" onclick="selectStar(2)">★</span><span class="star" data-value="3" onclick="selectStar(3)">★</span><span class="star" data-value="4" onclick="selectStar(4)">★</span><span class="star" data-value="5" onclick="selectStar(5)">★</span></div></div><div class="form-group"><label data-i18n="your_name">Il tuo nome</label><input type="text" id="reviewName" placeholder="Mario R."></div><div class="form-group"><label data-i18n="your_opinion">La tua opinione</label><textarea class="review-textarea" id="reviewText" placeholder="La pizza era fantastica..."></textarea></div><div class="form-group"><label data-i18n="order_number">Numero Ordine</label><input type="text" id="reviewOrderId" readonly style="opacity:.7;"></div><button class="review-submit-btn" onclick="submitReview()"><i class="fas fa-paper-plane"></i> <span data-i18n="send_review">Invia Recensione</span></button></div></div>
-<!-- PRIVACY MODAL -->
+
 <div class="modal-3d" id="privacyModal"><div class="modal-content-3d"><div class="modal-header"><h2><i class="fas fa-shield-alt"></i> <span data-i18n="privacy_policy">Privacy Policy</span></h2><button class="close-btn-3d" onclick="closePrivacyModal()">×</button></div><div class="privacy-text"><p><strong>Antica Pizzeria Grasso</strong> <span data-i18n="privacy_respect">rispetta la tua privacy.</span></p><h3 data-i18n="what_data">📋 Quali dati raccogliamo</h3><ul><li data-i18n="data_name">Nome e cognome</li><li data-i18n="data_phone">Telefono</li><li data-i18n="data_address">Indirizzo</li><li data-i18n="data_notes">Note ordine</li></ul><h3 data-i18n="security">🔒 Sicurezza</h3><p data-i18n="security_text">Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p><h3 data-i18n="retention">Conservazione</h3><p data-i18n="retention_text">Conserviamo i dati per 24 mesi.</p></div></div></div>
 <div class="toast-3d" id="toast"></div>
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
 <script>
-// ============================================================
-// TRADUZIONI
-// ============================================================
 const translations = {
 it: {
 welcome_title: "🍕 Benvenuto da Grasso!", save_home_title: "📱 Salva l'app sulla Home!",
@@ -672,7 +655,7 @@ clear_history_confirm: "Cancellare tutto lo storico?", add_another_promo: "Hai g
 promo_unavailable: "❌ Promo non disponibile", promo_exhausted: "❌ Promo esaurita",
 accettato: "✅ Accettato!", preparing: "🍕 In preparazione", ready: "✅ Pronto", picked: "📦 Ritirato", delivering: "🛵 In consegna!",
 delivered: "🎉 Consegnato!", rejected: "❌ Ordine rifiutato", review_btn: "⭐ Recensisci", already_reviewed: "✅ Già recensito",
-annullato: "🗑️ Ordine annullato", sold_out: "Non Disponibile", product_not_available: "❌ Prodotto esaurito, scegli altro!",
+annullato: "🗑️ Ordine annullato", sold_out: "Non Disponibile", product_not_available: "❌ Prodotto non disponibile, scegli altro!",
 app_updated: "🔄 App aggiornata!",
 notify_ready: "✅ Ordine Pronto!", notify_delivering: "🛵 Il rider sta arrivando!", notify_delayed: "⏰ Ordine in ritardo",
 select_valid_time: "⚠️ Seleziona un orario valido"
@@ -723,7 +706,7 @@ clear_history_confirm: "Clear all history?", add_another_promo: "You already hav
 promo_unavailable: "❌ Promo unavailable", promo_exhausted: "❌ Promo exhausted",
 accettato: "✅ Accepted!", preparing: "🍕 Preparing", ready: "✅ Ready", picked: "📦 Picked up", delivering: "🛵 Delivering!",
 delivered: "🎉 Delivered!", rejected: "❌ Order rejected", review_btn: "⭐ Review", already_reviewed: "✅ Already reviewed",
-annullato: "🗑️ Order cancelled", sold_out: "🍕 Sold Out", product_not_available: "❌ Product sold out, choose another!",
+annullato: "🗑️ Order cancelled", sold_out: "Non Disponibile", product_not_available: "❌ Product not available, choose another!",
 app_updated: "🔄 App updated!",
 notify_ready: "✅ Order Ready!", notify_delivering: "🛵 Rider is coming!", notify_delayed: "⏰ Order delayed",
 select_valid_time: "⚠️ Select a valid time"
@@ -774,15 +757,13 @@ clear_history_confirm: "Gesamten Verlauf löschen?", add_another_promo: "Sie hab
 promo_unavailable: "❌ Aktion nicht verfügbar", promo_exhausted: "❌ Aktion ausgeschöpft",
 accettato: "✅ Akzeptiert!", preparing: "🍕 In Zubereitung", ready: "✅ Fertig", picked: "📦 Abgeholt", delivering: "🛵 Wird geliefert!",
 delivered: "🎉 Geliefert!", rejected: "❌ Bestellung abgelehnt", review_btn: "⭐ Bewerten", already_reviewed: "✅ Bereits bewertet",
-annullato: "🗑️ Bestellung storniert", sold_out: "🍕 Ausverkauft", product_not_available: "❌ Produkt ausverkauft, wähle ein anderes!",
+annullato: "🗑️ Bestellung storniert", sold_out: "Non Disponibile", product_not_available: "❌ Produkt nicht verfügbar, wähle ein anderes!",
 app_updated: "🔄 App aktualisiert!",
 notify_ready: "✅ Bestellung fertig!", notify_delivering: "🛵 Fahrer kommt gleich!", notify_delayed: "⏰ Bestellung verspätet",
 select_valid_time: "⚠️ Wählen Sie eine gültige Zeit"
 }
 };
-// ============================================================
-// FIREBASE
-// ============================================================
+
 const firebaseConfig={
 apiKey:"AIzaSyAw8pBS3gOpitVIArnWutBnwca3hXSWuVs",
 authDomain:"teogra-c8cf5.firebaseapp.com",
@@ -794,9 +775,7 @@ appId:"1:686300112893:web:e147b82f91374f12db1b94"
 firebase.initializeApp(firebaseConfig);
 
 const db=firebase.database();
-// ============================================================
-// VARIABILI GLOBALI
-// ============================================================
+
 let currentUser=null,currentLang='it',userType='none',cart=[],orderType='delivery';
 let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null;
 let orderStatusListeners={},ordersData={};
@@ -804,9 +783,7 @@ let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:
 let selectedDateOffset = 0;
 const ORDER_POLL_MS = 30000;
 let festiveParticlesInterval = null;
-// ============================================================
-// LISTENER OTTIMIZZATI
-// ============================================================
+
 let statusListener = null;
 let servicesListener = null;
 let versionListener = null;
@@ -847,9 +824,7 @@ showToast(t('app_updated'));
 }
 });
 }
-// ============================================================
-// TRADUZIONI & PALETTE (OTTIMIZZATE CONTRO IL RITARDO)
-// ============================================================
+
 function t(key){return(translations[currentLang]&&translations[currentLang][key])||translations.it[key]||key}
 function applyTranslations(){
 document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const val=t(k);if(val)el.innerHTML=val;});
@@ -899,9 +874,6 @@ function applyPaletteFromFirebase() {
   });
 }
 
-// ============================================================
-// EFFETTO FESTE (10 EFFETTI)
-// ============================================================
 let festiveEffectListener = null;
 function startFestiveEffectListener() {
   if (festiveEffectListener) return;
@@ -945,9 +917,7 @@ function applyFestiveEffect(type) {
     setTimeout(() => particle.remove(), 9000);
   }, speed);
 }
-// ============================================================
-// AUTH
-// ============================================================
+
 function showConfirm(m){return new Promise(r=>{const o=document.getElementById('confirmModal');document.getElementById('confirmModalText').textContent=m;o.classList.add('active');const y=document.getElementById('confirmBtnYes'),n=document.getElementById('confirmBtnNo'),c=()=>{o.classList.remove('active');y.onclick=null;n.onclick=null};y.onclick=()=>{c();r(true)};n.onclick=()=>{c();r(false)}})}
 function showWelcomeScreen(){document.getElementById('welcomeScreen').style.display='flex';document.getElementById('mainApp').style.display='none'}
 function hideWelcomeScreen(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('mainApp').style.display='block'}
@@ -990,9 +960,7 @@ function updateUIForLoggedInUser(u){
   const fl = document.getElementById('footerLogout');
   if (fl) fl.style.display = 'block';
 }
-// ============================================================
-// CARICAMENTO DATI
-// ============================================================
+
 async function forceUpdateFromServer() {
 try {
 const [menuSnap, catsSnap, promosSnap, settingsSnap, imagesSnap, brandingSnap] = await Promise.all([
@@ -1024,9 +992,7 @@ showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); upda
 return true;
 } catch(e) { return false; }
 }
-// ============================================================
-// INIT APP
-// ============================================================
+
 document.addEventListener('DOMContentLoaded',()=>{
 if(!localStorage.getItem('cookies_accepted'))document.getElementById('cookieBanner').style.display='block';
 const lang=detectBrowserLanguage();currentLang=lang;document.getElementById('langSelect').value=lang;applyTranslations();
@@ -1069,9 +1035,7 @@ setTimeout(() => {
 richiediPermessoNotifiche();
 }, 2000);
 }
-// ============================================================
-// STATUS & CARRELLO
-// ============================================================
+
 function checkIfOpen(){
 const s = appData.settings || {};
 if(s.manualStatus === 'open') return true;
@@ -1130,9 +1094,7 @@ function updateNavLiveDotOld(){try{const o=JSON.parse(localStorage.getItem('pizz
 async function clearCart(){if(!cart.length)return;const ok=await showConfirm(t('empty_cart_confirm'));if(!ok)return;cart=[];updateCartBadge();closeCart();showToast(t('cart_emptied'))}
 function calculateDistance(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function computeDeliveryFee(dist){const bf=parseFloat(appData.settings.deliveryBaseFee)||3,mr=parseFloat(appData.settings.deliveryMaxRadius)||4,er=parseFloat(appData.settings.deliveryExtraRadius)||6,ef=parseFloat(appData.settings.deliveryExtraFee)||2;if(dist===null)return{fee:bf,outOfRange:false,withExtra:false};if(dist>er)return{fee:0,outOfRange:true,withExtra:false};if(dist>mr)return{fee:bf+ef,outOfRange:false,withExtra:true};return{fee:bf,outOfRange:false,withExtra:false}}
-// ============================================================
-// FUNZIONI PER SELEZIONE GIORNO (PRE-ORDINI)
-// ============================================================
+
 function generateValidDates() {
 const select = document.getElementById('scheduledDateSelect');
 if (!select) return;
@@ -1261,9 +1223,7 @@ select.appendChild(opt);
 });
 select.selectedIndex = 0;
 }
-// ============================================================
-// updateCartTotals
-// ============================================================
+
 function updateCartTotals(){
 let tot = 0;
 let prodottiTot = 0;
@@ -1333,9 +1293,7 @@ if(typ === 'delivery'){ document.getElementById('addressGroup').style.display = 
 else { document.getElementById('addressGroup').style.display = 'none'; document.getElementById('customerStreet').value = ''; document.getElementById('customerNumber').value = ''; window.customerGPSLat = null; window.customerGPSLng = null; }
 updateCartTotals();
 }
-// ============================================================
-// LOGICA ORARI (PRE-ORDINI)
-// ============================================================
+
 function selectTimeMode(m){
 if (m === 'asap' && !checkIfOpen()) {
 showToast(t('closed_now'));
@@ -1351,9 +1309,7 @@ generateValidDates();
 }
 }
 async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
-// ============================================================
-// FUNZIONI PER RIMUOVERE PRODOTTI DAL CARRELLO
-// ============================================================
+
 function removeProductFromCart(index) {
 if (index < 0 || index >= cart.length) return;
 const product = cart[index];
@@ -1377,9 +1333,7 @@ item.qty = newQty;
 updateCartBadge();
 openCart();
 }
-// ============================================================
-// OPEN CART
-// ============================================================
+
 function openCart(){
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
 if(!cart.length){
@@ -1500,9 +1454,7 @@ m.classList.add('active');
 function closeCart(){document.getElementById('cartModal').classList.remove('active')}
 function addPromoToCart(promoId){const promo=appData.promotions[promoId];if(!promo){showToast(t('promo_unavailable'));return;}if(promo.currentUses>=promo.maxUses){showToast(t('promo_exhausted'));return;}const existing=cart.find(item=>item.isPromo&&item.promoId===promoId);if(existing){if(!confirm(t('add_another_promo')))return;const idx=cart.indexOf(existing);cart.splice(idx,1);db.ref('promotions/'+promoId+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));}const totalPrice=promo.products.reduce((sum,p)=>sum+(p.price*p.qty),0);cart.push({isPromo:true,promoId:promoId,promoTitle:promo.title,products:promo.products,totalPrice:totalPrice});db.ref('promotions/'+promoId+'/currentUses').transaction(v=>(v||0)+1);updateCartBadge();showToast(`🎁 ${promo.title} aggiunta!`);if(document.getElementById('cartModal').classList.contains('active'))openCart();}
 async function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){const pid=cart[i].promoId;db.ref('promotions/'+pid+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));cart.splice(i,1);updateCartBadge();openCart();showToast(t('promo_removed'));}}
-// ============================================================
-// ORDER TRACKING
-// ============================================================
+
 let orderPollingInterval = null;
 function stopOrderStatusTracking() { if (orderPollingInterval) { clearInterval(orderPollingInterval); orderPollingInterval = null; } }
 function isOrderActive(status, type) { if (!status) return true; if (['delivered','rifiutato','annullato'].includes(status)) return false; if (type === 'pickup' && status === 'picked') return false; return true; }
@@ -1527,9 +1479,7 @@ snap.forEach(child => { const d = child.val(); if (d) updateLocalOrderStatus(o.o
 } catch(e) {}
 }
 }
-// ============================================================
-// UPDATE LOCAL ORDER STATUS
-// ============================================================
+
 function updateLocalOrderStatus(oid, ns, mr, delayMinutes){
 try{
 let o = JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
@@ -1603,9 +1553,7 @@ updateNavLiveDotOld();
 }
 } catch(e) { console.log('Errore aggiornamento stato:', e); }
 }
-// ============================================================
-// NOTIFICHE WEB
-// ============================================================
+
 async function richiediPermessoNotifiche() {
 if (!('Notification' in window)) return false;
 if (Notification.permission === 'granted') return true;
@@ -1631,9 +1579,7 @@ notifica.onclick = function() { window.focus(); this.close(); showMyOrders(); };
 setTimeout(() => { if (notifica) notifica.close(); }, 10000);
 } catch(e) {}
 }
-// ============================================================
-// AGGIORNAMENTO SILENZIOSO DEL SERVICE WORKER
-// ============================================================
+
 if ('serviceWorker' in navigator) {
 let registration = null;
 let lastActivity = Date.now();
@@ -1673,21 +1619,18 @@ window.location.reload();
 }, 30000);
 });
 }
-// ============================================================
-// INVIO ORDINE
-// ============================================================
+
 async function sendOrder(d){
 const btn=document.getElementById('checkoutBtn'),cb=[...cart];
 if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...'}
 try{
 const ref=db.ref('ordini').push();const snap=await db.ref('counter/ordini').transaction(c=>(c||0)+1);const num=snap.snapshot.val();const oid='ORD-'+String(num).padStart(5,'0');d.orderId=oid;
 
-// Ottieni l'ID dell'utente autenticato (anonimo o registrato)
 const uid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'anonimo';
 
 await ref.set({
 orderId:oid,
-userId:uid, // <-- Associa l'ordine in modo sicuro all'ID utente
+userId:uid,
 customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
 address:d.type==='delivery'?sanitizeWA(d.address):'', notes:sanitizeWA(d.notes), type:d.type,
 scheduledTime:d.scheduledTime,
@@ -1709,9 +1652,7 @@ showHome();
 }catch(e){console.error(e);cart=cb;updateCartBadge();showToast(t('order_error'))}
 finally{if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order')}}
 }
-// ============================================================
-// RECENSIONI & ORDINI
-// ============================================================
+
 function openReviewModal(){document.getElementById('reviewModal').classList.add('active')}
 function closeReviewModal(){document.getElementById('reviewModal').classList.remove('active');selectedStars=0;updateStarsDisplay();document.getElementById('reviewName').value='';document.getElementById('reviewText').value='';document.getElementById('reviewOrderId').value='';pendingReviewOrderId=null}
 function selectStar(n){selectedStars=n;updateStarsDisplay()}
@@ -1745,9 +1686,7 @@ async function annullaOrdine(orderId){
 if(!orderId)return;const conferma=await showConfirm("Vuoi davvero annullare questo ordine?");if(!conferma)return;
 try{const snapshot=await db.ref('ordini').orderByChild('orderId').equalTo(orderId).once('value');let key=null;snapshot.forEach(child=>{key=child.key;});if(key){await db.ref('ordini/'+key).update({status:'annullato',motivoAnnullamento:'Annullato dal cliente',annullatoIl:Date.now()});let localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders=localOrders.map(o=>o.orderId===orderId?{...o,status:'annullato'}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));showToast('✅ Ordine annullato!');renderMyOrders();}else{showToast('❌ Ordine non trovato sul server');}}catch(e){console.error(e);showToast('❌ Errore annullamento');}
 }
-// ============================================================
-// RENDER MY ORDERS (CORRETTO: RECENSIONE SOLO AD ORDINE COMPLETATO)
-// ============================================================
+
 function renderMyOrders(){
 const l=document.getElementById('myOrdersList');if(!l)return;
 try{
@@ -1763,7 +1702,6 @@ const tr=renderOrderTracker(s,x.motivoRifiuto||x.motivoAnnullamento,ot,x.delayMi
 const puoAnnullare=puoAnnullareOrdine(x);
 const annullamentoInfo=!puoAnnullare&&s!=='annullato'&&s!=='rifiutato'&&x.status!=='delivered'?`<span style="color:#f59e0b;font-size:0.8rem;font-weight:600;">🚫 Non più annullabile</span>`:'';
 
-// RECENSIONE VISIBILE SOLO SE COMPLETATO (delivered o picked) E NON ANCORA RECENSITO
 const isCompleted = (s === 'delivered' || (ot === 'pickup' && s === 'picked'));
 const reviewBtnHtml = isCompleted && !x.reviewed ? `<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>` : '';
 
@@ -1882,9 +1820,7 @@ else if (!isDeliveryEnabled && !isPickupEnabled) { document.getElementById('chec
 else { document.getElementById('checkoutBtn').disabled = false; document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order'); }
 }
 }
-// ============================================================
-// RENDER MENU
-// ============================================================
+
 function updateFooter() { const footerInfo = document.getElementById('footerInfo'); if (footerInfo) { const city = appData.branding?.city || "Manfredonia"; const phone = appData.settings?.visiblePhone || "0884660377"; footerInfo.innerHTML = `${city} • Tel. <span id="footerPhone">${phone}</span>`; } }
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso";}
 
@@ -1919,10 +1855,11 @@ function showCategories(){renderCategories();document.getElementById('categories
 function renderCategories(){
     const l = document.getElementById('categoriesList');
     if (!l) return;
-    const catsArray = Object.entries(appData.categories || {}).map(([key, val]) => ({
+    
+    const catsArray = Object.keys(appData.categories || {}).map(key => ({
         key: key,
-        ...val
-    })).sort((a, b) => (a.order || 0) - (b.order || 0));
+        ...appData.categories[key]
+    }));
 
     l.innerHTML = catsArray.map(catItem => {
         const c = catItem.key;
@@ -2038,7 +1975,7 @@ function searchGlobal(term){
             const soldOutBadge = isDisabled ? `<span class="product-availability-badge">${t('sold_out')}</span>` : '';
             let actions;
             if (isDisabled) { actions = `<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`; }
-            else if (qty > 0) { actions = `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+</button></div>`; }
+            else if (qty > 0) { actions = `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+</button></div>`; }
             else { actions = `<button type="button" class="add-btn-3d" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`; }
             const disabledClass = isDisabled ? 'product-disabled' : '';
             return `<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
