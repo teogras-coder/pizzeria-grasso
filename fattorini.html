@@ -502,7 +502,7 @@ function saveOrdersToCache() {
   localStorage.setItem('driverOrdersCache', JSON.stringify(toSave));
 }
 
-// ─── 🔥 LISTENER OTTIMIZZATO PER ORDINI (SOLO CONSEGNA) ────────────────────
+// ─── 🔥 LISTENER OTTIMIZZATO PER ORDINI (SOLO CONSEGNA) ────────────────    
 function setupOptimizedListeners() {
   // 1. 🔥 CARICA ORDINI ALL'AVVIO - SOLO CONSEGNA
   db.ref('ordini')
@@ -546,7 +546,7 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 3. 🔥 ASCOLTA CAMBIAMENTI DI STATO (child_changed) - SOLO CONSEGNA
+  // 3. 🔥 ASCOLTA CAMBIAMENTI DI STATO (child_changed) CON FIX PER ASSEGNAZIONE ISTANTANEA
   db.ref('ordini').on('child_changed', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
@@ -563,6 +563,7 @@ function setupOptimizedListeners() {
     
     const oldOrder = ordersCache[order.id];
     const oldStatus = oldOrder?.status;
+    const oldDriver = oldOrder?.assignedDriver;
     
     // 🔥 CASO 1: ORDINE ASSEGNATO AD UN ALTRO FATTORINO → RIMUOVI
     if (oldOrder && order.assignedDriver && order.assignedDriver !== currentDriver?.pin) {
@@ -572,7 +573,7 @@ function setupOptimizedListeners() {
       return;
     }
     
-    // 🔥 CASO 2: ORDINE CONSEGNATO O ANNULLATO → RIMUOVI (non serve più)
+    // 🔥 CASO 2: ORDINE CONSEGNATO O ANNULLATO → RIMUOVI
     if (order.status === 'delivered' || order.status === 'rifiutato' || order.status === 'annullato') {
       if (ordersCache[order.id]) {
         delete ordersCache[order.id];
@@ -582,12 +583,12 @@ function setupOptimizedListeners() {
       return;
     }
     
-    // 🔥 CASO 3: ORDINE ASSEGNATO A ME O ANCORA DISPONIBILE → AGGIORNA
+    // 🔥 AGGIORNA CACHE SEMPRE
     ordersCache[order.id] = order;
     saveOrdersToCache();
     
-    // Solo se lo stato è cambiato, renderizza e notifica
-    if (oldStatus !== order.status) {
+    // 🔥 FIX APPLICATO (da screenshot): Ridisegna se cambia lo stato O se cambia il driver assegnato (es. Prendi in carico)
+    if (oldStatus !== order.status || oldDriver !== order.assignedDriver) {
       renderOrders();
       
       // Notifica: ordine pronto per il ritiro (se assegnato a me)
@@ -736,8 +737,7 @@ function renderOrders() {
   let completedCount = 0;
   
   Object.values(ordersCache).forEach(order => {
-    // 🔥 SCHEDA "DISPONIBILI": 
-    // Vedono SUBITO gli ordini di consegna (new, accettato, preparing, delayed, ready)
+    // 🔥 SCHEDA "DISPONIBILI": ordini di consegna non ancora assegnati
     if (
       order.type === 'delivery' &&
       !order.assignedDriver &&
@@ -746,7 +746,6 @@ function renderOrders() {
       available.push(order);
     }
     // 🔥 SCHEDA "LE MIE": tutti gli ordini assegnati a me
-    // ESCLUSI delivered, rifiutato, annullato
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
@@ -764,7 +763,6 @@ function renderOrders() {
   availableCount.textContent = available.length;
   myOrdersCount.textContent = myOrders.length;
   
-  // Mostra pulsante cancella solo se ci sono ordini consegnati da nascondere
   const hasDelivered = Object.values(ordersCache).some(o => 
     o.assignedDriver === currentDriver?.pin && o.status === 'delivered' && !hiddenOrderIds.has(o.id)
   );
@@ -809,13 +807,11 @@ function renderOrders() {
     let actions = '';
     let statusClass = order.status;
     
-    // 🔥 ORDINE NON ASSEGNATO - Il fattorino lo vede SUBITO e può accettarlo
     if (!order.assignedDriver) {
       if (order.status === 'ready') {
         statusMessage = `<div class="status-message status-ready">✅ Pronto per il ritiro! Accetta e ritira subito.</div>`;
         actions = `<button class="btn-accept-pick" onclick="acceptAndPickOrder('${order.id}')">📦 Accetta & Ritira</button>`;
       } else if (['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) {
-        // Mostra il pulsante ACCETTA subito per gli ordini nuovi o in preparazione
         actions = `<button class="btn-accept" onclick="acceptOrder('${order.id}')">✅ Prendi in carico</button>`;
         
         if (order.status === 'new') {
@@ -827,7 +823,6 @@ function renderOrders() {
         }
       }
     } 
-    // 🔥 ORDINE ASSEGNATO A ME
     else if (order.assignedDriver === currentDriver?.pin) {
       if (order.status === 'new' || order.status === 'accettato') {
         statusMessage = `<div class="status-message status-waiting">⏳ In attesa che la pizzeria prepari...</div>`;
@@ -847,7 +842,6 @@ function renderOrders() {
       }
     }
     
-    // 🆕 Pulsante "Abbandona" per ordini in stato 'new', 'accettato', 'preparing' o 'delayed' assegnati a me
     if (
       order.assignedDriver === currentDriver?.pin && 
       ['new', 'accettato', 'preparing', 'delayed'].includes(order.status) &&
@@ -915,7 +909,6 @@ async function acceptOrder(orderId) {
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
-      // Può accettare se è new, accettato, preparing o delayed
       if (!['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) return order;
       if (order.type !== 'delivery') return order;
       order.assignedDriver = currentDriver.pin;
