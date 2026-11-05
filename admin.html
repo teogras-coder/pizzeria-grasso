@@ -122,7 +122,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
-.form-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 0.95rem; }
+.form-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 0.95ns; }
 .form-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 15px rgba(212,168,75,0.3); }
 textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: var(--card); border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(212,168,75,0.15); }
@@ -196,14 +196,16 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .admin-category-header-title { color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; }
 .admin-category-header-count { background: var(--gold-dark); color: var(--dark); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-left: auto; margin-right: 10px; }
 .admin-category-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; padding: 0 14px; }
-.admin-category-accordion.open .admin-category-body { max-height: 400px; overflow-y: auto; padding: 14px; border-top: 1px solid rgba(212,168,75,0.1); }
+.admin-category-accordion.open .admin-category-body { max-height: none; overflow-y: visible; padding: 14px; border-top: 1px solid rgba(212,168,75,0.1); }
 .admin-product-item { background: rgba(0,0,0,0.15); padding: 12px; border-radius: 10px; margin-bottom: 10px; transition: all 0.3s; }
 .admin-product-item.disabled { opacity: 0.6; border: 1px dashed #f87171; }
 .admin-product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .admin-product-name { color: var(--gold-light); font-weight: 600; }
 .delete-product-btn { background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; }
 .admin-product-inputs { display: flex; flex-direction: column; gap: 8px; }
-.admin-product-inputs input { padding: 8px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.85rem; }
+.admin-product-inputs input { padding: 10px; border-radius: 6px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--cream); font-size: 0.9rem; width: 100%; }
+.admin-product-inputs > div { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; }
+.admin-product-inputs > div > input { flex: 1 1 100% !important; min-width: 0 !important; }
 .admin-product-img-wrapper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .admin-product-img-preview { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px dashed var(--gold-dark); cursor: pointer; }
 .admin-product-img-upload { font-size: 0.75rem; color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -237,7 +239,7 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .btn-whatsapp { background: #25D366; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.3s; }
 .btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); }
 .btn-whatsapp:active { transform: translateY(0); }
-.btn-translate { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 0 #2563eb; transition: all 0.2s; margin-top: 6px; }
+.btn-translate { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 0 #2563eb; transition: all 0.2s; margin-top: 6px; width: 100%; justify-content: center; }
 .btn-translate:hover { transform: translateY(-1px); box-shadow: 0 4px 0 #2563eb; }
 .btn-translate:active { transform: translateY(2px); box-shadow: 0 1px 0 #2563eb; }
 .btn-translate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
@@ -1503,64 +1505,74 @@ else if (el.id==='pickupToggle') { appData.settings.pickupEnabled=on; db.ref('se
 }
 
 function renderCategories() {
-const l = document.getElementById('categoriesList'), s = document.getElementById('categorySelect');
-const keys = Object.keys(appData.categories);
-let index = 1;
-l.innerHTML = keys.map((k, idx) => {
-const numText = `#${index++} `;
-const btnUp = idx > 0 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', -1)"><i class="fas fa-arrow-up"></i></button>` : '';
-const btnDown = idx < keys.length - 1 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', 1)"><i class="fas fa-arrow-down"></i></button>` : '';
-return `<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-<span style="color:var(--gold);font-weight:700;">${numText}${sanitize(appData.categories[k].name)}</span>
-<div style="display:flex;gap:5px;align-items:center;">
-${btnUp}${btnDown}
-<button class="btn-danger" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteCategory('${k}')">Elimina</button>
-</div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-<input type="text" class="form-input" value="${sanitize(appData.categories[k].name||'')}" onchange="updateCategory('${k}','name',this.value)">
-<input type="text" class="form-input" value="${sanitize(appData.categories[k].icon||'')}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona">
-</div>
-</div>`;
-}).join('');
-if (s) s.innerHTML = '<option value="">Seleziona...</option>' + keys.map(c => `<option value="${c}">${sanitize(appData.categories[c].name)}</option>`).join('');
+  const l = document.getElementById('categoriesList'), s = document.getElementById('categorySelect');
+  let keys = Object.keys(appData.categories);
+  
+  let needsSave = false;
+  keys.forEach((k, i) => {
+    if (appData.categories[k].order === undefined) {
+      appData.categories[k].order = i;
+      needsSave = true;
+    }
+  });
+
+  if (needsSave) {
+    db.ref('categories').set(appData.categories);
+  }
+
+  keys.sort((a,b) => (appData.categories[a].order || 0) - (appData.categories[b].order || 0));
+  
+  let index = 1;
+  l.innerHTML = keys.map((k, idx) => {
+    const numText = `#${index++} `;
+    const btnUp = idx > 0 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', -1)"><i class="fas fa-arrow-up"></i></button>` : '';
+    const btnDown = idx < keys.length - 1 ? `<button class="btn-secondary" style="padding:6px 10px;font-size:0.75rem;" onclick="moveCategory('${k}', 1)"><i class="fas fa-arrow-down"></i></button>` : '';
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="color:var(--gold);font-weight:700;">${numText}${sanitize(appData.categories[k].name)}</span>
+      <div style="display:flex;gap:5px;align-items:center;">${btnUp}${btnDown}
+      <button class="btn-danger" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteCategory('${k}')">Elimina</button>
+      </div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <input type="text" class="form-input" value="${sanitize(appData.categories[k].name||'')}" onchange="updateCategory('${k}','name',this.value)">
+      <input type="text" class="form-input" value="${sanitize(appData.categories[k].icon||'')}" onchange="updateCategory('${k}','icon',this.value)" placeholder="Icona">
+      </div></div>`;
+  }).join('');
+  if (s) s.innerHTML = '<option value="">Seleziona...</option>' + keys.map(c => `<option value="${c}">${sanitize(appData.categories[c].name)}</option>`).join('');
 }
 
 async function moveCategory(key, direction) {
-const keys = Object.keys(appData.categories);
-const idx = keys.indexOf(key);
-if (idx < 0) return;
-const targetIdx = idx + direction;
-if (targetIdx < 0 || targetIdx >= keys.length) return;
-
-const temp = keys[idx];
-keys[idx] = keys[targetIdx];
-keys[targetIdx] = temp;
-
-const newCats = {};
-const newMenu = {};
-keys.forEach(k => {
-  newCats[k] = appData.categories[k];
-  if (appData.menu[k]) newMenu[k] = appData.menu[k];
-});
-
-appData.categories = newCats;
-appData.menu = newMenu;
-
-try {
-  await Promise.all([
-    db.ref('categories').set(appData.categories),
-    db.ref('menu').set(appData.menu)
-  ]);
-  showToast('✅ Posizione aggiornata');
-  renderCategories();
-  renderMenu();
-  populatePromoProductSelect();
-  notifyClients();
-} catch(e) {
-  showToast('❌ Errore spostamento');
-}
+  let keys = Object.keys(appData.categories);
+  keys.sort((a,b) => (appData.categories[a].order || 0) - (appData.categories[b].order || 0));
+  const idx = keys.indexOf(key);
+  if (idx < 0) return;
+  const targetIdx = idx + direction;
+  if (targetIdx < 0 || targetIdx >= keys.length) return;
+  
+  const temp = keys[idx];
+  keys[idx] = keys[targetIdx];
+  keys[targetIdx] = temp;
+  
+  keys.forEach((k, i) => { appData.categories[k].order = i; });
+  
+  const newCats = {};
+  const newMenu = {};
+  keys.forEach(k => {
+    newCats[k] = appData.categories[k];
+    if (appData.menu[k]) newMenu[k] = appData.menu[k];
+  });
+  
+  appData.categories = newCats;
+  appData.menu = newMenu;
+  
+  try {
+    await db.ref('categories').set(appData.categories);
+    await db.ref('menu').set(appData.menu);
+    showToast('✅ Posizione aggiornata');
+    renderCategories();
+    renderMenu();
+    notifyClients();
+  } catch(e) { showToast('❌ Errore spostamento'); }
 }
 
 async function addCategory() {
@@ -1568,7 +1580,8 @@ const n = await showPrompt('Nuova Categoria', 'Nome:', 'Es: Pizze'); if(!n||!n.t
 const i = await showPrompt('Icona', 'FontAwesome (senza fa-):', 'Es: pizza-slice', 'utensils'); if(i===null) return;
 const k = await showPrompt('Chiave', 'Chiave univoca (minuscole):', 'Es: pizze'); if(!k) return;
 const key = sanitizeKey(k); if(!key||!/^[a-z][a-z0-9_]*$/.test(key)||appData.categories[key]) { showToast('⚠️ Chiave non valida o esistente'); return; }
-appData.categories[key] = { name: sanitize(n), icon: 'fa-'+sanitize(i) }; if(!appData.menu[key]) appData.menu[key]=[];
+const maxOrder = Math.max(-1, ...Object.values(appData.categories).map(c => c.order !== undefined ? c.order : -1));
+appData.categories[key] = { name: sanitize(n), icon: 'fa-'+sanitize(i), order: maxOrder + 1 }; if(!appData.menu[key]) appData.menu[key]=[];
 try { await db.ref('categories').set(appData.categories); await db.ref('menu').set(appData.menu); showToast('✅ Aggiunta'); renderCategories(); renderMenu(); populatePromoProductSelect(); notifyClients(); } catch(e) { showToast('❌ Errore'); }
 }
 function updateCategory(k,f,v) { appData.categories[k][f]=sanitize(v); db.ref('categories').set(appData.categories); notifyClients(); }
@@ -1587,21 +1600,24 @@ if(Object.keys(up).length) await db.ref(`menu/${c}/${i}`).update(up); showToast(
 function renderMenu() {
 const c = document.getElementById('menuAccordion'), st = (document.getElementById('menuSearch')?.value||'').toLowerCase(); let h='';
 let catIndex = 1;
-Object.keys(appData.categories).forEach(cat => {
+
+let sortedCategories = Object.keys(appData.categories).sort((a,b) => (appData.categories[a].order || 0) - (appData.categories[b].order || 0));
+
+sortedCategories.forEach(cat => {
 const ci = appData.categories[cat], pr = appData.menu[cat]||[], io = openCategories.has(cat), fp = pr.filter(p => p.name.toLowerCase().includes(st)||(p.desc||'').toLowerCase().includes(st));
 if (st && !fp.length) return;
 const catNumLabel = `#${catIndex++} `;
 h += `<div class="admin-category-accordion ${io?'open':''}" id="accordion-${cat}"><div class="admin-category-header" onclick="toggleCategoryAccordion('${cat}')"><div class="admin-category-header-left"><div class="admin-category-header-icon"><i class="fas ${ci.icon||'fa-utensils'}"></i></div><span class="admin-category-header-title">${catNumLabel}${sanitize(ci.name)}</span></div><span class="admin-category-header-count">${pr.length}</span><button class="btn-add-product" onclick="event.stopPropagation();addProduct('${cat}')"><i class="fas fa-plus"></i></button></div><div class="admin-category-body">`;
 h += (st?fp:pr).map((p,idx) => {
 const oi = pr.indexOf(p), dis = p.disabled===true;
-return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(NON DISPONIBILE)</span>':''}</span></div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
-<div class="admin-product-inputs"><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.name)}" onchange="updateProduct('${cat}',${oi},'name',this.value)" placeholder="Nome 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_en||'')}" onchange="updateProduct('${cat}',${oi},'name_en',this.value)" placeholder="Name 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.name_de||'')}" onchange="updateProduct('${cat}',${oi},'name_de',this.value)" placeholder="Name 🇩🇪" style="flex:2;min-width:150px;"></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" value="${sanitize(p.desc||'')}" onchange="updateProduct('${cat}',${oi},'desc',this.value)" placeholder="Descrizione 🇮🇹" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_en||'')}" onchange="updateProduct('${cat}',${oi},'desc_en',this.value)" placeholder="Description 🇬🇧" style="flex:2;min-width:150px;"><input type="text" value="${sanitize(p.desc_de||'')}" onchange="updateProduct('${cat}',${oi},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪" style="flex:2;min-width:150px;"></div>
-<input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${cat}',${oi},'price',parseFloat(this.value))" placeholder="Prezzo €">
+return `<div class="admin-product-item ${dis?'disabled':''}"><div class="admin-product-header"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle-switch ${dis?'closed':'on'}" style="transform:scale(0.8);transform-origin:left;" onclick="toggleProductAvailability('${cat}',${oi},this)"></div><span class="admin-product-name">${sanitize(p.name)} ${dis?'<span style="color:#f87171;font-size:0.8rem;">(ESAURITO)</span>':''}</span></div><button class="delete-product-btn" onclick="deleteProduct('${cat}',${oi})"><i class="fas fa-times"></i></button></div>
+<div class="admin-product-inputs"><div><input type="text" value="${sanitize(p.name)}" onchange="updateProduct('${cat}',${oi},'name',this.value)" placeholder="Nome 🇮🇹"></div><div><input type="text" value="${sanitize(p.name_en||'')}" onchange="updateProduct('${cat}',${oi},'name_en',this.value)" placeholder="Name 🇬🇧"></div><div><input type="text" value="${sanitize(p.name_de||'')}" onchange="updateProduct('${cat}',${oi},'name_de',this.value)" placeholder="Name 🇩🇪"></div>
+<div><input type="text" value="${sanitize(p.desc||'')}" onchange="updateProduct('${cat}',${oi},'desc',this.value)" placeholder="Descrizione 🇮🇹"></div><div><input type="text" value="${sanitize(p.desc_en||'')}" onchange="updateProduct('${cat}',${oi},'desc_en',this.value)" placeholder="Description 🇬🇧"></div><div><input type="text" value="${sanitize(p.desc_de||'')}" onchange="updateProduct('${cat}',${oi},'desc_de',this.value)" placeholder="Beschreibung 🇩🇪"></div>
+<div><input type="number" step="0.50" min="0" value="${p.price}" onchange="updateProduct('${cat}',${oi},'price',parseFloat(this.value))" placeholder="Prezzo €"></div>
 <div class="admin-product-img-wrapper">${p.img?`<img src="${p.img}" class="admin-product-img-preview" onclick="removeProductImage('${cat}',${oi})" title="Rimuovi">`:''}<label class="admin-product-img-upload"><i class="fas fa-camera"></i> ${p.img?'Cambia':'Aggiungi'} Foto<input type="file" accept="image/*" onchange="uploadProductImage('${cat}',${oi},this)"></label></div>
 <button class="btn-translate" onclick="translateProduct('${cat}',${oi},this)"><i class="fas fa-language"></i> Traduci 🌐</button></div></div>`;
 }).join('');
-if (!st) h += `<button class="btn-primary" style="margin-top:10px;" onclick="addProduct('${cat}')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>`;
+if (!st) h += `<button class="btn-primary" style="margin-top:10px;width:100%;" onclick="addProduct('${cat}')"><i class="fas fa-plus"></i> Aggiungi Prodotto</button>`;
 h += '</div></div>';
 });
 c.innerHTML = (h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto</p>') + '<div style="height:200px;"></div>';
@@ -1707,7 +1723,7 @@ function applyCurrentPalette() { applyPalette(appData.settings.colorPalette||'au
 function applyPalette(n) { const c=palettes[n]?.colors; if(!c) return; const r=document.documentElement; r.style.setProperty('--gold',c.gold); r.style.setProperty('--gold-light',c.goldLight); r.style.setProperty('--gold-dark',c.goldDark); r.style.setProperty('--dark',c.dark); r.style.setProperty('--brown',c.brown); r.style.setProperty('--brown-light',c.brownLight); r.style.setProperty('--card',c.card); r.style.setProperty('--card-light',c.cardLight); r.style.setProperty('--cream',c.cream); }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 async function resetOrderCounter() { if(!await showConfirm('⚠️ SEI SICURO?\nContatore azzerato.\nProssimo: ORD-00001.')) return; try { await db.ref('counter/ordini').set(0); showToast('✅ Azzerato! Prossimo: ORD-00001'); notifyClients(); } catch(e) { showToast('❌ '+e.message); } }
-document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.innerHTML.trim() === '') window.location.reload(); }, 500); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.html.trim() === '') window.location.reload(); }, 500); });
 </script>
 </body>
 </html>
