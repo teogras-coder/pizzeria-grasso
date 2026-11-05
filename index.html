@@ -1051,6 +1051,36 @@ return false;
 function updateStatusBanner(){const b = document.getElementById('statusBanner');const txt = document.getElementById('statusText');const o = checkIfOpen();if(!b || !txt) return;b.className = `status-banner ${o ? 'status-open' : 'status-closed'}`;txt.textContent = o ? t('open') : t('closed');}
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 
+function changeProductQty(cat, idx, delta) {
+  if (!appData.menu[cat] || !appData.menu[cat][idx]) return;
+  const p = appData.menu[cat][idx];
+  if (p.disabled === true) { showToast(t('product_not_available')); return; }
+  let item = cart.find(x => !x.isPromo && x.cat === cat && x.name === p.name);
+  if (item) {
+    item.qty = (item.qty || 1) + delta;
+    if (item.qty <= 0) {
+      cart = cart.filter(x => x !== item);
+    }
+  } else {
+    if (delta > 0) {
+      cart.push({
+        cat: cat,
+        name: p.name,
+        price: p.price,
+        qty: 1,
+        img: p.img || '',
+        isPromo: false
+      });
+    }
+  }
+  updateCartBadge();
+  const searchterm = document.getElementById('productSearch')?.value || '';
+  renderProductList(cat, searchterm);
+  if (delta > 0) {
+    showToast(p.name + ' ' + t('add_product'));
+  }
+}
+
 function updateCartBadge(){
   let n=0;
   let totalItemsCount = 0;
@@ -2006,17 +2036,6 @@ return `<div class="product-card-3d ${disabledClass}">${img}<div class="product-
 }).join('');
 list.querySelectorAll('.qty-btn,.add-btn-3d:not(.disabled-btn)').forEach(btn=>{btn.onclick=function(e){e.preventDefault();e.stopPropagation();const cat=this.dataset.cat;const idx=parseInt(this.dataset.idx,10);const delta=parseInt(this.dataset.delta,10);if(cat&&!isNaN(idx)&&!isNaN(delta)){changeProductQty(cat,idx,delta);}}});
 }
-function changeProductQty(c,i,d){
-if(!appData.menu||!appData.menu[c]||!appData.menu[c][i]){showToast('❌ Errore prodotto');return}
-const it=appData.menu[c][i];
-if (it.disabled === true) { showToast(t('product_not_available')); return; }
-const ex=cart.find(x=>!x.isPromo&&x.name===it.name&&x.cat===c);
-if(ex){ex.qty=(ex.qty||0)+d;if(ex.qty<=0){cart.splice(cart.indexOf(ex),1);showToast(`🗑️ ${it.name} rimosso`)}else if(d>0){showToast(`🛒 ${it.name} ×${ex.qty}`)}else{showToast(`➖ ${it.name} ×${ex.qty}`)}}
-else if(d>0){cart.push({...it,cat:c,qty:1,isPromo:false});showToast(`🛒 ${it.name} ${t('add_product')}`);}
-updateCartBadge();
-if(currentSearchCat===c)renderProductList(c,document.getElementById('productSearch')?.value||'');
-if(document.getElementById('cartModal').classList.contains('active'))openCart();
-}
 function filterProducts(term){if(currentSearchCat)renderProductList(currentSearchCat,term||'')}
 function showHome(){
   document.getElementById('mainMenu').style.display='block';
@@ -2051,7 +2070,11 @@ function debouncedSearchGlobal(term) {
 function searchGlobal(term){
   const query = (term||'').toLowerCase().trim();
   if(!query) { showHome(); return; }
-  for (const catKey in appData.menu) {
+  
+  let sortedCategoryKeys = Object.keys(appData.menu || {});
+  sortedCategoryKeys.sort((a,b) => (appData.categories[a]?.order || 0) - (appData.categories[b]?.order || 0));
+
+  for (const catKey of sortedCategoryKeys) {
     const products = appData.menu[catKey];
     const found = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
     if (found.length > 0) {
@@ -2061,7 +2084,7 @@ function searchGlobal(term){
       document.getElementById('categoryTitle').textContent = 'Risultati per: ' + term;
       document.getElementById('productList').innerHTML = '';
       let html = '';
-      for (const ck in appData.menu) {
+      for (const ck of sortedCategoryKeys) {
         const prods = appData.menu[ck].filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
         if (prods.length > 0) {
           html += `<div style="margin-top:15px; margin-bottom:8px; border-bottom:1px solid rgba(212,168,75,0.3); padding-bottom:4px;"><h4 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1rem;">${getCategoryDisplayName(ck)}</h4></div>`;
