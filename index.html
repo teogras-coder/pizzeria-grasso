@@ -1620,6 +1620,105 @@ window.location.reload();
 });
 }
 
+function confirmAndSendOrder(){
+  // Validazioni
+  const name = document.getElementById('customerName')?.value.trim();
+  const phone = document.getElementById('customerPhone')?.value.trim();
+  const privacy = document.getElementById('privacyConsent')?.checked;
+  const honeypot = document.getElementById('honeypot')?.value;
+
+  if(honeypot){ return; } // bot
+  
+  if(!privacy){
+    showToast(t('accept_privacy'));
+    return;
+  }
+  if(!name){
+    showToast(t('fill_name'));
+    document.getElementById('customerName')?.focus();
+    return;
+  }
+  if(!phone || phone.length < 8){
+    showToast(t('invalid_phone'));
+    return;
+  }
+  if(orderType === 'delivery'){
+    const street = document.getElementById('customerStreet')?.value.trim();
+    const number = document.getElementById('customerNumber')?.value.trim();
+    if(!street || !number){
+      showToast(t('fill_address'));
+      return;
+    }
+    // Controllo fuori raggio
+    const distRow = document.getElementById('distanceInfo');
+    if(distRow && distRow.style.display !== 'none' && distRow.textContent.includes('Fuori')){
+      showToast(t('out_of_range'));
+      return;
+    }
+  }
+
+  // Controllo orario programmato
+  let scheduledTime = null;
+  let isPreOrder = false;
+  let scheduledDate = null;
+  
+  if(timeMode === 'scheduled'){
+    const dateSelect = document.getElementById('scheduledDateSelect');
+    const timeSelect = document.getElementById('scheduledTimeSelect');
+    if(!dateSelect?.value || !timeSelect?.value){
+      showToast(t('select_valid_time'));
+      return;
+    }
+    scheduledTime = timeSelect.value;
+    const dayOffset = parseInt(dateSelect.value);
+    isPreOrder = dayOffset > 0 || (dayOffset === 0 && scheduledTime);
+    scheduledDate = dateSelect.options[dateSelect.selectedIndex]?.dataset.date || null;
+  } else {
+    if(!checkIfOpen()){
+      showToast(t('closed_now'));
+      return;
+    }
+  }
+
+  // Calcolo totali
+  let productsTotal = 0;
+  let deliveryFee = 0;
+  let finalTotal = 0;
+  
+  cart.forEach(i=>{
+    if(i.isPromo) productsTotal += i.totalPrice||0;
+    else productsTotal += (i.price||0)*(i.qty||1);
+  });
+
+  if(orderType === 'delivery'){
+    const feeText = document.getElementById('deliveryFeeValue')?.textContent || '€0';
+    deliveryFee = parseFloat(feeText.replace('€','').replace(',','.')) || (parseFloat(appData.settings.deliveryBaseFee)||3);
+  }
+
+  finalTotal = productsTotal + deliveryFee;
+
+  // Costruisci oggetto ordine
+  const orderData = {
+    name: name,
+    phone: phone,
+    address: orderType === 'delivery' ? 
+      `${document.getElementById('customerStreet').value} ${document.getElementById('customerNumber').value}`.trim() : '',
+    notes: document.getElementById('customerNotes')?.value || '',
+    type: orderType,
+    items: [...cart],
+    productsTotal: productsTotal,
+    deliveryFee: deliveryFee,
+    finalTotal: finalTotal,
+    customerLat: window.customerGPSLat || null,
+    customerLng: window.customerGPSLng || null,
+    scheduledTime: scheduledTime,
+    isPreOrder: isPreOrder,
+    scheduledDate: scheduledDate
+  };
+
+  sendOrder(orderData);
+}
+
 async function sendOrder(d){
 const btn=document.getElementById('checkoutBtn'),cb=[...cart];
 if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...'}
@@ -1856,13 +1955,11 @@ function renderCategories(){
     const l = document.getElementById('categoriesList');
     if (!l) return;
     
-    // Converte l'oggetto in un array e ordina in base al campo 'order' salvato nel gestionale
     let catsArray = Object.keys(appData.categories || {}).map(key => ({
         key: key,
         ...appData.categories[key]
     }));
 
-    // Ordina le categorie in base alla proprietà numerica 'order'
     catsArray.sort((a, b) => (a.order || 0) - (b.order || 0));
 
     l.innerHTML = catsArray.map(catItem => {
