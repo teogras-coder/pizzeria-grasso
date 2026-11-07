@@ -1048,7 +1048,8 @@ async function trasformaInOrdine(orderId) {
     deliveryFee:deliveryFee, finalTotal:finalTotal,
     scheduledTime:order.scheduledTime||'Prima possibile',
     notes:order.notes||'',
-    stampato_130:null, stampato_131:null, stampato_annullato:null
+    stampato_130:null, stampato_131:null, stampato_annullato:null,
+    richiestaRistampa_130:null, richiestaRistampa_131:null, ristampa:null
   });
   order.status='new'; order.isPreOrder=false; order.deliveryFee=deliveryFee; order.finalTotal=finalTotal;
   showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); 
@@ -1069,18 +1070,12 @@ async function ristampaOrdine(id){
   const order = ordersCache[id];
   if (!order) return;
   if (!await showConfirm('Ristampare?', `Ristampo ${order.orderId || id}?`)) return;
-  try {
-    await db.ref(`ordini/${id}`).update({
-      stampato_130: null,
-      stampato_131: null,
-      stampato_annullato: null,
-      ristampa: true
-    });
-    order.ristampa = true;
-    order.stampato_130 = null;
-    order.stampato_131 = null;
-    showToast('🖨️ Ristampa inviata');
-  } catch(e) { showToast('❌ Errore ristampa: ' + e.message); }
+  await db.ref(`ordini/${id}`).update({
+    richiestaRistampa_130: true,
+    richiestaRistampa_131: true,
+    richiestaRistampaAt: Date.now()
+  });
+  showToast('🖨️ Ristampa inviata');
 }
 
 function avviaControlloPreOrdini() {
@@ -1285,7 +1280,7 @@ try { await db.ref('ordini/' + id).remove(); await db.ref('comande_stampate/' + 
 }
 
 function setupOptimizedListeners() {
-db.ref('ordini').orderByChild('timestamp').limitToLast(50).once('value').then(snap => {
+db.ref('ordini').orderByChild('timestamp').limitToLast(50).once('value', snap => {
 snap.forEach(c => { ordersCache[c.key] = { id: c.key, ...c.val() }; }); renderOrders(ordersCache);
 });
 db.ref('ordini').orderByChild('timestamp').limitToLast(50).on('value', snap => {
