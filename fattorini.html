@@ -15,7 +15,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
-<!-- 🔥 AGGIUNTO SDK AUTH -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
 :root { --gold: #D48806; --gold-light: #FFB347; --gold-dark: #B8860B; --dark: #1a1a1a; --card: #2a2a2a; --card-light: #3a3a3a; --cream: #f5e6c8; --shadow: #0a0a0a; --success: #4ade80; --warning: #fbbf24; --danger: #f87171; }
@@ -58,7 +57,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .order-card.ready { border-left: 6px solid #a855f7; }
 .order-card.picked { border-left: 6px solid var(--success); }
 .order-card.delivering { border-left: 6px solid #60a5fa; }
-.order-card.delivered { border-left: 6px solid #60a5fa; opacity: 0.7; }
+.order-card.delivered { border-left: 6px solid #4ade80; opacity: 0.85; background: rgba(74,222,128,0.05); }
 
 @keyframes pulseNew { 0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.4); } 50% { box-shadow: 0 0 0 10px rgba(251,191,36,0); } }
 
@@ -67,6 +66,7 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .order-time { color: #8a8a8a; font-size: 0.85rem; }
 .order-customer { color: var(--cream); font-weight: 700; margin-bottom: 10px; font-size: 1.1rem; }
 .order-address { color: #a0a0a0; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.5; }
+.order-notes-box { background: rgba(212,136,6,0.15); border-left: 4px solid var(--gold); padding: 8px 12px; border-radius: 6px; color: var(--cream); font-size: 0.85rem; margin-bottom: 10px; }
 .order-items { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.9rem; }
 .order-items div { color: var(--cream); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .order-items div:last-child { border-bottom: none; }
@@ -114,7 +114,6 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .logout-btn { position: fixed; top: 10px; right: 10px; background: rgba(248,113,113,0.2); color: #f87171; border: 2px solid #f87171; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; z-index: 1001; display: none; }
 .logout-btn.show { display: block; }
 
-/* MODALI CUSTOM */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10001; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
 .modal-overlay.active { display: flex; }
 .modal-box { background: linear-gradient(145deg, var(--card-light), var(--card)); padding: 28px 24px; border-radius: 20px; width: 100%; max-width: 400px; border: 2px solid var(--gold); }
@@ -126,7 +125,6 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 .modal-btn-cancel { background: var(--card-light); color: var(--cream); border: 2px solid var(--gold) !important; }
 .modal-btn-danger { background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 4px 0 #922b21; }
 
-/* MODAL DETTAGLI ORDINE */
 .modal-details { max-height: 80vh; overflow-y: auto; }
 .modal-details .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(212,136,6,0.2); }
 .modal-details .detail-row:last-child { border-bottom: none; }
@@ -138,7 +136,6 @@ body { font-family: 'Montserrat', sans-serif; background: linear-gradient(180deg
 </head>
 <body>
 
-<!-- MODALI CUSTOM -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <h3 id="confirmTitle">Conferma</h3>
@@ -232,9 +229,11 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// 🔥 AGGIUNTO: LOGIN ANONIMO PER FATTORINI
 firebase.auth().signInAnonymously()
-  .then(() => console.log('✅ Fattorini auth OK'))
+  .then(() => {
+    console.log('✅ Fattorini auth OK');
+    checkAutoLogin();
+  })
   .catch(e => console.error('❌ Fattorini auth Error:', e));
 
 const db = firebase.database();
@@ -315,9 +314,12 @@ function showDetailsModal(orderId) {
   
   const items = order.items?.map(i => `<div>• ${sanitize(i.name)} x${i.qty} - €${(i.price * i.qty).toFixed(2)}</div>`).join('') || '<div>Nessun prodotto</div>';
   
+  const customerLat = order.customerLat || (order.coords && order.coords.lat);
+  const customerLng = order.customerLng || (order.coords && order.coords.lng);
+  
   let distanceText = '';
-  if (order.customerLat && order.customerLng) {
-    const d = calculateDistance(pizzeriaSettings.lat, pizzeriaSettings.lng, order.customerLat, order.customerLng);
+  if (customerLat && customerLng) {
+    const d = calculateDistance(pizzeriaSettings.lat, pizzeriaSettings.lng, customerLat, customerLng);
     if (d) distanceText = `<div class="detail-row"><span class="detail-label">Distanza</span><span class="detail-value">${d.toFixed(1)} km</span></div>`;
   }
   
@@ -389,13 +391,19 @@ function loadPizzeriaSettings() {
 function initNotificationSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    notificationSound = new AudioContext();
+    if (!notificationSound) {
+      notificationSound = new AudioContext();
+    }
+    if (notificationSound.state === 'suspended') {
+      notificationSound.resume();
+    }
   } catch(e) { 
     console.log('Audio non supportato'); 
   }
 }
 
 function playNotificationSound() {
+  initNotificationSound();
   if (!notificationSound) return;
   try {
     const osc = notificationSound.createOscillator();
@@ -437,7 +445,21 @@ async function requestWakeLock() {
   }
 }
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
+// ─── LOGIN & AUTO-LOGIN ───────────────────────────────────────────────────────
+async function checkAutoLogin() {
+  const savedPin = localStorage.getItem('driver_pin');
+  const savedName = localStorage.getItem('driver_name');
+  if (savedPin && savedName) {
+    try {
+      const snapshot = await db.ref('drivers/' + savedPin).once('value');
+      if (snapshot.exists()) {
+        enterDriverApp(savedPin, snapshot.val());
+        return;
+      }
+    } catch(e) {}
+  }
+}
+
 async function checkPin() {
   const pin = document.getElementById('pinInput').value.trim();
   if (!pin) {
@@ -451,20 +473,9 @@ async function checkPin() {
     const driverEntry = Object.entries(driversData).find(([p]) => p === pin);
     
     if (driverEntry) {
-      currentDriver = { pin, name: driverEntry[1] };
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
-      document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
-      document.getElementById('logoutBtn').classList.add('show');
-      
-      initNotificationSound();
-      requestNotificationPermissionUI();
-      requestNotificationPermission();
-      setupNotificationListener();
-      loadPizzeriaSettings();
-      loadOrdersFromCache();
-      setupOptimizedListeners();
-      showToast(`✅ Benvenuto, ${currentDriver.name}!`);
+      localStorage.setItem('driver_pin', pin);
+      localStorage.setItem('driver_name', driverEntry[1]);
+      enterDriverApp(pin, driverEntry[1]);
     } else {
       document.getElementById('loginError').style.display = 'block';
       document.getElementById('pinInput').value = '';
@@ -472,6 +483,23 @@ async function checkPin() {
   } catch(e) {
     showToast('❌ Errore di connessione');
   }
+}
+
+function enterDriverApp(pin, name) {
+  currentDriver = { pin, name };
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('driverGreeting').textContent = `Ciao, ${currentDriver.name}!`;
+  document.getElementById('logoutBtn').classList.add('show');
+  
+  initNotificationSound();
+  requestNotificationPermissionUI();
+  requestNotificationPermission();
+  setupNotificationListener();
+  loadPizzeriaSettings();
+  loadOrdersFromCache();
+  setupOptimizedListeners();
+  showToast(`✅ Benvenuto, ${currentDriver.name}!`);
 }
 
 document.getElementById('pinInput').addEventListener('keypress', e => {
@@ -497,23 +525,21 @@ function loadOrdersFromCache() {
 
 function saveOrdersToCache() {
   const toSave = Object.values(ordersCache)
-    .filter(o => o.status !== 'delivered' && o.status !== 'rifiutato' && o.status !== 'annullato')
+    .filter(o => o.status !== 'rifiutato' && o.status !== 'annullato')
     .slice(0, 30);
   localStorage.setItem('driverOrdersCache', JSON.stringify(toSave));
 }
 
-// ─── 🔥 LISTENER OTTIMIZZATO PER ORDINI (SOLO CONSEGNA) ────────────────    
+// ─── LISTENER OTTIMIZZATO ORDINI ─────────────────────────────────────────────
 function setupOptimizedListeners() {
-  // 1. 🔥 CARICA ORDINI ALL'AVVIO - SOLO CONSEGNA
   db.ref('ordini')
     .orderByChild('timestamp')
-    .limitToLast(30)
+    .limitToLast(40)
     .once('value', (snapshot) => {
       snapshot.forEach(child => {
         const order = child.val();
         order.id = child.key;
-        // Solo ordini di consegna
-        if (order.type === 'delivery') {
+        if (order.type === 'delivery' && !order.isPreOrder && order.status !== 'preorder') {
           ordersCache[order.id] = order;
         }
       });
@@ -522,18 +548,16 @@ function setupOptimizedListeners() {
       saveOrdersToCache();
     });
 
-  // 2. 🔥 ASCOLTA NUOVI ORDINI (child_added) - SOLO CONSEGNA
   db.ref('ordini').on('child_added', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    if (order.type === 'delivery') {
+    if (order.type === 'delivery' && !order.isPreOrder && order.status !== 'preorder') {
       ordersCache[order.id] = order;
       renderOrders();
       saveOrdersToCache();
       
-      // Suona se è un nuovo ordine non assegnato (new, accettato, preparing, delayed)
-      if (!order.assignedDriver && ['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) {
+      if (!firstLoad && !order.assignedDriver && ['new', 'accettato', 'preparing', 'delayed', 'ready'].includes(order.status)) {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         const available = Object.values(ordersCache).filter(o => 
@@ -546,12 +570,10 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 3. 🔥 ASCOLTA CAMBIAMENTI DI STATO (child_changed) CON FIX PER ASSEGNAZIONE ISTANTANEA
   db.ref('ordini').on('child_changed', (snapshot) => {
     const order = snapshot.val();
     order.id = snapshot.key;
     
-    // Se non è un ordine di consegna, rimuovilo dalla cache
     if (order.type !== 'delivery') {
       if (ordersCache[order.id]) {
         delete ordersCache[order.id];
@@ -565,16 +587,8 @@ function setupOptimizedListeners() {
     const oldStatus = oldOrder?.status;
     const oldDriver = oldOrder?.assignedDriver;
     
-    // 🔥 CASO 1: ORDINE ASSEGNATO AD UN ALTRO FATTORINO → RIMUOVI
-    if (oldOrder && order.assignedDriver && order.assignedDriver !== currentDriver?.pin) {
-      delete ordersCache[order.id];
-      saveOrdersToCache();
-      renderOrders();
-      return;
-    }
-    
-    // 🔥 CASO 2: ORDINE CONSEGNATO O ANNULLATO → RIMUOVI
-    if (order.status === 'delivered' || order.status === 'rifiutato' || order.status === 'annullato') {
+    // Assegnato ad un altro fattorino: rimuovi
+    if (order.assignedDriver && order.assignedDriver !== currentDriver?.pin) {
       if (ordersCache[order.id]) {
         delete ordersCache[order.id];
         saveOrdersToCache();
@@ -583,15 +597,22 @@ function setupOptimizedListeners() {
       return;
     }
     
-    // 🔥 AGGIORNA CACHE SEMPRE
+    // Rifiutato o annullato: rimuovi
+    if (order.status === 'rifiutato' || order.status === 'annullato') {
+      if (ordersCache[order.id]) {
+        delete ordersCache[order.id];
+        saveOrdersToCache();
+        renderOrders();
+      }
+      return;
+    }
+    
     ordersCache[order.id] = order;
     saveOrdersToCache();
     
-    // 🔥 FIX APPLICATO (da screenshot): Ridisegna se cambia lo stato O se cambia il driver assegnato (es. Prendi in carico)
     if (oldStatus !== order.status || oldDriver !== order.assignedDriver) {
       renderOrders();
       
-      // Notifica: ordine pronto per il ritiro (se assegnato a me)
       if (order.assignedDriver === currentDriver?.pin && order.status === 'ready' && oldStatus !== 'ready') {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
@@ -599,38 +620,23 @@ function setupOptimizedListeners() {
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('🍕 Ordine Pronto!', {
             body: `Ordine ${order.orderId || order.id} pronto per il ritiro`,
-            icon: 'https://i.imgur.com/nWLqs68.png'
+            icon: '/logofattorini192.png'
           });
         }
       }
       
-      // Notifica: ordine in ritardo (se assegnato a me)
       if (order.assignedDriver === currentDriver?.pin && order.status === 'delayed' && oldStatus !== 'delayed') {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([250, 80, 250]);
-        showToast('⏰ Un tuo ordine è in ritardo');
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('⏰ Ordine in Ritardo', {
-            body: `Ordine ${order.orderId || order.id} in ritardo`,
-            icon: 'https://i.imgur.com/nWLqs68.png'
-          });
-        }
+        showToast(`⏰ Ordine in ritardo (+${order.delayMinutes || 10}m)`);
       }
       
-      // Notifica: ordine accettato dal gestionale (se assegnato a me)
-      if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && order.status === 'preparing') {
+      if (order.assignedDriver === currentDriver?.pin && oldStatus === 'new' && (order.status === 'preparing' || order.status === 'accettato')) {
         showToast('✅ Ordine accettato! Inizia la preparazione...');
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('🍕 Ordine Accettato!', {
-            body: `Ordine ${order.orderId || order.id} in preparazione`,
-            icon: 'https://i.imgur.com/nWLqs68.png'
-          });
-        }
       }
     }
   });
 
-  // 4. 🔥 ASCOLTA RIMOZIONI (child_removed) - ELIMINA DEFINITIVAMENTE
   db.ref('ordini').on('child_removed', (snapshot) => {
     const id = snapshot.key;
     if (ordersCache[id]) {
@@ -640,7 +646,6 @@ function setupOptimizedListeners() {
     }
   });
 
-  // 5. 🔥 OFFLINE STATUS
   db.ref('.info/connected').on('value', snapshot => {
     const banner = document.getElementById('offlineBanner');
     if (banner) banner.style.display = snapshot.val() === false ? 'block' : 'none';
@@ -657,9 +662,9 @@ function showNotification(count) {
   }
   if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('🆕 Nuovo Ordine!', {
+    new Notification('🆕 Nuovo Ordine Consegna!', {
       body: `${count} ordine${count > 1 ? 'i' : ''} disponibile${count > 1 ? 'i' : ''}`,
-      icon: 'https://i.imgur.com/nWLqs68.png',
+      icon: '/logofattorini192.png',
       tag: 'new-order',
       requireInteraction: true
     });
@@ -683,7 +688,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// ─── ACCETTA E RITIRA SUBITO (per ordini già pronti) ──────────────────────
+// ─── ACCETTA E RITIRA SUBITO ──────────────────────────────────────────────────
 async function acceptAndPickOrder(orderId) {
   const ok = await showConfirm(
     'Accettare e ritirare?',
@@ -713,7 +718,7 @@ async function acceptAndPickOrder(orderId) {
     const snapshot = await orderRef.once('value');
     const order = snapshot.val();
     if (order && order.assignedDriver === currentDriver.pin) {
-      showToast('✅ Ordine accettato e ritirato! Ora puoi consegnarlo.');
+      showToast('✅ Ordine accettato e ritirato!');
       playNotificationSound();
     } else {
       showToast('❌ Ordine già preso da un altro fattorino');
@@ -734,26 +739,26 @@ function renderOrders() {
   
   let available = [];
   let myOrders = [];
-  let completedCount = 0;
   
   Object.values(ordersCache).forEach(order => {
-    // 🔥 SCHEDA "DISPONIBILI": ordini di consegna non ancora assegnati
+    // DISPONIBILI: ordini delivery non assegnati e attivi
     if (
       order.type === 'delivery' &&
+      !order.isPreOrder &&
+      order.status !== 'preorder' &&
       !order.assignedDriver &&
       ['new', 'accettato', 'preparing', 'delayed', 'ready'].includes(order.status)
     ) {
       available.push(order);
     }
-    // 🔥 SCHEDA "LE MIE": tutti gli ordini assegnati a me
+    // LE MIE: ordini assegnati a me (inclusi consegnati non nascosti)
     else if (
       order.assignedDriver === currentDriver?.pin &&
       !hiddenOrderIds.has(order.id) &&
       order.type === 'delivery' &&
-      ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering'].includes(order.status)
+      ['new', 'accettato', 'preparing', 'delayed', 'ready', 'picked', 'delivering', 'delivered'].includes(order.status)
     ) {
       myOrders.push(order);
-      if (order.status === 'delivered') completedCount++;
     }
   });
   
@@ -763,10 +768,8 @@ function renderOrders() {
   availableCount.textContent = available.length;
   myOrdersCount.textContent = myOrders.length;
   
-  const hasDelivered = Object.values(ordersCache).some(o => 
-    o.assignedDriver === currentDriver?.pin && o.status === 'delivered' && !hiddenOrderIds.has(o.id)
-  );
-  if (hasDelivered) {
+  const hasDelivered = myOrders.some(o => o.status === 'delivered');
+  if (hasDelivered && currentTab === 'my') {
     clearBtnContainer.classList.add('show');
   } else {
     clearBtnContainer.classList.remove('show');
@@ -786,8 +789,8 @@ function renderOrders() {
     
     let mapHtml = '';
     let distanceHtml = '';
-    const customerLat = order.customerLat;
-    const customerLng = order.customerLng;
+    const customerLat = order.customerLat || (order.coords && order.coords.lat);
+    const customerLng = order.customerLng || (order.coords && order.coords.lng);
     
     if (customerLat && customerLng) {
       const distance = calculateDistance(pizzeriaSettings.lat, pizzeriaSettings.lng, customerLat, customerLng);
@@ -796,11 +799,11 @@ function renderOrders() {
       const bboxLat = 0.006;
       const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${customerLng-bboxLng},${customerLat-bboxLat},${customerLng+bboxLng},${customerLat+bboxLat}&layer=mapnik&marker=${customerLat},${customerLng}`;
       const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${pizzeriaSettings.lat},${pizzeriaSettings.lng}&destination=${customerLat},${customerLng}&travelmode=driving`;
-      mapHtml = `<div class="map-container"><iframe src="${mapUrl}" loading="lazy"></iframe><a href="${gmapsUrl}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
+      mapHtml = `<div class="map-container"><iframe src="${mapUrl}" loading="lazy"></iframe><a href="${gmapsUrl}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Naviga con Google Maps</a></div>`;
       distanceHtml = `<div class="distance-info"><span class="label">📍 Distanza:</span><span class="distance">${distanceText} km</span></div>`;
     } else if (order.address) {
       const encodedAddr = encodeURIComponent(order.address + ' Manfredonia');
-      mapHtml = `<div class="map-container" style="padding: 15px; text-align: center;"><i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i><p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${sanitize(order.address)}</p><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Apri in Google Maps</a></div>`;
+      mapHtml = `<div class="map-container" style="padding: 15px; text-align: center;"><i class="fas fa-map-marker-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i><p style="color: var(--cream); margin-bottom: 10px; font-size: 0.9rem;">${sanitize(order.address)}</p><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="map-link"><i class="fas fa-directions"></i> Cerca con Google Maps</a></div>`;
     }
     
     let statusMessage = '';
@@ -836,9 +839,9 @@ function renderOrders() {
       } else if (order.status === 'picked') {
         actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">🏍️ In Consegna</button>`;
       } else if (order.status === 'delivering') {
-        actions = `<button class="btn-deliver" onclick="deliverOrder('${order.id}')">✅ Consegnato</button>`;
+        actions = `<button class="btn-deliver" style="background:linear-gradient(180deg,#4ade80 0%,#22c55e 100%);" onclick="deliverOrder('${order.id}')">✅ Conferma Consegna</button>`;
       } else if (order.status === 'delivered') {
-        statusMessage = `<div class="status-message" style="background: rgba(74,222,128,0.2); color: #4ade80;">✅ Consegnato!</div>`;
+        statusMessage = `<div class="status-message" style="background: rgba(74,222,128,0.2); color: #4ade80;">✅ Consegnato con successo!</div>`;
       }
     }
     
@@ -849,8 +852,13 @@ function renderOrders() {
     ) {
       const isDelayed = order.status === 'delayed';
       const label = isDelayed ? '⏰ Abbandona (ritardo)' : '⬅️ Abbandona';
-      actions += `<button class="btn-abandon" onclick="abandonOrder('${order.id}')" style="background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); color: white;">${label}</button>`;
+      actions += `<button class="btn-abandon" onclick="abandonOrder('${order.id}')">${label}</button>`;
     }
+
+    const cleanPhone = (order.customerPhone || '').replace(/\D/g, '');
+    const phoneLink = cleanPhone ? `<a href="tel:${cleanPhone}" style="color:var(--gold);font-weight:700;"><i class="fas fa-phone"></i> ${cleanPhone}</a>` : 'N/A';
+    const waLink = cleanPhone ? `<a href="https://wa.me/${cleanPhone.startsWith('39')?cleanPhone:'39'+cleanPhone}?text=${encodeURIComponent(`🍕 *Antica Pizzeria Grasso*\nCiao ${order.customerName||''}! Il fattorino è in arrivo per il tuo ordine!`)}" target="_blank" style="margin-left:12px;color:#25D366;font-weight:700;text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '';
+    const notesBox = order.notes ? `<div class="order-notes-box">📝 <strong>Note:</strong> ${sanitize(order.notes)}</div>` : '';
     
     return `
       <div class="order-card ${statusClass}">
@@ -859,7 +867,11 @@ function renderOrders() {
           <span class="order-time">${timeStr}</span>
         </div>
         <div class="order-customer">👤 ${sanitize(order.customerName || 'N/A')}</div>
-        <div class="order-address">📍 ${sanitize(order.address || 'N/A')}<br>📞 <a href="tel:${order.customerPhone}" style="color:var(--gold);">${sanitize(order.customerPhone || '')}</a></div>
+        <div class="order-address">
+          📍 ${sanitize(order.address || 'N/A')}<br>
+          📞 ${phoneLink} ${waLink}
+        </div>
+        ${notesBox}
         ${mapHtml}
         ${distanceHtml}
         ${statusMessage}
@@ -881,7 +893,7 @@ function renderOrders() {
 async function clearCompletedOrders() {
   const ok = await showConfirm(
     'Cancellare ordini completati?',
-    'Gli ordini consegnati verranno nascosti.'
+    'Gli ordini consegnati verranno nascosti da questa schermata.'
   );
   if (!ok) return;
 
@@ -909,7 +921,7 @@ async function acceptOrder(orderId) {
     await orderRef.transaction(order => {
       if (!order) return order;
       if (order.assignedDriver) return order;
-      if (!['new', 'accettato', 'preparing', 'delayed'].includes(order.status)) return order;
+      if (!['new', 'accettato', 'preparing', 'delayed', 'ready'].includes(order.status)) return order;
       if (order.type !== 'delivery') return order;
       order.assignedDriver = currentDriver.pin;
       order.assignedName = currentDriver.name;
@@ -1013,6 +1025,9 @@ async function logout() {
   const ok = await showConfirm('Uscire dall\'app?', 'Dovrai reinserire il PIN per accedere.');
   if (!ok) return;
   
+  localStorage.removeItem('driver_pin');
+  localStorage.removeItem('driver_name');
+  
   if (notificationRef && notificationCallback) {
     notificationRef.off('child_added', notificationCallback);
     notificationRef = null;
@@ -1051,8 +1066,11 @@ function showToast(msg) {
 }
 
 document.addEventListener('visibilitychange', async () => {
-  if (wakeLock !== null && document.visibilityState === 'visible') {
-    await requestWakeLock();
+  if (document.visibilityState === 'visible') {
+    if (wakeLock !== null) {
+      await requestWakeLock();
+    }
+    initNotificationSound();
   }
 });
 
