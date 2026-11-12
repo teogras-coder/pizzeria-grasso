@@ -9,7 +9,7 @@
 <title>Antica Pizzeria Grasso</title>
 <meta name="apple-mobile-web-app-title" content="Antica Pizzeria Grasso">
 <meta name="application-name" content="Antica Pizzeria Grasso">
-<link rel="manifest" href="manifest-clienti.json?v=10">
+<link rel="manifest" href="manifest-clienti.json?v=11">
 <link rel="icon" type="image/png" href="icon-clienti-192.png">
 <link rel="apple-touch-icon" href="icon-clienti-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -443,9 +443,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 #bannerRifiuto .banner-title{font-size:1.5rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:10px}
 #bannerRifiuto .banner-motivo{font-size:1rem;margin-bottom:15px;opacity:.95}
 #bannerRifiuto .banner-btn{background:white;color:#dc2626;border:none;padding:12px 30px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.95rem;box-shadow:0 4px 15px rgba(0,0,0,.3)}
-.gold-shimmer-bar{position:relative;width:100%;height:4px;margin:0;background:linear-gradient(180deg,#f0d78c 0%,#d4a84b 40%,#b8860b 60%,#8b6914 80%,#d4a84b 100%);box-shadow:0 2px 5px rgba(0,0,0,.6),0 0 12px rgba(212,168,75,.5);overflow:hidden;display:none !important}
-.shimmer-light{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.1) 30%,rgba(255,255,255,.8) 50%,rgba(255,255,255,.1) 70%,transparent 100%);animation:shimmerMove 3s ease-in-out infinite}
-@keyframes shimmerMove{0%{left:-100%}100%{left:100%}}
 .user-menu{position:fixed;top:10px;right:10px;z-index:9999;background:rgba(42,30,19,.95);padding:10px 15px;border-radius:10px;border:1px solid var(--gold-dark);display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px)}
 .user-menu span{color:var(--cream);font-size:.85rem;font-weight:600}
 .welcome-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,var(--dark) 0%,var(--card) 100%);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;overflow-y:auto}
@@ -1651,13 +1648,12 @@ window.location.reload();
 }
 
 function confirmAndSendOrder(){
-  // Validazioni
   const name = document.getElementById('customerName')?.value.trim();
   const phone = document.getElementById('customerPhone')?.value.trim();
   const privacy = document.getElementById('privacyConsent')?.checked;
   const honeypot = document.getElementById('honeypot')?.value;
 
-  if(honeypot){ return; } // bot
+  if(honeypot){ return; }
   
   if(!privacy){
     showToast(t('accept_privacy'));
@@ -1679,7 +1675,6 @@ function confirmAndSendOrder(){
       showToast(t('fill_address'));
       return;
     }
-    // Controllo fuori raggio
     const distRow = document.getElementById('distanceInfo');
     if(distRow && distRow.style.display !== 'none' && distRow.textContent.includes('Fuori')){
       showToast(t('out_of_range'));
@@ -1687,7 +1682,6 @@ function confirmAndSendOrder(){
     }
   }
 
-  // Controllo orario programmato
   let scheduledTime = null;
   let isPreOrder = false;
   let scheduledDate = null;
@@ -1710,7 +1704,6 @@ function confirmAndSendOrder(){
     }
   }
 
-  // Calcolo totali
   let productsTotal = 0;
   let deliveryFee = 0;
   let finalTotal = 0;
@@ -1727,7 +1720,6 @@ function confirmAndSendOrder(){
 
   finalTotal = productsTotal + deliveryFee;
 
-  // Costruisci oggetto ordine
   const orderData = {
     name: name,
     phone: phone,
@@ -1789,7 +1781,30 @@ function updateStarsDisplay(){document.querySelectorAll('#starsInput .star').for
 function submitReview(){const n=document.getElementById('reviewName').value.trim(),txt=document.getElementById('reviewText').value.trim(),oid=pendingReviewOrderId||document.getElementById('reviewOrderId').value.trim();if(!selectedStars){showToast('⚠️ Seleziona stelle');return}if(!n){showToast('❌ Inserisci nome');return}if(!txt){showToast('❌ Scrivi commento');return}db.ref('recensioni').push({name:sanitizeWA(n),text:sanitizeWA(txt),stars:selectedStars,orderId:oid||'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{if(pendingReviewOrderId){let lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');lo=lo.map(o=>o.orderId===pendingReviewOrderId?{...o,reviewed:true}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(lo));renderMyOrders()}closeReviewModal();showToast(t('thanks_review'))})}
 function showMyOrders(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='block';window.scrollTo(0,0);startOrderStatusTracking();renderMyOrders();updateNavLiveDotOld()}
 function cleanLocalHistory(){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');o=o.filter(x=>(Date.now()-x.date)<30*24*3600*1000);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o))}catch(e){}}
-function saveOrderToLocal(od){try{let o=[];try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}if(o.find(x=>x.orderId===od.orderId))return;o.unshift({orderId:od.orderId,date:Date.now(),total:od.finalTotal,items:od.items.map(i=>i.name).join(', '),reviewed:false,status: od.isPreOrder ? 'preorder' : 'new', type:od.type||'delivery', isPreOrder: od.isPreOrder || false});if(o.length>5)o=o.slice(0,5);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld()}catch(e){}}
+
+function saveOrderToLocal(od){
+  try{
+    let o=[];
+    try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}
+    if(o.find(x=>x.orderId===od.orderId))return;
+    const itemsDescription = od.items.map(i => i.isPromo ? (i.promoTitle || 'Promozione') : i.name).filter(Boolean).join(', ');
+    o.unshift({
+      orderId:od.orderId,
+      date:Date.now(),
+      total:od.finalTotal,
+      items:itemsDescription,
+      reviewed:false,
+      status: od.isPreOrder ? 'preorder' : 'new',
+      type:od.type||'delivery',
+      isPreOrder: od.isPreOrder || false
+    });
+    if(o.length>5)o=o.slice(0,5);
+    localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));
+    renderMyOrders();
+    updateNavLiveDotOld();
+  }catch(e){}
+}
+
 async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_confirm'));if(!ok)return;Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();updateNavLiveDotOld();showToast(t('history_cleared'))}
 function getOrderProgress(s,typ){
 if(typ==='pickup'){
