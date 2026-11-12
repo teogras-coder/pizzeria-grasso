@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -23,254 +25,58 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
-:root{
-  --gold:#d4a84b;
-  --gold-light:#f0d78c;
-  --gold-dark:#b8860b;
-  --dark: #1a1209;
-  --card:#2a1e13;
-  --card-light:#3d2b1a;
-  --cream:#f5e6c8;
-  --shadow:#0a0704;
-}
+:root{--gold:#d4a84b;--gold-light:#f0d78c;--gold-dark:#b8860b;--dark:#1a1209;--card:#2a1e13;--card-light:#3d2b1a;--cream:#f5e6c8;--shadow:#0a0704;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{height:-webkit-fill-available;background:var(--dark) !important}
-html,body{height:100%;min-height:100vh;min-height:100svh;min-height:100dvh;min-height:-webkit-fill-available;background:var(--dark) !important;color:var(--cream)}
+html{height:-webkit-fill-available;background:var(--dark)!important}
+html,body{height:100%;min-height:100vh;min-height:100svh;min-height:100dvh;min-height:-webkit-fill-available;background:var(--dark)!important;color:var(--cream)}
 body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;position:relative;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
-
-.phone-frame{
-    width:100% !important;
-    max-width:480px !important;
-    height:100vh !important;
-    height:100svh !important;
-    height:100dvh !important;
-    min-height:100vh !important;
-    min-height:100svh !important;
-    min-height:100dvh !important;
-    min-height:-webkit-fill-available !important;
-    background: var(--dark) !important;
-    position:relative;
-    overflow-y:scroll;
-    -webkit-overflow-scrolling:touch;
-    z-index:10;
-    padding-bottom:calc(110px + env(safe-area-inset-bottom)) !important;
-    will-change: scroll-position;
-}
-
+.phone-frame{width:100%!important;max-width:480px!important;height:100vh!important;height:100svh!important;height:100dvh!important;min-height:100vh!important;min-height:100svh!important;min-height:100dvh!important;min-height:-webkit-fill-available!important;background:var(--dark)!important;position:relative;overflow-y:scroll;-webkit-overflow-scrolling:touch;z-index:10;padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;will-change:scroll-position;}
 .header{background:transparent;padding:0;text-align:center;position:relative;z-index:20;flex-shrink:0;overflow:visible}
-.logo-area{
-    width:100%;
-    position:relative;
-    overflow:visible;
-    padding-top:env(safe-area-inset-top);
-    padding-bottom:0; 
-    margin-bottom:0;
-    background-color: var(--dark) !important;
-    box-shadow: none !important;
-    line-height: 0;
-    z-index: 10;
-}
-.logo-area img{
-    width:100%;
-    height:auto;
-    display:block;
-    object-fit:contain;
-    max-height:220px;
-    position:relative;
-    z-index:1;
-    margin:0;
-    mix-blend-mode: normal !important;
-}
-.logo-area::after {
-    content: '';
-    position: absolute;
-    bottom: -30px;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background: linear-gradient(to bottom, var(--dark) 0%, var(--dark) 10%, transparent 100%);
-    pointer-events: none;
-    z-index: 11;
-}
+.logo-area{width:100%;position:relative;overflow:visible;padding-top:env(safe-area-inset-top);padding-bottom:0;margin-bottom:0;background-color:var(--dark)!important;box-shadow:none!important;line-height:0;z-index:10;}
+.logo-area img{width:100%;height:auto;display:block;object-fit:contain;max-height:220px;position:relative;z-index:1;margin:0;mix-blend-mode:normal!important;}
+.logo-area::after{content:'';position:absolute;bottom:-30px;left:0;width:100%;height:30px;background:linear-gradient(to bottom,var(--dark) 0%,var(--dark) 10%,transparent 100%);pointer-events:none;z-index:11;}
 .hero-section{position:relative;height:130px;overflow:hidden;flex-shrink:0;margin-bottom:0;margin-top:-1px;z-index:1;background:var(--dark);}
-.hero-img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;background-color:var(--dark) !important;}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg, var(--dark) 0%, transparent 35%, transparent 70%, var(--dark) 100%);z-index:2;pointer-events:none}
-
+.hero-img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;background-color:var(--dark)!important;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,var(--dark) 0%,transparent 35%,transparent 70%,var(--dark) 100%);z-index:2;pointer-events:none}
 .status-banner{position:relative;margin:8px auto 4px!important;padding:6px 16px!important;z-index:10;font-weight:700;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;display:inline-flex;align-items:center;background:rgba(26,18,9,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(212,168,75,.4);border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
 .status-open{color:#f0d78c!important;text-shadow:0 0 8px rgba(212,168,75,.8)!important}
 .status-closed{color:#f87171!important;text-shadow:0 0 8px rgba(248,113,113,.6)!important}
-
 .section-divider{display:flex;align-items:center;padding:12px 25px 10px}
 .section-divider span{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);text-shadow:0 0 10px var(--gold)}
 .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent);margin:0 15px}
-
-.global-search-wrap { padding: 10px 20px 5px; }
+.global-search-wrap{padding:10px 20px 5px;}
 .search-bar-3d{position:relative;margin-bottom:10px;}
-.search-bar-3d input{width:100%;padding:14px 14px 14px 45px;border-radius:14px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:.95rem;outline:none;box-shadow:0 4px 0 var(--shadow);transition: border-color .2s;}
+.search-bar-3d input{width:100%;padding:14px 14px 14px 45px;border-radius:14px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:.95rem;outline:none;box-shadow:0 4px 0 var(--shadow);transition:border-color .2s;}
 .search-bar-3d input:focus{border-color:var(--gold);}
 .search-bar-3d i{position:absolute;left:15px;top:14px;color:var(--gold);z-index:2;}
-
-#promoCardContainer {
-    display: none; 
-    padding: 0 20px 10px;
-}
-#promoCardContainer.active {
-    display: block;
-}
-.promo-home-card {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    border-radius: 12px;
-    padding: 15px;
-    color: white;
-    box-shadow: 0 4px 15px rgba(238,90,36,0.4);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-.promo-home-card:active { transform: scale(0.98); }
-.promo-home-card-info { flex: 1; }
-.promo-home-card-title { font-weight: 800; font-size: 1rem; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.promo-home-card-desc { font-size: 0.8rem; opacity: 0.9; }
-.promo-home-card-price { font-size: 1.2rem; font-weight: 800; margin-top: 6px; }
-.promo-home-card-btn {
-    background: white;
-    color: #ee5a24;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 30px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.menu-list {
-    display: grid;
-    grid-template-rows: repeat(2, auto);
-    grid-auto-flow: column;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 12px;
-    padding: 5px 20px 15px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-.menu-list::-webkit-scrollbar { display: none; }
-
-.menu-btn-3d {
-    width: 150px;
-    background: linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);
-    border-radius: 16px;
-    overflow: hidden;
-    cursor: pointer;
-    color: white;
-    position: relative;
-    transition: all .3s ease;
-    box-shadow: 0 5px 0 var(--shadow), 0 6px 12px rgba(0,0,0,.4);
-    border: 1px solid rgba(212,168,75,.15);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: center;
-    scroll-snap-align: start;
-    aspect-ratio: 1.6 / 1;
-}
+#promoCardContainer{display:none;padding:0 20px 10px;}
+#promoCardContainer.active{display:block;}
+.promo-home-card{background:linear-gradient(135deg,#ff6b6b 0%,#ee5a24 100%);border-radius:12px;padding:15px;color:white;box-shadow:0 4px 15px rgba(238,90,36,0.4);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform 0.2s;}
+.promo-home-card:active{transform:scale(0.98);}
+.promo-home-card-info{flex:1;}
+.promo-home-card-title{font-weight:800;font-size:1rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.promo-home-card-desc{font-size:0.8rem;opacity:0.9;}
+.promo-home-card-price{font-size:1.2rem;font-weight:800;margin-top:6px;}
+.promo-home-card-btn{background:white;color:#ee5a24;border:none;padding:10px 15px;border-radius:30px;font-weight:800;font-size:0.8rem;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.menu-list{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;overflow-x:auto;overflow-y:hidden;gap:12px;padding:5px 20px 15px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;width:100%;}
+.menu-list::-webkit-scrollbar{display:none;}
+.menu-btn-3d{width:150px;background:linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);border-radius:16px;overflow:hidden;cursor:pointer;color:white;position:relative;transition:all .3s ease;box-shadow:0 5px 0 var(--shadow),0 6px 12px rgba(0,0,0,.4);border:1px solid rgba(212,168,75,.15);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;text-align:center;scroll-snap-align:start;aspect-ratio:1.6 / 1;}
 .category-img-container{width:100%;height:65px;overflow:hidden;position:relative;flex-shrink:0}
-.category-img{width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(.8);transition: transform .3s;}
-.menu-btn-3d:hover .category-img { transform: scale(1.05); }
+.category-img{width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(.8);transition:transform .3s;}
+.menu-btn-3d:hover .category-img{transform:scale(1.05);}
 .category-img-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(42,30,19,.9) 100%)}
-
-.menu-btn-content{
-    padding:8px 10px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:2px;
-    width:100%;
-    background: linear-gradient(180deg, transparent, var(--card) 20%);
-    position: relative;
-    z-index: 2;
-}
+.menu-btn-content{padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;background:linear-gradient(180deg,transparent,var(--card) 20%);position:relative;z-index:2;}
 .menu-btn-3d .btn-content h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light);margin-bottom:2px;line-height:1.1;}
 .menu-btn-3d .btn-content p{font-size:.7rem;color:#a08b6d;}
-
-.reviews-home-wrap {
-    padding: 0 20px;
-    margin-bottom: 15px;
-    overflow: visible;
-}
-.reviews-scroll {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 8px;
-    padding-bottom: 8px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    width: 100%;
-    max-width: 100%;
-    height: 90px;
-}
-.reviews-scroll::-webkit-scrollbar { display: none; }
-.review-card-home {
-    flex: 0 0 46%;
-    background: var(--card);
-    border-radius: 10px;
-    padding: 8px 10px;
-    border: 1px solid rgba(212,168,75,.15);
-    scroll-snap-align: start;
-    box-shadow: 0 4px 10px rgba(0,0,0,.2);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
-    height: 100%;
-    max-height: 85px;
-    overflow: hidden;
-}
-.review-header-home {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 3px;
-}
-.review-name-home {
-    color: var(--cream);
-    font-weight: 700;
-    font-size: .72rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 65%;
-}
-.review-stars-home {
-    color: var(--gold);
-    font-size: .6rem;
-}
-.review-text-home {
-    color: var(--cream);
-    font-size: .68rem;
-    line-height: 1.2;
-    font-style: italic;
-    flex: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.review-date-home {
-    color: #8a7a5a;
-    font-size: .55rem;
-    margin-top: 3px;
-    text-align: right;
-}
-
+.reviews-home-wrap{padding:0 20px;margin-bottom:15px;overflow:visible;}
+.reviews-scroll{display:flex;overflow-x:auto;overflow-y:hidden;gap:8px;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;touch-action:pan-x;width:100%;max-width:100%;height:90px;}
+.reviews-scroll::-webkit-scrollbar{display:none;}
+.review-card-home{flex:0 0 46%;background:var(--card);border-radius:10px;padding:8px 10px;border:1px solid rgba(212,168,75,.15);scroll-snap-align:start;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;height:100%;max-height:85px;overflow:hidden;}
+.review-header-home{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.review-name-home{color:var(--cream);font-weight:700;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65%;}
+.review-stars-home{color:var(--gold);font-size:.6rem;}
+.review-text-home{color:var(--cream);font-size:.68rem;line-height:1.2;font-style:italic;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;}
+.review-date-home{color:#8a7a5a;font-size:.55rem;margin-top:3px;text-align:right;}
 .quick-nav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:15px 20px 20px}
 .quick-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 4px;border-radius:14px;border:1px solid rgba(212,168,75,.2);background:linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);color:var(--cream);cursor:pointer;position:relative;box-shadow:0 4px 0 var(--shadow),0 6px 12px rgba(0,0,0,.4);transition:all .2s ease;-webkit-tap-highlight-color:rgba(212,168,75,.3)}
 .quick-nav-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow),0 2px 6px rgba(0,0,0,.3)}
@@ -283,12 +89,10 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .quick-nav-btn .nav-badge{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:white;font-size:9px;font-weight:900;font-family:monospace;min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:none;align-items:center;justify-content:center;border:2px solid var(--dark);pointer-events:none}
 .quick-nav-btn .nav-live-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:#e74c3c;border-radius:50%;border:1px solid var(--dark);display:none;animation:pulseDot 1.5s ease-in-out infinite;pointer-events:none}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-
 #productsView,#myOrdersView,#reviewsPublicView{display:none;padding:0 20px 20px;box-sizing:border-box}
 #productList{overflow-y:auto;max-height:calc(100vh - 280px);padding-right:6px;}
 .back-btn-3d{background:var(--card-light);border:none;color:var(--gold);padding:12px 20px;border-radius:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;margin:20px 0;box-shadow:0 4px 0 var(--shadow)}
 .category-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);margin-bottom:20px;text-shadow:0 0 10px rgba(212,168,75,.3)}
-
 .product-card-3d{background:linear-gradient(145deg,var(--card-light) 0%,var(--dark) 100%);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 0 var(--shadow);border:1px solid rgba(212,168,75,.1);min-height:72px}
 .product-card-3d.product-disabled{opacity:.65;filter:grayscale(.4);border-color:rgba(248,113,113,.3);background:linear-gradient(145deg,#2a1e13 0%,#1a1209 100%)}
 .product-card-3d.product-disabled .product-info h4{color:#8a7a5a}
@@ -308,14 +112,12 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .qty-btn:active{transform:scale(.92)}
 .qty-btn.minus{background:var(--card-light);color:var(--gold);box-shadow:none;border:1px solid var(--gold-dark)}
 .qty-value{min-width:24px;text-align:center;font-weight:700;color:var(--cream);font-size:.9rem}
-
 .modal-3d{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
 .modal-3d.active{display:flex}
 .modal-content-3d{background:linear-gradient(145deg,var(--card-light) 0%,var(--card) 100%);padding:25px;border-radius:20px;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;border:1px solid rgba(212,168,75,.2)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .modal-header h2{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.3rem}
 .close-btn-3d{width:35px;height:35px;border-radius:50%;background:var(--card);border:none;color:var(--gold);font-size:1.2rem;cursor:pointer}
-
 .confirm-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
 .confirm-modal-overlay.active{display:flex}
 .confirm-modal-box{background:linear-gradient(145deg,var(--card-light),var(--card));padding:28px 24px;border-radius:20px;width:100%;max-width:340px;border:1px solid rgba(212,168,75,.25);text-align:center}
@@ -324,7 +126,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .confirm-modal-actions button{flex:1;padding:13px;border-radius:12px;border:none;font-weight:700;font-size:.9rem;cursor:pointer}
 .confirm-btn-yes{background:linear-gradient(180deg,#e74c3c 0%,#c0392b 100%);color:white;box-shadow:0 4px 0 #922b21}
 .confirm-btn-no{background:var(--card-light);color:var(--gold);border:1px solid var(--gold-dark)!important}
-
 .cart-item-3d{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(212,168,75,.1)}
 .cart-item-name{color:var(--cream);font-weight:600}
 .cart-item-price{color:var(--gold);font-weight:700}
@@ -346,9 +147,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .type-option i{display:block;font-size:1.3rem;margin-bottom:6px;color:var(--gold)}
 .type-option.active{background:linear-gradient(145deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border-color:var(--gold-light)}
 .type-option.active i{color:var(--dark)}
-.type-option.disabled{opacity:.35 !important;cursor:not-allowed !important;pointer-events:none !important;border-color:#555 !important;background:var(--card) !important;filter:grayscale(0.8)}
-.type-option.disabled i{color:#555 !important}
-.type-option.disabled span{color:#555 !important}
+.type-option.disabled{opacity:.35!important;cursor:not-allowed!important;pointer-events:none!important;border-color:#555!important;background:var(--card)!important;filter:grayscale(0.8)}
+.type-option.disabled i,.type-option.disabled span{color:#555!important}
 .customer-form{margin-top:20px;padding-top:20px;border-top:2px solid rgba(212,168,75,.3)}
 .form-group{margin-bottom:15px}
 .form-group label{display:block;color:var(--cream);font-size:.85rem;margin-bottom:6px;font-weight:600}
@@ -362,7 +162,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .time-toggle{display:flex;gap:10px;margin-bottom:10px}
 .time-option{flex:1;padding:10px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);text-align:center;cursor:pointer;font-size:.8rem;font-weight:600}
 .time-option.active{background:var(--gold-dark);color:var(--dark)}
-.time-option.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; background: #222; border-color: #444; color: #666; }
+.time-option.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none;background:#222;border-color:#444;color:#666;}
 .time-picker-wrap{margin-top:10px;padding:10px;background:rgba(0,0,0,.2);border-radius:10px;display:none}
 .time-picker-wrap.show{display:block}
 .checkout-btn-3d{width:100%;margin-top:15px;padding:16px;border-radius:12px;border:none;background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);font-weight:700;font-size:1rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
@@ -372,7 +172,6 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .stars-input .star.active{color:var(--gold);text-shadow:0 0 10px var(--gold)}
 .review-textarea{width:100%;min-height:80px;padding:12px;border-radius:10px;border:1px solid var(--gold-dark);background:var(--card);color:var(--cream);font-size:.9rem;resize:vertical;font-family:inherit}
 .review-submit-btn{width:100%;margin-top:12px;padding:14px;border-radius:12px;border:none;background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 5px 0 var(--gold-dark)}
-
 .reviews-public-list{padding:10px 20px 20px}
 .review-public-card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid rgba(212,168,75,.15)}
 .review-public-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -392,6 +191,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-cancel-order:active{transform:scale(.95)}
 .btn-cancel-order:disabled{opacity:.5;cursor:not-allowed}
 .btn-clear-history{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;width:100%;margin-bottom:15px}
+
 .order-status-tracker{margin-top:12px;padding:12px;background:rgba(0,0,0,.3);border-radius:10px}
 .order-status-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;font-size:.8rem;font-weight:700;margin-bottom:10px}
 .status-new{background:rgba(156,163,175,.2);color:#9ca3af;border:1px solid rgba(156,163,175,.4)}
@@ -407,9 +207,13 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.7}}
 .order-progress-bar{position:relative;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin:8px 0}
 .order-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 100%);border-radius:3px;transition:width .5s ease;box-shadow:0 0 10px var(--gold)}
-.order-progress-steps{display:flex;justify-content:space-between;margin-top:6px;font-size:.65rem;color:#8a7a5a}
-.order-progress-steps span{text-align:center;flex:1}
+
+.order-progress-steps{display:flex;justify-content:space-between;margin-top:8px;color:#8a7a5a}
+.order-progress-steps span{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
 .order-progress-steps span.active{color:var(--gold);font-weight:700}
+.order-progress-steps .step-icon{font-size:1.2rem;line-height:1}
+.order-progress-steps .step-label{font-size:0.68rem;white-space:nowrap;letter-spacing:0.2px}
+
 .order-reject-message{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;margin-top:8px;color:#fca5a5;font-size:.8rem}
 .order-reject-message strong{color:#ef4444;display:block;margin-bottom:4px}
 .order-live-indicator{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;color:#4ade80;margin-left:8px}
@@ -427,8 +231,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-ho-capito{background:linear-gradient(180deg,#f87171 0%,#dc2626 100%);color:white;border:none;padding:15px 40px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 4px 0 #991b1b}
 .btn-ho-capito:active{transform:translateY(4px);box-shadow:0 0 0 #991b1b}
 @media(max-width:768px){.modal-rifiuto-content{padding:30px 20px;margin-bottom:env(safe-area-inset-bottom)}}
-
-.app-footer{background:linear-gradient(180deg,var(--card) 0%,var(--dark) 100%);padding:20px;text-align:center;border-top:2px solid var(--gold-dark);margin-top: 20px;}
+.app-footer{background:linear-gradient(180deg,var(--card) 0%,var(--dark) 100%);padding:20px;text-align:center;border-top:2px solid var(--gold-dark);margin-top:20px;}
 .footer-info{color:#8a7a5a;font-size:.75rem}
 .footer-links{margin-top:10px;display:flex;justify-content:center;gap:15px}
 .footer-links a{color:var(--gold);text-decoration:none;font-size:.75rem;cursor:pointer}
@@ -461,17 +264,8 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 .btn-register{background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 6px 0 var(--gold-dark)}
 .btn-guest{background:linear-gradient(180deg,var(--card-light) 0%,var(--card) 100%);color:var(--gold);border:2px solid var(--gold);padding:16px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer}
 .welcome-copyright{color:#666;font-size:.75rem;margin-top:20px}
-
-.festive-particle {
-  position: fixed;
-  top: -20px;
-  pointer-events: none;
-  z-index: 9998;
-  animation: fall linear forwards;
-}
-@keyframes fall {
-  to { transform: translateY(110vh) rotate(360deg); }
-}
+.festive-particle{position:fixed;top:-20px;pointer-events:none;z-index:9998;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -520,8 +314,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 
 <div class="section-divider" style="margin-top:10px;"><span>💬 Dicono di noi</span></div>
 <div class="reviews-home-wrap">
-    <div class="reviews-scroll" id="reviewsHomeList">
-    </div>
+    <div class="reviews-scroll" id="reviewsHomeList"></div>
 </div>
 
 <div class="section-divider"><span data-i18n="quick_access">Accesso Rapido</span></div>
@@ -567,12 +360,12 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 </footer>
 </div>
 
-<div id="stickyCartBar" onclick="openCart()" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg, var(--card-light) 0%, var(--card) 100%); border-top:2px solid var(--gold); padding:12px 20px; z-index:1500; justify-content:space-between; align-items:center; box-shadow:0 -5px 20px rgba(0,0,0,0.6); backdrop-filter:blur(10px); cursor:pointer;">
-  <div style="display:flex; flex-direction:column;">
-    <span style="font-size:0.75rem; color:#8a7a5a; text-transform:uppercase; font-weight:700;" data-i18n="cart">Carrello</span>
-    <span id="stickyCartTotal" style="font-size:1.1rem; color:var(--gold); font-weight:800;">€0.00</span>
+<div id="stickyCartBar" onclick="openCart()" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--card-light) 0%,var(--card) 100%);border-top:2px solid var(--gold);padding:12px 20px;z-index:1500;justify-content:space-between;align-items:center;box-shadow:0 -5px 20px rgba(0,0,0,0.6);backdrop-filter:blur(10px);cursor:pointer;">
+  <div style="display:flex;flex-direction:column;">
+    <span style="font-size:0.75rem;color:#8a7a5a;text-transform:uppercase;font-weight:700;" data-i18n="cart">Carrello</span>
+    <span id="stickyCartTotal" style="font-size:1.1rem;color:var(--gold);font-weight:800;">€0.00</span>
   </div>
-  <button type="button" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%); color:var(--dark); border:none; padding:10px 22px; border-radius:30px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:0 4px 10px rgba(212,168,75,0.4); display:flex; align-items:center; gap:8px; pointer-events:none;">
+  <button type="button" style="background:linear-gradient(180deg,var(--gold) 0%,var(--gold-dark) 100%);color:var(--dark);border:none;padding:10px 22px;border-radius:30px;font-weight:800;font-size:0.9rem;cursor:pointer;box-shadow:0 4px 10px rgba(212,168,75,0.4);display:flex;align-items:center;gap:8px;pointer-events:none;">
     <i class="fas fa-shopping-cart"></i> <span data-i18n="your_order">Visualizza Carrello</span> (<span id="stickyCartCount">0</span>)
   </button>
 </div>
@@ -584,17 +377,17 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="time-option active" id="timeAsap" onclick="selectTimeMode('asap')" data-i18n="asap">⚡ Prima possibile</div>
 <div class="time-option" id="timeScheduled" onclick="selectTimeMode('scheduled')" data-i18n="choose_time">🕐 Scegli Orario</div>
 </div>
-<div class="form-group" id="datePickerGroup" style="display:none; margin-top:10px;">
-<label data-i18n="select_date" style="display:block; margin-bottom:8px; font-size:0.85rem; color:var(--gold);">
+<div class="form-group" id="datePickerGroup" style="display:none;margin-top:10px;">
+<label data-i18n="select_date" style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--gold);">
 <i class="fas fa-calendar-alt"></i> Seleziona il giorno:
 </label>
-<select id="scheduledDateSelect" class="form-input" style="font-weight:bold; font-size:1rem;" onchange="onDateChange()">
+<select id="scheduledDateSelect" class="form-input" style="font-weight:bold;font-size:1rem;" onchange="onDateChange()">
 <option value="">⏳ Caricamento giorni...</option>
 </select>
 </div>
 <div class="time-picker-wrap" id="timePickerWrap">
-<label data-i18n="select_time" style="display:block; margin-bottom:8px; font-size:0.85rem; color:var(--gold);">Seleziona orario di ritiro/consegna:</label>
-<select id="scheduledTimeSelect" class="form-input" style="font-weight:bold; font-size:1rem;"></select>
+<label data-i18n="select_time" style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--gold);">Seleziona orario di ritiro/consegna:</label>
+<select id="scheduledTimeSelect" class="form-input" style="font-weight:bold;font-size:1rem;"></select>
 </div>
 </div>
 <div class="form-group"><label data-i18n="name_label">Nome e Cognome *</label><input type="text" id="customerName" placeholder="Mario Rossi" required></div><div class="form-group"><label data-i18n="phone_label">Telefono *</label><input type="tel" id="customerPhone" placeholder="+39 333 1234567" required></div><div class="form-group" id="addressGroup" style="display:none;"><label data-i18n="address_label">Indirizzo di Consegna *</label><div style="display:flex;gap:8px;"><input type="text" id="customerStreet" placeholder="Via/Piazza" style="flex:3;"><input type="text" id="customerNumber" placeholder="Civico" style="flex:1;"></div><button class="gps-btn" id="gpsBtn" onclick="getGPSLocation()"><i class="fas fa-location-crosshairs"></i> <span data-i18n="use_gps">Usa GPS</span></button></div><div class="form-group"><label data-i18n="notes_label">Note (opzionale)</label><textarea id="customerNotes" rows="2" placeholder="Citofono, piano, allergie..."></textarea></div><div aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9999px;top:-9999px;"><input type="text" id="honeypot" name="website" autocomplete="off" tabindex="-1"></div><div class="form-group"><div class="privacy-checkbox"><input type="checkbox" id="privacyConsent" required><label for="privacyConsent"><span data-i18n="privacy_accept">Ho letto e accetto la</span> <a onclick="openPrivacyModal()" data-i18n="privacy_policy">Privacy Policy</a> *</label></div></div></div><button class="clear-cart-btn" id="clearCartBtn" style="display:none;" onclick="clearCart()"><i class="fas fa-trash-alt"></i> <span data-i18n="clear_cart">Svuota Carrello</span></button><button class="checkout-btn-3d" id="checkoutBtn" style="display:none;" onclick="confirmAndSendOrder()"><i class="fas fa-paper-plane"></i> <span data-i18n="send_order">Invia Ordine</span></button></div></div>
@@ -604,6 +397,7 @@ body{display:flex;justify-content:center;font-family:'Montserrat',sans-serif;pos
 <div class="modal-3d" id="privacyModal"><div class="modal-content-3d"><div class="modal-header"><h2><i class="fas fa-shield-alt"></i> <span data-i18n="privacy_policy">Privacy Policy</span></h2><button class="close-btn-3d" onclick="closePrivacyModal()">×</button></div><div class="privacy-text"><p><strong>Antica Pizzeria Grasso</strong> <span data-i18n="privacy_respect">rispetta la tua privacy.</span></p><h3 data-i18n="what_data">📋 Quali dati raccogliamo</h3><ul><li data-i18n="data_name">Nome e cognome</li><li data-i18n="data_phone">Telefono</li><li data-i18n="data_address">Indirizzo</li><li data-i18n="data_notes">Note ordine</li></ul><h3 data-i18n="security">🔒 Sicurezza</h3><p data-i18n="security_text">Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.</p><h3 data-i18n="retention">Conservazione</h3><p data-i18n="retention_text">Conserviamo i dati per 24 mesi.</p></div></div></div>
 <div class="toast-3d" id="toast"></div>
 <div id="cookieBanner"><p><span data-i18n="cookie_text">Utilizziamo cookie tecnici.</span> <a onclick="openPrivacyModal()" style="color:var(--gold);cursor:pointer;" data-i18n="privacy_policy">Privacy Policy</a></p><button onclick="acceptCookies()" data-i18n="accept">Accetta</button></div>
+
 <script>
 const translations = {
 it: {
@@ -621,41 +415,37 @@ my_orders: "📦 I Miei Ordini", orders_info: "Visualizzi solo gli ultimi 5 ordi
 clear_history: "Cancella Storico Locale", reviews: "⭐ Le Nostre Recensioni", privacy_policy: "Privacy Policy",
 your_order: "Il Tuo Ordine", delivery_fee: "Costo consegna", total: "Totale", delivery_short: "Consegna",
 pickup_short: "Ritiro", your_data: "I Tuoi Dati", time_label: "Orario", asap: "⚡ Prima possibile",
-choose_time: "🕐 Scegli Orario", select_time: "Seleziona orario:",
-select_date: "Seleziona il giorno:",
-no_available_dates: "⚠️ Nessun giorno disponibile nei prossimi 7 giorni",
-select_valid_date: "⚠️ Seleziona una data valida",
-phone_label: "Telefono *",
-address_label: "Indirizzo di Consegna *", use_gps: "Usa GPS", notes_label: "Note (opzionale)",
+choose_time: "🕐 Scegli Orario", select_time: "Seleziona orario:", select_date: "Seleziona il giorno:",
+no_available_dates: "⚠️ Nessun giorno disponibile nei prossimi 7 giorni", select_valid_date: "⚠️ Seleziona una data valida",
+phone_label: "Telefono *", address_label: "Indirizzo di Consegna *", use_gps: "Usa GPS", notes_label: "Note (opzionale)",
 privacy_accept: "Ho letto e accetto la", clear_cart: "Svuota Carrello", send_order: "Invia Ordine",
 leave_review: "Lascia una Recensione", how_many_stars: "Quante stelle? ⭐", your_name: "Il tuo nome",
 your_opinion: "La tua opinione", order_number: "Numero Ordine", send_review: "Invia Recensione",
 privacy_respect: "rispetta la tua privacy.", what_data: "📋 Quali dati raccogliamo",
 data_name: "Nome e cognome", data_phone: "Telefono", data_address: "Indirizzo", data_notes: "Note ordine",
 security: "🔒 Sicurezza", security_text: "Dati archiviati su server sicuri (Firebase/Google Cloud) con crittografia.",
-retention: "Conservazione", retention_text: "Conserviamo i dati per 24 mesi.",
-cookie_text: "Utilizziamo cookie tecnici.", accept: "Accetta", cancel: "Annulla", confirm: "Conferma",
-order_rejected: "❌ Ordine Rifiutato", order_rejected_title: "Ordine Rifiutato",
-order_rejected_default: "La pizzeria non può accettare il tuo ordine.", reject_default_msg: "La pizzeria non può accettare il tuo ordine.",
-understood: "Ho capito", offline_msg: "⚠️ Sei offline — riconnessione in corso...",
-empty_cart: "Vuoto", add_product: "aggiunta!", promo_removed: "Promo rimossa", cart_emptied: "Svuotato",
-gps_loading: "Caricamento...", gps_fail: "Impossibile ottenere posizione", gps_ok: "Posizione trovata!",
-order_sent: "✅ Ordine inviato!", order_error: "❌ Errore invio", history_cleared: "🗑️ Storico cancellato!",
-thanks_review: "⭐ Grazie per la recensione!", no_reviews: "Nessuna recensione.<br>Sii il primo! 🌟",
-no_orders: "Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕", not_available: "❌ Non disponibile",
-no_products: "Nessun prodotto trovato 🍕", closed_now: "⚠️ Siamo chiusi ora, ma puoi ordinare per dopo!",
-no_delivery: "🚫 Consegna non disponibile", no_pickup: "🚫 Ritiro non disponibile",
-wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
+retention: "Conservazione", retention_text: "Conserviamo i dati per 24 mesi.", cookie_text: "Utilizziamo cookie tecnici.",
+accept: "Accetta", cancel: "Annulla", confirm: "Conferma", order_rejected: "❌ Ordine Rifiutato",
+order_rejected_title: "Ordine Rifiutato", order_rejected_default: "La pizzeria non può accettare il tuo ordine.",
+reject_default_msg: "La pizzeria non può accettare il tuo ordine.", understood: "Ho capito",
+offline_msg: "⚠️ Sei offline — riconnessione in corso...", empty_cart: "Vuoto", add_product: "aggiunta!",
+promo_removed: "Promo rimossa", cart_emptied: "Svuotato", gps_loading: "Caricamento...",
+gps_fail: "Impossibile ottenere posizione", gps_ok: "Posizione trovata!", order_sent: "✅ Ordine inviato!",
+order_error: "❌ Errore invio", history_cleared: "🗑️ Storico cancellato!", thanks_review: "⭐ Grazie per la recensione!",
+no_reviews: "Nessuna recensione.<br>Sii il primo! 🌟", no_orders: "Nessun ordine recente.<br>Fai il tuo primo ordine! 🍕",
+not_available: "❌ Non disponibile", no_products: "Nessun prodotto trovato 🍕",
+closed_now: "⚠️ Siamo chiusi ora, ma puoi ordinare per dopo!", no_delivery: "🚫 Consegna non disponibile",
+no_pickup: "🚫 Ritiro non disponibile", wait_minute: "⏳ Attendi 1 minuto", accept_privacy: "⚠️ Accetta Privacy",
 fill_name: "⚠️ Inserisci il nome", invalid_phone: "❌ Telefono non valido", out_of_range: "❌ Fuori raggio",
-fill_address: "⚠️ Completa indirizzo", min_order: "⚠️ Ordine minimo per consegna: €", empty_cart_confirm: "Vuoi svuotare il carrello?",
-clear_history_confirm: "Cancellare tutto lo storico?", add_another_promo: "Hai già questa promo. Aggiungerne un'altra?",
-promo_unavailable: "❌ Promo non disponibile", promo_exhausted: "❌ Promo esaurita",
-accettato: "✅ Accettato!", preparing: "🍕 In preparazione", ready: "✅ Pronto", picked: "📦 Ritirato", delivering: "🛵 In consegna!",
-delivered: "🎉 Consegnato!", rejected: "❌ Ordine rifiutato", review_btn: "⭐ Recensisci", already_reviewed: "✅ Già recensito",
+fill_address: "⚠️ Completa indirizzo", min_order: "⚠️ Ordine minimo per consegna: €",
+empty_cart_confirm: "Vuoi svuotare il carrello?", clear_history_confirm: "Cancellare tutto lo storico?",
+add_another_promo: "Hai già questa promo. Aggiungerne un'altra?", promo_unavailable: "❌ Promo non disponibile",
+promo_exhausted: "❌ Promo esaurita", accettato: "✅ Accettato!", preparing: "🍕 In preparazione",
+ready: "✅ Pronto", picked: "📦 Ritirato", delivering: "🛵 In consegna!", delivered: "🎉 Consegnato!",
+rejected: "❌ Ordine rifiutato", review_btn: "⭐ Recensisci", already_reviewed: "✅ Già recensito",
 annullato: "🗑️ Ordine annullato", sold_out: "Non Disponibile", product_not_available: "❌ Prodotto non disponibile, scegli altro!",
-app_updated: "🔄 App aggiornata!",
-notify_ready: "✅ Ordine Pronto!", notify_delivering: "🛵 Il rider sta arrivando!", notify_delayed: "⏰ Ordine in ritardo",
-select_valid_time: "⚠️ Seleziona un orario valido"
+app_updated: "🔄 App aggiornata!", notify_ready: "✅ Ordine Pronto!", notify_delivering: "🛵 Il rider sta arrivando!",
+notify_delayed: "⏰ Ordine in ritardo", select_valid_time: "⚠️ Seleziona un orario valido"
 },
 en: {
 welcome_title: "🍕 Welcome to Grasso!", save_home_title: "📱 Save app to Home!",
@@ -672,41 +462,37 @@ my_orders: "📦 My Orders", orders_info: "Showing last 5 recent orders.",
 clear_history: "Clear Local History", reviews: "⭐ Our Reviews", privacy_policy: "Privacy Policy",
 your_order: "Your Order", delivery_fee: "Delivery fee", total: "Total", delivery_short: "Delivery",
 pickup_short: "Pickup", your_data: "Your Details", time_label: "Time", asap: "⚡ ASAP",
-choose_time: "🕐 Choose Time", select_time: "Select time:",
-select_date: "Select the day:",
-no_available_dates: "⚠️ No available days in the next 7 days",
-select_valid_date: "⚠️ Select a valid date",
-phone_label: "Phone *",
-address_label: "Delivery Address *", use_gps: "Use GPS", notes_label: "Notes (optional)",
+choose_time: "🕐 Choose Time", select_time: "Select time:", select_date: "Select the day:",
+no_available_dates: "⚠️ No available days in the next 7 days", select_valid_date: "⚠️ Select a valid date",
+phone_label: "Phone *", address_label: "Delivery Address *", use_gps: "Use GPS", notes_label: "Notes (optional)",
 privacy_accept: "I have read and accept the", clear_cart: "Empty Cart", send_order: "Send Order",
 leave_review: "Leave a Review", how_many_stars: "How many stars? ⭐", your_name: "Your name",
 your_opinion: "Your opinion", order_number: "Order Number", send_review: "Send Review",
 privacy_respect: "respects your privacy.", what_data: "📋 What data we collect",
 data_name: "Full name", data_phone: "Phone", data_address: "Address", data_notes: "Order notes",
 security: "🔒 Security", security_text: "Data stored on secure servers (Firebase/Google Cloud) with encryption.",
-retention: "Retention", retention_text: "We keep data for 24 months.",
-cookie_text: "We use technical cookies.", accept: "Accept", cancel: "Cancel", confirm: "Confirm",
-order_rejected: "❌ Order Rejected", order_rejected_title: "Order Rejected",
-order_rejected_default: "The pizzeria cannot accept your order.", reject_default_msg: "The pizzeria cannot accept your order.",
-understood: "Got it", offline_msg: "⚠️ You are offline — reconnecting...",
-empty_cart: "Empty", add_product: "added!", promo_removed: "Promo removed", cart_emptied: "Emptied",
-gps_loading: "Loading...", gps_fail: "Cannot get location", gps_ok: "Location found!",
-order_sent: "✅ Order sent!", order_error: "❌ Send error", history_cleared: "🗑️ History cleared!",
-thanks_review: "⭐ Thanks for the review!", no_reviews: "No reviews yet.<br>Be the first! 🌟",
-no_orders: "No recent orders.<br>Place your first order! 🍕", not_available: "❌ Not available",
-no_products: "No products found 🍕", closed_now: "⚠️ We are closed now, but you can order for later!",
-no_delivery: "🚫 Delivery not available", no_pickup: "🚫 Pickup not available",
-wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
+retention: "Retention", retention_text: "We keep data for 24 months.", cookie_text: "We use technical cookies.",
+accept: "Accept", cancel: "Cancel", confirm: "Confirm", order_rejected: "❌ Order Rejected",
+order_rejected_title: "Order Rejected", order_rejected_default: "The pizzeria cannot accept your order.",
+reject_default_msg: "The pizzeria cannot accept your order.", understood: "Got it",
+offline_msg: "⚠️ You are offline — reconnecting...", empty_cart: "Empty", add_product: "added!",
+promo_removed: "Promo removed", cart_emptied: "Emptied", gps_loading: "Loading...",
+gps_fail: "Cannot get location", gps_ok: "Location found!", order_sent: "✅ Order sent!",
+order_error: "❌ Send error", history_cleared: "🗑️ History cleared!", thanks_review: "⭐ Thanks for the review!",
+no_reviews: "No reviews yet.<br>Be the first! 🌟", no_orders: "No recent orders.<br>Place your first order! 🍕",
+not_available: "❌ Not available", no_products: "No products found 🍕",
+closed_now: "⚠️ We are closed now, but you can order for later!", no_delivery: "🚫 Delivery not available",
+no_pickup: "🚫 Pickup not available", wait_minute: "⏳ Wait 1 minute", accept_privacy: "⚠️ Accept Privacy",
 fill_name: "⚠️ Enter name", invalid_phone: "❌ Invalid phone", out_of_range: "❌ Out of range",
-fill_address: "⚠️ Complete address", min_order: "⚠️ Minimum for delivery: €", empty_cart_confirm: "Empty the cart?",
-clear_history_confirm: "Clear all history?", add_another_promo: "You already have this promo. Add another?",
-promo_unavailable: "❌ Promo unavailable", promo_exhausted: "❌ Promo exhausted",
-accettato: "✅ Accepted!", preparing: "🍕 Preparing", ready: "✅ Ready", picked: "📦 Picked up", delivering: "🛵 Delivering!",
-delivered: "🎉 Delivered!", rejected: "❌ Order rejected", review_btn: "⭐ Review", already_reviewed: "✅ Already reviewed",
+fill_address: "⚠️ Complete address", min_order: "⚠️ Minimum for delivery: €",
+empty_cart_confirm: "Empty the cart?", clear_history_confirm: "Clear all history?",
+add_another_promo: "You already have this promo. Add another?", promo_unavailable: "❌ Promo unavailable",
+promo_exhausted: "❌ Promo exhausted", accettato: "✅ Accepted!", preparing: "🍕 Preparing",
+ready: "✅ Ready", picked: "📦 Picked up", delivering: "🛵 Delivering!", delivered: "🎉 Delivered!",
+rejected: "❌ Order rejected", review_btn: "⭐ Review", already_reviewed: "✅ Already reviewed",
 annullato: "🗑️ Order cancelled", sold_out: "Non Disponibile", product_not_available: "❌ Product not available, choose another!",
-app_updated: "🔄 App updated!",
-notify_ready: "✅ Order Ready!", notify_delivering: "🛵 Rider is coming!", notify_delayed: "⏰ Order delayed",
-select_valid_time: "⚠️ Select a valid time"
+app_updated: "🔄 App updated!", notify_ready: "✅ Order Ready!", notify_delivering: "🛵 Rider is coming!",
+notify_delayed: "⏰ Order delayed", select_valid_time: "⚠️ Select a valid time"
 },
 de: {
 welcome_title: "🍕 Willkommen bei Grasso!", save_home_title: "📱 App zum Startbildschirm!",
@@ -723,41 +509,37 @@ my_orders: "📦 Meine Bestellungen", orders_info: "Zeige die letzten 5 Bestellu
 clear_history: "Lokalen Verlauf löschen", reviews: "⭐ Unsere Bewertungen", privacy_policy: "Datenschutz",
 your_order: "Ihre Bestellung", delivery_fee: "Liefergebühr", total: "Gesamt", delivery_short: "Lieferung",
 pickup_short: "Abholung", your_data: "Ihre Daten", time_label: "Zeit", asap: "⚡ So bald wie möglich",
-choose_time: "🕐 Zeit wählen", select_time: "Zeit auswählen:",
-select_date: "Tag auswählen:",
-no_available_dates: "⚠️ Keine verfügbaren Tage in den nächsten 7 Tagen",
-select_valid_date: "⚠️ Wählen Sie ein gültiges Datum",
-phone_label: "Telefon *",
-address_label: "Lieferadresse *", use_gps: "GPS nutzen", notes_label: "Notizen (optional)",
+choose_time: "🕐 Zeit wählen", select_time: "Zeit auswählen:", select_date: "Tag auswählen:",
+no_available_dates: "⚠️ Keine verfügbaren Tage in den nächsten 7 Tagen", select_valid_date: "⚠️ Wählen Sie ein gültiges Datum",
+phone_label: "Telefon *", address_label: "Lieferadresse *", use_gps: "GPS nutzen", notes_label: "Notizen (optional)",
 privacy_accept: "Ich habe die gelesen und akzeptiere die", clear_cart: "Warenkorb leeren", send_order: "Bestellung senden",
 leave_review: "Bewertung schreiben", how_many_stars: "Wie viele Sterne? ⭐", your_name: "Ihr Name",
 your_opinion: "Ihre Meinung", order_number: "Bestellnummer", send_review: "Bewertung senden",
 privacy_respect: "respektiert Ihre Privatsphäre.", what_data: "📋 Welche Daten wir sammeln",
 data_name: "Vor- und Nachname", data_phone: "Telefon", data_address: "Adresse", data_notes: "Bestellnotizen",
 security: "🔒 Sicherheit", security_text: "Daten auf sicheren Servern (Firebase/Google Cloud) mit Verschlüsselung gespeichert.",
-retention: "Aufbewahrung", retention_text: "Wir speichern Daten für 24 Monate.",
-cookie_text: "Wir verwenden technische Cookies.", accept: "Akzeptieren", cancel: "Abbrechen", confirm: "Bestätigen",
-order_rejected: "❌ Bestellung abgelehnt", order_rejected_title: "Bestellung abgelehnt",
-order_rejected_default: "Die Pizzeria kann Ihre Bestellung nicht annehmen.", reject_default_msg: "Die Pizzeria kann Ihre Bestellung nicht annehmen.",
-understood: "Verstanden", offline_msg: "⚠️ Sie sind offline — Verbindung wird hergestellt...",
-empty_cart: "Leer", add_product: "hinzugefügt!", promo_removed: "Aktion entfernt", cart_emptied: "Geleert",
-gps_loading: "Laden...", gps_fail: "Standort nicht verfügbar", gps_ok: "Standort gefunden!",
-order_sent: "✅ Bestellung gesendet!", order_error: "❌ Sende-Fehler", history_cleared: "🗑️ Verlauf gelöscht!",
-thanks_review: "⭐ Danke für die Bewertung!", no_reviews: "Noch keine Bewertungen.<br>Seien Sie der Erste! 🌟",
-no_orders: "Keine aktuellen Bestellungen.<br>Geben Sie Ihre erste Bestellung auf! 🍕", not_available: "❌ Nicht verfügbar",
-no_products: "Keine Produkte gefunden 🍕", closed_now: "⚠️ Wir sind jetzt geschlossen, aber Sie können für später bestellen!",
-no_delivery: "🚫 Keine Lieferung", no_pickup: "🚫 Keine Abholung",
-wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
+retention: "Aufbewahrung", retention_text: "Wir speichern Daten für 24 Monate.", cookie_text: "Wir verwenden technische Cookies.",
+accept: "Akzeptieren", cancel: "Abbrechen", confirm: "Bestätigen", order_rejected: "❌ Bestellung abgelehnt",
+order_rejected_title: "Bestellung abgelehnt", order_rejected_default: "Die Pizzeria kann Ihre Bestellung nicht annehmen.",
+reject_default_msg: "Die Pizzeria kann Ihre Bestellung nicht annehmen.", understood: "Verstanden",
+offline_msg: "⚠️ Sie sind offline — Verbindung wird hergestellt...", empty_cart: "Leer", add_product: "hinzugefügt!",
+promo_removed: "Aktion entfernt", cart_emptied: "Geleert", gps_loading: "Laden...",
+gps_fail: "Standort nicht verfügbar", gps_ok: "Standort gefunden!", order_sent: "✅ Bestellung gesendet!",
+order_error: "❌ Sende-Fehler", history_cleared: "🗑️ Verlauf gelöscht!", thanks_review: "⭐ Danke für die Bewertung!",
+no_reviews: "Noch keine Bewertungen.<br>Seien Sie der Erste! 🌟", no_orders: "Keine aktuellen Bestellungen.<br>Geben Sie Ihre erste Bestellung auf! 🍕",
+not_available: "❌ Nicht verfügbar", no_products: "Keine Produkte gefunden 🍕",
+closed_now: "⚠️ Wir sind jetzt geschlossen, aber Sie können für später bestellen!", no_delivery: "🚫 Keine Lieferung",
+no_pickup: "🚫 Keine Abholung", wait_minute: "⏳ Warten Sie 1 Minute", accept_privacy: "⚠️ Datenschutz akzeptieren",
 fill_name: "⚠️ Name eingeben", invalid_phone: "❌ Ungültiges Telefon", out_of_range: "❌ Außerhalb des Bereichs",
-fill_address: "⚠️ Adresse vervollständigen", min_order: "⚠️ Mindestbestellwert für Lieferung: €", empty_cart_confirm: "Warenkorb leeren?",
-clear_history_confirm: "Gesamten Verlauf löschen?", add_another_promo: "Sie haben diese Aktion bereits. Eine weitere hinzufügen?",
-promo_unavailable: "❌ Aktion nicht verfügbar", promo_exhausted: "❌ Aktion ausgeschöpft",
-accettato: "✅ Akzeptiert!", preparing: "🍕 In Zubereitung", ready: "✅ Fertig", picked: "📦 Abgeholt", delivering: "🛵 Wird geliefert!",
-delivered: "🎉 Geliefert!", rejected: "❌ Bestellung abgelehnt", review_btn: "⭐ Bewerten", already_reviewed: "✅ Bereits bewertet",
+fill_address: "⚠️ Adresse vervollständigen", min_order: "⚠️ Mindestbestellwert für Lieferung: €",
+empty_cart_confirm: "Warenkorb leeren?", clear_history_confirm: "Gesamten Verlauf löschen?",
+add_another_promo: "Sie haben diese Aktion bereits. Eine weitere hinzufügen?", promo_unavailable: "❌ Aktion nicht verfügbar",
+promo_exhausted: "❌ Aktion ausgeschöpft", accettato: "✅ Akzeptiert!", preparing: "🍕 In Zubereitung",
+ready: "✅ Fertig", picked: "📦 Abgeholt", delivering: "🛵 Wird geliefert!", delivered: "🎉 Geliefert!",
+rejected: "❌ Bestellung abgelehnt", review_btn: "⭐ Bewerten", already_reviewed: "✅ Bereits bewertet",
 annullato: "🗑️ Bestellung storniert", sold_out: "Non Disponibile", product_not_available: "❌ Produkt nicht verfügbar, wähle ein anderes!",
-app_updated: "🔄 App aktualisiert!",
-notify_ready: "✅ Bestellung fertig!", notify_delivering: "🛵 Fahrer kommt gleich!", notify_delayed: "⏰ Bestellung verspätet",
-select_valid_time: "⚠️ Wählen Sie eine gültige Zeit"
+app_updated: "🔄 App aktualisiert!", notify_ready: "✅ Bestellung fertig!", notify_delivering: "🛵 Fahrer kommt gleich!",
+notify_delayed: "⏰ Bestellung verspätet", select_valid_time: "⚠️ Wählen Sie eine gültige Zeit"
 }
 };
 
@@ -770,53 +552,49 @@ storageBucket:"teogra-c8cf5.firebasestorage.app",
 appId:"1:686300112893:web:e147b82f91374f12db1b94"
 };
 firebase.initializeApp(firebaseConfig);
-
 const db=firebase.database();
 
 let currentUser=null,currentLang='it',userType='none',cart=[],orderType='delivery';
 let timeMode='asap',currentSearchCat='',selectedStars=0,pendingReviewOrderId=null;
 let orderStatusListeners={},ordersData={};
 let appData={categories:{},menu:{},promotions:{},settings:{},branding:{},images:{}};
-let selectedDateOffset = 0;
-const ORDER_POLL_MS = 30000;
-let festiveParticlesInterval = null;
+let selectedDateOffset=0;
+const ORDER_POLL_MS=30000;
+let festiveParticlesInterval=null;
 
-let statusListener = null;
-let servicesListener = null;
-let versionListener = null;
-function startStatusListener() {
-if (statusListener) return;
-statusListener = db.ref('settings/manualStatus').on('value', snap => {
-const status = snap.val();
-updateStatusBanner();
-const oldStatus = localStorage.getItem('last_known_status');
-if (oldStatus && oldStatus !== status) {
-if (status === 'open') { showToast('🟢 Ora siamo APERTI!'); playNotificationSound(); if(navigator.vibrate) navigator.vibrate(200); }
-else if (status === 'closed') { showToast('🔴 Ora siamo CHIUSI'); playNotificationSound(); if(navigator.vibrate) navigator.vibrate([100, 50, 100]); }
+let statusListener=null,servicesListener=null,versionListener=null;
+function startStatusListener(){
+if(statusListener)return;
+statusListener=db.ref('settings/manualStatus').on('value',snap=>{
+const status=snap.val();updateStatusBanner();
+const oldStatus=localStorage.getItem('last_known_status');
+if(oldStatus&&oldStatus!==status){
+if(status==='open'){showToast('🟢 Ora siamo APERTI!');playNotificationSound();if(navigator.vibrate)navigator.vibrate(200);}
+else if(status==='closed'){showToast('🔴 Ora siamo CHIUSI');playNotificationSound();if(navigator.vibrate)navigator.vibrate([100,50,100]);}
 }
-localStorage.setItem('last_known_status', status || 'auto');
+localStorage.setItem('last_known_status',status||'auto');
 });
 }
-function startServicesListener() {
-if (servicesListener) return;
-servicesListener = db.ref('settings').on('value', snap => {
-const data = snap.val(); if (!data) return;
-const oldDelivery = localStorage.getItem('delivery_state'); const oldPickup = localStorage.getItem('pickup_state');
-const newDelivery = data.deliveryEnabled !== false; const newPickup = data.pickupEnabled !== false;
-appData.settings.deliveryEnabled = newDelivery; appData.settings.pickupEnabled = newPickup;
-localStorage.setItem('delivery_state', String(newDelivery)); localStorage.setItem('pickup_state', String(newPickup));
+function startServicesListener(){
+if(servicesListener)return;
+servicesListener=db.ref('settings').on('value',snap=>{
+const data=snap.val();if(!data)return;
+const oldDelivery=localStorage.getItem('delivery_state');const oldPickup=localStorage.getItem('pickup_state');
+const newDelivery=data.deliveryEnabled!==false;const newPickup=data.pickupEnabled!==false;
+appData.settings.deliveryEnabled=newDelivery;appData.settings.pickupEnabled=newPickup;
+localStorage.setItem('delivery_state',String(newDelivery));localStorage.setItem('pickup_state',String(newPickup));
 updateDeliveryPickupUI();
-if (oldDelivery !== null && String(oldDelivery) !== String(newDelivery)) { showToast(newDelivery ? '🛵 Consegna ATTIVA' : '🚫 Consegna DISATTIVATA'); playNotificationSound(); }
-if (oldPickup !== null && String(oldPickup) !== String(newPickup)) { showToast(newPickup ? '🏪 Ritiro ATTIVO' : '🚫 Ritiro DISATTIVATO'); playNotificationSound(); }
+if(oldDelivery!==null&&String(oldDelivery)!==String(newDelivery)){showToast(newDelivery?'🛵 Consegna ATTIVA':'🚫 Consegna DISATTIVATA');playNotificationSound();}
+if(oldPickup!==null&&String(oldPickup)!==String(newPickup)){showToast(newPickup?'🏪 Ritiro ATTIVO':'🚫 Ritiro DISATTIVATO');playNotificationSound();}
 });
 }
-function startVersionListener() {
-if (versionListener) return;
-versionListener = db.ref('settings/appVersion').on('value', async snap => {
-const serverVersion = snap.val() || 0; const cachedVersion = parseInt(localStorage.getItem('appVersion')) || 0;
-if (serverVersion > cachedVersion) {
-showToast('🔄 Aggiornamento dati...'); await forceUpdateFromServer();
-localStorage.setItem('appVersion', String(serverVersion)); localStorage.setItem('cacheTimestamp', Date.now());
+function startVersionListener(){
+if(versionListener)return;
+versionListener=db.ref('settings/appVersion').on('value',async snap=>{
+const serverVersion=snap.val()||0;const cachedVersion=parseInt(localStorage.getItem('appVersion'))||0;
+if(serverVersion>cachedVersion){
+showToast('🔄 Aggiornamento dati...');await forceUpdateFromServer();
+localStorage.setItem('appVersion',String(serverVersion));localStorage.setItem('cacheTimestamp',Date.now());
 showToast(t('app_updated'));
 }
 });
@@ -831,7 +609,7 @@ updateStatusBanner();
 function changeLanguage(lang){currentLang=lang;localStorage.setItem('grasso_lang',lang);document.getElementById('langSelect').value=lang;applyTranslations();if(document.getElementById('cartModal').classList.contains('active')){openCart();if(timeMode==='scheduled')generateValidDates();}if(document.getElementById('myOrdersView').style.display==='block')renderMyOrders();if(currentSearchCat)renderProductList(currentSearchCat,document.getElementById('productSearch')?.value||'');}
 function detectBrowserLanguage(){const saved=localStorage.getItem('grasso_lang');if(saved)return saved;const bl=(navigator.language||navigator.userLanguage||'it').toLowerCase();if(bl.startsWith('de'))return'de';if(bl.startsWith('en'))return'en';return'it';}
 
-const palettes = { 
+const palettes={
 autunno:{icon:'fa-leaf',colors:{gold:'#d4a84b',goldLight:'#f0d78c',goldDark:'#b8860b',dark:'#1a1209',card:'#2a1e13',cardLight:'#3d2b1a',cream:'#f5e6c8'}},
 inverno:{icon:'fa-snowflake',colors:{gold:'#a8c3d4',goldLight:'#c8d8e4',goldDark:'#7a99b0',dark:'#1a2530',card:'#203040',cardLight:'#304050',cream:'#e8f0f5'}},
 primavera:{icon:'fa-seedling',colors:{gold:'#8cd4a8',goldLight:'#b0e8c8',goldDark:'#60b080',dark:'#1a2d1f',card:'#1e3828',cardLight:'#2e4838',cream:'#e8f5ec'}},
@@ -847,89 +625,49 @@ vaniglia:{icon:'fa-cookie-bite',colors:{gold:'#f5e6a8',goldLight:'#fff8c8',goldD
 nocciola:{icon:'fa-seedling',colors:{gold:'#c49a6c',goldLight:'#e8c49a',goldDark:'#a07a4a',dark:'#231a12',card:'#352a1e',cardLight:'#453a2e',cream:'#f5ece0'}}
 };
 
-let paletteListener = null;
-
-function applyPalette(name) {
-  const p = palettes[name] || palettes.autunno;
-  const colors = p.colors || p;
-  const r = document.documentElement;
-  Object.keys(colors).forEach(k => r.style.setProperty('--' + k, colors[k]));
+let paletteListener=null;
+function applyPalette(name){
+const p=palettes[name]||palettes.autunno;const colors=p.colors||p;const r=document.documentElement;
+Object.keys(colors).forEach(k=>r.style.setProperty('--'+k,colors[k]));
+}
+function applyPaletteFromFirebase(){
+if(paletteListener)return;
+const savedPalette=localStorage.getItem('grasso_current_palette');if(savedPalette)applyPalette(savedPalette);
+paletteListener=db.ref('settings/colorPalette').on('value',s=>{
+const paletteName=s.val()||'autunno';localStorage.setItem('grasso_current_palette',paletteName);applyPalette(paletteName);
+});
 }
 
-function applyPaletteFromFirebase() {
-  if (paletteListener) return;
-
-  const savedPalette = localStorage.getItem('grasso_current_palette');
-  if (savedPalette) {
-    applyPalette(savedPalette);
-  }
-
-  paletteListener = db.ref('settings/colorPalette').on('value', s => {
-    const paletteName = s.val() || 'autunno';
-    localStorage.setItem('grasso_current_palette', paletteName);
-    applyPalette(paletteName);
-  });
+let festiveEffectListener=null;
+function startFestiveEffectListener(){
+if(festiveEffectListener)return;
+festiveEffectListener=db.ref('settings/festiveEffect').on('value',snap=>{applyFestiveEffect(snap.val());});
 }
-
-let festiveEffectListener = null;
-function startFestiveEffectListener() {
-  if (festiveEffectListener) return;
-  festiveEffectListener = db.ref('settings/festiveEffect').on('value', snap => {
-    const effect = snap.val(); 
-    applyFestiveEffect(effect);
-  });
-}
-
-function applyFestiveEffect(type) {
-  if (festiveParticlesInterval) { clearInterval(festiveParticlesInterval); festiveParticlesInterval = null; }
-  document.querySelectorAll('.festive-particle').forEach(el => el.remove());
-
-  if (!type || type === 'none') return;
-
-  const effects = {
-    snow:      { symbols: ['❄️', '❅', '❆'], speed: 400 },
-    confetti:  { symbols: ['🎉', '✨', '🎊'], speed: 600 },
-    halloween: { symbols: ['🎃', '👻', '🦇', '🕷️'], speed: 700 },
-    easter:    { symbols: ['🐰', '🥚', '🐣', '🌷'], speed: 700 },
-    christmas: { symbols: ['🎄', '🎁', '⭐', '❄️'], speed: 600 },
-    newyear:   { symbols: ['🎆', '✨', '🥂', '🎇'], speed: 500 },
-    valentine: { symbols: ['❤️', '💖', '🌹', '💕'], speed: 600 },
-    carnevale: { symbols: ['🎭', '🎊', '🎉', '✨'], speed: 500 },
-    summer:    { symbols: ['☀️', '🌻', '🌴', '🍦'], speed: 800 }
-  };
-
-  const effect = effects[type] || effects.confetti;
-  const symbols = effect.symbols;
-  const speed = effect.speed;
-
-  festiveParticlesInterval = setInterval(() => {
-    const particle = document.createElement('div');
-    particle.className = 'festive-particle';
-    particle.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-    particle.style.left = Math.random() * 100 + 'vw';
-    particle.style.fontSize = (12 + Math.random() * 15) + 'px';
-    particle.style.animationDuration = (4 + Math.random() * 4) + 's';
-    particle.style.opacity = 0.6 + Math.random() * 0.4;
-    document.body.appendChild(particle);
-    setTimeout(() => particle.remove(), 9000);
-  }, speed);
+function applyFestiveEffect(type){
+if(festiveParticlesInterval){clearInterval(festiveParticlesInterval);festiveParticlesInterval=null;}
+document.querySelectorAll('.festive-particle').forEach(el=>el.remove());
+if(!type||type==='none')return;
+const effects={
+snow:{symbols:['❄️','❅','❆'],speed:400},confetti:{symbols:['🎉','✨','🎊'],speed:600},
+halloween:{symbols:['🎃','👻','🦇','🕷️'],speed:700},easter:{symbols:['🐰','🥚','🐣','🌷'],speed:700},
+christmas:{symbols:['🎄','🎁','⭐','❄️'],speed:600},newyear:{symbols:['🎆','✨','🥂','🎇'],speed:500},
+valentine:{symbols:['❤️','💖','🌹','💕'],speed:600},carnevale:{symbols:['🎭','🎊','🎉','✨'],speed:500},
+summer:{symbols:['☀️','🌻','🌴','🍦'],speed:800}
+};
+const effect=effects[type]||effects.confetti;const symbols=effect.symbols;
+festiveParticlesInterval=setInterval(()=>{
+const particle=document.createElement('div');particle.className='festive-particle';
+particle.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+particle.style.left=Math.random()*100+'vw';particle.style.fontSize=(12+Math.random()*15)+'px';
+particle.style.animationDuration=(4+Math.random()*4)+'s';particle.style.opacity=0.6+Math.random()*0.4;
+document.body.appendChild(particle);setTimeout(()=>particle.remove(),9000);
+},effect.speed);
 }
 
 function showConfirm(m){return new Promise(r=>{const o=document.getElementById('confirmModal');document.getElementById('confirmModalText').textContent=m;o.classList.add('active');const y=document.getElementById('confirmBtnYes'),n=document.getElementById('confirmBtnNo'),c=()=>{o.classList.remove('active');y.onclick=null;n.onclick=null};y.onclick=()=>{c();r(true)};n.onclick=()=>{c();r(false)}})}
 function showWelcomeScreen(){document.getElementById('welcomeScreen').style.display='flex';document.getElementById('mainApp').style.display='none'}
 function hideWelcomeScreen(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('mainApp').style.display='block'}
-
-function enterAsGuest(){
-  userType = 'guest';
-  localStorage.setItem('grasso_user_type','guest');
-  if (!firebase.auth().currentUser) {
-    firebase.auth().signInAnonymously().catch(console.error);
-  }
-  hideWelcomeScreen();
-  updateUIForLoggedInUser(firebase.auth().currentUser);
-  showToast(t('guest_btn'));
-}
-
+function enterAsGuest(){userType='guest';localStorage.setItem('grasso_user_type','guest');if(!firebase.auth().currentUser){firebase.auth().signInAnonymously().catch(console.error);}hideWelcomeScreen();updateUIForLoggedInUser(firebase.auth().currentUser);showToast(t('guest_btn'));}
 function showRegisterModal(){document.getElementById('welcomeScreen').style.display='none';document.getElementById('authModal').classList.add('active');showLoginForm()}
 function closeAuthModal(){document.getElementById('authModal').classList.remove('active');showWelcomeScreen()}
 function showLoginForm(){document.getElementById('loginForm').style.display='block';document.getElementById('registerForm').style.display='none'}
@@ -937,543 +675,311 @@ function showRegisterForm(){document.getElementById('loginForm').style.display='
 function registerUser(){const n=document.getElementById('registerName').value.trim(),e=document.getElementById('registerEmail').value.trim(),p=document.getElementById('registerPassword').value,pc=document.getElementById('registerPasswordConfirm').value;if(!n||!e||!p){showToast('⚠️ Compila tutto');return}if(p!==pc){showToast('❌ Password diverse');return}if(p.length<6){showToast('❌ Minimo 6 caratteri');return}firebase.auth().createUserWithEmailAndPassword(e,p).then(u=>{u.user.updateProfile({displayName:n});firebase.database().ref('users/'+u.user.uid).set({name:n,email:e,createdAt:Date.now()});showToast('✅ Registrato!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
 function loginWithEmail(e,p){firebase.auth().signInWithEmailAndPassword(e,p).then(()=>{showToast('✅ Accesso!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
 function loginWithGoogle(){const pr=new firebase.auth.GoogleAuthProvider();firebase.auth().signInWithPopup(pr).then(()=>{showToast('✅ Google!');closeAuthModal();hideWelcomeScreen()}).catch(er=>showToast('❌ '+er.message))}
+function logout(){userType='none';localStorage.removeItem('grasso_user_type');localStorage.removeItem('pizzeria_grasso_orders');const fl=document.getElementById('footerLogout');if(fl)fl.style.display='none';showToast('👋 Arrivederci!');firebase.auth().signOut().then(()=>{setTimeout(()=>location.reload(),300);});}
+function updateUIForLoggedInUser(u){const fl=document.getElementById('footerLogout');if(fl)fl.style.display='block';}
 
-function logout(){
-  userType='none';
-  localStorage.removeItem('grasso_user_type');
-  localStorage.removeItem('pizzeria_grasso_orders');
-  
-  const fl=document.getElementById('footerLogout');
-  if(fl) fl.style.display='none';
-  
-  showToast('👋 Arrivederci!');
-
-  firebase.auth().signOut().then(() => {
-    setTimeout(() => location.reload(), 300);
-  });
-}
-
-function updateUIForLoggedInUser(u){
-  const fl = document.getElementById('footerLogout');
-  if (fl) fl.style.display = 'block';
-}
-
-async function forceUpdateFromServer() {
-try {
-const [menuSnap, catsSnap, promosSnap, settingsSnap, imagesSnap, brandingSnap] = await Promise.all([
-db.ref('menu').once('value'), db.ref('categories').once('value'), db.ref('promotions').once('value'),
-db.ref('settings').once('value'), db.ref('images').once('value'), db.ref('branding').once('value')
+async function forceUpdateFromServer(){
+try{
+const[menuSnap,catsSnap,promosSnap,settingsSnap,imagesSnap,brandingSnap]=await Promise.all([
+db.ref('menu').once('value'),db.ref('categories').once('value'),db.ref('promotions').once('value'),
+db.ref('settings').once('value'),db.ref('images').once('value'),db.ref('branding').once('value')
 ]);
-if (menuSnap.exists()) { appData.menu = menuSnap.val(); localStorage.setItem('menuCache', JSON.stringify(appData.menu)); }
-if (catsSnap.exists()) { appData.categories = catsSnap.val(); localStorage.setItem('categoriesCache', JSON.stringify(appData.categories)); }
-if (promosSnap.exists()) { appData.promotions = promosSnap.val(); localStorage.setItem('promoCache', JSON.stringify(appData.promotions)); }
-if (settingsSnap.exists()) { appData.settings = { ...appData.settings, ...settingsSnap.val() }; localStorage.setItem('settingsCache', JSON.stringify(appData.settings)); updateStatusBanner(); updateDeliveryPickupUI(); }
-if (imagesSnap.exists()) { appData.images = imagesSnap.val(); localStorage.setItem('imagesCache', JSON.stringify(appData.images)); }
-if (brandingSnap.exists()) { appData.branding = brandingSnap.val(); localStorage.setItem('brandingCache', JSON.stringify(appData.branding)); }
-showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); updateStatusBanner(); updateFooter(); applyPaletteFromFirebase();
-if (currentSearchCat) renderProductList(currentSearchCat, document.getElementById('productSearch')?.value || '');
-} catch(e) { console.error('❌ Errore aggiornamento:', e); loadFromCache(); }
+if(menuSnap.exists()){appData.menu=menuSnap.val();localStorage.setItem('menuCache',JSON.stringify(appData.menu));}
+if(catsSnap.exists()){appData.categories=catsSnap.val();localStorage.setItem('categoriesCache',JSON.stringify(appData.categories));}
+if(promosSnap.exists()){appData.promotions=promosSnap.val();localStorage.setItem('promoCache',JSON.stringify(appData.promotions));}
+if(settingsSnap.exists()){appData.settings={...appData.settings,...settingsSnap.val()};localStorage.setItem('settingsCache',JSON.stringify(appData.settings));updateStatusBanner();updateDeliveryPickupUI();}
+if(imagesSnap.exists()){appData.images=imagesSnap.val();localStorage.setItem('imagesCache',JSON.stringify(appData.images));}
+if(brandingSnap.exists()){appData.branding=brandingSnap.val();localStorage.setItem('brandingCache',JSON.stringify(appData.branding));}
+showCategories();applyBranding();applyImages();renderPromotionsBanner();updateStatusBanner();updateFooter();applyPaletteFromFirebase();
+if(currentSearchCat)renderProductList(currentSearchCat,document.getElementById('productSearch')?.value||'');
+}catch(e){console.error('❌ Errore:',e);loadFromCache();}
 }
-function loadFromCache() {
-try {
-const cacheTime = localStorage.getItem('cacheTimestamp');
-if (!cacheTime || (Date.now() - parseInt(cacheTime) > 7 * 24 * 60 * 60 * 1000)) return false;
-const cachedMenu = localStorage.getItem('menuCache'); if (cachedMenu) appData.menu = JSON.parse(cachedMenu);
-const cachedCats = localStorage.getItem('categoriesCache'); if (cachedCats) appData.categories = JSON.parse(cachedCats);
-const cachedPromos = localStorage.getItem('promoCache'); if (cachedPromos) appData.promotions = JSON.parse(cachedPromos);
-const cachedImages = localStorage.getItem('imagesCache'); if (cachedImages) appData.images = JSON.parse(cachedImages);
-const cachedBranding = localStorage.getItem('brandingCache'); if (cachedBranding) appData.branding = JSON.parse(cachedBranding);
-const cachedSettings = localStorage.getItem('settingsCache'); if (cachedSettings) appData.settings = JSON.parse(cachedSettings);
-if (Object.keys(appData.categories).length === 0 && Object.keys(appData.menu).length === 0) return false;
-showCategories(); applyBranding(); applyImages(); renderPromotionsBanner(); updateStatusBanner(); updateFooter();
+function loadFromCache(){
+try{
+const cacheTime=localStorage.getItem('cacheTimestamp');
+if(!cacheTime||(Date.now()-parseInt(cacheTime)>7*24*60*60*1000))return false;
+const cachedMenu=localStorage.getItem('menuCache');if(cachedMenu)appData.menu=JSON.parse(cachedMenu);
+const cachedCats=localStorage.getItem('categoriesCache');if(cachedCats)appData.categories=JSON.parse(cachedCats);
+const cachedPromos=localStorage.getItem('promoCache');if(cachedPromos)appData.promotions=JSON.parse(cachedPromos);
+const cachedImages=localStorage.getItem('imagesCache');if(cachedImages)appData.images=JSON.parse(cachedImages);
+const cachedBranding=localStorage.getItem('brandingCache');if(cachedBranding)appData.branding=JSON.parse(cachedBranding);
+const cachedSettings=localStorage.getItem('settingsCache');if(cachedSettings)appData.settings=JSON.parse(cachedSettings);
+if(Object.keys(appData.categories).length===0&&Object.keys(appData.menu).length===0)return false;
+showCategories();applyBranding();applyImages();renderPromotionsBanner();updateStatusBanner();updateFooter();
 return true;
-} catch(e) { return false; }
+}catch(e){return false;}
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
 if(!localStorage.getItem('cookies_accepted'))document.getElementById('cookieBanner').style.display='block';
 const lang=detectBrowserLanguage();currentLang=lang;document.getElementById('langSelect').value=lang;applyTranslations();
-const hasCache = loadFromCache();
-if (!hasCache) { forceUpdateFromServer(); } else { startVersionListener(); }
+const hasCache=loadFromCache();
+if(!hasCache){forceUpdateFromServer();}else{startVersionListener();}
 initApp();
-
-firebase.auth().onAuthStateChanged(u => {
-  if (!u) {
-    firebase.auth().signInAnonymously().catch(console.error);
-    return;
-  }
-
-  if (u.isAnonymous) {
-    currentUser = u;
-    const savedType = localStorage.getItem('grasso_user_type');
-    if (savedType === 'guest' || savedType === 'registered') {
-      hideWelcomeScreen();
-      updateUIForLoggedInUser(u);
-    } else {
-      showWelcomeScreen();
-      const fl = document.getElementById('footerLogout');
-      if (fl) fl.style.display = 'none';
-    }
-    return;
-  }
-
-  currentUser = u;
-  userType = 'registered';
-  localStorage.setItem('grasso_user_type', 'registered');
-  hideWelcomeScreen();
-  updateUIForLoggedInUser(u);
+firebase.auth().onAuthStateChanged(u=>{
+if(!u){firebase.auth().signInAnonymously().catch(console.error);return;}
+if(u.isAnonymous){
+currentUser=u;const savedType=localStorage.getItem('grasso_user_type');
+if(savedType==='guest'||savedType==='registered'){hideWelcomeScreen();updateUIForLoggedInUser(u);}
+else{showWelcomeScreen();const fl=document.getElementById('footerLogout');if(fl)fl.style.display='none';}
+return;
+}
+currentUser=u;userType='registered';localStorage.setItem('grasso_user_type','registered');hideWelcomeScreen();updateUIForLoggedInUser(u);
 });
 });
-function initApp() {
+
+function initApp(){
 cleanLocalHistory();
-try { const s = localStorage.getItem('pizzeria_cart_v3'); if (s) { const p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) { cart = p; updateCartBadge(); } } } catch(e) {}
-startStatusListener(); startServicesListener(); loadReviewsPublic(); loadReviewsHome(); renderMyOrders(); startOrderStatusTracking(); controllaRifiutiCliente(); applyPaletteFromFirebase(); startFestiveEffectListener(); setInterval(updateStatusBanner, 60000);
-setTimeout(() => {
-richiediPermessoNotifiche();
-}, 2000);
+try{const s=localStorage.getItem('pizzeria_cart_v3');if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length>0){cart=p;updateCartBadge();}}}catch(e){}
+startStatusListener();startServicesListener();loadReviewsPublic();loadReviewsHome();renderMyOrders();startOrderStatusTracking();controllaRifiutiCliente();applyPaletteFromFirebase();startFestiveEffectListener();setInterval(updateStatusBanner,60000);
+setTimeout(()=>{richiediPermessoNotifiche();},2000);
 }
 
 function checkIfOpen(){
-const s = appData.settings || {};
-if(s.manualStatus === 'open') return true;
-if(s.manualStatus === 'closed') return false;
-const days = ['dom','lun','mar','mer','gio','ven','sab'];const today = days[new Date().getDay()];
-if(s.openDays && s.openDays.length > 0 && !s.openDays.includes(today)) return false;
-const ds = new Date().toISOString().split('T')[0];
-if(s.specialClosures && s.specialClosures.split(',').map(d => d.trim()).includes(ds)) return false;
-const hs = s.hours || "11:00-15:00,18:00-23:00";const ranges = hs.split(',').map(r => r.trim()).filter(Boolean);const cm = new Date().getHours() * 60 + new Date().getMinutes();
-for(let r of ranges){const p = r.split('-');if(p.length !== 2) continue;const [sh, sm] = p[0].split(':').map(Number);const [eh, em] = p[1].split(':').map(Number);if(isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) continue;if(cm >= sh * 60 + sm && cm < eh * 60 + em) return true;}
+const s=appData.settings||{};
+if(s.manualStatus==='open')return true;
+if(s.manualStatus==='closed')return false;
+const days=['dom','lun','mar','mer','gio','ven','sab'];const today=days[new Date().getDay()];
+if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(today))return false;
+const ds=new Date().toISOString().split('T')[0];
+if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(ds))return false;
+const hs=s.hours||"11:00-15:00,18:00-23:00";const ranges=hs.split(',').map(r=>r.trim()).filter(Boolean);const cm=new Date().getHours()*60+new Date().getMinutes();
+for(let r of ranges){const p=r.split('-');if(p.length!==2)continue;const[sh,sm]=p[0].split(':').map(Number);const[eh,em]=p[1].split(':').map(Number);if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))continue;if(cm>=sh*60+sm&&cm<eh*60+em)return true;}
 return false;
 }
-function updateStatusBanner(){const b = document.getElementById('statusBanner');const txt = document.getElementById('statusText');const o = checkIfOpen();if(!b || !txt) return;b.className = `status-banner ${o ? 'status-open' : 'status-closed'}`;txt.textContent = o ? t('open') : t('closed');}
+function updateStatusBanner(){const b=document.getElementById('statusBanner');const txt=document.getElementById('statusText');const o=checkIfOpen();if(!b||!txt)return;b.className=`status-banner ${o?'status-open':'status-closed'}`;txt.textContent=o?t('open'):t('closed');}
 function getCartQty(c,n){const e=cart.find(x=>!x.isPromo&&x.cat===c&&x.name===n);return e?(e.qty||0):0}
 
-function changeProductQty(cat, idx, delta) {
-  if (!appData.menu[cat] || !appData.menu[cat][idx]) return;
-  const p = appData.menu[cat][idx];
-  if (p.disabled === true) { showToast(t('product_not_available')); return; }
-  let item = cart.find(x => !x.isPromo && x.cat === cat && x.name === p.name);
-  if (item) {
-    item.qty = (item.qty || 1) + delta;
-    if (item.qty <= 0) {
-      cart = cart.filter(x => x !== item);
-    }
-  } else {
-    if (delta > 0) {
-      cart.push({
-        cat: cat,
-        name: p.name,
-        price: p.price,
-        qty: 1,
-        img: p.img || '',
-        isPromo: false
-      });
-    }
-  }
-  updateCartBadge();
-  const searchterm = document.getElementById('productSearch')?.value || '';
-  renderProductList(cat, searchterm);
-  if (delta > 0) {
-    showToast(p.name + ' ' + t('add_product'));
-  }
+function changeProductQty(cat,idx,delta){
+if(!appData.menu[cat]||!appData.menu[cat][idx])return;
+const p=appData.menu[cat][idx];
+if(p.disabled===true){showToast(t('product_not_available'));return;}
+let item=cart.find(x=>!x.isPromo&&x.cat===cat&&x.name===p.name);
+if(item){
+item.qty=(item.qty||1)+delta;
+if(item.qty<=0)cart=cart.filter(x=>x!==item);
+}else{
+if(delta>0)cart.push({cat:cat,name:p.name,price:p.price,qty:1,img:p.img||'',isPromo:false});
+}
+updateCartBadge();
+renderProductList(cat,document.getElementById('productSearch')?.value||'');
+if(delta>0)showToast(p.name+' '+t('add_product'));
 }
 
 function updateCartBadge(){
-  let n=0;
-  let totalItemsCount = 0;
-  cart.forEach(i=>{
-    if(i.isPromo) {
-      n+=1;
-      totalItemsCount+=1;
-    } else {
-      n+=(i.qty||0);
-      totalItemsCount+=(i.qty||0);
-    }
-  });
-
-  const nb=document.getElementById('navCartBadge');
-  if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}
-
-  const stickyBar = document.getElementById('stickyCartBar');
-  const stickyCount = document.getElementById('stickyCartCount');
-  const stickyTotal = document.getElementById('stickyCartTotal');
-  
-  if (stickyBar && stickyCount && stickyTotal) {
-    if (totalItemsCount > 0) {
-      stickyBar.style.display = 'flex';
-      stickyCount.textContent = totalItemsCount;
-      let currentTot = 0;
-      cart.forEach(i => {
-        if (i.isPromo) currentTot += i.totalPrice || 0;
-        else currentTot += (i.price || 0) * (i.qty || 1);
-      });
-      stickyTotal.textContent = '€' + currentTot.toFixed(2);
-    } else {
-      stickyBar.style.display = 'none';
-    }
-  }
-
-  try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}
+let n=0,totalItemsCount=0;
+cart.forEach(i=>{if(i.isPromo){n+=1;totalItemsCount+=1;}else{n+=(i.qty||0);totalItemsCount+=(i.qty||0);}});
+const nb=document.getElementById('navCartBadge');if(nb){nb.textContent=n;nb.style.display=n>0?'flex':'none'}
+const stickyBar=document.getElementById('stickyCartBar');const stickyCount=document.getElementById('stickyCartCount');const stickyTotal=document.getElementById('stickyCartTotal');
+if(stickyBar&&stickyCount&&stickyTotal){
+if(totalItemsCount>0){
+stickyBar.style.display='flex';stickyCount.textContent=totalItemsCount;
+let currentTot=0;cart.forEach(i=>{if(i.isPromo)currentTot+=i.totalPrice||0;else currentTot+=(i.price||0)*(i.qty||1);});
+stickyTotal.textContent='€'+currentTot.toFixed(2);
+}else{stickyBar.style.display='none';}
+}
+try{localStorage.setItem('pizzeria_cart_v3',JSON.stringify(cart))}catch(e){}
 }
 
-function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(!d)return;d.style.display=hasActive?'block':'none'}
+function updateNavLiveDot(hasActive){const d=document.getElementById('navLiveDot');if(d)d.style.display=hasActive?'block':'none'}
 function updateNavLiveDotOld(){try{const o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');updateNavLiveDot(hasActive)}catch(e){updateNavLiveDot(false)}}
 async function clearCart(){if(!cart.length)return;const ok=await showConfirm(t('empty_cart_confirm'));if(!ok)return;cart=[];updateCartBadge();closeCart();showToast(t('cart_emptied'))}
 function calculateDistance(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function computeDeliveryFee(dist){const bf=parseFloat(appData.settings.deliveryBaseFee)||3,mr=parseFloat(appData.settings.deliveryMaxRadius)||4,er=parseFloat(appData.settings.deliveryExtraRadius)||6,ef=parseFloat(appData.settings.deliveryExtraFee)||2;if(dist===null)return{fee:bf,outOfRange:false,withExtra:false};if(dist>er)return{fee:0,outOfRange:true,withExtra:false};if(dist>mr)return{fee:bf+ef,outOfRange:false,withExtra:true};return{fee:bf,outOfRange:false,withExtra:false}}
 
-function generateValidDates() {
-const select = document.getElementById('scheduledDateSelect');
-if (!select) return;
-select.innerHTML = '';
-const s = appData.settings || {};
-const now = new Date();
-let foundDates = false;
-for (let offset = 0; offset <= 7; offset++) {
-const checkDate = new Date(now);
-checkDate.setDate(now.getDate() + offset);
-const checkDayStr = ['dom','lun','mar','mer','gio','ven','sab'][checkDate.getDay()];
-const checkDs = checkDate.toISOString().split('T')[0];
-let isOpen = true;
-if (s.openDays && s.openDays.length > 0 && !s.openDays.includes(checkDayStr)) {
-isOpen = false;
+function generateValidDates(){
+const select=document.getElementById('scheduledDateSelect');if(!select)return;
+select.innerHTML='';const s=appData.settings||{};const now=new Date();let foundDates=false;
+for(let offset=0;offset<=7;offset++){
+const checkDate=new Date(now);checkDate.setDate(now.getDate()+offset);
+const checkDayStr=['dom','lun','mar','mer','gio','ven','sab'][checkDate.getDay()];
+const checkDs=checkDate.toISOString().split('T')[0];let isOpen=true;
+if(s.openDays&&s.openDays.length>0&&!s.openDays.includes(checkDayStr))isOpen=false;
+if(s.specialClosures&&s.specialClosures.split(',').map(d=>d.trim()).includes(checkDs))isOpen=false;
+if(offset===0){
+const hs=s.hours||"11:00-15:00,18:00-23:00";const ranges=hs.split(',').map(r=>r.trim()).filter(Boolean);const currentMins=now.getHours()*60+now.getMinutes();let isPastClosing=true;
+for(let range of ranges){const p=range.split('-');if(p.length!==2)continue;const[eh,em]=p[1].split(':').map(Number);if(isNaN(eh)||isNaN(em))continue;if(currentMins<eh*60+em){isPastClosing=false;break;}}
+if(isPastClosing)isOpen=false;
 }
-if (s.specialClosures && s.specialClosures.split(',').map(d => d.trim()).includes(checkDs)) {
-isOpen = false;
-}
-if (offset === 0) {
-const hs = s.hours || "11:00-15:00,18:00-23:00";
-const ranges = hs.split(',').map(r => r.trim()).filter(Boolean);
-const currentMins = now.getHours() * 60 + now.getMinutes();
-let isPastClosing = true;
-for (let range of ranges) {
-const p = range.split('-');
-if (p.length !== 2) continue;
-const [eh, em] = p[1].split(':').map(Number);
-if (isNaN(eh) || isNaN(em)) continue;
-const closingMins = eh * 60 + em;
-if (currentMins < closingMins) {
-isPastClosing = false;
-break;
+if(isOpen){
+foundDates=true;const opt=document.createElement('option');
+const dayLabel=checkDate.toLocaleDateString(currentLang==='it'?'it-IT':currentLang==='de'?'de-DE':'en-US',{weekday:'short',day:'numeric',month:'short'});
+opt.value=offset;opt.textContent=offset===0?`📅 Oggi (${dayLabel})`:`📅 ${dayLabel}`;opt.dataset.date=checkDs;opt.dataset.dayOffset=offset;select.appendChild(opt);
 }
 }
-if (isPastClosing) isOpen = false;
-}
-if (isOpen) {
-foundDates = true;
-const opt = document.createElement('option');
-const dayLabel = checkDate.toLocaleDateString(
-currentLang === 'it' ? 'it-IT' : currentLang === 'de' ? 'de-DE' : 'en-US',
-{ weekday: 'short', day: 'numeric', month: 'short' }
-);
-opt.value = offset;
-opt.textContent = offset === 0 ? `📅 Oggi (${dayLabel})` : `📅 ${dayLabel}`;
-opt.dataset.date = checkDs;
-opt.dataset.dayOffset = offset;
-select.appendChild(opt);
+if(!foundDates){
+const opt=document.createElement('option');opt.value="";opt.textContent=t('no_available_dates');select.appendChild(opt);
+document.getElementById('scheduledTimeSelect').innerHTML=`<option value="">⏰ ${t('no_available_dates')}</option>`;
+}else{
+select.value=select.options[0]?.value||"0";onDateChange();
 }
 }
-if (!foundDates) {
-const opt = document.createElement('option');
-opt.value = "";
-opt.textContent = t('no_available_dates');
-select.appendChild(opt);
-document.getElementById('scheduledTimeSelect').innerHTML =
-`<option value="">⏰ ${t('no_available_dates')}</option>`;
-} else {
-select.value = select.options[0]?.value || "0";
-onDateChange();
+
+function onDateChange(){
+const dateSelect=document.getElementById('scheduledDateSelect');const timeSelect=document.getElementById('scheduledTimeSelect');
+if(!dateSelect||!timeSelect)return;
+const offset=parseInt(dateSelect.value);
+if(isNaN(offset)){timeSelect.innerHTML=`<option value="">⏰ ${t('no_available_dates')}</option>`;return;}
+selectedDateOffset=offset;generateValidTimeSlotsForDate(offset);
 }
-}
-function onDateChange() {
-const dateSelect = document.getElementById('scheduledDateSelect');
-const timeSelect = document.getElementById('scheduledTimeSelect');
-if (!dateSelect || !timeSelect) return;
-const offset = parseInt(dateSelect.value);
-if (isNaN(offset)) {
-timeSelect.innerHTML = `<option value="">⏰ ${t('no_available_dates')}</option>`;
-return;
-}
-selectedDateOffset = offset;
-generateValidTimeSlotsForDate(offset);
-}
-function generateValidTimeSlotsForDate(dayOffset) {
-const select = document.getElementById('scheduledTimeSelect');
-if (!select) return;
-select.innerHTML = '';
-const s = appData.settings || {};
-const hs = s.hours || "11:00-15:00,18:00-23:00";
-const ranges = hs.split(',').map(r => r.trim()).filter(Boolean);
-const now = new Date();
-const targetDate = new Date(now);
-targetDate.setDate(now.getDate() + dayOffset);
-const isToday = (dayOffset === 0);
-const currentMins = isToday ? (now.getHours() * 60 + now.getMinutes()) : 0;
-let slots = [];
-ranges.forEach(range => {
-const p = range.split('-');
-if (p.length !== 2) return;
-const [sh, sm] = p[0].split(':').map(Number);
-const [eh, em] = p[1].split(':').map(Number);
-if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return;
-let startM = sh * 60 + sm;
-let endM = eh * 60 + em;
-if (isToday && startM < currentMins) {
-startM = Math.ceil(currentMins / 5) * 5;
-}
-for (let m = startM; m <= endM; m += 5) {
-if (isToday && m <= currentMins) continue;
-const h = Math.floor(m / 60);
-const min = m % 60;
-slots.push({
-mins: m,
-label: `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`,
-dayOffset: dayOffset
-});
+
+function generateValidTimeSlotsForDate(dayOffset){
+const select=document.getElementById('scheduledTimeSelect');if(!select)return;
+select.innerHTML='';const s=appData.settings||{};const hs=s.hours||"11:00-15:00,18:00-23:00";const ranges=hs.split(',').map(r=>r.trim()).filter(Boolean);
+const now=new Date();const isToday=(dayOffset===0);const currentMins=isToday?(now.getHours()*60+now.getMinutes()):0;let slots=[];
+ranges.forEach(range=>{
+const p=range.split('-');if(p.length!==2)return;
+const[sh,sm]=p[0].split(':').map(Number);const[eh,em]=p[1].split(':').map(Number);
+if(isNaN(sh)||isNaN(sm)||isNaN(eh)||isNaN(em))return;
+let startM=sh*60+sm;let endM=eh*60+em;
+if(isToday&&startM<currentMins)startM=Math.ceil(currentMins/5)*5;
+for(let m=startM;m<=endM;m+=5){
+if(isToday&&m<=currentMins)continue;
+const h=Math.floor(m/60),min=m%60;
+slots.push({mins:m,label:`${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`,dayOffset:dayOffset});
 }
 });
-if (slots.length === 0) {
-const opt = document.createElement('option');
-opt.value = "";
-opt.textContent = "⏰ " + t('no_available_dates');
-select.appendChild(opt);
-return;
+if(slots.length===0){
+const opt=document.createElement('option');opt.value="";opt.textContent="⏰ "+t('no_available_dates');select.appendChild(opt);return;
 }
-slots.forEach(slot => {
-const opt = document.createElement('option');
-opt.value = slot.label;
-opt.textContent = slot.label;
-opt.dataset.mins = slot.mins;
-opt.dataset.dayOffset = slot.dayOffset;
-if (slot.fullDate) opt.dataset.fullDate = slot.fullDate;
-select.appendChild(opt);
+slots.forEach(slot=>{
+const opt=document.createElement('option');opt.value=slot.label;opt.textContent=slot.label;opt.dataset.mins=slot.mins;opt.dataset.dayOffset=slot.dayOffset;select.appendChild(opt);
 });
-select.selectedIndex = 0;
+select.selectedIndex=0;
 }
 
 function updateCartTotals(){
-let tot = 0;
-let prodottiTot = 0;
-cart.forEach(i => {
-if (i.isPromo) {
-tot += i.totalPrice || 0;
-} else {
-const qty = i.qty || 1;
-const price = i.price || 0;
-tot += price * qty;
-prodottiTot += price * qty;
+let tot=0,prodottiTot=0;
+cart.forEach(i=>{if(i.isPromo){tot+=i.totalPrice||0;}else{const qty=i.qty||1,price=i.price||0;tot+=price*qty;prodottiTot+=price*qty;}});
+let finalTotal=tot,isOutOfRange=false;
+if(orderType==='delivery'&&appData.settings.deliveryEnabled!==false&&cart.length>0){
+if(window.customerGPSLat&&window.customerGPSLng&&appData.settings.pizzeriaLat&&appData.settings.pizzeriaLng){
+const dist=calculateDistance(appData.settings.pizzeriaLat,appData.settings.pizzeriaLng,window.customerGPSLat,window.customerGPSLng);
+const{fee,outOfRange,withExtra}=computeDeliveryFee(dist);isOutOfRange=outOfRange;
+if(outOfRange){
+document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='block';
+document.getElementById('distanceText').textContent='📍 Fuori dal raggio di consegna';document.getElementById('distanceText').style.color='#ef4444';document.getElementById('checkoutBtn').disabled=true;
+}else{
+document.getElementById('deliveryFeeRow').style.display='flex';document.getElementById('deliveryFeeValue').textContent='€'+fee.toFixed(2);document.getElementById('distanceInfo').style.display='block';
+document.getElementById('distanceText').textContent=withExtra?`📍 ${dist.toFixed(1)} km (+supplemento)`:`📍 ${dist.toFixed(1)} km`;document.getElementById('distanceText').style.color=withExtra?'#fbbf24':'#3498db';document.getElementById('checkoutBtn').disabled=false;finalTotal=tot+fee;
 }
-});
-let finalTotal = tot;
-let isOutOfRange = false;
-if (orderType === 'delivery' && appData.settings.deliveryEnabled !== false && cart.length > 0) {
-if (window.customerGPSLat && window.customerGPSLng && appData.settings.pizzeriaLat && appData.settings.pizzeriaLng) {
-const dist = calculateDistance(appData.settings.pizzeriaLat, appData.settings.pizzeriaLng, window.customerGPSLat, window.customerGPSLng);
-const { fee, outOfRange, withExtra } = computeDeliveryFee(dist);
-isOutOfRange = outOfRange;
-if (outOfRange) {
-document.getElementById('deliveryFeeRow').style.display = 'none';
-document.getElementById('distanceInfo').style.display = 'block';
-document.getElementById('distanceText').textContent = '📍 Fuori dal raggio di consegna';
-document.getElementById('distanceText').style.color = '#ef4444';
-document.getElementById('checkoutBtn').disabled = true;
-} else {
-document.getElementById('deliveryFeeRow').style.display = 'flex';
-document.getElementById('deliveryFeeValue').textContent = '€' + fee.toFixed(2);
-document.getElementById('distanceInfo').style.display = 'block';
-document.getElementById('distanceText').textContent = withExtra ? `📍 ${dist.toFixed(1)} km (+supplemento)` : `📍 ${dist.toFixed(1)} km`;
-document.getElementById('distanceText').style.color = withExtra ? '#fbbf24' : '#3498db';
-document.getElementById('checkoutBtn').disabled = false;
-finalTotal = tot + fee;
+}else{
+const fee=parseFloat(appData.settings.deliveryBaseFee)||3;document.getElementById('deliveryFeeRow').style.display='flex';document.getElementById('deliveryFeeValue').textContent='€'+fee.toFixed(2);document.getElementById('distanceInfo').style.display='none';document.getElementById('checkoutBtn').disabled=false;finalTotal=tot+fee;
 }
-} else {
-const fee = parseFloat(appData.settings.deliveryBaseFee) || 3;
-document.getElementById('deliveryFeeRow').style.display = 'flex';
-document.getElementById('deliveryFeeValue').textContent = '€' + fee.toFixed(2);
-document.getElementById('distanceInfo').style.display = 'none';
-document.getElementById('checkoutBtn').disabled = false;
-finalTotal = tot + fee;
+}else{
+document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';document.getElementById('checkoutBtn').disabled=false;
 }
-} else {
-document.getElementById('deliveryFeeRow').style.display = 'none';
-document.getElementById('distanceInfo').style.display = 'none';
-document.getElementById('checkoutBtn').disabled = false;
-}
-document.getElementById('totalAmount').textContent = '€' + finalTotal.toFixed(2);
-const mo = parseFloat(appData.settings.minDeliveryOrder) || 0;
-if (orderType === 'delivery' && mo > 0 && prodottiTot < mo && !isOutOfRange) {
-document.getElementById('checkoutBtn').disabled = true;
-document.getElementById('checkoutBtn').innerHTML = t('min_order') + mo.toFixed(2) + ' (prodotti: €' + prodottiTot.toFixed(2) + ')';
-} else if (!isOutOfRange) {
-document.getElementById('checkoutBtn').disabled = false;
-document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order');
+document.getElementById('totalAmount').textContent='€'+finalTotal.toFixed(2);
+const mo=parseFloat(appData.settings.minDeliveryOrder)||0;
+if(orderType==='delivery'&&mo>0&&prodottiTot<mo&&!isOutOfRange){
+document.getElementById('checkoutBtn').disabled=true;document.getElementById('checkoutBtn').innerHTML=t('min_order')+mo.toFixed(2)+' (prodotti: €'+prodottiTot.toFixed(2)+')';
+}else if(!isOutOfRange){
+document.getElementById('checkoutBtn').disabled=false;document.getElementById('checkoutBtn').innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order');
 }
 }
+
 function selectOrderType(typ){
-if(typ === 'delivery' && appData.settings.deliveryEnabled === false){ showToast(t('no_delivery')); return; }
-if(typ === 'pickup' && appData.settings.pickupEnabled === false){ showToast(t('no_pickup')); return; }
-orderType = typ;
-document.getElementById('typeDelivery').classList.toggle('active', typ === 'delivery');
-document.getElementById('typePickup').classList.toggle('active', typ === 'pickup');
-document.getElementById('timeTypeLabel').textContent = typ === 'delivery' ? t('delivery_short') : t('pickup_short');
-if(typ === 'delivery'){ document.getElementById('addressGroup').style.display = 'block'; }
-else { document.getElementById('addressGroup').style.display = 'none'; document.getElementById('customerStreet').value = ''; document.getElementById('customerNumber').value = ''; window.customerGPSLat = null; window.customerGPSLng = null; }
+if(typ==='delivery'&&appData.settings.deliveryEnabled===false){showToast(t('no_delivery'));return;}
+if(typ==='pickup'&&appData.settings.pickupEnabled===false){showToast(t('no_pickup'));return;}
+orderType=typ;
+document.getElementById('typeDelivery').classList.toggle('active',typ==='delivery');
+document.getElementById('typePickup').classList.toggle('active',typ==='pickup');
+document.getElementById('timeTypeLabel').textContent=typ==='delivery'?t('delivery_short'):t('pickup_short');
+if(typ==='delivery'){document.getElementById('addressGroup').style.display='block';}
+else{document.getElementById('addressGroup').style.display='none';document.getElementById('customerStreet').value='';document.getElementById('customerNumber').value='';window.customerGPSLat=null;window.customerGPSLng=null;}
 updateCartTotals();
 }
 
 function selectTimeMode(m){
-if (m === 'asap' && !checkIfOpen()) {
-showToast(t('closed_now'));
-return;
+if(m==='asap'&&!checkIfOpen()){showToast(t('closed_now'));return;}
+timeMode=m;
+document.getElementById('timeAsap').classList.toggle('active',m==='asap');
+document.getElementById('timeScheduled').classList.toggle('active',m==='scheduled');
+document.getElementById('timePickerWrap').classList.toggle('show',m==='scheduled');
+document.getElementById('datePickerGroup').style.display=m==='scheduled'?'block':'none';
+if(m==='scheduled')generateValidDates();
 }
-timeMode = m;
-document.getElementById('timeAsap').classList.toggle('active', m === 'asap');
-document.getElementById('timeScheduled').classList.toggle('active', m === 'scheduled');
-document.getElementById('timePickerWrap').classList.toggle('show', m === 'scheduled');
-document.getElementById('datePickerGroup').style.display = m === 'scheduled' ? 'block' : 'none';
-if (m === 'scheduled') {
-generateValidDates();
-}
-}
-async function getGPSLocation(){const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';try{const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);const d=await res.json(),a=d.address;document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals()}catch(e){showToast(t('gps_fail'))}finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}}
 
-function removeProductFromCart(index) {
-if (index < 0 || index >= cart.length) return;
-const product = cart[index];
-if (!product || product.isPromo) return;
-const productName = product.name || 'Prodotto';
-cart.splice(index, 1);
-updateCartBadge();
-openCart();
-showToast(`🗑️ ${productName} rimosso dal carrello`);
+async function getGPSLocation(){
+const b=document.getElementById('gpsBtn');if(!navigator.geolocation){showToast('GPS non disponibile');return}
+b.innerHTML='<i class="fas fa-spinner fa-spin"></i>...';
+try{
+const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:15000}));
+const{latitude,longitude}=pos.coords;window.customerGPSLat=latitude;window.customerGPSLng=longitude;
+const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
+const d=await res.json(),a=d.address;
+document.getElementById('customerStreet').value=a.road||a.pedestrian||'';document.getElementById('customerNumber').value=a.house_number||'';
+showToast(t('gps_ok'));if(orderType==='delivery')updateCartTotals();
+}catch(e){showToast(t('gps_fail'))}
+finally{b.innerHTML='<i class="fas fa-location-crosshairs"></i> '+t('use_gps')}
 }
-function changeProductQtyInCart(index, delta) {
-if (index < 0 || index >= cart.length) return;
-const item = cart[index];
-if (!item || item.isPromo) return;
-const newQty = (item.qty || 1) + delta;
-if (newQty <= 0) {
-removeProductFromCart(index);
-return;
+
+function removeProductFromCart(index){
+if(index<0||index>=cart.length)return;
+const product=cart[index];if(!product||product.isPromo)return;
+const productName=product.name||'Prodotto';cart.splice(index,1);updateCartBadge();openCart();showToast(`🗑️ ${productName} rimosso dal carrello`);
 }
-item.qty = newQty;
-updateCartBadge();
-openCart();
+function changeProductQtyInCart(index,delta){
+if(index<0||index>=cart.length)return;
+const item=cart[index];if(!item||item.isPromo)return;
+const newQty=(item.qty||1)+delta;
+if(newQty<=0){removeProductFromCart(index);return;}
+item.qty=newQty;updateCartBadge();openCart();
 }
 
 function openCart(){
 const m=document.getElementById('cartModal'),it=document.getElementById('cartItems'),ts=document.getElementById('cartTotalSection'),cb=document.getElementById('checkoutBtn'),cl=document.getElementById('clearCartBtn'),cf=document.getElementById('customerForm'),tt=document.getElementById('orderTypeToggle');
 if(!cart.length){
 it.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px 0;">${t('empty_cart')}</p>`;
-ts.style.display='none'; cb.style.display='none'; cl.style.display='none'; cf.style.display='none'; tt.style.display='none';
-document.getElementById('deliveryFeeRow').style.display='none'; document.getElementById('distanceInfo').style.display='none';
-} else {
+ts.style.display='none';cb.style.display='none';cl.style.display='none';cf.style.display='none';tt.style.display='none';
+document.getElementById('deliveryFeeRow').style.display='none';document.getElementById('distanceInfo').style.display='none';
+}else{
 let h='';
 cart.forEach((x,i)=>{
-if(x.isPromo) {
-h+=`
-<div class="promo-card-item">
-<div class="promo-card-item-header">
-<div class="promo-card-item-title">
-<span class="promo-badge">PROMO</span> ${x.promoTitle}
-</div>
-<button onclick="removePromoFromCartAtIndex(${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:1.2rem;">✕</button>
-</div>
-<div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div>
-<div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div>
-</div>`;
+if(x.isPromo){
+h+=`<div class="promo-card-item"><div class="promo-card-item-header"><div class="promo-card-item-title"><span class="promo-badge">PROMO</span> ${x.promoTitle}</div><button onclick="removePromoFromCartAtIndex(${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:1.2rem;">✕</button></div><div style="font-size:.85rem;color:var(--cream);margin-top:5px;">${x.products.map(p=>`${p.name} ×${p.qty}`).join(', ')}</div><div style="color:#ff6b6b;font-weight:700;margin-top:5px;">€${x.totalPrice.toFixed(2)}</div></div>`;
 }
 });
-
-const categoriesMap = {};
-cart.forEach((x, idx) => {
-if (!x.isPromo) {
-const catKey = x.cat || 'Altro';
-if (!categoriesMap[catKey]) categoriesMap[catKey] = [];
-categoriesMap[catKey].push({ ...x, originalIndex: idx });
-}
-});
-
-Object.keys(categoriesMap).forEach(catKey => {
-const catName = getCategoryDisplayName(catKey);
-h += `<div style="margin-top:15px; margin-bottom:8px; border-bottom:1px solid rgba(212,168,75,0.3); padding-bottom:4px;">
-<h4 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1rem;">${catName}</h4>
-</div>`;
-
-categoriesMap[catKey].forEach(item => {
-const idx = item.originalIndex;
-h+=`
-<div class="cart-item-3d" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(212,168,75,0.1);">
-<div style="flex:1;">
-<span class="cart-item-name">${item.name}</span>
-<div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
-<div class="qty-counter" style="transform:scale(0.85);transform-origin:left;">
-<button type="button" class="qty-btn minus" onclick="changeProductQtyInCart(${idx}, -1)" style="width:28px;height:28px;font-size:0.85rem;">−</button>
-<span class="qty-value" style="min-width:20px;">${item.qty || 1}</span>
-<button type="button" class="qty-btn" onclick="changeProductQtyInCart(${idx}, 1)" style="width:28px;height:28px;font-size:0.85rem;">+</button>
-</div>
-<span class="cart-item-price" style="font-size:0.95rem;">€${((item.price || 0) * (item.qty || 1)).toFixed(2)}</span>
-</div>
-</div>
-<button onclick="removeProductFromCart(${idx})" style="
-background:rgba(248,113,113,0.15);
-color:#f87171;
-border:1px solid rgba(248,113,113,0.3);
-border-radius:8px;
-padding:8px 12px;
-font-size:0.75rem;
-font-weight:600;
-cursor:pointer;
-transition:all 0.2s;
-white-space:nowrap;
-" onmouseover="this.style.background='rgba(248,113,113,0.3)'" onmouseout="this.style.background='rgba(248,113,113,0.15)'">
-🗑️ Rimuovi
-</button>
-</div>`;
+const categoriesMap={};
+cart.forEach((x,idx)=>{if(!x.isPromo){const catKey=x.cat||'Altro';if(!categoriesMap[catKey])categoriesMap[catKey]=[];categoriesMap[catKey].push({...x,originalIndex:idx});}});
+Object.keys(categoriesMap).forEach(catKey=>{
+const catName=getCategoryDisplayName(catKey);
+h+=`<div style="margin-top:15px;margin-bottom:8px;border-bottom:1px solid rgba(212,168,75,0.3);padding-bottom:4px;"><h4 style="color:var(--gold);font-family:'Playfair Display',serif;font-size:1rem;">${catName}</h4></div>`;
+categoriesMap[catKey].forEach(item=>{
+const idx=item.originalIndex;
+h+=`<div class="cart-item-3d" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(212,168,75,0.1);"><div style="flex:1;"><span class="cart-item-name">${item.name}</span><div style="display:flex;align-items:center;gap:10px;margin-top:4px;"><div class="qty-counter" style="transform:scale(0.85);transform-origin:left;"><button type="button" class="qty-btn minus" onclick="changeProductQtyInCart(${idx},-1)" style="width:28px;height:28px;font-size:0.85rem;">−</button><span class="qty-value" style="min-width:20px;">${item.qty||1}</span><button type="button" class="qty-btn" onclick="changeProductQtyInCart(${idx},1)" style="width:28px;height:28px;font-size:0.85rem;">+</button></div><span class="cart-item-price" style="font-size:0.95rem;">€${((item.price||0)*(item.qty||1)).toFixed(2)}</span></div></div><button onclick="removeProductFromCart(${idx})" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 12px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;">🗑️ Rimuovi</button></div>`;
 });
 });
-
-it.innerHTML=h; ts.style.display='flex'; cl.style.display='flex'; cf.style.display='block'; tt.style.display='flex';
-const de = appData.settings.deliveryEnabled !== false; const pe = appData.settings.pickupEnabled !== false;
-document.getElementById('typeDelivery').classList.toggle('disabled', !de); document.getElementById('typePickup').classList.toggle('disabled', !pe);
-const isOpen = checkIfOpen();
-const btnAsap = document.getElementById('timeAsap');
-if (!isOpen) {
-btnAsap.classList.add('disabled');
-btnAsap.classList.remove('active');
-document.getElementById('timeScheduled').classList.add('active');
-document.getElementById('timePickerWrap').classList.add('show');
-document.getElementById('datePickerGroup').style.display = 'block';
-timeMode = 'scheduled';
-generateValidDates();
-} else {
+it.innerHTML=h;ts.style.display='flex';cl.style.display='flex';cf.style.display='block';tt.style.display='flex';
+const de=appData.settings.deliveryEnabled!==false,pe=appData.settings.pickupEnabled!==false;
+document.getElementById('typeDelivery').classList.toggle('disabled',!de);document.getElementById('typePickup').classList.toggle('disabled',!pe);
+const isOpen=checkIfOpen();const btnAsap=document.getElementById('timeAsap');
+if(!isOpen){
+btnAsap.classList.add('disabled');btnAsap.classList.remove('active');
+document.getElementById('timeScheduled').classList.add('active');document.getElementById('timePickerWrap').classList.add('show');document.getElementById('datePickerGroup').style.display='block';
+timeMode='scheduled';generateValidDates();
+}else{
 btnAsap.classList.remove('disabled');
-if (timeMode === 'asap') {
-btnAsap.classList.add('active');
-document.getElementById('timeScheduled').classList.remove('active');
-document.getElementById('timePickerWrap').classList.remove('show');
-document.getElementById('datePickerGroup').style.display = 'none';
-} else {
-btnAsap.classList.remove('active');
-document.getElementById('timeScheduled').classList.add('active');
-document.getElementById('timePickerWrap').classList.add('show');
-document.getElementById('datePickerGroup').style.display = 'block';
+if(timeMode==='asap'){
+btnAsap.classList.add('active');document.getElementById('timeScheduled').classList.remove('active');document.getElementById('timePickerWrap').classList.remove('show');document.getElementById('datePickerGroup').style.display='none';
+}else{
+btnAsap.classList.remove('active');document.getElementById('timeScheduled').classList.add('active');document.getElementById('timePickerWrap').classList.add('show');document.getElementById('datePickerGroup').style.display='block';
 generateValidDates();
 }
 }
-if(!de && !pe){ cb.style.display='none'; document.getElementById('checkoutBtn').disabled = true; document.getElementById('checkoutBtn').innerHTML = '🚫 Servizio non disponibile'; document.getElementById('typeDelivery').classList.remove('active'); document.getElementById('typePickup').classList.remove('active'); }
-else {
+if(!de&&!pe){cb.style.display='none';document.getElementById('checkoutBtn').disabled=true;document.getElementById('checkoutBtn').innerHTML='🚫 Servizio non disponibile';document.getElementById('typeDelivery').classList.remove('active');document.getElementById('typePickup').classList.remove('active');}
+else{
 cb.style.display='block';
-if(!de && orderType === 'delivery'){ selectOrderType('pickup'); }
-else if(!pe && orderType === 'pickup'){ selectOrderType('delivery'); }
-else {
-document.getElementById('checkoutBtn').disabled = false; document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order');
-document.getElementById('typeDelivery').classList.toggle('active', orderType === 'delivery'); document.getElementById('typePickup').classList.toggle('active', orderType === 'pickup');
-if(!document.getElementById('typeDelivery').classList.contains('active') && !document.getElementById('typePickup').classList.contains('active')){ selectOrderType('delivery'); }
+if(!de&&orderType==='delivery'){selectOrderType('pickup');}
+else if(!pe&&orderType==='pickup'){selectOrderType('delivery');}
+else{
+document.getElementById('checkoutBtn').disabled=false;document.getElementById('checkoutBtn').innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order');
+document.getElementById('typeDelivery').classList.toggle('active',orderType==='delivery');document.getElementById('typePickup').classList.toggle('active',orderType==='pickup');
+if(!document.getElementById('typeDelivery').classList.contains('active')&&!document.getElementById('typePickup').classList.contains('active')){selectOrderType('delivery');}
 }
 }
-if(orderType === 'delivery' && de){ document.getElementById('addressGroup').style.display = 'block'; }
-else { document.getElementById('addressGroup').style.display = 'none'; if(orderType === 'pickup'){ document.getElementById('customerStreet').value = ''; document.getElementById('customerNumber').value = ''; window.customerGPSLat = null; window.customerGPSLng = null; } }
+if(orderType==='delivery'&&de){document.getElementById('addressGroup').style.display='block';}
+else{document.getElementById('addressGroup').style.display='none';if(orderType==='pickup'){document.getElementById('customerStreet').value='';document.getElementById('customerNumber').value='';window.customerGPSLat=null;window.customerGPSLng=null;}}
 updateCartTotals();
 }
 m.classList.add('active');
@@ -1482,293 +988,162 @@ function closeCart(){document.getElementById('cartModal').classList.remove('acti
 function addPromoToCart(promoId){const promo=appData.promotions[promoId];if(!promo){showToast(t('promo_unavailable'));return;}if(promo.currentUses>=promo.maxUses){showToast(t('promo_exhausted'));return;}const existing=cart.find(item=>item.isPromo&&item.promoId===promoId);if(existing){if(!confirm(t('add_another_promo')))return;const idx=cart.indexOf(existing);cart.splice(idx,1);db.ref('promotions/'+promoId+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));}const totalPrice=promo.products.reduce((sum,p)=>sum+(p.price*p.qty),0);cart.push({isPromo:true,promoId:promoId,promoTitle:promo.title,products:promo.products,totalPrice:totalPrice});db.ref('promotions/'+promoId+'/currentUses').transaction(v=>(v||0)+1);updateCartBadge();showToast(`🎁 ${promo.title} aggiunta!`);if(document.getElementById('cartModal').classList.contains('active'))openCart();}
 async function removePromoFromCartAtIndex(i){if(cart[i]&&cart[i].isPromo){const pid=cart[i].promoId;db.ref('promotions/'+pid+'/currentUses').transaction(v=>Math.max(0,(v||0)-1));cart.splice(i,1);updateCartBadge();openCart();showToast(t('promo_removed'));}}
 
-let orderPollingInterval = null;
-function stopOrderStatusTracking() { if (orderPollingInterval) { clearInterval(orderPollingInterval); orderPollingInterval = null; } }
-function isOrderActive(status, type) { if (!status) return true; if (['delivered','rifiutato','annullato'].includes(status)) return false; if (type === 'pickup' && status === 'picked') return false; return true; }
-function startOrderStatusTracking() {
+let orderPollingInterval=null;
+function stopOrderStatusTracking(){if(orderPollingInterval){clearInterval(orderPollingInterval);orderPollingInterval=null;}}
+function isOrderActive(status,type){if(!status)return true;if(['delivered','rifiutato','annullato'].includes(status))return false;if(type==='pickup'&&status==='picked')return false;return true;}
+function startOrderStatusTracking(){
 stopOrderStatusTracking();
-const lo = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-const activeOrders = lo.filter(o => o.orderId && isOrderActive(o.status, o.type));
-if (!activeOrders.length) { updateNavLiveDot(false); return; }
+const lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
+const activeOrders=lo.filter(o=>o.orderId&&isOrderActive(o.status,o.type));
+if(!activeOrders.length){updateNavLiveDot(false);return;}
 pollOrderStatuses(activeOrders);
-orderPollingInterval = setInterval(() => {
-const freshLo = JSON.parse(localStorage.getItem('pizzeria_grasso_orders') || '[]');
-const freshActive = freshLo.filter(o => o.orderId && isOrderActive(o.status, o.type));
-if (!freshActive.length) { stopOrderStatusTracking(); updateNavLiveDot(false); return; }
+orderPollingInterval=setInterval(()=>{
+const freshLo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
+const freshActive=freshLo.filter(o=>o.orderId&&isOrderActive(o.status,o.type));
+if(!freshActive.length){stopOrderStatusTracking();updateNavLiveDot(false);return;}
 pollOrderStatuses(freshActive);
-}, ORDER_POLL_MS);
+},ORDER_POLL_MS);
 }
-async function pollOrderStatuses(orders) {
-for (const o of orders) {
-try {
-const snap = await db.ref('ordini').orderByChild('orderId').equalTo(o.orderId).once('value');
-snap.forEach(child => { const d = child.val(); if (d) updateLocalOrderStatus(o.orderId, d.status, d.motivoRifiuto || d.motivoAnnullamento, d.delayMinutes); });
-} catch(e) {}
+async function pollOrderStatuses(orders){
+for(const o of orders){
+try{
+const snap=await db.ref('ordini').orderByChild('orderId').equalTo(o.orderId).once('value');
+snap.forEach(child=>{const d=child.val();if(d)updateLocalOrderStatus(o.orderId,d.status,d.motivoRifiuto||d.motivoAnnullamento,d.delayMinutes);});
+}catch(e){}
 }
 }
 
-function updateLocalOrderStatus(oid, ns, mr, delayMinutes){
+function updateLocalOrderStatus(oid,ns,mr,delayMinutes){
 try{
-let o = JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
-let ch = false;
-o = o.map(x => {
-if(x.orderId === oid){
-const prevDelay = x.delayMinutes; const nextDelay = delayMinutes ?? prevDelay;
-let finalStatus = ns;
-if (x.type === 'pickup' && (ns === 'picked' || ns === 'delivered')) finalStatus = 'delivered';
-const changed = x.status !== finalStatus || (finalStatus === 'delayed' && prevDelay !== nextDelay);
+let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
+let ch=false;
+o=o.map(x=>{
+if(x.orderId===oid){
+const prevDelay=x.delayMinutes;const nextDelay=delayMinutes??prevDelay;
+let finalStatus=ns;if(x.type==='pickup'&&(ns==='picked'||ns==='delivered'))finalStatus='delivered';
+const changed=x.status!==finalStatus||(finalStatus==='delayed'&&prevDelay!==nextDelay);
 if(changed){
-ch = true; x.status = finalStatus; x.delayMinutes = nextDelay;
-if((finalStatus === 'rifiutato' || finalStatus === 'annullato') && mr){ if(finalStatus === 'rifiutato') x.motivoRifiuto = mr; else x.motivoAnnullamento = mr; }
-let titolo = '🍕 Antica Pizzeria Grasso';
-let messaggio = '';
-let icona = '/icon-clienti-192.png';
-if(finalStatus === 'delayed'){
-messaggio = nextDelay ? `⏰ Ordine in ritardo (${nextDelay} min)` : '⏰ Ordine in ritardo';
-showToast(messaggio);
-playNotificationSound();
-if(navigator.vibrate) navigator.vibrate([250,80,250]);
-}
-else if(finalStatus === 'ready'){
-messaggio = '✅ Il tuo ordine è pronto! Vieni a ritirarlo!';
-showToast(t('notify_ready'));
-playNotificationSound();
-if(navigator.vibrate) navigator.vibrate([200,100,200]);
-}
-else if(finalStatus === 'delivering'){
-messaggio = '🛵 Il rider sta arrivando con il tuo ordine!';
-showToast(t('notify_delivering'));
-playNotificationSound();
-if(navigator.vibrate) navigator.vibrate([200,100,200]);
-}
-else if (finalStatus === 'delivered' && x.type === 'pickup') {
-messaggio = '✅ Ordine ritirato! Grazie e buon appetito!';
-showToast('✅ Ordine ritirato! Grazie!');
-playNotificationSound();
-}
-else if (finalStatus === 'rifiutato'){
-messaggio = mr || '❌ Il tuo ordine è stato rifiutato dalla pizzeria.';
-playNotificationSound();
-if(navigator.vibrate) navigator.vibrate([500,200,500]);
-mostraModalRifiuto(mr || t('order_rejected_default'));
-}
-else if (finalStatus === 'annullato'){
-messaggio = '🗑️ Il tuo ordine è stato annullato.';
-playNotificationSound();
-if(navigator.vibrate) navigator.vibrate([300,200,300]);
-}
-else if (finalStatus === 'accettato') {
-messaggio = '✅ Ordine accettato dalla pizzeria!';
-}
-else if (finalStatus === 'preparing') {
-messaggio = '🍕 Il tuo ordine è in preparazione!';
-}
-else if (finalStatus === 'picked') {
-messaggio = '📦 Il rider ha ritirato il tuo ordine!';
-}
-if (messaggio) {
-inviaNotificaWeb(titolo, messaggio, icona);
-}
+ch=true;x.status=finalStatus;x.delayMinutes=nextDelay;
+if((finalStatus==='rifiutato'||finalStatus==='annullato')&&mr){if(finalStatus==='rifiutato')x.motivoRifiuto=mr;else x.motivoAnnullamento=mr;}
+let titolo='🍕 Antica Pizzeria Grasso',messaggio='',icona='/icon-clienti-192.png';
+if(finalStatus==='delayed'){messaggio=nextDelay?`⏰ Ordine in ritardo (${nextDelay} min)`:'⏰ Ordine in ritardo';showToast(messaggio);playNotificationSound();if(navigator.vibrate)navigator.vibrate([250,80,250]);}
+else if(finalStatus==='ready'){messaggio='✅ Il tuo ordine è pronto! Vieni a ritirarlo!';showToast(t('notify_ready'));playNotificationSound();if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+else if(finalStatus==='delivering'){messaggio='🛵 Il rider sta arrivando con il tuo ordine!';showToast(t('notify_delivering'));playNotificationSound();if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+else if(finalStatus==='delivered'&&x.type==='pickup'){messaggio='✅ Ordine ritirato! Grazie e buon appetito!';showToast('✅ Ordine ritirato! Grazie!');playNotificationSound();}
+else if(finalStatus==='rifiutato'){messaggio=mr||'❌ Il tuo ordine è stato rifiutato dalla pizzeria.';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500]);mostraModalRifiuto(mr||t('order_rejected_default'));}
+else if(finalStatus==='annullato'){messaggio='🗑️ Il tuo ordine è stato annullato.';playNotificationSound();if(navigator.vibrate)navigator.vibrate([300,200,300]);}
+else if(finalStatus==='accettato'){messaggio='✅ Ordine accettato dalla pizzeria!';}
+else if(finalStatus==='preparing'){messaggio='🍕 Il tuo ordine è in preparazione!';}
+else if(finalStatus==='picked'){messaggio='📦 Il rider ha ritirato il tuo ordine!';}
+if(messaggio)inviaNotificaWeb(titolo,messaggio,icona);
 }
 }
 return x;
 });
-if(ch){
-localStorage.setItem('pizzeria_grasso_orders', JSON.stringify(o));
-renderMyOrders();
-updateNavLiveDotOld();
-}
-} catch(e) { console.log('Errore aggiornamento stato:', e); }
+if(ch){localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld();}
+}catch(e){console.log('Errore aggiornamento stato:',e);}
 }
 
-async function richiediPermessoNotifiche() {
-if (!('Notification' in window)) return false;
-if (Notification.permission === 'granted') return true;
-if (Notification.permission === 'denied') return false;
-try {
-const permission = await Notification.requestPermission();
-return permission === 'granted';
-} catch(e) { return false; }
+async function richiediPermessoNotifiche(){
+if(!('Notification' in window))return false;
+if(Notification.permission==='granted')return true;
+if(Notification.permission==='denied')return false;
+try{const p=await Notification.requestPermission();return p==='granted';}catch(e){return false;}
 }
-function inviaNotificaWeb(titolo, messaggio, icona = '/icon-clienti-192.png') {
-try {
-if (!('Notification' in window) || Notification.permission !== 'granted' || document.hasFocus()) return;
-const notifica = new Notification(titolo, {
-body: messaggio,
-icon: icona,
-badge: '/icon-clienti-192.png',
-tag: 'order_update_' + Date.now(),
-requireInteraction: true,
-silent: false,
-data: { timestamp: Date.now() }
-});
-notifica.onclick = function() { window.focus(); this.close(); showMyOrders(); };
-setTimeout(() => { if (notifica) notifica.close(); }, 10000);
-} catch(e) {}
+function inviaNotificaWeb(titolo,messaggio,icona='/icon-clienti-192.png'){
+try{
+if(!('Notification' in window)||Notification.permission!=='granted'||document.hasFocus())return;
+const notifica=new Notification(titolo,{body:messaggio,icon:icona,badge:'/icon-clienti-192.png',tag:'order_update_'+Date.now(),requireInteraction:true,silent:false,data:{timestamp:Date.now()}});
+notifica.onclick=function(){window.focus();this.close();showMyOrders();};
+setTimeout(()=>{if(notifica)notifica.close();},10000);
+}catch(e){}
 }
 
-if ('serviceWorker' in navigator) {
-let registration = null;
-let lastActivity = Date.now();
-document.addEventListener('click', () => { lastActivity = Date.now(); });
-document.addEventListener('touchstart', () => { lastActivity = Date.now(); });
-document.addEventListener('scroll', () => { lastActivity = Date.now(); });
-navigator.serviceWorker.register('/sw.js')
-.then(reg => {
-registration = reg;
-document.addEventListener('visibilitychange', () => {
-if (!document.hidden && registration) registration.update();
+if('serviceWorker' in navigator){
+let registration=null,lastActivity=Date.now();
+document.addEventListener('click',()=>{lastActivity=Date.now();});
+document.addEventListener('touchstart',()=>{lastActivity=Date.now();});
+document.addEventListener('scroll',()=>{lastActivity=Date.now();});
+navigator.serviceWorker.register('/sw.js').then(reg=>{
+registration=reg;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&registration)registration.update();});
+registration.addEventListener('updatefound',()=>{
+const newSW=registration.installing;
+newSW.addEventListener('statechange',()=>{if(newSW.state==='installed'&&navigator.serviceWorker.controller)newSW.postMessage({type:'SKIP_WAITING'});});
 });
-registration.addEventListener('updatefound', () => {
-const newSW = registration.installing;
-newSW.addEventListener('statechange', () => {
-if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-newSW.postMessage({ type: 'SKIP_WAITING' });
-}
-});
-});
-})
-.catch(err => {});
-let refreshing = false;
-navigator.serviceWorker.addEventListener('controllerchange', () => {
-if (refreshing) return;
-refreshing = true;
-const checkInactivity = setInterval(() => {
-if (Date.now() - lastActivity > 5000) {
-clearInterval(checkInactivity);
-window.location.reload();
-}
-}, 1000);
-setTimeout(() => {
-clearInterval(checkInactivity);
-if (!refreshing) return;
-window.location.reload();
-}, 30000);
+}).catch(err=>{});
+let refreshing=false;
+navigator.serviceWorker.addEventListener('controllerchange',()=>{
+if(refreshing)return;refreshing=true;
+const checkInactivity=setInterval(()=>{if(Date.now()-lastActivity>5000){clearInterval(checkInactivity);window.location.reload();}},1000);
+setTimeout(()=>{clearInterval(checkInactivity);if(!refreshing)return;window.location.reload();},30000);
 });
 }
 
 function confirmAndSendOrder(){
-  const name = document.getElementById('customerName')?.value.trim();
-  const phone = document.getElementById('customerPhone')?.value.trim();
-  const privacy = document.getElementById('privacyConsent')?.checked;
-  const honeypot = document.getElementById('honeypot')?.value;
-
-  if(honeypot){ return; }
-  
-  if(!privacy){
-    showToast(t('accept_privacy'));
-    return;
-  }
-  if(!name){
-    showToast(t('fill_name'));
-    document.getElementById('customerName')?.focus();
-    return;
-  }
-  if(!phone || phone.length < 8){
-    showToast(t('invalid_phone'));
-    return;
-  }
-  if(orderType === 'delivery'){
-    const street = document.getElementById('customerStreet')?.value.trim();
-    const number = document.getElementById('customerNumber')?.value.trim();
-    if(!street || !number){
-      showToast(t('fill_address'));
-      return;
-    }
-    const distRow = document.getElementById('distanceInfo');
-    if(distRow && distRow.style.display !== 'none' && distRow.textContent.includes('Fuori')){
-      showToast(t('out_of_range'));
-      return;
-    }
-  }
-
-  let scheduledTime = null;
-  let isPreOrder = false;
-  let scheduledDate = null;
-  
-  if(timeMode === 'scheduled'){
-    const dateSelect = document.getElementById('scheduledDateSelect');
-    const timeSelect = document.getElementById('scheduledTimeSelect');
-    if(!dateSelect?.value || !timeSelect?.value){
-      showToast(t('select_valid_time'));
-      return;
-    }
-    scheduledTime = timeSelect.value;
-    const dayOffset = parseInt(dateSelect.value);
-    isPreOrder = dayOffset > 0 || (dayOffset === 0 && scheduledTime);
-    scheduledDate = dateSelect.options[dateSelect.selectedIndex]?.dataset.date || null;
-  } else {
-    if(!checkIfOpen()){
-      showToast(t('closed_now'));
-      return;
-    }
-  }
-
-  let productsTotal = 0;
-  let deliveryFee = 0;
-  let finalTotal = 0;
-  
-  cart.forEach(i=>{
-    if(i.isPromo) productsTotal += i.totalPrice||0;
-    else productsTotal += (i.price||0)*(i.qty||1);
-  });
-
-  if(orderType === 'delivery'){
-    const feeText = document.getElementById('deliveryFeeValue')?.textContent || '€0';
-    deliveryFee = parseFloat(feeText.replace('€','').replace(',','.')) || (parseFloat(appData.settings.deliveryBaseFee)||3);
-  }
-
-  finalTotal = productsTotal + deliveryFee;
-
-  const orderData = {
-    name: name,
-    phone: phone,
-    address: orderType === 'delivery' ? 
-      `${document.getElementById('customerStreet').value} ${document.getElementById('customerNumber').value}`.trim() : '',
-    notes: document.getElementById('customerNotes')?.value || '',
-    type: orderType,
-    items: [...cart],
-    productsTotal: productsTotal,
-    deliveryFee: deliveryFee,
-    finalTotal: finalTotal,
-    customerLat: window.customerGPSLat || null,
-    customerLng: window.customerGPSLng || null,
-    scheduledTime: scheduledTime,
-    isPreOrder: isPreOrder,
-    scheduledDate: scheduledDate
-  };
-
-  sendOrder(orderData);
+const name=document.getElementById('customerName')?.value.trim();
+const phone=document.getElementById('customerPhone')?.value.trim();
+const privacy=document.getElementById('privacyConsent')?.checked;
+const honeypot=document.getElementById('honeypot')?.value;
+if(honeypot)return;
+if(!privacy){showToast(t('accept_privacy'));return;}
+if(!name){showToast(t('fill_name'));document.getElementById('customerName')?.focus();return;}
+if(!phone||phone.length<8){showToast(t('invalid_phone'));return;}
+if(orderType==='delivery'){
+const street=document.getElementById('customerStreet')?.value.trim();
+const number=document.getElementById('customerNumber')?.value.trim();
+if(!street||!number){showToast(t('fill_address'));return;}
+const distRow=document.getElementById('distanceInfo');
+if(distRow&&distRow.style.display!=='none'&&distRow.textContent.includes('Fuori')){showToast(t('out_of_range'));return;}
+}
+let scheduledTime=null,isPreOrder=false,scheduledDate=null;
+if(timeMode==='scheduled'){
+const dateSelect=document.getElementById('scheduledDateSelect');const timeSelect=document.getElementById('scheduledTimeSelect');
+if(!dateSelect?.value||!timeSelect?.value){showToast(t('select_valid_time'));return;}
+scheduledTime=timeSelect.value;const dayOffset=parseInt(dateSelect.value);
+isPreOrder=dayOffset>0||(dayOffset===0&&scheduledTime);
+scheduledDate=dateSelect.options[dateSelect.selectedIndex]?.dataset.date||null;
+}else{
+if(!checkIfOpen()){showToast(t('closed_now'));return;}
+}
+let productsTotal=0,deliveryFee=0,finalTotal=0;
+cart.forEach(i=>{if(i.isPromo)productsTotal+=i.totalPrice||0;else productsTotal+=(i.price||0)*(i.qty||1);});
+if(orderType==='delivery'){
+const feeText=document.getElementById('deliveryFeeValue')?.textContent||'€0';
+deliveryFee=parseFloat(feeText.replace('€','').replace(',','.'))||(parseFloat(appData.settings.deliveryBaseFee)||3);
+}
+finalTotal=productsTotal+deliveryFee;
+const orderData={
+name:name,phone:phone,
+address:orderType==='delivery'?`${document.getElementById('customerStreet').value} ${document.getElementById('customerNumber').value}`.trim():'',
+notes:document.getElementById('customerNotes')?.value||'',type:orderType,items:[...cart],productsTotal:productsTotal,
+deliveryFee:deliveryFee,finalTotal:finalTotal,customerLat:window.customerGPSLat||null,customerLng:window.customerGPSLng||null,
+scheduledTime:scheduledTime,isPreOrder:isPreOrder,scheduledDate:scheduledDate
+};
+sendOrder(orderData);
 }
 
 async function sendOrder(d){
 const btn=document.getElementById('checkoutBtn'),cb=[...cart];
 if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Invio...'}
 try{
-const ref=db.ref('ordini').push();const snap=await db.ref('counter/ordini').transaction(c=>(c||0)+1);const num=snap.snapshot.val();const oid='ORD-'+String(num).padStart(5,'0');d.orderId=oid;
-
-const uid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'anonimo';
-
+const ref=db.ref('ordini').push();const snap=await db.ref('counter/ordini').transaction(c=>(c||0)+1);
+const num=snap.snapshot.val();const oid='ORD-'+String(num).padStart(5,'0');d.orderId=oid;
+const uid=firebase.auth().currentUser?firebase.auth().currentUser.uid:'anonimo';
 await ref.set({
-orderId:oid,
-userId:uid,
-customerName:sanitizeWA(d.name), customerPhone:sanitizeWA(d.phone),
-address:d.type==='delivery'?sanitizeWA(d.address):'', notes:sanitizeWA(d.notes), type:d.type,
-scheduledTime:d.scheduledTime,
-isPreOrder: d.isPreOrder || false,
-scheduledDate: d.scheduledDate || null,
-items:d.items, productsTotal:d.productsTotal, deliveryFee:d.deliveryFee, finalTotal:d.finalTotal,
-customerLat:d.customerLat, customerLng:d.customerLng,
-status: d.isPreOrder ? 'preorder' : 'new',
-timestamp:Date.now()
+orderId:oid,userId:uid,customerName:sanitizeWA(d.name),customerPhone:sanitizeWA(d.phone),
+address:d.type==='delivery'?sanitizeWA(d.address):'',notes:sanitizeWA(d.notes),type:d.type,
+scheduledTime:d.scheduledTime,isPreOrder:d.isPreOrder||false,scheduledDate:d.scheduledDate||null,
+items:d.items,productsTotal:d.productsTotal,deliveryFee:d.deliveryFee,finalTotal:d.finalTotal,
+customerLat:d.customerLat,customerLng:d.customerLng,status:d.isPreOrder?'preorder':'new',timestamp:Date.now()
 });
-localStorage.setItem('lastOrderTime',Date.now()); saveOrderToLocal(d); startOrderStatusTracking();
+localStorage.setItem('lastOrderTime',Date.now());saveOrderToLocal(d);startOrderStatusTracking();
 cart=[];updateCartBadge();closeCart();
 ['customerName','customerPhone','customerStreet','customerNumber','customerNotes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
 const pcb=document.getElementById('privacyConsent');if(pcb)pcb.checked=false;
 window.customerGPSLat=null;window.customerGPSLng=null;
-if (checkIfOpen()) selectTimeMode('asap');
-showToast(d.isPreOrder ? '✅ Pre-ordine inviato!' : t('order_sent'));
+if(checkIfOpen())selectTimeMode('asap');
+showToast(d.isPreOrder?'✅ Pre-ordine inviato!':t('order_sent'));
 showHome();
 }catch(e){console.error(e);cart=cb;updateCartBadge();showToast(t('order_error'))}
 finally{if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order')}}
@@ -1778,57 +1153,127 @@ function openReviewModal(){document.getElementById('reviewModal').classList.add(
 function closeReviewModal(){document.getElementById('reviewModal').classList.remove('active');selectedStars=0;updateStarsDisplay();document.getElementById('reviewName').value='';document.getElementById('reviewText').value='';document.getElementById('reviewOrderId').value='';pendingReviewOrderId=null}
 function selectStar(n){selectedStars=n;updateStarsDisplay()}
 function updateStarsDisplay(){document.querySelectorAll('#starsInput .star').forEach((s,i)=>{s.classList.toggle('active',i<selectedStars)})}
-function submitReview(){const n=document.getElementById('reviewName').value.trim(),txt=document.getElementById('reviewText').value.trim(),oid=pendingReviewOrderId||document.getElementById('reviewOrderId').value.trim();if(!selectedStars){showToast('⚠️ Seleziona stelle');return}if(!n){showToast('❌ Inserisci nome');return}if(!txt){showToast('❌ Scrivi commento');return}db.ref('recensioni').push({name:sanitizeWA(n),text:sanitizeWA(txt),stars:selectedStars,orderId:oid||'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{if(pendingReviewOrderId){let lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');lo=lo.map(o=>o.orderId===pendingReviewOrderId?{...o,reviewed:true}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(lo));renderMyOrders()}closeReviewModal();showToast(t('thanks_review'))})}
+function submitReview(){
+const n=document.getElementById('reviewName').value.trim(),txt=document.getElementById('reviewText').value.trim(),oid=pendingReviewOrderId||document.getElementById('reviewOrderId').value.trim();
+if(!selectedStars){showToast('⚠️ Seleziona stelle');return}if(!n){showToast('❌ Inserisci nome');return}if(!txt){showToast('❌ Scrivi commento');return}
+db.ref('recensioni').push({name:sanitizeWA(n),text:sanitizeWA(txt),stars:selectedStars,orderId:oid||'Anonimo',timestamp:Date.now(),status:'pending'}).then(()=>{
+if(pendingReviewOrderId){
+let lo=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');lo=lo.map(o=>o.orderId===pendingReviewOrderId?{...o,reviewed:true}:o);
+localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(lo));renderMyOrders();
+}
+closeReviewModal();showToast(t('thanks_review'));
+});
+}
 function showMyOrders(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='block';window.scrollTo(0,0);startOrderStatusTracking();renderMyOrders();updateNavLiveDotOld()}
 function cleanLocalHistory(){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');o=o.filter(x=>(Date.now()-x.date)<30*24*3600*1000);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o))}catch(e){}}
 
 function saveOrderToLocal(od){
-  try{
-    let o=[];
-    try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}
-    if(o.find(x=>x.orderId===od.orderId))return;
-    const itemsDescription = od.items.map(i => i.isPromo ? (i.promoTitle || 'Promozione') : i.name).filter(Boolean).join(', ');
-    o.unshift({
-      orderId:od.orderId,
-      date:Date.now(),
-      total:od.finalTotal,
-      items:itemsDescription,
-      reviewed:false,
-      status: od.isPreOrder ? 'preorder' : 'new',
-      type:od.type||'delivery',
-      isPreOrder: od.isPreOrder || false
-    });
-    if(o.length>5)o=o.slice(0,5);
-    localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));
-    renderMyOrders();
-    updateNavLiveDotOld();
-  }catch(e){}
+try{
+let o=[];try{o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]')}catch(e){o=[]}
+if(o.find(x=>x.orderId===od.orderId))return;
+const itemsDescription=od.items.map(i=>i.isPromo?(i.promoTitle||'Promozione'):i.name).filter(Boolean).join(', ');
+o.unshift({orderId:od.orderId,date:Date.now(),total:od.finalTotal,items:itemsDescription,reviewed:false,status:od.isPreOrder?'preorder':'new',type:od.type||'delivery',isPreOrder:od.isPreOrder||false});
+if(o.length>5)o=o.slice(0,5);
+localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o));renderMyOrders();updateNavLiveDotOld();
+}catch(e){}
+}
+async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_confirm'));if(!ok)return;Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();updateNavLiveDotOld();showToast(t('history_cleared'))}
+
+function getOrderProgress(s, typ) {
+  const isPickup = (typ === 'pickup');
+  if (s === 'rifiutato') return { percent: 0, step: -1, label: t('rejected'), icon: '❌', class: 'status-rifiutato' };
+  if (s === 'annullato') return { percent: 0, step: -1, label: t('annullato'), icon: '🗑️', class: 'status-annullato' };
+  
+  if (isPickup) {
+    const map = {
+      'preorder':  { percent: 10,  step: 0, label: 'Pre-ordine',       icon: '📅', class: 'status-new' },
+      'new':       { percent: 15,  step: 0, label: 'Ricevuto',         icon: '📥', class: 'status-new' },
+      'accettato': { percent: 35,  step: 1, label: 'Confermato',       icon: '✅', class: 'status-accettato' },
+      'preparing': { percent: 50,  step: 1, label: 'In preparazione',  icon: '🍕', class: 'status-preparing' },
+      'delayed':   { percent: 50,  step: 1, label: 'In ritardo',       icon: '⏰', class: 'status-delayed' },
+      'ready':     { percent: 80,  step: 2, label: 'Pronto al ritiro', icon: '✅', class: 'status-ready' },
+      'picked':    { percent: 100, step: 3, label: 'Ritirato',         icon: '🎉', class: 'status-delivered' },
+      'delivered': { percent: 100, step: 3, label: 'Ritirato',         icon: '🎉', class: 'status-delivered' }
+    };
+    return map[s] || map['new'];
+  } else {
+    const map = {
+      'preorder':   { percent: 10,  step: 0, label: 'Pre-ordine',       icon: '📅', class: 'status-new' },
+      'new':        { percent: 15,  step: 0, label: 'Ricevuto',         icon: '📥', class: 'status-new' },
+      'accettato':  { percent: 35,  step: 1, label: 'Confermato',       icon: '✅', class: 'status-accettato' },
+      'preparing':  { percent: 50,  step: 1, label: 'In preparazione',  icon: '🍕', class: 'status-preparing' },
+      'delayed':    { percent: 50,  step: 1, label: 'In ritardo',       icon: '⏰', class: 'status-delayed' },
+      'ready':      { percent: 65,  step: 1, label: 'Pronto per rider', icon: '🍕', class: 'status-ready' },
+      'picked':     { percent: 75,  step: 2, label: 'Rider partito',    icon: '🛵', class: 'status-delivering' },
+      'delivering': { percent: 85,  step: 2, label: 'In consegna',      icon: '🛵', class: 'status-delivering' },
+      'delivered':  { percent: 100, step: 3, label: 'Consegnato',       icon: '🎉', class: 'status-delivered' }
+    };
+    return map[s] || map['new'];
+  }
 }
 
-async function clearLocalHistory(){const ok=await showConfirm(t('clear_history_confirm'));if(!ok)return;Object.keys(orderStatusListeners).forEach(id=>{try{orderStatusListeners[id].off('value')}catch(e){}});orderStatusListeners={};localStorage.removeItem('pizzeria_grasso_orders');renderMyOrders();updateNavLiveDotOld();showToast(t('history_cleared'))}
-function getOrderProgress(s,typ){
-if(typ==='pickup'){
-const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preorder':{percent:5,step:0,label:'Pre-ordine',icon:'📅',class:'status-new'},'accettato':{percent:15,step:1,label:t('accettato'),icon:'✅',class:'status-accettato'},'preparing':{percent:35,step:2,label:t('preparing'),icon:'🍕',class:'status-preparing'},'delayed':{percent:45,step:3,label:'In Ritardo',icon:'⏰',class:'status-delayed'},'ready':{percent:70,step:4,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:100,step:5,label:t('picked'),icon:'🎉',class:'status-picked'},'delivered':{percent:100,step:5,label:t('picked'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};
-return p[s]||p['new']
+function renderOrderTracker(s, mr, ot, delayMinutes) {
+  const typ = ot || 'delivery';
+  const pr = getOrderProgress(s, typ);
+
+  if (s === 'rifiutato' || s === 'annullato') {
+    const label = s === 'rifiutato' ? t('rejected') : t('annullato');
+    return `
+      <div class="order-status-tracker">
+        <div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>
+        ${mr ? `<div class="order-reject-message"><strong>${s === 'rifiutato' ? 'Motivo' : 'Dettaglio'}:</strong> ${mr}</div>` : ''}
+      </div>`;
+  }
+
+  const steps = typ === 'pickup' ? [
+    { label: 'Ricevuto', icon: '📥' },
+    { label: 'In forno', icon: '🍕' },
+    { label: 'Pronto',   icon: '✅' },
+    { label: 'Ritirato', icon: '🎉' }
+  ] : [
+    { label: 'Ricevuto',   icon: '📥' },
+    { label: 'In forno',   icon: '🍕' },
+    { label: 'In viaggio', icon: '🛵' },
+    { label: 'Consegnato', icon: '🎉' }
+  ];
+
+  let badgeLabel = pr.label;
+  if (s === 'delayed' && delayMinutes) {
+    badgeLabel = `In ritardo (${delayMinutes} min)`;
+  }
+
+  const liveDot = (s !== 'delivered' && s !== 'picked') ? `<span class="order-live-indicator">LIVE</span>` : '';
+
+  return `
+    <div class="order-status-tracker">
+      <div class="order-status-badge ${pr.class}">
+        <span>${pr.icon}</span> ${badgeLabel} ${liveDot}
+      </div>
+      <div class="order-progress-bar">
+        <div class="order-progress-fill" style="width:${pr.percent}%"></div>
+      </div>
+      <div class="order-progress-steps">
+        ${steps.map((x, i) => `
+          <span class="${i <= pr.step ? 'active' : ''}">
+            <span class="step-icon">${x.icon}</span>
+            <span class="step-label">${x.label}</span>
+          </span>
+        `).join('')}
+      </div>
+    </div>`;
 }
-const p={'new':{percent:10,step:0,label:'Ricevuto',icon:'📥',class:'status-new'},'preorder':{percent:5,step:0,label:'Pre-ordine',icon:'📅',class:'status-new'},'accettato':{percent:15,step:1,label:t('accettato'),icon:'✅',class:'status-accettato'},'preparing':{percent:30,step:2,label:t('preparing'),icon:'🍕',class:'status-preparing'},'delayed':{percent:45,step:3,label:'In Ritardo',icon:'⏰',class:'status-delayed'},'ready':{percent:55,step:4,label:t('ready'),icon:'✅',class:'status-ready'},'picked':{percent:70,step:5,label:t('picked'),icon:'📦',class:'status-picked'},'delivering':{percent:85,step:6,label:t('delivering'),icon:'🛵',class:'status-delivering'},'delivered':{percent:100,step:7,label:t('delivered'),icon:'🎉',class:'status-delivered'},'rifiutato':{percent:0,step:-1,label:t('rejected'),icon:'❌',class:'status-rifiutato'},'annullato':{percent:0,step:-1,label:t('annullato'),icon:'🗑️',class:'status-annullato'}};
-return p[s]||p['new']
-}
-function renderOrderTracker(s,mr,ot,delayMinutes){
-const typ=ot||'delivery',pr=getOrderProgress(s,typ);
-if(s==='rifiutato'||s==='annullato'){
-const label=s==='rifiutato'?t('rejected'):t('annullato');
-return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${label}</div>${mr?`<div class="order-reject-message"><strong>${s==='rifiutato'?'Motivo':'Dettaglio'}:</strong> ${mr}</div>`:''}</div>`
-}
-if(s==='delivered'||(typ==='pickup'&&(s==='picked'||s==='delivered')))
-return`<div class="order-status-tracker"><div class="order-status-badge status-delivered"><span>🎉</span> ${typ==='pickup'?t('picked'):t('delivered')}</div><div class="order-progress-bar"><div class="order-progress-fill" style="width:100%"></div></div></div>`;
-const st=typ==='pickup'?[{label:'Ricevuto',icon:'📥'},{label:t('accettato'),icon:'✅'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'🎉'}]:[{label:'Ricevuto',icon:'📥'},{label:t('accettato'),icon:'✅'},{label:t('preparing'),icon:'🍕'},{label:t('ready'),icon:'✅'},{label:t('picked'),icon:'📦'},{label:t('delivering'),icon:'🛵'},{label:t('delivered'),icon:'🎉'}];
-return`<div class="order-status-tracker"><div class="order-status-badge ${pr.class}"><span>${pr.icon}</span> ${pr.label}<span class="order-live-indicator">LIVE</span></div><div class="order-progress-bar"><div class="order-progress-fill" style="width:${pr.percent}%"></div></div><div class="order-progress-steps">${st.map((x,i)=>`<span class="${i<=pr.step?'active':''}">${x.icon}<br>${x.label}</span>`).join('')}</div></div>`
-}
-function puoAnnullareOrdine(order) { if(!order) return false; if(order.status === 'new' || order.status === 'preorder') return true; return false; }
+
+function puoAnnullareOrdine(order){if(!order)return false;if(order.status==='new'||order.status==='preorder')return true;return false;}
 async function annullaOrdine(orderId){
 if(!orderId)return;const conferma=await showConfirm("Vuoi davvero annullare questo ordine?");if(!conferma)return;
-try{const snapshot=await db.ref('ordini').orderByChild('orderId').equalTo(orderId).once('value');let key=null;snapshot.forEach(child=>{key=child.key;});if(key){await db.ref('ordini/'+key).update({status:'annullato',motivoAnnullamento:'Annullato dal cliente',annullatoIl:Date.now()});let localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders=localOrders.map(o=>o.orderId===orderId?{...o,status:'annullato'}:o);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));showToast('✅ Ordine annullato!');renderMyOrders();}else{showToast('❌ Ordine non trovato sul server');}}catch(e){console.error(e);showToast('❌ Errore annullamento');}
+try{
+const snapshot=await db.ref('ordini').orderByChild('orderId').equalTo(orderId).once('value');let key=null;snapshot.forEach(child=>{key=child.key;});
+if(key){
+await db.ref('ordini/'+key).update({status:'annullato',motivoAnnullamento:'Annullato dal cliente',annullatoIl:Date.now()});
+let localOrders=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');localOrders=localOrders.map(o=>o.orderId===orderId?{...o,status:'annullato'}:o);
+localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(localOrders));showToast('✅ Ordine annullato!');renderMyOrders();
+}else{showToast('❌ Ordine non trovato sul server');}
+}catch(e){console.error(e);showToast('❌ Errore annullamento');}
 }
 
 function renderMyOrders(){
@@ -1836,160 +1281,107 @@ const l=document.getElementById('myOrdersList');if(!l)return;
 try{
 let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');
 if(!o.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_orders')}</div>`;return;}
-o.sort((a,b) => b.date - a.date);
+o.sort((a,b)=>b.date-a.date);
 const hasActive=o.some(x=>x.status!=='delivered'&&x.status!=='rifiutato'&&x.status!=='picked'&&x.status!=='annullato');updateNavLiveDot(hasActive);
 l.innerHTML=o.map(x=>{
 const ds=new Date(x.date).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});const s=x.status||'new';const ot=x.type||'delivery';const tl=ot==='pickup'?'📦 Ritiro':'🛵 Consegna';
 const bc=s==='rifiutato'?'#ef4444':s==='annullato'?'#f87171':s==='preorder'?'var(--gold)':'var(--gold-dark)';
-const preOrderBadge = x.isPreOrder ? `<span style="color:var(--gold);font-size:0.65rem;font-weight:700;background:rgba(212,168,75,0.2);padding:2px 8px;border-radius:10px;margin-left:5px;">📅 PRE-ORDINE</span>` : '';
+const preOrderBadge=x.isPreOrder?`<span style="color:var(--gold);font-size:0.65rem;font-weight:700;background:rgba(212,168,75,0.2);padding:2px 8px;border-radius:10px;margin-left:5px;">📅 PRE-ORDINE</span>`:'';
 const tr=renderOrderTracker(s,x.motivoRifiuto||x.motivoAnnullamento,ot,x.delayMinutes);
 const puoAnnullare=puoAnnullareOrdine(x);
 const annullamentoInfo=!puoAnnullare&&s!=='annullato'&&s!=='rifiutato'&&x.status!=='delivered'?`<span style="color:#f59e0b;font-size:0.8rem;font-weight:600;">🚫 Non più annullabile</span>`:'';
-
-const isCompleted = (s === 'delivered' || (ot === 'pickup' && s === 'picked'));
-const reviewBtnHtml = isCompleted && !x.reviewed ? `<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>` : '';
-
+const isCompleted=(s==='delivered'||(ot==='pickup'&&s==='picked'));
+const reviewBtnHtml=isCompleted&&!x.reviewed?`<button class="btn-review-order" onclick="openReviewForOrder('${x.orderId}')">⭐ Recensisci</button>`:'';
 return`<div class="my-order-card" style="border-left-color:${bc}"><div class="my-order-header"><span class="my-order-id">📦 ${x.orderId} ${preOrderBadge}</span><span class="my-order-date">${ds} • ${tl}</span></div><div class="my-order-items">${x.items}</div><div class="my-order-total">€${x.total.toFixed(2)}</div>${tr}<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${puoAnnullare?`<button class="btn-cancel-order" onclick="annullaOrdine('${x.orderId}')">🗑️ Annulla Ordine</button>`:''}${annullamentoInfo}${s==='annullato'?`<span style="color:#f87171;font-weight:bold;">🗑️ ORDINE ANNULLATO</span>`:''}${reviewBtnHtml}${x.reviewed?`<span class="btn-reviewed">✅ Già recensito</span>`:''}</div></div>`
 }).join('')
 }catch(e){l.innerHTML='<p style="color:red">Errore caricamento ordini</p>'}
 }
+
 function openReviewForOrder(oid){pendingReviewOrderId=oid;document.getElementById('reviewOrderId').value=oid;openReviewModal()}
 function showReviewsPublic(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('myOrdersView').style.display='none';document.getElementById('reviewsPublicView').style.display='block';window.scrollTo(0,0)}
-function loadReviewsPublic(){db.ref('recensioni').orderByChild('status').equalTo('approved').limitToLast(10).once('value',s=>{const rv=[];let totalApproved=0;db.ref('recensioni').orderByChild('status').equalTo('approved').once('value',countSnap=>{totalApproved=countSnap.numChildren()||0;s.forEach(c=>{const r=c.val();rv.push({id:c.key,...r});});rv.sort((a,b)=>b.timestamp-a.timestamp);const l=document.getElementById('reviewsPublicList');if(!l)return;if(!rv.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}const maxToShow=5,recensioniDaMostrare=rv.slice(0,maxToShow),rimanenti=totalApproved-maxToShow;let html=`<div style="text-align:center;margin-bottom:20px;padding:15px;background:rgba(212,168,75,0.1);border-radius:12px;border:1px solid rgba(212,168,75,0.3);"><div style="color:var(--gold);font-size:1.8rem;font-weight:700;">⭐ ${totalApproved}</div><div style="color:var(--cream);font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Recensioni totali</div></div>`;html+=recensioniDaMostrare.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`}).join('');if(rimanenti>0){html+=`<div style="text-align:center;color:#8a7a5a;padding:20px;font-size:0.9rem;font-weight:600;"><i class="fas fa-chevron-down"></i> ...e altre ${rimanenti} recensioni</div>`;}l.innerHTML=html;});})}
-
-function loadReviewsHome(){
-  db.ref('recensioni').on('value', snap => {
-    const rv = [];
-    snap.forEach(child => {
-      const r = child.val();
-      const status = String(r.status || '').trim().toLowerCase();
-      if (status === 'approved') {
-        rv.push({ ...r, _key: child.key });
-      }
-    });
-    rv.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    const limited = rv.slice(0, 10);
-    const l = document.getElementById('reviewsHomeList');
-    if (!l) return;
-    if (!limited.length) {
-      l.innerHTML = `<div style="color:#8a7a5a; font-size:0.85rem; padding:10px;">Nessuna recensione ancora. Sii il primo! 🌟</div>`;
-      return;
-    }
-    l.innerHTML = limited.map(r => {
-      const ds = new Date(r.timestamp).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
-      return `<div class="review-card-home">
-        <div class="review-header-home">
-          <span class="review-name-home">👤 ${r.name || 'Anonimo'}</span>
-          <span class="review-stars-home">${'⭐'.repeat(r.stars || 0)}</span>
-        </div>
-        <div class="review-text-home">"${r.text || ''}"</div>
-        <div class="review-date-home">${ds}</div>
-      </div>`;
-    }).join('');
-  });
+function loadReviewsPublic(){
+db.ref('recensioni').orderByChild('status').equalTo('approved').limitToLast(10).once('value',s=>{
+const rv=[];let totalApproved=0;
+db.ref('recensioni').orderByChild('status').equalTo('approved').once('value',countSnap=>{
+totalApproved=countSnap.numChildren()||0;s.forEach(c=>{const r=c.val();rv.push({id:c.key,...r});});rv.sort((a,b)=>b.timestamp-a.timestamp);
+const l=document.getElementById('reviewsPublicList');if(!l)return;if(!rv.length){l.innerHTML=`<div style="text-align:center;color:#8a7a5a;padding:30px;">${t('no_reviews')}</div>`;return;}
+const maxToShow=5,recensioniDaMostrare=rv.slice(0,maxToShow),rimanenti=totalApproved-maxToShow;
+let html=`<div style="text-align:center;margin-bottom:20px;padding:15px;background:rgba(212,168,75,0.1);border-radius:12px;border:1px solid rgba(212,168,75,0.3);"><div style="color:var(--gold);font-size:1.8rem;font-weight:700;">⭐ ${totalApproved}</div><div style="color:var(--cream);font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Recensioni totali</div></div>`;
+html+=recensioniDaMostrare.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});return`<div class="review-public-card"><div class="review-public-header"><span class="review-public-name">👤 ${r.name}</span><span class="review-public-date">${ds}</span></div><div class="review-public-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><div class="review-public-text">${r.text}</div></div>`}).join('');
+if(rimanenti>0){html+=`<div style="text-align:center;color:#8a7a5a;padding:20px;font-size:0.9rem;font-weight:600;"><i class="fas fa-chevron-down"></i> ...e altre ${rimanenti} recensioni</div>`;}
+l.innerHTML=html;
+});
+});
 }
 
-function controllaRifiutiCliente(){try{const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).once('value').then(s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})}).catch(e=>{});}catch(e){}}
+function loadReviewsHome(){
+db.ref('recensioni').on('value',snap=>{
+const rv=[];snap.forEach(child=>{const r=child.val();const status=String(r.status||'').trim().toLowerCase();if(status==='approved'){rv.push({...r,_key:child.key});}});
+rv.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));const limited=rv.slice(0,10);const l=document.getElementById('reviewsHomeList');if(!l)return;
+if(!limited.length){l.innerHTML=`<div style="color:#8a7a5a;font-size:0.85rem;padding:10px;">Nessuna recensione ancora. Sii il primo! 🌟</div>`;return;}
+l.innerHTML=limited.map(r=>{const ds=new Date(r.timestamp).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});return`<div class="review-card-home"><div class="review-header-home"><span class="review-name-home">👤 ${r.name||'Anonimo'}</span><span class="review-stars-home">${'⭐'.repeat(r.stars||0)}</span></div><div class="review-text-home">"${r.text||''}"</div><div class="review-date-home">${ds}</div></div>`;}).join('');
+});
+}
+
+function controllaRifiutiCliente(){
+try{
+const ol=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');if(!ol.length)return;const u=ol[0];if(Date.now()-u.date>24*3600*1000)return;
+db.ref('ordini').orderByChild('orderId').equalTo(u.orderId).once('value').then(s=>{s.forEach(c=>{const d=c.val();if(d&&(d.status==='rifiutato'||d.status==='annullato')){const gc=localStorage.getItem('modalRifiutoMostrato_'+u.orderId);if(!gc){if(d.status==='rifiutato')mostraModalRifiuto(d.motivoRifiuto||t('order_rejected_default'));localStorage.setItem('modalRifiutoMostrato_'+u.orderId,'mostrato')}}})}).catch(e=>{});
+}catch(e){}
+}
 function playNotificationSound(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.setValueAtTime(880,c.currentTime);o.frequency.setValueAtTime(1100,c.currentTime+.1);o.frequency.setValueAtTime(880,c.currentTime+.2);g.gain.setValueAtTime(.3,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.4);o.start(c.currentTime);o.stop(c.currentTime+.4)}catch(e){}}
 function acceptCookies(){localStorage.setItem('cookies_accepted','true');document.getElementById('cookieBanner').style.display='none'}
 function openPrivacyModal(){document.getElementById('privacyModal').classList.add('active')}
 function closePrivacyModal(){document.getElementById('privacyModal').classList.remove('active')}
 
 function sanitizeWA(txt){
-  if (txt === null || txt === undefined) return '';
-  return String(txt)
-    .replace(/[<>]/g, '')
-    .replace(/[*_~`]/g, '\\$&');
+if(txt===null||txt===undefined)return'';
+return String(txt).replace(/[<>]/g,'').replace(/[*_~`]/g,'\\$&');
 }
 
-function callPhone() {
-  const tel = (appData.settings.visiblePhone || "0884660377").replace(/\s/g, '');
-  window.open("tel:" + tel, "_self");
+function callPhone(){const tel=(appData.settings.visiblePhone||"0884660377").replace(/\s/g,'');window.open("tel:"+tel,"_self");}
+function openMaps(){
+const address="Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";const mapsUrl="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(address);
+const tempLink=document.createElement('a');tempLink.href=mapsUrl;tempLink.target='_blank';tempLink.rel='noopener noreferrer';document.body.appendChild(tempLink);tempLink.click();document.body.removeChild(tempLink);
 }
 
-function openMaps() {
-  const address = "Antica Pizzeria Grasso, Via Antiche Mura 8/A, Manfredonia, FG";
-  const mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(address);
-  const tempLink = document.createElement('a');
-  tempLink.href = mapsUrl;
-  tempLink.target = '_blank';
-  tempLink.rel = 'noopener noreferrer';
-  document.body.appendChild(tempLink);
-  tempLink.click();
-  document.body.removeChild(tempLink);
+function fixWhitePage(){
+const frame=document.querySelector('.phone-frame');const main=document.getElementById('mainApp');const app=document.getElementById('welcomeScreen');
+document.documentElement.style.height='-webkit-fill-available';document.body.style.height='-webkit-fill-available';document.body.style.background='#1a1209';
+if(frame){frame.style.display='block';frame.style.height='-webkit-fill-available';void frame.offsetWidth;}
+if(main)main.style.display='block';if(app&&app.style.display!=='none')app.style.display='flex';
+window.scrollTo(0,0);
 }
-
-function fixWhitePage() {
-  const frame = document.querySelector('.phone-frame');
-  const main = document.getElementById('mainApp');
-  const app = document.getElementById('welcomeScreen');
-
-  document.documentElement.style.height = '-webkit-fill-available';
-  document.body.style.height = '-webkit-fill-available';
-  document.body.style.background = '#1a1209';
-
-  if (frame) {
-    frame.style.display = 'block';
-    frame.style.height = '-webkit-fill-available';
-    void frame.offsetWidth;
-  }
-  if (main) main.style.display = 'block';
-  if (app && app.style.display !== 'none') app.style.display = 'flex';
-
-  window.scrollTo(0, 0);
-}
-
-['visibilitychange', 'pageshow', 'focus'].forEach(evt => {
-  window.addEventListener(evt, () => {
-    if (!document.hidden) {
-      fixWhitePage();
-      setTimeout(fixWhitePage, 50);
-      setTimeout(fixWhitePage, 250);
-    }
-  });
-});
+['visibilitychange','pageshow','focus'].forEach(evt=>{window.addEventListener(evt,()=>{if(!document.hidden){fixWhitePage();setTimeout(fixWhitePage,50);setTimeout(fixWhitePage,250);}});});
 
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function mostraModalRifiuto(m){const md=document.getElementById('modalRifiutoOrdine'),el=document.getElementById('motivoRifiutoModal');if(el)el.textContent=m||t('order_rejected_default');if(md){md.style.display='flex';playNotificationSound();if(navigator.vibrate)navigator.vibrate([500,200,500])}}
 function chiudiModalRifiuto(){const m=document.getElementById('modalRifiutoOrdine');if(m)m.style.display='none'}
 function chiudiBannerRifiuto(){document.getElementById('bannerRifiuto').style.display='none'}
-function updateDeliveryPickupUI() {
-const isDeliveryEnabled = appData.settings.deliveryEnabled !== false; const isPickupEnabled = appData.settings.pickupEnabled !== false;
-if (document.getElementById('cartModal').classList.contains('active')) {
-const delBtn = document.getElementById('typeDelivery'); const pickBtn = document.getElementById('typePickup');
-delBtn.classList.toggle('disabled', !isDeliveryEnabled); pickBtn.classList.toggle('disabled', !isPickupEnabled);
-if (orderType === 'delivery' && !isDeliveryEnabled && isPickupEnabled) { selectOrderType('pickup'); }
-else if (orderType === 'pickup' && !isPickupEnabled && isDeliveryEnabled) { selectOrderType('delivery'); }
-else if (!isDeliveryEnabled && !isPickupEnabled) { document.getElementById('checkoutBtn').disabled = true; document.getElementById('checkoutBtn').innerHTML = '🚫 Servizio non disponibile'; }
-else { document.getElementById('checkoutBtn').disabled = false; document.getElementById('checkoutBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + t('send_order'); }
+
+function updateDeliveryPickupUI(){
+const isDeliveryEnabled=appData.settings.deliveryEnabled!==false;const isPickupEnabled=appData.settings.pickupEnabled!==false;
+if(document.getElementById('cartModal').classList.contains('active')){
+const delBtn=document.getElementById('typeDelivery');const pickBtn=document.getElementById('typePickup');
+delBtn.classList.toggle('disabled',!isDeliveryEnabled);pickBtn.classList.toggle('disabled',!isPickupEnabled);
+if(orderType==='delivery'&&!isDeliveryEnabled&&isPickupEnabled){selectOrderType('pickup');}
+else if(orderType==='pickup'&&!isPickupEnabled&&isDeliveryEnabled){selectOrderType('delivery');}
+else if(!isDeliveryEnabled&&!isPickupEnabled){document.getElementById('checkoutBtn').disabled=true;document.getElementById('checkoutBtn').innerHTML='🚫 Servizio non disponibile';}
+else{document.getElementById('checkoutBtn').disabled=false;document.getElementById('checkoutBtn').innerHTML='<i class="fas fa-paper-plane"></i> '+t('send_order');}
 }
 }
 
-function updateFooter() { const footerInfo = document.getElementById('footerInfo'); if (footerInfo) { const city = appData.branding?.city || "Manfredonia"; const phone = appData.settings?.visiblePhone || "0884660377"; footerInfo.innerHTML = `${city} • Tel. <span id="footerPhone">${phone}</span>`; } }
+function updateFooter(){const footerInfo=document.getElementById('footerInfo');if(footerInfo){const city=appData.branding?.city||"Manfredonia";const phone=appData.settings?.visiblePhone||"0884660377";footerInfo.innerHTML=`${city} • Tel. <span id="footerPhone">${phone}</span>`;}}
 function applyBranding(){const n=appData.branding.name||"Antica Pizzeria Grasso";}
 
 function renderPromotionsBanner(){
-  const container = document.getElementById('promoCardContainer');
-  if (!container) return;
-  const a = getActivePromotion();
-  if (a) {
-    const tp = (a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);
-    const rm = (a.maxUses||0)-(a.currentUses||0);
-    container.innerHTML = `
-      <div class="promo-home-card" onclick="addPromoToCart('${a.id}')">
-        <div class="promo-home-card-info">
-          <div class="promo-home-card-title">🎁 ${a.title}</div>
-          <div class="promo-home-card-desc">${a.message || 'Offerta speciale!'} - Rimasti: ${rm}</div>
-          <div class="promo-home-card-price">€${tp.toFixed(2)}</div>
-        </div>
-        <button class="promo-home-card-btn">AGGIUNGI +</button>
-      </div>
-    `;
-    container.classList.add('active');
-  } else {
-    container.innerHTML = '';
-    container.classList.remove('active');
-  }
+const container=document.getElementById('promoCardContainer');if(!container)return;
+const a=getActivePromotion();
+if(a){
+const tp=(a.products||[]).reduce((s,p)=>s+(p.price*p.qty),0);const rm=(a.maxUses||0)-(a.currentUses||0);
+container.innerHTML=`<div class="promo-home-card" onclick="addPromoToCart('${a.id}')"><div class="promo-home-card-info"><div class="promo-home-card-title">🎁 ${a.title}</div><div class="promo-home-card-desc">${a.message||'Offerta speciale!'} - Rimasti: ${rm}</div><div class="promo-home-card-price">€${tp.toFixed(2)}</div></div><button class="promo-home-card-btn">AGGIUNGI +</button></div>`;
+container.classList.add('active');
+}else{container.innerHTML='';container.classList.remove('active');}
 }
 
 function getActivePromotion(){const td=new Date().toISOString().split('T')[0];const ps=Object.entries(appData.promotions||{}).filter(([i,p])=>p.active&&p.startDate<=td&&p.endDate>=td&&(p.currentUses||0)<p.maxUses&&p.products&&p.products.length>0);return ps.length?{id:ps[0][0],...ps[0][1]}:null}
@@ -1997,143 +1389,84 @@ function getCategoryDisplayName(k){return(appData.categories[k]&&appData.categor
 function showCategories(){renderCategories();document.getElementById('categoriesSkeletons').style.display='none';document.getElementById('categoriesList').style.display='grid'}
 
 function renderCategories(){
-    const l = document.getElementById('categoriesList');
-    if (!l) return;
-    
-    let catsArray = Object.keys(appData.categories || {}).map(key => ({
-        key: key,
-        ...appData.categories[key]
-    }));
-
-    catsArray.sort((a, b) => (a.order || 0) - (b.order || 0));
-
-    l.innerHTML = catsArray.map(catItem => {
-        const c = catItem.key;
-        const i = appData.categories[c];
-        const p = appData.menu[c] || [];
-        const s = (appData.images.categories && appData.images.categories[c]) || '';
-        
-        return `
-            <div class="menu-btn-3d" onclick="showCategory('${c}')">
-                <div class="category-img-container">
-                    <img class="category-img" src="${s}" alt="${i.name}" onerror="this.style.display='none';">
-                    <div class="category-img-overlay"></div>
-                </div>
-                <div class="menu-btn-content">
-                    <div class="btn-content">
-                        <h3>${i.name}</h3>
-                        <p>${p.length} prodotti</p>
-                    </div>
-                </div>
-            </div>`;
-    }).join('');
+const l=document.getElementById('categoriesList');if(!l)return;
+let catsArray=Object.keys(appData.categories||{}).map(key=>({key:key,...appData.categories[key]}));
+catsArray.sort((a,b)=>(a.order||0)-(b.order||0));
+l.innerHTML=catsArray.map(catItem=>{
+const c=catItem.key,i=appData.categories[c],p=appData.menu[c]||[],s=(appData.images.categories&&appData.images.categories[c])||'';
+return`<div class="menu-btn-3d" onclick="showCategory('${c}')"><div class="category-img-container"><img class="category-img" src="${s}" alt="${i.name}" onerror="this.style.display='none';"><div class="category-img-overlay"></div></div><div class="menu-btn-content"><div class="btn-content"><h3>${i.name}</h3><p>${p.length} prodotti</p></div></div></div>`;
+}).join('');
 }
 
 function showCategory(c){if(!c||!appData.menu||!appData.menu[c]){showToast(t('not_available'));return}currentSearchCat=c;document.getElementById('productSearch').value='';document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent=getCategoryDisplayName(c);renderProductList(c);window.scrollTo(0,0)}
+
 function renderProductList(cat,ft){
 if(!cat||!appData.menu||!appData.menu[cat])return;
 const term=(ft||'').toLowerCase();const list=document.getElementById('productList');if(!list)return;
-const filtered=appData.menu[cat].filter(p => p.name.toLowerCase().includes(term) || (p.desc && p.desc.toLowerCase().includes(term)));
+const filtered=appData.menu[cat].filter(p=>p.name.toLowerCase().includes(term)||(p.desc&&p.desc.toLowerCase().includes(term)));
 if(!filtered.length){list.innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px;">${t('no_products')}</p>`;return;}
 list.innerHTML=filtered.map((p,idx)=>{
-const originalIdx=appData.menu[cat].indexOf(p);const isDisabled = p.disabled === true;const qty = isDisabled ? 0 : getCartQty(cat,p.name);
+const originalIdx=appData.menu[cat].indexOf(p);const isDisabled=p.disabled===true;const qty=isDisabled?0:getCartQty(cat,p.name);
 let displayName=p.name,displayDesc=p.desc||'';
 if(currentLang==='en'){displayName=p.translations?.en?.name||p.name_en||p.name;displayDesc=p.translations?.en?.desc||p.desc_en||p.desc||''}
 else if(currentLang==='de'){displayName=p.translations?.de?.name||p.name_de||p.name;displayDesc=p.translations?.de?.desc||p.desc_de||p.desc||''}
 const img=p.img?`<img src="${p.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'';
-const soldOutBadge = isDisabled ? `<span class="product-availability-badge">${t('sold_out')}</span>` : '';
+const soldOutBadge=isDisabled?`<span class="product-availability-badge">${t('sold_out')}</span>`:'';
 let actions;
-if (isDisabled) { actions = `<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`; }
-else if (qty > 0) { actions = `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+</button></div>`; }
-else { actions = `<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`; }
-const disabledClass = isDisabled ? 'product-disabled' : '';
-return `<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
+if(isDisabled){actions=`<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`;}
+else if(qty>0){actions=`<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${cat}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+</button></div>`;}
+else{actions=`<button type="button" class="add-btn-3d" data-cat="${cat}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;}
+const disabledClass=isDisabled?'product-disabled':'';
+return`<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
 }).join('');
 list.querySelectorAll('.qty-btn,.add-btn-3d:not(.disabled-btn)').forEach(btn=>{btn.onclick=function(e){e.preventDefault();e.stopPropagation();const cat=this.dataset.cat;const idx=parseInt(this.dataset.idx,10);const delta=parseInt(this.dataset.delta,10);if(cat&&!isNaN(idx)&&!isNaN(delta)){changeProductQty(cat,idx,delta);}}});
 }
+
 function filterProducts(term){if(currentSearchCat)renderProductList(currentSearchCat,term||'')}
-function showHome(){
-  document.getElementById('mainMenu').style.display='block';
-  document.getElementById('productsView').style.display='none';
-  document.getElementById('reviewsPublicView').style.display='none';
-  document.getElementById('myOrdersView').style.display='none';
-  currentSearchCat='';
-  const globalInput = document.getElementById('globalSearchInput');
-  if (globalInput) globalInput.value = '';
-}
-function applyImages(){
-  const HERO_FISSA = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop";
-  const heroEl = document.getElementById('heroImg');
-  if(heroEl){
-    if(appData.images && appData.images.hero && appData.images.hero !== ""){
-      heroEl.src = appData.images.hero;
-    } else {
-      heroEl.src = HERO_FISSA;
-    }
-  }
-  renderCategories();
-}setTimeout(updateNavLiveDotOld,500);
+function showHome(){document.getElementById('mainMenu').style.display='block';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='none';currentSearchCat='';const globalInput=document.getElementById('globalSearchInput');if(globalInput)globalInput.value='';}
+function applyImages(){const HERO_FISSA="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop";const heroEl=document.getElementById('heroImg');if(heroEl){if(appData.images&&appData.images.hero&&appData.images.hero!==""){heroEl.src=appData.images.hero;}else{heroEl.src=HERO_FISSA;}}renderCategories();}
+setTimeout(updateNavLiveDotOld,500);
 
 let searchTimeout;
-function debouncedSearchGlobal(term) {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    searchGlobal(term);
-  }, 1000);
-}
+function debouncedSearchGlobal(term){clearTimeout(searchTimeout);searchTimeout=setTimeout(()=>{searchGlobal(term);},1000);}
 
 function searchGlobal(term){
-  const query = (term||'').toLowerCase().trim();
-  if(!query) { showHome(); return; }
-  
-  let sortedCategoryKeys = Object.keys(appData.menu || {});
-  sortedCategoryKeys.sort((a,b) => (appData.categories[a]?.order || 0) - (appData.categories[b]?.order || 0));
-
-  for (const catKey of sortedCategoryKeys) {
-    const products = appData.menu[catKey];
-    const found = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
-    if (found.length > 0) {
-      currentSearchCat = catKey;
-      document.getElementById('mainMenu').style.display='none';
-      document.getElementById('productsView').style.display='block';
-      document.getElementById('categoryTitle').textContent = 'Risultati per: ' + term;
-      document.getElementById('productList').innerHTML = '';
-      let html = '';
-      for (const ck of sortedCategoryKeys) {
-        const prods = appData.menu[ck].filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
-        if (prods.length > 0) {
-          html += `<div style="margin-top:15px; margin-bottom:8px; border-bottom:1px solid rgba(212,168,75,0.3); padding-bottom:4px;"><h4 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1rem;">${getCategoryDisplayName(ck)}</h4></div>`;
-          html += prods.map((p,idx)=>{
-            const originalIdx = appData.menu[ck].indexOf(p);
-            const isDisabled = p.disabled === true;
-            const qty = isDisabled ? 0 : getCartQty(ck, p.name);
-            let displayName = p.name, displayDesc = p.desc || '';
-            if(currentLang==='en'){displayName=p.translations?.en?.name||p.name_en||p.name;displayDesc=p.translations?.en?.desc||p.desc_en||p.desc||''}
-            else if(currentLang==='de'){displayName=p.translations?.de?.name||p.name_de||p.name;displayDesc=p.translations?.de?.desc||p.desc_de||p.desc||''}
-            const img = p.img ? `<img src="${p.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">` : '';
-            const soldOutBadge = isDisabled ? `<span class="product-availability-badge">${t('sold_out')}</span>` : '';
-            let actions;
-            if (isDisabled) { actions = `<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`; }
-            else if (qty > 0) { actions = `<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+</button></div>`; }
-            else { actions = `<button type="button" class="add-btn-3d" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`; }
-            const disabledClass = isDisabled ? 'product-disabled' : '';
-            return `<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
-          }).join('');
-        }
-      }
-      if (html === '') {
-        html = `<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>`;
-      }
-      document.getElementById('productList').innerHTML = html;
-      document.getElementById('productList').querySelectorAll('.qty-btn,.add-btn-3d:not(.disabled-btn)').forEach(btn=>{btn.onclick=function(e){e.preventDefault();e.stopPropagation();const cat=this.dataset.cat;const idx=parseInt(this.dataset.idx,10);const delta=parseInt(this.dataset.delta,10);if(cat&&!isNaN(idx)&&!isNaN(delta)){changeProductQty(cat,idx,delta);}}});
-      window.scrollTo(0,0);
-      return;
-    }
-  }
-  document.getElementById('mainMenu').style.display='none';
-  document.getElementById('productsView').style.display='block';
-  document.getElementById('categoryTitle').textContent = 'Risultati per: ' + term;
-  document.getElementById('productList').innerHTML = `<p style="text-align:center;color:#8a7a5a;padding:20px;">Nessun prodotto trovato 🍕</p>`;
+const query=(term||'').toLowerCase().trim();if(!query){showHome();return;}
+let sortedCategoryKeys=Object.keys(appData.menu||{});
+sortedCategoryKeys.sort((a,b)=>(appData.categories[a]?.order||0)-(appData.categories[b]?.order||0));
+for(const catKey of sortedCategoryKeys){
+const products=appData.menu[catKey];
+const found=products.filter(p=>p.name.toLowerCase().includes(query)||(p.desc&&p.desc.toLowerCase().includes(query)));
+if(found.length>0){
+currentSearchCat=catKey;document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent='Risultati per: '+term;document.getElementById('productList').innerHTML='';
+let html='';
+for(const ck of sortedCategoryKeys){
+const prods=appData.menu[ck].filter(p=>p.name.toLowerCase().includes(query)||(p.desc&&p.desc.toLowerCase().includes(query)));
+if(prods.length>0){
+html+=`<div style="margin-top:15px;margin-bottom:8px;border-bottom:1px solid rgba(212,168,75,0.3);padding-bottom:4px;"><h4 style="color:var(--gold);font-family:'Playfair Display',serif;font-size:1rem;">${getCategoryDisplayName(ck)}</h4></div>`;
+html+=prods.map((p,idx)=>{
+const originalIdx=appData.menu[ck].indexOf(p);const isDisabled=p.disabled===true;const qty=isDisabled?0:getCartQty(ck,p.name);
+let displayName=p.name,displayDesc=p.desc||'';
+if(currentLang==='en'){displayName=p.translations?.en?.name||p.name_en||p.name;displayDesc=p.translations?.en?.desc||p.desc_en||p.desc||''}
+else if(currentLang==='de'){displayName=p.translations?.de?.name||p.name_de||p.name;displayDesc=p.translations?.de?.desc||p.desc_de||p.desc||''}
+const img=p.img?`<img src="${p.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'';
+const soldOutBadge=isDisabled?`<span class="product-availability-badge">${t('sold_out')}</span>`:'';
+let actions;
+if(isDisabled){actions=`<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`;}
+else if(qty>0){actions=`<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+</button></div>`;}
+else{actions=`<button type="button" class="add-btn-3d" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;}
+const disabledClass=isDisabled?'product-disabled':'';
+return`<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
+}).join('');
+}
+}
+document.getElementById('productList').innerHTML=html;
+document.getElementById('productList').querySelectorAll('.qty-btn,.add-btn-3d:not(.disabled-btn)').forEach(btn=>{btn.onclick=function(e){e.preventDefault();e.stopPropagation();const cat=this.dataset.cat;const idx=parseInt(this.dataset.idx,10);const delta=parseInt(this.dataset.delta,10);if(cat&&!isNaN(idx)&&!isNaN(delta)){changeProductQty(cat,idx,delta);}}});
+window.scrollTo(0,0);return;
+}
+}
+document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='block';document.getElementById('categoryTitle').textContent='Risultati per: '+term;
+document.getElementById('productList').innerHTML=`<p style="text-align:center;color:#8a7a5a;padding:20px;">${t('no_products')}</p>`;
 }
 </script>
 </body>
