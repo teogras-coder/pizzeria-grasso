@@ -1,38 +1,39 @@
 // =====================================================
 // 🍕 SERVICE WORKER - Antica Pizzeria Grasso
-// Versione: 5.0 (2026-10-16) - CACHE + NOTIFICHE ADMIN
+// Versione: 5.0 - CACHE + NOTIFICHE ADMIN
 // =====================================================
 
-// 🔥 REGOLA: Cambia questi numeri (es. v13, v14) ogni volta che aggiorni l'app!
-const STATIC_CACHE = 'pizzeria-grasso-static-v24';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v24';
+// 🔥 Cambia questa versione ogni volta che fai aggiornamenti grafici o di codice
+const STATIC_CACHE = 'pizzeria-grasso-static-v25';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v25';
 
-// Risorse statiche da cacheare all'installazione
+// Risorse statiche salvate al primo avvio
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest-clienti.json',
   '/icon-clienti-192.png',
-  '/icon-clienti-512.png'
+  '/icon-clienti-512.png',
+  '/icon-admin-192.png'
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📥 INSTALL: Cachea risorse statiche
+// 📥 INSTALL: Scarica e memorizza le risorse statiche
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => {
-        console.log('[SW] Cache statiche inizializzata');
+        console.log('[SW] Inizializzazione cache statica...');
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => self.skipWaiting())
-      .catch(err => console.error('[SW] Errore install:', err))
+      .catch(err => console.error('[SW] Errore durante l\'installazione:', err))
   );
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔄 ACTIVATE: Pulisce vecchie cache
+// 🔄 ACTIVATE: Rimuove le vecchie versioni della cache
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -41,13 +42,13 @@ self.addEventListener('activate', event => {
         keys
           .filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE)
           .map(key => {
-            console.log('[SW] Elimino vecchia cache:', key);
+            console.log('[SW] Rimozione vecchia cache:', key);
             return caches.delete(key);
           })
       );
     })
     .then(() => {
-      console.log('[SW] Claim clients...');
+      console.log('[SW] Controllo client acquisito');
       return self.clients.claim();
     })
     .then(() => {
@@ -64,7 +65,7 @@ self.addEventListener('activate', event => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🌐 FETCH: Strategia ibrida
+// 🌐 FETCH: Strategia di rete ibrida
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('fetch', event => {
   const { request } = event;
@@ -78,7 +79,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ─── ESCLUSIONI: NON cachare mai ───
+  // ─── ESCLUSIONI: Bypass totale per chiamate Realtime / Auth / API ───
   if (url.hostname.includes('firebase') || 
       url.hostname.includes('firebaseio') ||
       url.hostname.includes('firebasedatabase.app')) {
@@ -97,7 +98,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ─── Cache First per risorse statiche ───
+  // ─── Cache First per file statici (immagini, font, CSS, JS) ───
   if (/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(request)
@@ -113,19 +114,17 @@ self.addEventListener('fetch', event => {
               const responseToCache = response.clone();
               caches.open(DYNAMIC_CACHE)
                 .then(cache => cache.put(request, responseToCache))
-                .catch(err => console.warn('[SW] Errore cache statica:', err));
+                .catch(err => console.warn('[SW] Errore salvataggio risorsa:', err));
               
               return response;
             })
-            .catch(() => {
-              return new Response('', { status: 404, statusText: 'Offline' });
-            });
+            .catch(() => new Response('', { status: 404, statusText: 'Offline' }));
         })
     );
     return;
   }
 
-  // ─── Network First per HTML ───
+  // ─── Network First per file HTML ───
   event.respondWith(
     fetch(request)
       .then(response => {
@@ -134,7 +133,7 @@ self.addEventListener('fetch', event => {
           const responseToCache = response.clone();
           caches.open(DYNAMIC_CACHE)
             .then(cache => cache.put(request, responseToCache))
-            .catch(err => console.warn('[SW] Errore cache dinamica:', err));
+            .catch(err => console.warn('[SW] Errore cache dinamica HTML:', err));
         }
         return response;
       })
@@ -145,6 +144,9 @@ self.addEventListener('fetch', event => {
             
             const accept = request.headers.get('accept') || '';
             if (accept.includes('text/html')) {
+              if (url.pathname.includes('admin')) {
+                return caches.match('/admin.html');
+              }
               return caches.match('/index.html');
             }
           });
@@ -153,13 +155,12 @@ self.addEventListener('fetch', event => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📢 MESSAGE: Aggiornamento + Notifiche Admin
+// 📢 MESSAGE: Ricezione comandi e notifiche Admin
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('message', event => {
   const data = event.data || {};
 
   if (data.type === 'SKIP_WAITING') {
-    console.log('[SW] SKIP_WAITING ricevuto, aggiorno subito');
     self.skipWaiting();
   }
   
@@ -167,9 +168,8 @@ self.addEventListener('message', event => {
     caches.delete(STATIC_CACHE).then(() => caches.delete(DYNAMIC_CACHE));
   }
 
-  // 🔔 NOTIFICHE ADMIN (tendina + telefono bloccato)
+  // Notifiche sistema per Admin (a schermo spento / tendina)
   if (data.type === 'SHOW_NOTIFICATION') {
-    console.log('[SW] 🔔 Notifica admin:', data.title);
     event.waitUntil(
       self.registration.showNotification(
         data.title || '🍕 Nuovo ordine!',
@@ -189,7 +189,7 @@ self.addEventListener('message', event => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 👆 NOTIFICATION CLICK: Apre/focalizza l'admin
+// 👆 NOTIFICATION CLICK: Focalizza o apre l'app Admin
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 self.addEventListener('notificationclick', event => {
   event.notification.close();
