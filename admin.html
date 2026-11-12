@@ -122,7 +122,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
-.form-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 0.95ns; }
+.form-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--gold-dark); background: var(--card); color: var(--gold); font-size: 0.95rem; }
 .form-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 15px rgba(212,168,75,0.3); }
 textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: var(--card); border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(212,168,75,0.15); }
@@ -1022,11 +1022,16 @@ function calcolaCostoConsegna(order) {
         const extraFee = parseFloat(settings.deliveryExtraFee) || 2.00;
         const maxRadius = parseFloat(settings.deliveryMaxRadius) || 4;
         const extraRadius = parseFloat(settings.deliveryExtraRadius) || 6;
-        if (!order.coords || !order.coords.lat || !order.coords.lng) return baseFee;
+        
+        const lat = order.customerLat || (order.coords && order.coords.lat);
+        const lng = order.customerLng || (order.coords && order.coords.lng);
+
+        if (!lat || !lng) return baseFee;
         const pizzeriaLat = parseFloat(settings.pizzeriaLat) || 0;
         const pizzeriaLng = parseFloat(settings.pizzeriaLng) || 0;
         if (pizzeriaLat === 0 || pizzeriaLng === 0) return baseFee;
-        const dist = calcolaDistanza(pizzeriaLat, pizzeriaLng, order.coords.lat, order.coords.lng);
+        
+        const dist = calcolaDistanza(pizzeriaLat, pizzeriaLng, lat, lng);
         if (dist <= maxRadius) return baseFee;
         if (dist <= extraRadius) return baseFee + extraFee;
         return 0;
@@ -1618,7 +1623,7 @@ h += '</div></div>';
 c.innerHTML = (h || '<p style="color:#8a7a5a;text-align:center;padding:30px;">Nessun prodotto</p>') + '<div style="height:200px;"></div>';
 }
 function toggleProductAvailability(c,i,el) { const ns = !(appData.menu[c][i].disabled===true); appData.menu[c][i].disabled=ns; if(ns){el.classList.remove('on');el.classList.add('closed');}else{el.classList.remove('closed');el.classList.add('on');} db.ref(`menu/${c}/${i}/disabled`).set(ns); showToast(ns?'🚫 ESAURITO':'✅ DISPONIBILE'); notifyClients(); }
-function toggleCategoryAccordion(c) { const el = document.getElementById('accordion-'+c); if(!el) return; document.querySelectorAll('.admin-category-accordion').forEach(a => { if(a.id!=='accordion-'+c){a.classList.remove('open');openCategories.delete(a.id.replace('accordion-','',''));} }); el.classList.toggle('open'); if(el.classList.contains('open')) openCategories.add(c); else openCategories.delete(c); }
+function toggleCategoryAccordion(c) { const el = document.getElementById('accordion-'+c); if(!el) return; document.querySelectorAll('.admin-category-accordion').forEach(a => { if(a.id!=='accordion-'+c){a.classList.remove('open');openCategories.delete(a.id.replace('accordion-',''));} }); el.classList.toggle('open'); if(el.classList.contains('open')) openCategories.add(c); else openCategories.delete(c); }
 async function addProduct(c) {
 const n = await showPrompt('Nuovo Prodotto', 'Nome (🇮🇹):', 'Es: Margherita'); if(!n||!n.trim()) return;
 const ps = await showPrompt('Prezzo', 'Prezzo (€):', 'Es: 7.00', '5.00'); if(ps===null) return; const p = parseFloat(ps.replace(',','.')); if(isNaN(p)||p<0) return;
@@ -1718,7 +1723,8 @@ function applyCurrentPalette() { applyPalette(appData.settings.colorPalette||'au
 function applyPalette(n) { const c=palettes[n]?.colors; if(!c) return; const r=document.documentElement; r.style.setProperty('--gold',c.gold); r.style.setProperty('--gold-light',c.goldLight); r.style.setProperty('--gold-dark',c.goldDark); r.style.setProperty('--dark',c.dark); r.style.setProperty('--brown',c.brown); r.style.setProperty('--brown-light',c.brownLight); r.style.setProperty('--card',c.card); r.style.setProperty('--card-light',c.cardLight); r.style.setProperty('--cream',c.cream); }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 async function resetOrderCounter() { if(!await showConfirm('⚠️ SEI SICURO?\nContatore azzerato.\nProssimo: ORD-00001.')) return; try { await db.ref('counter/ordini').set(0); showToast('✅ Azzerato! Prossimo: ORD-00001'); notifyClients(); } catch(e) { showToast('❌ '+e.message); } }
-document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.html.trim() === '') window.location.reload(); }, 500); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => { if (!document.body || document.body.innerHTML.trim() === '') window.location.reload(); }, 500); });
 </script>
 </body>
 </html>
+
