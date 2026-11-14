@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -648,6 +646,7 @@ if(festiveParticlesInterval){clearInterval(festiveParticlesInterval);festivePart
 document.querySelectorAll('.festive-particle').forEach(el=>el.remove());
 if(!type||type==='none')return;
 const effects={
+pizza:{symbols:['🍕','🍅','🧀','🫒','🌿','🍄'],speed:500},
 snow:{symbols:['❄️','❅','❆'],speed:400},confetti:{symbols:['🎉','✨','🎊'],speed:600},
 halloween:{symbols:['🎃','👻','🦇','🕷️'],speed:700},easter:{symbols:['🐰','🥚','🐣','🌷'],speed:700},
 christmas:{symbols:['🎄','🎁','⭐','❄️'],speed:600},newyear:{symbols:['🎆','✨','🥂','🎇'],speed:500},
@@ -1101,7 +1100,7 @@ if(timeMode==='scheduled'){
 const dateSelect=document.getElementById('scheduledDateSelect');const timeSelect=document.getElementById('scheduledTimeSelect');
 if(!dateSelect?.value||!timeSelect?.value){showToast(t('select_valid_time'));return;}
 scheduledTime=timeSelect.value;const dayOffset=parseInt(dateSelect.value);
-isPreOrder=dayOffset>0||(dayOffset===0&&scheduledTime);
+isPreOrder=dayOffset>0;
 scheduledDate=dateSelect.options[dateSelect.selectedIndex]?.dataset.date||null;
 }else{
 if(!checkIfOpen()){showToast(t('closed_now'));return;}
@@ -1165,7 +1164,8 @@ closeReviewModal();showToast(t('thanks_review'));
 });
 }
 function showMyOrders(){document.getElementById('mainMenu').style.display='none';document.getElementById('productsView').style.display='none';document.getElementById('reviewsPublicView').style.display='none';document.getElementById('myOrdersView').style.display='block';window.scrollTo(0,0);startOrderStatusTracking();renderMyOrders();updateNavLiveDotOld()}
-function cleanLocalHistory(){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');o=o.filter(x=>(Date.now()-x.date)<30*24*3600*1000);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o))}catch(e){}}
+function cleanLocalHistory(){try{let o=JSON.parse(localStorage.getItem('pizzeria_grasso_orders')||'[]');o=o.filter(x=>(Date.now()-x.date)<30*24*3600*1000);localStorage.setItem('pizzeria_grasso_orders',JSON.stringify(o))}catch(e){}
+}
 
 function saveOrderToLocal(od){
 try{
