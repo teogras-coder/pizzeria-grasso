@@ -133,7 +133,7 @@ html, body { font-family: 'Montserrat', sans-serif; background: var(--dark); col
 .btn-ready { background: #4ade80; color: var(--dark); }
 .btn-rifiuta { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important; color: white !important; }
 .btn-delete { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3) !important; }
-.btn-transform { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 3px 0 var(--gold-dark); }
+.btn-transform { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); box-shadow: 0 3px 0 var(--gold-dark); font-weight: 700; }
 .btn-primary { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--gold-dark); }
 .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-secondary { background: var(--card); color: var(--cream); border: 1px solid var(--gold-dark); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -1296,14 +1296,26 @@ ah = `${btnWhatsApp}<button class="btn-delete" onclick="deleteOrder('${id}')">�
 if (o.motivoRifiuto) motivoMessage = `<div class="order-reject-message"><strong>❌ Motivo:</strong> ${sanitize(o.motivoRifiuto)}</div>`;
 } else {
 const st = o.status || 'new';
-if (st === 'new') ah = `<button class="btn-accept" onclick="accettaOrdine('${id}')">✅ Accetta</button>${btnRistampa}<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'accettato') ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button>${btnRistampa}${btnWhatsApp}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'preparing') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'delayed') ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'ready') ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button>${btnRistampa}${btnWhatsApp}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
-else if (st === 'picked') ah = `${btnRistampa}<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>`;
-else if (st === 'delivering') ah = `${btnRistampa}${btnWhatsApp}<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
-else ah = `${btnRistampa}<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+if (st === 'preorder') {
+ah = `<button class="btn-transform" onclick="trasformaInOrdine('${id}')">📅 Trasforma</button>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">🗑️ Elimina</button>`;
+motivoMessage = `<div class="order-preorder-message"><strong>📅 PRE-ORDINE:</strong> ${o.scheduledDate || '?'} alle ${o.scheduledTime || '?'}</div>`;
+} else if (st === 'new') {
+ah = `<button class="btn-accept" onclick="accettaOrdine('${id}')">✅ Accetta</button>${btnRistampa}<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button><button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+} else if (st === 'accettato') {
+ah = `<button class="btn-preparing" onclick="updateOrderStatus('${id}','preparing')">Prep</button>${btnRistampa}${btnWhatsApp}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+} else if (st === 'preparing') {
+ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-preparing" style="background:#f59e0b;color:white;" onclick="setOrderDelayed('${id}')">Ritardo</button><button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+} else if (st === 'delayed') {
+ah = `<button class="btn-ready" onclick="updateOrderStatus('${id}','ready')">Pronto</button>${btnRistampa}<button class="btn-rifiuta" onclick="rifiutaOrdine('${id}')">Rifiuta</button><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+} else if (st === 'ready') {
+ah = o.type === 'pickup' ? `<button class="btn-ready" style="background:#8b5cf6;color:white;" onclick="updateOrderStatus('${id}','delivered','${o.type}')">Ritirato</button>${btnRistampa}${btnWhatsApp}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>` : `<span style="color:#a08b6d;font-size:0.8rem;">In attesa fattorino...</span>${btnRistampa}<button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+} else if (st === 'picked') {
+ah = `${btnRistampa}<span style="color:#8b5cf6;font-size:0.8rem;">Fattorino ha ritirato</span>`;
+} else if (st === 'delivering') {
+ah = `${btnRistampa}${btnWhatsApp}<span style="color:#ec4899;font-size:0.8rem;">Fattorino in viaggio</span>`;
+} else {
+ah = `${btnRistampa}<span style="color:#4ade80;font-size:0.8rem;">Completato</span><button class="btn-delete" onclick="deleteOrder('${id}')">Elimina</button>`;
+}
 }
 
 return `<div class="order-card ${extraClass}" style="border-left-color:${borderColor};">
