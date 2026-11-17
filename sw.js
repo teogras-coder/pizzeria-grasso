@@ -4,8 +4,8 @@
 // =====================================================
 
 // 🔥 Cambia questa versione ogni volta che fai aggiornamenti grafici o di codice
-const STATIC_CACHE = 'pizzeria-grasso-static-v26';
-const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v26';
+const STATIC_CACHE = 'pizzeria-grasso-static-v27';
+const DYNAMIC_CACHE = 'pizzeria-grasso-dynamic-v27';
 
 // Risorse statiche salvate al primo avvio
 const STATIC_ASSETS = [
