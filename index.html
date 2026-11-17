@@ -1508,9 +1508,13 @@ else if(currentLang==='de'){displayName=p.translations?.de?.name||p.name_de||p.n
 const img=p.img?`<img src="${p.img}" class="product-img-square" alt="${displayName}" onerror="this.style.display='none'">`:'';
 const soldOutBadge=isDisabled?`<span class="product-availability-badge">${t('sold_out')}</span>`:'';
 let actions;
-if(isDisabled){actions=`<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`;}
-else if(qty>0){actions=`<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+</button></div>`;}
-else{actions=`<button type="button" class="add-btn-3d" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;}
+if(isDisabled){
+  actions=`<button type="button" class="add-btn-3d disabled-btn" disabled>${t('sold_out')}</button>`;
+}else if(qty>0){
+  actions=`<div class="qty-counter"><button type="button" class="qty-btn minus" data-cat="${ck}" data-idx="${originalIdx}" data-delta="-1">−</button><span class="qty-value">${qty}</span><button type="button" class="qty-btn" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+</button></div>`;
+}else{
+  actions=`<button type="button" class="add-btn-3d" data-cat="${ck}" data-idx="${originalIdx}" data-delta="1">+ Aggiungi</button>`;
+}
 const disabledClass=isDisabled?'product-disabled':'';
 return`<div class="product-card-3d ${disabledClass}">${img}<div class="product-info" style="flex:1;"><h4>${displayName}</h4><p>${displayDesc}</p><div class="product-price">€${p.price.toFixed(2)} ${soldOutBadge}</div></div>${actions}</div>`;
 }).join('');
