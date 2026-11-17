@@ -21,7 +21,7 @@
 <style>
 :root { --gold: #d4a84b; --gold-light: #f0d78c; --gold-dark: #b8860b; --dark: #1a1209; --brown: #2d1f12; --brown-light: #4a3728; --card: #2a1e13; --card-light: #3d2b1a; --cream: #f5e6c8; --shadow: #0a0704; }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--cream); min-height: 100vh; }
+html, body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--cream); min-height: 100vh; overflow-x: hidden; touch-action: manipulation; }
 .mobile-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); border-bottom: 2px solid var(--gold-dark); z-index: 1002; align-items: center; justify-content: space-between; padding: 0 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 .mobile-top-bar .logo-area { display: flex; align-items: center; gap: 6px; }
 .mobile-top-bar .logo-area img { height: 35px; border-radius: 8px; border: 1px solid var(--gold-dark); }
@@ -46,7 +46,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .login-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--dark); font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 0 var(--gold-dark); }
 .login-error { color: #f87171; margin-top: 15px; font-size: 0.9rem; display: none; }
 .app-container { display: none; grid-template-columns: 260px 1fr; min-height: 100vh; }
-.sidebar { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); border-right: 2px solid var(--gold-dark); padding: 20px 15px; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
+.sidebar { background: linear-gradient(180deg, var(--brown) 0%, var(--dark) 100%); border-right: 2px solid var(--gold-dark); padding: 20px 15px; overflow-y: auto; height: 100vh; position: sticky; top: 0; z-index: 1001; }
 .sidebar-logo { text-align: center; padding: 15px 10px 20px; border-bottom: 1px solid rgba(212,168,75,0.2); margin-bottom: 20px; }
 .sidebar-logo-img { max-width: 120px; height: auto; margin-bottom: 10px; }
 .sidebar-logo h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.3rem; }
@@ -63,10 +63,10 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 @keyframes badgePulse { 0%,100% { box-shadow: 0 0 5px #f87171; } 50% { box-shadow: 0 0 15px #f87171; } }
 .sidebar-footer { padding-top: 15px; border-top: 1px solid rgba(212,168,75,0.2); }
 .logout-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.1); color: #f87171; font-weight: 600; cursor: pointer; }
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(3px); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; backdrop-filter: blur(3px); }
 .sidebar-overlay.active { display: block; }
 .sidebar.mobile-active { transform: translateX(0) !important; }
-.main-content { padding: 25px; padding-bottom: 200px; overflow-y: auto; min-height: 100vh; scroll-behavior: smooth; }
+.main-content { padding: 25px; padding-bottom: 200px; overflow-y: auto; min-height: 100vh; scroll-behavior: smooth; position: relative; z-index: 2; }
 .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(212,168,75,0.2); flex-wrap: wrap; gap: 15px; }
 .content-header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.8rem; }
 .content-header .subtitle { color: #8a7a5a; font-size: 0.85rem; margin-top: 5px; }
@@ -81,7 +81,6 @@ body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: va
 .stat-card.rifiutati .number { color: #ef4444; }
 .stat-card.delivered .number { color: #60a5fa; }
 .stat-card.preorder .number { color: var(--gold); }
-.stat-card .stat-icon { font-size: 1.1rem; display: block; margin-bottom: 2px; }
 .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 .order-card { background: var(--card-light); border-radius: 12px; padding: 15px; border: 1px solid rgba(212,168,75,0.2); border-left: 4px solid var(--gold); }
 .order-card.annullati { border-left-color: #f87171; opacity: 0.8; }
@@ -245,6 +244,11 @@ textarea.form-input { resize: vertical; min-height: 80px; font-family: inherit; 
 .btn-translate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-translate i.spinning { animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Effetto particelle a tema pizzeria */
+.festive-particle { position: fixed; top: -30px; pointer-events: none; z-index: 1; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
@@ -705,11 +709,11 @@ let openCategories = new Set();
 let driversList = {};
 let notificationSound = null;
 let tempPromoProducts = [];
-let isFirstLoad = true;
 let accordionState = { annullati: false, rifiutati: false };
 let wakeLock = null;
 let notifPermission = 'default';
 let swRegistration = null;
+let festiveParticlesInterval = null;
 
 async function requestWakeLock() {
 try {
@@ -783,15 +787,13 @@ async function initSystemNotifications() {
   if ('serviceWorker' in navigator) {
     try {
       swRegistration = await navigator.serviceWorker.register('/sw.js');
-      console.log('✅ SW registrato');
-    } catch(e) { console.warn('⚠️ SW registration failed:', e); }
+    } catch(e) {}
   }
-  if (!('Notification' in window)) { console.warn('⚠️ Notifiche non supportate'); return; }
+  if (!('Notification' in window)) return;
   notifPermission = Notification.permission;
   if (notifPermission === 'default') {
     try { notifPermission = await Notification.requestPermission(); } catch(e) {}
   }
-  console.log('🔔 Permesso notifiche:', notifPermission);
 }
 
 async function sendSystemNotification(title, body, tag, url) {
@@ -808,7 +810,7 @@ async function sendSystemNotification(title, body, tag, url) {
         badge: '/icon-admin-192.png'
       });
       return;
-    } catch(e) { console.warn('SW postMessage failed, fallback Notification', e); }
+    } catch(e) {}
   }
   try {
     new Notification(title, {
@@ -818,7 +820,7 @@ async function sendSystemNotification(title, body, tag, url) {
       tag: tag,
       requireInteraction: true
     });
-  } catch(e) { console.warn('Notification fallback failed', e); }
+  } catch(e) {}
 }
 
 function vibrate(pattern) {
@@ -932,6 +934,7 @@ function initApp() {
 updateClock(); setInterval(updateClock, 1000);
 loadAllData(); setupOptimizedListeners(); renderPalettes(); applyCurrentPalette(); avviaControlloPreOrdini();
 initSystemNotifications().then(() => setTimeout(updateNotifStatus, 800));
+startFestiveEffectListener();
 }
 
 function updateClock() {
@@ -958,9 +961,7 @@ function updateGlobalHeaderStatus() {
 function updateQuickServiceUI(type, isEnabled) {
   const mobileBtn = document.getElementById(type === 'delivery' ? 'mobileDeliveryBtn' : 'mobilePickupBtn');
   const sidebarBtn = document.getElementById(type === 'delivery' ? 'sidebarDeliveryBtn' : 'sidebarPickupBtn');
-  
   const cls = isEnabled ? 'quick-service-btn active' : 'quick-service-btn off';
-  
   if (mobileBtn) mobileBtn.className = cls;
   if (sidebarBtn) sidebarBtn.className = cls;
 }
@@ -1132,6 +1133,43 @@ if (name === 'security') updateNotifStatus();
 if (name === 'colors') loadFestiveEffect();
 }
 
+function startFestiveEffectListener(){
+  db.ref('settings/festiveEffect').on('value', snap => {
+    applyFestiveEffect(snap.val() || 'pizza');
+  });
+}
+
+function applyFestiveEffect(type){
+  if(festiveParticlesInterval){ clearInterval(festiveParticlesInterval); festiveParticlesInterval=null; }
+  document.querySelectorAll('.festive-particle').forEach(el=>el.remove());
+  if(!type || type==='none') return;
+  const effects = {
+    pizza:{symbols:['🍕','🍅','🧀','🫒','🌿','🍄'],speed:700},
+    snow:{symbols:['❄️','❅','❆'],speed:600},
+    confetti:{symbols:['🎉','✨','🎊'],speed:700},
+    halloween:{symbols:['🎃','👻','🦇','🍬'],speed:700},
+    easter:{symbols:['🐰','🐣','🥚','🌸'],speed:700},
+    christmas:{symbols:['🎄','⭐','🎁','❄️'],speed:600},
+    newyear:{symbols:['🎆','🎇','✨','🍾'],speed:600},
+    valentine:{symbols:['❤️','💖','💘','🌹'],speed:700},
+    carnevale:{symbols:['🎭','🎊','🎪','✨'],speed:700},
+    summer:{symbols:['☀️','🌴','🌊','🍉'],speed:700}
+  };
+  const effect = effects[type] || effects.pizza;
+  const symbols = effect.symbols;
+  festiveParticlesInterval = setInterval(()=>{
+    const particle = document.createElement('div');
+    particle.className = 'festive-particle';
+    particle.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    particle.style.left = Math.random()*100+'vw';
+    particle.style.fontSize = (14+Math.random()*14)+'px';
+    particle.style.animationDuration = (5+Math.random()*4)+'s';
+    particle.style.opacity = 0.6+Math.random()*0.3;
+    document.body.appendChild(particle);
+    setTimeout(()=>particle.remove(), 9000);
+  }, effect.speed);
+}
+
 function renderOrders(orders) {
 const list = document.getElementById('ordersList');
 const gruppi = { new: [], accettato: [], preparing: [], delayed: [], ready: [], picked: [], delivering: [], delivered: [], annullati: [], rifiutati: [], preorder: [] };
@@ -1298,18 +1336,10 @@ else if (old.status !== o.status || old.delayMinutes !== o.delayMinutes) changed
 });
 added.forEach(o => {
   if (o.status === 'preorder') {
-    playAdminNotification(
-      `📅 Pre-ordine ${o.orderId || o.id}`,
-      `${o.customerName || 'Cliente'} - ${o.scheduledDate || ''} ${o.scheduledTime || ''}`,
-      'preorder-' + o.id
-    );
+    playAdminNotification(`📅 Pre-ordine ${o.orderId || o.id}`, `${o.customerName || 'Cliente'} - ${o.scheduledDate || ''} ${o.scheduledTime || ''}`, 'preorder-' + o.id);
     showToast(`📅 Pre-ordine ${o.orderId || o.id}`);
   } else {
-    playAdminNotification(
-      `🆕 Nuovo ordine ${o.orderId || o.id}`,
-      `${o.customerName || 'Cliente'} - €${parseFloat(o.finalTotal || 0).toFixed(2)} - ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}`,
-      'order-' + o.id
-    );
+    playAdminNotification(`🆕 Nuovo ordine ${o.orderId || o.id}`, `${o.customerName || 'Cliente'} - €${parseFloat(o.finalTotal || 0).toFixed(2)} - ${o.type === 'delivery' ? 'Consegna' : 'Ritiro'}`, 'order-' + o.id);
     showToast(`🆕 Nuovo ordine ${o.orderId || o.id} da ${o.customerName}`);
   }
 });
@@ -1318,11 +1348,7 @@ changed.forEach(({ new: o }) => {
   if (msgs[o.status]) {
     showToast(`${msgs[o.status]} (${o.orderId||o.id})`);
     if (o.status === 'annullato' || o.status === 'rifiutato') {
-      playAdminNotification(
-        `${msgs[o.status]} - ${o.orderId||o.id}`,
-        `${o.customerName || 'Cliente'} - ${o.motivoAnnullamento || o.motivoRifiuto || ''}`,
-        'status-' + o.id
-      );
+      playAdminNotification(`${msgs[o.status]} - ${o.orderId||o.id}`, `${o.customerName || 'Cliente'} - ${o.motivoAnnullamento || o.motivoRifiuto || ''}`, 'status-' + o.id);
     }
   }
 });
@@ -1358,7 +1384,7 @@ ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1
 ov.innerHTML = `<div style="background:linear-gradient(145deg,#3d2b1a,#2a1e13);padding:28px 24px;border-radius:20px;width:100%;max-width:450px;border:1px solid rgba(212,168,75,0.25);">
 <h3 style="color:#d4a84b;font-family:'Playfair Display',serif;margin-bottom:15px;font-size:1.3rem;">🧹 Pulizia Ordini</h3>
 <div style="display:flex;flex-direction:column;gap:10px;">
-<button class="bp" data-op="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(212,168,75,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;">✅ Completati</button>
+<button class="bp" data-op="completati" style="padding:12px;border-radius:10px;border:1px solid rgba(74,222,128,0.3);background:rgba(74,222,128,0.1);color:#4ade80;font-weight:600;cursor:pointer;">✅ Completati</button>
 <button class="bp" data-op="rifiutati" style="padding:12px;border-radius:10px;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#f87171;font-weight:600;cursor:pointer;">❌ Solo Rifiutati</button>
 <button class="bp" data-op="annullati" style="padding:12px;border-radius:10px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.1);color:#fbbf24;font-weight:600;cursor:pointer;">🗑️ Solo Annullati</button>
 <button class="bp" data-op="consegnati" style="padding:12px;border-radius:10px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.1);color:#60a5fa;font-weight:600;cursor:pointer;">🎉 Solo Consegnati</button>
@@ -1507,21 +1533,10 @@ else if (el.id==='pickupToggle') { appData.settings.pickupEnabled=on; db.ref('se
 function renderCategories() {
   const l = document.getElementById('categoriesList'), s = document.getElementById('categorySelect');
   let keys = Object.keys(appData.categories);
-  
   let needsSave = false;
-  keys.forEach((k, i) => {
-    if (appData.categories[k].order === undefined) {
-      appData.categories[k].order = i;
-      needsSave = true;
-    }
-  });
-
-  if (needsSave) {
-    db.ref('categories').set(appData.categories);
-  }
-
+  keys.forEach((k, i) => { if (appData.categories[k].order === undefined) { appData.categories[k].order = i; needsSave = true; } });
+  if (needsSave) { db.ref('categories').set(appData.categories); }
   keys.sort((a,b) => (appData.categories[a].order || 0) - (appData.categories[b].order || 0));
-  
   let index = 1;
   l.innerHTML = keys.map((k, idx) => {
     const numText = `#${index++} `;
@@ -1548,30 +1563,16 @@ async function moveCategory(key, direction) {
   if (idx < 0) return;
   const targetIdx = idx + direction;
   if (targetIdx < 0 || targetIdx >= keys.length) return;
-  
-  const temp = keys[idx];
-  keys[idx] = keys[targetIdx];
-  keys[targetIdx] = temp;
-  
+  const temp = keys[idx]; keys[idx] = keys[targetIdx]; keys[targetIdx] = temp;
   keys.forEach((k, i) => { appData.categories[k].order = i; });
-  
-  const newCats = {};
-  const newMenu = {};
-  keys.forEach(k => {
-    newCats[k] = appData.categories[k];
-    if (appData.menu[k]) newMenu[k] = appData.menu[k];
-  });
-  
-  appData.categories = newCats;
-  appData.menu = newMenu;
-  
+  const newCats = {}, newMenu = {};
+  keys.forEach(k => { newCats[k] = appData.categories[k]; if (appData.menu[k]) newMenu[k] = appData.menu[k]; });
+  appData.categories = newCats; appData.menu = newMenu;
   try {
     await db.ref('categories').set(appData.categories);
     await db.ref('menu').set(appData.menu);
     showToast('✅ Posizione aggiornata');
-    renderCategories();
-    renderMenu();
-    notifyClients();
+    renderCategories(); renderMenu(); notifyClients();
   } catch(e) { showToast('❌ Errore spostamento'); }
 }
 
@@ -1600,7 +1601,6 @@ if(Object.keys(up).length) await db.ref(`menu/${c}/${i}`).update(up); showToast(
 function renderMenu() {
 const c = document.getElementById('menuAccordion'), st = (document.getElementById('menuSearch')?.value||'').toLowerCase(); let h='';
 let catIndex = 1;
-
 let sortedCategories = Object.keys(appData.categories).sort((a,b) => (appData.categories[a].order || 0) - (appData.categories[b].order || 0));
 
 sortedCategories.forEach(cat => {
@@ -1727,4 +1727,3 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) setT
 </script>
 </body>
 </html>
-
