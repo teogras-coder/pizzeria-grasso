@@ -1064,20 +1064,34 @@ async function trasformaInOrdine(orderId) {
   if (order.type === 'delivery') deliveryFee = calcolaCostoConsegna(order);
   const subtotale = order.items ? order.items.reduce((s,i)=>s+(parseFloat(i.price||0)*(parseInt(i.qty||1))),0) : 0;
   const finalTotal = subtotale + deliveryFee;
+  
   await db.ref(`ordini/${orderId}`).update({
-    status:'new', isPreOrder:false, trasformatoIl:Date.now(),
-    customerName:order.customerName||'', customerPhone:order.customerPhone||'',
-    address:order.address||'', type:order.type||'pickup',
-    items:order.items||[], productsTotal:subtotale,
-    deliveryFee:deliveryFee, finalTotal:finalTotal,
+    status:'new', 
+    isPreOrder:false, 
+    trasformatoIl:Date.now(),
+    customerName:order.customerName||'', 
+    customerPhone:order.customerPhone||'',
+    address:order.address||'', 
+    type:order.type||'pickup',
+    items:order.items||[], 
+    productsTotal:subtotale,
+    deliveryFee:deliveryFee, 
+    finalTotal:finalTotal,
     scheduledTime:order.scheduledTime||'Prima possibile',
+    scheduledDate:order.scheduledDate||'', // Mantiene correttamente la data programmata anche dopo la trasformazione
     notes:order.notes||'',
     stampato_130:null, stampato_131:null, stampato_annullato:null,
     richiestaRistampa_130:null, richiestaRistampa_131:null, ristampa:null
   });
-  order.status='new'; order.isPreOrder=false; order.deliveryFee=deliveryFee; order.finalTotal=finalTotal;
+  
+  order.status='new'; 
+  order.isPreOrder=false; 
+  order.deliveryFee=deliveryFee; 
+  order.finalTotal=finalTotal;
+  
   showToast(`✅ Pre-ordine ${order.orderId} trasformato!`); 
-  renderOrders(ordersCache); notifyClients();
+  renderOrders(ordersCache); 
+  notifyClients();
 }
 
 async function trasformaTuttiPreOrdini() {
@@ -1321,7 +1335,7 @@ ah = `${btnRistampa}<span style="color:#4ade80;font-size:0.8rem;">Completato</sp
 return `<div class="order-card ${extraClass}" style="border-left-color:${borderColor};">
 <div class="order-header"><span class="order-id">${o.orderId || id} ${statusBadge} ${driverBadge}</span><span class="order-time">${ds} ${ts}</span></div>
 <div class="order-customer">${sanitize(o.customerName || 'N/A')} - ${sanitize(o.customerPhone || 'N/A')}</div>
-<div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.scheduledTime ? ' - ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : ''}${o.notes ? '<br>📝 ' + sanitize(o.notes) : ''}${o.isPreOrder ? '<br>📅 <strong>Pre-ordine:</strong> ' + (o.scheduledDate || '') : ''}</div>
+<div class="order-details">${o.type === 'delivery' ? '🚚 Consegna' : '📦 Ritiro'}${o.scheduledDate ? ' - ' + o.scheduledDate : ''}${o.scheduledTime ? ' ' + o.scheduledTime : ''}${o.type === 'delivery' && o.address ? '<br>📍 ' + sanitize(o.address) : ''}${o.notes ? '<br>📝 ' + sanitize(o.notes) : ''}</div>
 <div class="order-items">${itemsHtml}</div>
 <div class="order-total"><span>Totale</span><span>€${(parseFloat(o.finalTotal) || 0).toFixed(2)}</span></div>
 ${deliveryFeeDisplay}
